@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
+import waterfallBg from './assets/waterfall_bg.jpg';
 
 // Pages
 import Home from './pages/Home';
@@ -32,7 +33,12 @@ function App() {
       <CartProvider>
         <WishlistProvider>
           <Router>
-            <div className="flex flex-col min-h-screen bg-cream-light text-charcoal">
+            <div className="flex flex-col min-h-screen bg-[#FFFDF7] text-charcoal relative">
+              {/* Global Subtle Waterfall Watermark Background */}
+              <div 
+                className="fixed inset-0 pointer-events-none z-0 opacity-[0.05] bg-cover bg-center bg-no-repeat bg-fixed"
+                style={{ backgroundImage: `url(${waterfallBg})` }}
+              />
               {/* Luxury Header */}
               <Navbar />
               
