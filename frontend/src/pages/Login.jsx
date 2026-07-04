@@ -1,0 +1,127 @@
+import React, { useState, useContext, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import logo from '../assets/logo.png';
+
+const Login = () => {
+  const { login, user } = useContext(AuthContext);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirect = searchParams.get('redirect') || '/';
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate(user.role === 'admin' ? '/admin' : redirect);
+    }
+  }, [user, navigate, redirect]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSubmitting(true);
+
+    try {
+      const data = await login(email, password);
+      if (data) {
+        navigate(data.role === 'admin' ? '/admin' : redirect);
+      }
+    } catch (err) {
+      setError(err || 'Invalid credentials');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="min-h-[80vh] flex items-center justify-center px-6 font-sans">
+      <div className="glass max-w-md w-full rounded-2xl shadow-xl border border-cream-dark/50 p-6 md:p-8 animate-slide-up">
+        
+        {/* Branding */}
+        <div className="flex flex-col items-center gap-3 mb-8 text-center">
+          <img src={`${logo}?v=3`} alt="Ascension by Sonali Bhasin Kumar" className="h-16 w-auto object-contain" />
+          <p className="text-[10px] text-sage font-bold tracking-widest uppercase mt-1">
+            Enter your spiritual space
+          </p>
+        </div>
+
+        {error && (
+          <div className="bg-red-500/10 text-red-600 border border-red-500/20 text-xs p-3.5 rounded-xl text-left mb-4">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-xs text-charcoal text-left">
+          {/* Email */}
+          <div className="flex flex-col gap-1.5">
+            <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Email Address</label>
+            <div className="relative">
+              <input
+                type="email"
+                required
+                placeholder="Enter email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-cream-light border border-cream-dark/60 rounded-xl py-2.5 px-3.5 pl-9 text-charcoal focus:outline-none focus:border-sage transition-all"
+              />
+              <Mail className="w-4 h-4 text-charcoal/40 absolute left-3 top-3" />
+            </div>
+          </div>
+
+          {/* Password */}
+          <div className="flex flex-col gap-1.5">
+            <div className="flex justify-between items-center">
+              <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Password</label>
+              <Link to="/forgot-password" className="text-[10px] font-bold text-sage hover:text-gold transition-colors">
+                Forgot Password?
+              </Link>
+            </div>
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                required
+                placeholder="Enter password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-cream-light border border-cream-dark/60 rounded-xl py-2.5 px-3.5 pl-9 pr-9 text-charcoal focus:outline-none focus:border-sage transition-all"
+              />
+              <Lock className="w-4 h-4 text-charcoal/40 absolute left-3 top-3" />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-3 text-charcoal/40 hover:text-charcoal focus:outline-none"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={submitting}
+            className="w-full bg-sage hover:bg-sage-dark text-white font-bold py-3 rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center uppercase tracking-wider mt-4"
+          >
+            {submitting ? 'Authenticating...' : 'Sign In'}
+          </button>
+        </form>
+
+        <p className="text-xs text-charcoal-light mt-6 text-center">
+          New to Ascension?{' '}
+          <Link to={`/register?redirect=${redirect}`} className="font-bold text-sage hover:text-gold transition-colors">
+            Create an Account
+          </Link>
+        </p>
+
+      </div>
+    </div>
+  );
+};
+
+export default Login;
