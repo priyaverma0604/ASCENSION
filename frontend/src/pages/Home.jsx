@@ -117,7 +117,7 @@ const Home = () => {
 
         <div className="flex flex-col items-center gap-4 relative z-10 w-full max-w-4xl mx-auto animate-fade-in -translate-y-8">
 
-          <span className="font-cormorant italic text-sm sm:text-base text-black font-bold tracking-wider uppercase">
+          <span className="font-cormorant text-sm sm:text-base text-black font-bold tracking-wider uppercase">
             Reclaim your peace. Reconnect with your light.
           </span>
 
@@ -301,7 +301,7 @@ const Home = () => {
             </div>
             {/* Elegant quote bubble */}
             <div className="absolute -bottom-6 -right-6 bg-white/95 backdrop-blur-xs p-5 rounded-2xl shadow-xl border border-cream-dark/40 max-w-[220px]">
-              <p className="font-cormorant italic text-[13px] text-gold-dark font-bold">"Together, we rise by uplifting others and healing within."</p>
+              <p className="font-cormorant text-[13px] text-gold-dark font-bold">"Together, we rise by uplifting others and healing within."</p>
               <p className="font-sans text-[9px] uppercase tracking-wider text-charcoal-light mt-2">- Sonali Bhasin Kumar</p>
             </div>
           </div>

@@ -116,7 +116,7 @@ const NGO = () => {
           </div>
           <div className="flex flex-col gap-4 text-left">
             <h3 className="font-serif text-lg font-bold text-charcoal-dark uppercase tracking-wider">Our Story</h3>
-            <span className="font-cormorant italic text-[13px] text-gold-dark font-medium -mt-2 block">
+            <span className="font-cormorant text-[13px] text-gold-dark font-medium -mt-2 block">
               From One Thought In 2022 To A Growing Movement Of Change
             </span>
             <p className="text-xs text-charcoal-light leading-relaxed font-sans mt-2">
@@ -142,7 +142,7 @@ const NGO = () => {
             </p>
 
             {/* Quote block */}
-            <div className="mt-4 border-l-2 border-gold pl-4 py-1 italic text-charcoal-light leading-relaxed bg-cream-light/30 rounded-r-xl">
+            <div className="mt-4 border-l-2 border-gold pl-4 py-1 text-charcoal-light leading-relaxed bg-cream-light/30 rounded-r-xl">
               <p className="font-cormorant text-sm">
                 "We don't just serve communities — we walk alongside them, empowering them to write their own stories of change."
               </p>
