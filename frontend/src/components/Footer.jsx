@@ -40,7 +40,6 @@ const Footer = () => {
             <Link to="/services" className="text-xs text-charcoal-light hover:text-gold transition-colors duration-200">Healing Services</Link>
             <Link to="/programs" className="text-xs text-charcoal-light hover:text-gold transition-colors duration-200">Wellness Programs</Link>
             <Link to="/ngo" className="text-xs text-charcoal-light hover:text-gold transition-colors duration-200">Ascension Seva NGO</Link>
-            <Link to="/csr" className="text-xs text-charcoal-light hover:text-gold transition-colors duration-200">CSR Partnerships</Link>
             <Link to="/community" className="text-xs text-charcoal-light hover:text-gold transition-colors duration-200">Community Feed</Link>
           </div>
         </div>
