@@ -31,6 +31,7 @@ const Navbar = () => {
     { name: 'Shop', path: '/shop' },
     { name: 'Community', path: '/community' },
     { name: 'Seva NGO', path: '/ngo' },
+    { name: 'CSR Partnerships', path: '/csr' },
     { name: 'Donate', path: '/donate' },
     { name: 'Contact', path: '/contact' }
   ];

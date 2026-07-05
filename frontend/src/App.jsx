@@ -15,6 +15,7 @@ import Programs from './pages/Programs';
 import Shop from './pages/Shop';
 import Community from './pages/Community';
 import NGO from './pages/NGO';
+import CSR from './pages/CSR';
 import Donation from './pages/Donation';
 import Contact from './pages/Contact';
 import Login from './pages/Login';
@@ -57,6 +58,7 @@ function App() {
                   <Route path="/ngo" element={<NGO />} />
                   <Route path="/donate" element={<Donation />} />
                   <Route path="/contact" element={<Contact />} />
+                   <Route path="/csr" element={<CSR />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
 
