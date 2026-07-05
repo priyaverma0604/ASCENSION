@@ -36,7 +36,8 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className={`${isHomePage ? 'absolute' : 'sticky'} top-0 z-50 w-full px-4 py-3 md:px-8`}>
+    <>
+      <nav className="fixed top-0 z-50 w-full px-4 py-3 md:px-8">
       <div className="glass max-w-7xl mx-auto rounded-2xl shadow-sm px-6 py-3 flex items-center justify-between transition-all duration-300">
 
         {/* Logo */}
@@ -172,7 +173,9 @@ const Navbar = () => {
           </div>
         </div>
       )}
-    </nav>
+      </nav>
+      {!isHomePage && <div className="h-[76px] md:h-[88px] w-full shrink-0" />}
+    </>
   );
 };
 
