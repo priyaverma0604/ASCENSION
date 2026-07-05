@@ -1,5 +1,6 @@
 import React from 'react';
 import { Compass, ShieldCheck, HeartHandshake, Eye, Flame } from 'lucide-react';
+import founderImg from '../assets/founder.jpg';
 
 const About = () => {
   const philosophies = [
@@ -40,9 +41,9 @@ const About = () => {
         <section className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
           <div className="w-full h-80 rounded-2xl overflow-hidden shadow-sm bg-cream">
             <img 
-              src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80" 
+              src={founderImg} 
               alt="Sonali Bhasin Kumar" 
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover transform hover:scale-[1.02] transition-transform duration-500"
             />
           </div>
           <div className="flex flex-col gap-4 text-left">

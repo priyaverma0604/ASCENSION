@@ -10,6 +10,7 @@ import axios from 'axios';
 import RegisterWorkshopModal from '../components/RegisterWorkshopModal';
 import RegisterWebinarModal from '../components/RegisterWebinarModal';
 import waterfallBg from '../assets/waterfall_bg.jpg';
+import founderImg from '../assets/founder.jpg';
 
 const getImageUrl = (path) => {
   if (!path) return '';
@@ -293,7 +294,7 @@ const Home = () => {
           <div className="relative justify-self-center">
             <div className="w-72 h-[420px] rounded-3xl overflow-hidden shadow-xl border border-gold-dark/20 relative">
               <img
-                src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80"
+                src={founderImg}
                 alt="Sonali Bhasin Kumar"
                 className="w-full h-full object-cover transform hover:scale-[1.02] transition-transform duration-500"
               />
