@@ -104,7 +104,7 @@ const Home = () => {
     <div className="flex flex-col min-h-screen">
 
       {/* 1. Hero Section */}
-      <section className="relative h-screen min-h-[600px] max-h-[960px] flex flex-col justify-center items-center px-6 md:px-12 lg:px-20 text-center overflow-hidden border-b border-cream-dark/30 bg-cream-light">
+      <section className="relative min-h-[500px] lg:h-screen lg:min-h-[600px] lg:max-h-[960px] flex flex-col justify-center items-center px-6 md:px-12 lg:px-20 text-center overflow-hidden border-b border-cream-dark/30 bg-cream-light py-12 lg:py-0">
         {/* Blurred & Softened Background Layer */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -116,7 +116,7 @@ const Home = () => {
         {/* Soft Radial Contrast Overlay to enhance text readability without fading the bottom edges */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.65)_0%,rgba(255,255,255,0)_80%)] z-0" />
 
-        <div className="flex flex-col items-center gap-4 relative z-10 w-full max-w-4xl mx-auto animate-fade-in -translate-y-8">
+        <div className="flex flex-col items-center gap-4 relative z-10 w-full max-w-4xl mx-auto animate-fade-in lg:-translate-y-8">
 
           <span className="font-cormorant text-sm sm:text-base text-black font-bold tracking-wider uppercase">
             Reclaim your peace. Reconnect with your light.
@@ -152,11 +152,11 @@ const Home = () => {
         </div>
 
         {/* 1b. Trust Building Section Floating Card - Positioned absolute bottom inside Hero */}
-        <div className="absolute bottom-6 md:bottom-8 left-0 right-0 z-20 max-w-5xl w-full mx-auto px-6 animate-slide-up">
-          <div className="bg-white/95 backdrop-blur-xs rounded-3xl p-3 md:p-3.5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4 items-center shadow-xl border border-cream-dark/50 hover:shadow-2xl transition-all duration-300">
+        <div className="relative lg:absolute lg:bottom-8 left-0 right-0 z-20 max-w-5xl w-full mx-auto px-6 mt-8 lg:mt-0 animate-slide-up">
+          <div className="bg-white/95 backdrop-blur-xs rounded-3xl p-4 md:p-3.5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-4 items-center shadow-xl border border-cream-dark/50 hover:shadow-2xl transition-all duration-300">
 
             {/* Column 1: Lives Touched */}
-            <div className="flex flex-col text-left gap-1.5 px-3 py-1 border-r border-cream-dark/50 last:border-0 last:pr-0 w-full">
+            <div className="flex flex-col text-left gap-1.5 px-3 py-1 border-b lg:border-b-0 lg:border-r border-cream-dark/50 last:border-0 last:pr-0 w-full pb-3 lg:pb-0">
               <span className="text-[10px] text-charcoal-light uppercase tracking-wider font-semibold">Lives Touched</span>
               <div className="flex items-center gap-2.5">
                 <span className="p-1 rounded bg-gold/10 text-gold shrink-0">
@@ -170,7 +170,7 @@ const Home = () => {
             </div>
 
             {/* Column 2: Experience */}
-            <div className="flex flex-col text-left gap-1.5 px-3 py-1 border-r border-cream-dark/50 last:border-0 last:pr-0 w-full">
+            <div className="flex flex-col text-left gap-1.5 px-3 py-1 border-b lg:border-b-0 lg:border-r border-cream-dark/50 last:border-0 last:pr-0 w-full pb-3 lg:pb-0">
               <span className="text-[10px] text-charcoal-light uppercase tracking-wider font-semibold">Experience</span>
               <div className="flex items-center gap-2.5">
                 <span className="p-1 rounded bg-gold/10 text-gold shrink-0">
@@ -184,7 +184,7 @@ const Home = () => {
             </div>
 
             {/* Column 3: Holistic Approach */}
-            <div className="flex flex-col text-left gap-1.5 px-3 py-1 border-r border-cream-dark/50 last:border-0 last:pr-0 w-full">
+            <div className="flex flex-col text-left gap-1.5 px-3 py-1 border-b lg:border-b-0 lg:border-r border-cream-dark/50 last:border-0 last:pr-0 w-full pb-3 lg:pb-0">
               <span className="text-[10px] text-charcoal-light uppercase tracking-wider font-semibold">Holistic Approach</span>
               <div className="flex items-center gap-2.5">
                 <span className="p-1 rounded bg-gold/10 text-gold shrink-0">
@@ -198,7 +198,7 @@ const Home = () => {
             </div>
 
             {/* Column 4: Safe & Sacred Space */}
-            <div className="flex flex-col text-left gap-1.5 px-3 py-1 border-r border-cream-dark/50 last:border-0 last:pr-0 w-full">
+            <div className="flex flex-col text-left gap-1.5 px-3 py-1 border-b lg:border-b-0 lg:border-r border-cream-dark/50 last:border-0 last:pr-0 w-full pb-3 lg:pb-0">
               <span className="text-[10px] text-charcoal-light uppercase tracking-wider font-semibold">Sacred Space</span>
               <div className="flex items-center gap-2.5">
                 <span className="p-1 rounded bg-gold/10 text-gold shrink-0">
@@ -301,7 +301,7 @@ const Home = () => {
               />
             </div>
             {/* Elegant quote bubble */}
-            <div className="absolute -bottom-6 -right-6 bg-white/95 backdrop-blur-xs p-5 rounded-2xl shadow-xl border border-cream-dark/40 max-w-[220px]">
+            <div className="absolute -bottom-8 left-4 right-4 bg-white/95 backdrop-blur-xs p-4 rounded-2xl shadow-xl border border-cream-dark/40 max-w-[240px] mx-auto md:left-auto md:right-[-24px] md:bottom-[-24px] md:max-w-[220px]">
               <p className="font-cormorant text-[13px] text-gold-dark font-bold">"Together, we rise by uplifting others and healing within."</p>
               <p className="font-sans text-[9px] uppercase tracking-wider text-charcoal-light mt-2">- Sonali Bhasin Kumar</p>
             </div>
