@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { Compass, CheckCircle, Heart, Users, BookOpen, Smile, ShieldAlert } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
+import founderImg from '../assets/founder.jpg';
 
 const NGO = () => {
   const { user } = useContext(AuthContext);
@@ -80,22 +81,50 @@ const NGO = () => {
         </div>
 
         {/* NGO Banner and Mission */}
-        <div className="glass p-8 rounded-2xl grid grid-cols-1 md:grid-cols-2 gap-10 items-center border border-cream-dark/65">
-          <div className="h-64 rounded-xl overflow-hidden bg-cream shadow-sm">
+        <div className="glass p-8 rounded-2xl grid grid-cols-1 md:grid-cols-2 gap-10 items-start border border-cream-dark/65">
+          <div className="h-96 md:h-full md:min-h-[480px] rounded-2xl overflow-hidden bg-cream shadow-sm group">
             <img 
-              src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80" 
-              alt="Seva" 
-              className="w-full h-full object-cover" 
+              src={founderImg} 
+              alt="Sonali Bhasin Kumar - Founder" 
+              className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" 
             />
           </div>
           <div className="flex flex-col gap-4 text-left">
-            <h3 className="font-serif text-base font-bold text-charcoal-dark uppercase tracking-wider">Our Healing Mission</h3>
-            <p className="text-xs text-charcoal-light leading-relaxed">
-              Founded from the vision of Sonali Bhasin Kumar, the Ascension NGO acts as a conduit where spirituality, active care, and human upliftment merge. Every act of service is conducted with clean intentions, positive energy, and love.
+            <h3 className="font-serif text-lg font-bold text-charcoal-dark uppercase tracking-wider">Our Story</h3>
+            <span className="font-serif italic text-xs text-gold-dark font-medium -mt-2 block">
+              From One Thought In 2022 To A Growing Movement Of Change
+            </span>
+            <p className="text-xs text-charcoal-light leading-relaxed font-sans mt-2">
+              Ascension Seva began in 2022 with a simple belief — that meaningful change does not always begin with large resources; it begins with people who care enough to act.
             </p>
-            <p className="text-xs text-charcoal-light leading-relaxed">
-              By supporting our NGO, you participate in feeding local children, training women for financial self-reliance, and caring for voiceless animals, elevating the collective planetary consciousness.
+            <p className="text-xs text-charcoal-light leading-relaxed font-sans">
+              What started as a vision to serve communities with dignity has transformed into a journey of impact, compassion, and responsibility. With every initiative, every drive, every volunteer, and every life touched, we discovered that true change happens when kindness is converted into action.
             </p>
+            <p className="text-xs text-charcoal-light leading-relaxed font-sans">
+              Over the years, Ascension Seva has evolved—not only in scale, but in purpose, systems, and reach. We have learned, adapted, grown, and continuously transformed ourselves to create deeper and more sustainable impact.
+            </p>
+            <p className="text-xs text-charcoal-light leading-relaxed font-sans">
+              Today, we are building more than campaigns. We are building trust, opportunity, dignity, and communities that can grow stronger together.
+            </p>
+            <p className="text-xs text-charcoal-light leading-relaxed font-sans">
+              This journey has only been possible because of people and partners who chose to believe that impact is created collectively.
+            </p>
+            <p className="text-xs text-charcoal-light leading-relaxed font-sans">
+              We invite organisations and CSR leaders to become a part of the next chapter—where purpose meets measurable change and every contribution becomes a story of transformation.
+            </p>
+            <p className="text-xs text-charcoal-light font-bold leading-relaxed font-sans">
+              Together, we don’t just support communities. We help shape futures.
+            </p>
+
+            {/* Quote block */}
+            <div className="mt-4 border-l-2 border-gold pl-4 py-1 italic text-xs text-charcoal-light leading-relaxed bg-cream-light/30 rounded-r-xl">
+              <p className="font-serif">
+                "We don't just serve communities — we walk alongside them, empowering them to write their own stories of change."
+              </p>
+              <p className="text-[10px] uppercase font-bold text-gold-dark font-sans tracking-wide mt-2">
+                — Sonali Bhasin Kumar, Ascension Seva
+              </p>
+            </div>
           </div>
         </div>
 
