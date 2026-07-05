@@ -123,7 +123,7 @@ const Home = () => {
 
           <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold tracking-wide text-charcoal-dark leading-tight mt-2">
             A Sanctuary for <br />
-            <span className="text-gold-dark drop-shadow-[0_1px_2px_rgba(255,255,255,0.85)] font-bold">Spiritual Awakening</span> <br />
+            <span className="text-gold drop-shadow-[0_1.5px_2px_rgba(31,29,26,0.4)] font-bold">Spiritual Awakening</span> <br />
             & Healing
           </h1>
 
