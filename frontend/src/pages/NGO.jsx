@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { Compass, CheckCircle, Heart, Users, BookOpen, Smile, ShieldAlert } from 'lucide-react';
+import { Compass, CheckCircle, Heart, Users, BookOpen, Smile, ShieldAlert, GraduationCap, Apple, Flame, Sparkles, Shield, HeartPulse, Leaf, Calendar, Cat } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
 import founderImg from '../assets/founder.jpg';
@@ -39,29 +39,54 @@ const NGO = () => {
 
   const initiatives = [
     {
-      icon: <Heart className="w-5 h-5 text-gold-dark" />,
-      title: "1. Food Seva & Health Welfare",
-      desc: "Nourishment drives providing daily meals and basic healthcare aid to underserved local families, ensuring physical wellness is coupled with energetic compassion."
+      icon: <GraduationCap className="w-5 h-5 text-gold-dark" />,
+      title: "Shiksha Kendra Campaign",
+      desc: "Providing educational support, learning resources, mentorship, and opportunities to underprivileged children because education remains the strongest tool for breaking the cycle of poverty."
+    },
+    {
+      icon: <Apple className="w-5 h-5 text-gold-dark" />,
+      title: "Annadan & Jal Seva Campaign",
+      desc: "Organizing food distribution and water seva drives for vulnerable communities, daily wage workers, and families in need throughout the year."
+    },
+    {
+      icon: <Flame className="w-5 h-5 text-gold-dark" />,
+      title: "Mahabhoj Campaign – Mahashivratri Seva",
+      desc: "One of our most impactful initiatives, where we served and fed 5,000+ individuals during Mahashivratri, celebrating the spirit of service through Annadan and community support."
+    },
+    {
+      icon: <Sparkles className="w-5 h-5 text-gold-dark" />,
+      title: "Shravan Shraddha Seva Campaign",
+      desc: "During the sacred month of Shravan, we embrace the philosophy of \"Serving Shiva by Serving His Creation.\" Through this initiative, Ascension Seva successfully provided meals and support to 10,000+ individuals, reinforcing the belief that humanity itself is the truest form of worship."
+    },
+    {
+      icon: <Shield className="w-5 h-5 text-gold-dark" />,
+      title: "Women's Dignity & Menstrual Hygiene Campaign",
+      desc: "Conducting awareness sessions and sanitary napkin distribution drives to promote menstrual health, dignity, and education for women and young girls."
+    },
+    {
+      icon: <HeartPulse className="w-5 h-5 text-gold-dark" />,
+      title: "Health & Community Wellness Campaign",
+      desc: "Supporting underserved communities through awareness initiatives, wellness programs, and healthcare outreach activities."
+    },
+    {
+      icon: <Leaf className="w-5 h-5 text-gold-dark" />,
+      title: "Environmental Sustainability Campaign",
+      desc: "Organizing plantation drives, cleanliness initiatives, and environmental awareness campaigns to create a greener and healthier future."
+    },
+    {
+      icon: <Calendar className="w-5 h-5 text-gold-dark" />,
+      title: "Festival Seva Campaigns",
+      desc: "Conducting large-scale community service initiatives during festivals, Ekadashi observances, and other spiritually significant occasions, ensuring that celebrations are shared with those who need support the most."
+    },
+    {
+      icon: <Cat className="w-5 h-5 text-gold-dark" />,
+      title: "Animal Welfare & Compassion Campaign",
+      desc: "Providing food and care for stray animals while promoting compassion and coexistence within communities."
     },
     {
       icon: <Users className="w-5 h-5 text-gold-dark" />,
-      title: "2. Women Empowerment Programs",
-      desc: "Counseling and skill-building workshops designed to support underprivileged women to build financial autonomy, inner confidence, and emotional boundaries."
-    },
-    {
-      icon: <BookOpen className="w-5 h-5 text-gold-dark" />,
-      title: "3. Shiksha Kendra & Child Welfare",
-      desc: "Educating and mentoring underprivileged children in creative arts, basic academics, and mindfulness practices, nurturing future conscious minds."
-    },
-    {
-      icon: <Smile className="w-5 h-5 text-gold-dark" />,
-      title: "4. Community Welfare & Support",
-      desc: "Self-help support circles and emotional counseling sessions organized to help families navigate personal stress, relationship conflicts, and domestic loads."
-    },
-    {
-      icon: <Compass className="w-5 h-5 text-gold-dark" />,
-      title: "5. Animal Welfare & Environment",
-      desc: "Feeding and caring for stray street animals in Delhi, sponsoring adoptions, and running waste reduction and cleaning drives in the local neighborhood."
+      title: "Volunteer & Community Engagement Campaign",
+      desc: "Creating opportunities for citizens and corporate teams to actively participate in community service and create tangible social impact."
     }
   ];
 
@@ -130,7 +155,7 @@ const NGO = () => {
 
         {/* Key Initiatives */}
         <div className="flex flex-col gap-6">
-          <h3 className="font-serif text-xl font-bold text-charcoal-dark text-center mb-4">Key Humanitarian Initiatives</h3>
+          <h3 className="font-serif text-xl font-bold text-charcoal-dark text-center mb-4">Our Flagship Campaigns & Impact Initiatives</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {initiatives.map((ini, index) => (
               <div key={index} className="glass p-6 rounded-2xl flex gap-4 text-left border border-cream-dark/50 shadow-sm hover:shadow-md transition-shadow">
