@@ -78,3 +78,16 @@
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
+/* Ensure premium charcoal dark text on all newly-gold buttons/elements for readability */
+button.bg-sage, 
+a.bg-sage,
+.bg-sage.text-white {
+  color: #1f1d1a !important;
+}
+button.bg-sage svg, 
+a.bg-sage svg,
+.bg-sage.text-white svg {
+  color: #1f1d1a !important;
+  fill: #1f1d1a !important;
+}

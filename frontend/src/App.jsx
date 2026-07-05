@@ -91,7 +91,7 @@ function App() {
                 className="fixed bottom-6 right-6 z-40 bg-sage hover:bg-sage-dark text-white p-4 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-105 group animate-heartbeat"
                 title="Support Our Seva - Donate Now"
               >
-                <Heart className="w-5 h-5 fill-current text-white group-hover:text-red-200 transition-colors" />
+                <Heart className="w-5 h-5 fill-current transition-colors" />
                 <span className="max-w-0 overflow-hidden group-hover:max-w-xs group-hover:ml-2 transition-all duration-500 ease-in-out text-[10px] font-bold uppercase tracking-wider whitespace-nowrap">
                   Donate
                 </span>

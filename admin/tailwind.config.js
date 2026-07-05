@@ -13,9 +13,9 @@ export default {
           dark: '#EFECE1',
         },
         sage: {
-          light: '#6E8B71',
-          DEFAULT: '#4F6B52',
-          dark: '#3A4F3D',
+          light: '#F3D77A',
+          DEFAULT: '#D4A617',
+          dark: '#B88900',
         },
         lavender: {
           light: '#FBF7EC',
@@ -23,9 +23,9 @@ export default {
           dark: '#CDBA96',
         },
         gold: {
-          light: '#D4B651',
-          DEFAULT: '#C9A227',
-          dark: '#9A7A1B',
+          light: '#F3D77A',
+          DEFAULT: '#D4A617',
+          dark: '#B88900',
         },
         charcoal: {
           light: '#4A4A4A',
