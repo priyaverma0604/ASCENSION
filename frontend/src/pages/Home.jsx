@@ -11,6 +11,7 @@ import RegisterWorkshopModal from '../components/RegisterWorkshopModal';
 import RegisterWebinarModal from '../components/RegisterWebinarModal';
 import waterfallBg from '../assets/waterfall_bg.jpg';
 import founderImg from '../assets/founder.jpg';
+import foodSeva from '../assets/food_seva.png';
 
 const getImageUrl = (path) => {
   if (!path) return '';
@@ -771,47 +772,51 @@ const Home = () => {
 
       {/* 10. Donation CTA Banner (Premium placement near bottom) */}
       <section className="py-24 bg-[#FFFDF7] px-6 md:px-12 border-b border-cream-dark/30 w-full text-center">
-        <div className="max-w-5xl mx-auto rounded-3xl bg-sage text-white p-10 md:p-14 border border-sage-dark/10 shadow-2xl relative overflow-hidden flex flex-col items-center gap-8 animate-fade-in">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05)_0%,rgba(0,0,0,0.15)_100%)] pointer-events-none"></div>
+        <div 
+          className="max-w-5xl mx-auto rounded-3xl text-white p-10 md:p-14 shadow-2xl relative overflow-hidden flex flex-col items-center gap-8 animate-fade-in bg-cover bg-center border border-cream-dark/30"
+          style={{ backgroundImage: `url(${foodSeva})` }}
+        >
+          {/* Dark Overlay for premium text contrast */}
+          <div className="absolute inset-0 bg-charcoal-dark/75 z-0"></div>
 
-          <div className="flex flex-col items-center max-w-2xl">
-            <div className="w-14 h-14 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-gold mb-5">
+          <div className="flex flex-col items-center max-w-2xl relative z-10">
+            <div className="w-14 h-14 rounded-full bg-white/15 border border-white/25 flex items-center justify-center text-gold mb-5">
               <Heart className="w-6 h-6 text-gold fill-gold/15" />
             </div>
             <h2 className="font-serif text-3xl md:text-4xl font-bold tracking-wide text-white leading-tight">
               Your Contribution Creates Healing
             </h2>
-            <p className="text-xs md:text-sm text-cream-light/85 max-w-xl mt-3.5 leading-relaxed font-light">
+            <p className="text-xs md:text-sm text-cream-light/90 max-w-xl mt-3.5 leading-relaxed font-light">
               Every donation helps us provide healing workshops, food distribution, skill training, and vital support to those who need it most.
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full max-w-md">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full max-w-md relative z-10">
             <Link
               to="/donate"
-              className="bg-gold hover:bg-gold-dark text-white rounded-xl py-4 px-8 font-bold shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] text-xs uppercase tracking-wider shrink-0 font-sans flex items-center gap-2 group w-full sm:w-auto justify-center"
+              className="bg-gold hover:bg-gold-dark text-charcoal-dark rounded-xl py-4 px-8 font-bold shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] text-xs uppercase tracking-wider shrink-0 font-sans flex items-center gap-2 group w-full sm:w-auto justify-center"
             >
               <span>Donate Now</span>
-              <Heart className="w-4 h-4 text-white shrink-0 fill-white" />
+              <Heart className="w-4 h-4 text-charcoal-dark shrink-0 fill-charcoal-dark" />
             </Link>
           </div>
 
           {/* Luxury Badges Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 border-t border-white/15 pt-8 w-full max-w-3xl mt-2 font-sans text-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 border-t border-white/15 pt-8 w-full max-w-3xl mt-2 font-sans text-xs relative z-10">
             <div className="flex flex-col items-center gap-1 text-center">
               <Lock className="w-5 h-5 text-gold shrink-0" />
               <span className="font-bold text-white uppercase tracking-wider text-[10px]">Secure Donation</span>
-              <span className="text-[9px] text-cream-light/75 font-light">Encrypted checkout portals</span>
+              <span className="text-[9px] text-cream-light/80 font-light">Encrypted checkout portals</span>
             </div>
             <div className="flex flex-col items-center gap-1 text-center">
               <ShieldCheck className="w-5 h-5 text-gold shrink-0" />
               <span className="font-bold text-white uppercase tracking-wider text-[10px]">Transparent Accounts</span>
-              <span className="text-[9px] text-cream-light/75 font-light">Regular audits & open ledgers</span>
+              <span className="text-[9px] text-cream-light/80 font-light">Regular audits & open ledgers</span>
             </div>
             <div className="flex flex-col items-center gap-1 text-center">
               <HeartHandshake className="w-5 h-5 text-gold shrink-0" />
               <span className="font-bold text-white uppercase tracking-wider text-[10px]">Real Local Impact</span>
-              <span className="text-[9px] text-cream-light/75 font-light">Direct grassroot mobilization</span>
+              <span className="text-[9px] text-cream-light/80 font-light">Direct grassroot mobilization</span>
             </div>
           </div>
 
