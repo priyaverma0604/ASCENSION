@@ -86,7 +86,7 @@ const Contact = () => {
                 <Mail className="w-5 h-5 text-sage shrink-0 mt-0.5" />
                 <div className="flex flex-col gap-0.5">
                   <span className="font-bold text-[10px] text-charcoal-light uppercase">Email Support</span>
-                  <a href="mailto:info@ascension.ind.in" className="hover:text-gold transition-colors font-medium">info@ascension.ind.in</a>
+                  <a href="mailto:ascension.sonalibhasin@gmail.com" className="hover:text-gold transition-colors font-medium">ascension.sonalibhasin@gmail.com</a>
                 </div>
               </div>
             </div>

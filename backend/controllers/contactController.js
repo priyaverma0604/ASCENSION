@@ -20,7 +20,7 @@ exports.submitContact = async (req, res, next) => {
     });
 
     // Send email notification to Admin
-    const adminEmail = process.env.ADMIN_EMAIL || 'info@ascension.ind.in';
+    const adminEmail = process.env.ADMIN_EMAIL || 'ascension.sonalibhasin@gmail.com';
     const emailSubject = `New Contact Form Query from ${name}`;
     const emailText = `You have received a new query on the Ascension Platform.\n\nDetails:\nName: ${name}\nEmail: ${email}\nPhone: ${phone || 'N/A'}\nMessage: ${message}\n\nReview this in the Admin Dashboard at /admin`;
 

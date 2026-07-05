@@ -74,7 +74,7 @@ const Footer = () => {
             </div>
             <div className="flex items-center gap-2 text-xs text-charcoal-light">
               <Mail className="w-4 h-4 text-sage shrink-0" />
-              <a href="mailto:info@ascension.ind.in" className="hover:text-gold transition-colors">info@ascension.ind.in</a>
+              <a href="mailto:ascension.sonalibhasin@gmail.com" className="hover:text-gold transition-colors">ascension.sonalibhasin@gmail.com</a>
             </div>
           </div>
 
