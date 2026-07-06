@@ -73,6 +73,59 @@ const Shop = () => {
     }
   }, [activeTab, user]);
 
+  // Horoscope Customiser state
+  const zodiacs = [
+    { name: "Aries", dates: "Mar 21 - Apr 19", element: "Fire", planet: "Mars", crystals: ["Carnelian", "Jasper", "Amethyst"], desc: "As a bold and energetic Fire sign, you thrive with grounding stones that harness your passion while maintaining inner calm. Carnelian fuels your motivation, Red Jasper grounds your energy, and Amethyst connects you to higher guidance." },
+    { name: "Taurus", dates: "Apr 20 - May 20", element: "Earth", planet: "Venus", crystals: ["Rose Quartz", "Selenite", "Clear Quartz"], desc: "Governed by Venus, you seek beauty, stability, and comfort. Rose Quartz opens your heart to love and abundance, Selenite purifies your energy field, and Clear Quartz amplifies your inner strength." },
+    { name: "Gemini", dates: "May 21 - Jun 20", element: "Air", planet: "Mercury", crystals: ["Citrine", "Tiger Eye", "Aventurine"], desc: "Expressive and intellectually active, you benefit from crystals that bring clarity and focus. Citrine channels optimism, Tiger Eye balances duality with confidence, and Green Aventurine invites luck and mental ease." },
+    { name: "Cancer", dates: "Jun 21 - Jul 22", element: "Water", planet: "Moon", crystals: ["Moonstone", "Rose Quartz", "Obsidian"], desc: "Deeply intuitive and emotional, you need protective, soothing stones. Moonstone enhances your natural psychic intuition, Rose Quartz nurtures self-care, and Black Obsidian shields your sensitive energy." },
+    { name: "Leo", dates: "Jul 23 - Aug 22", element: "Fire", planet: "Sun", crystals: ["Tiger Eye", "Citrine", "Carnelian"], desc: "Radiant, brave, and creative, you align with sun-drenched stones. Tiger Eye boosts your personal courage, Citrine mirrors your golden warmth, and Carnelian inspires bold creative projects." },
+    { name: "Virgo", dates: "Aug 23 - Sep 22", element: "Earth", planet: "Mercury", crystals: ["Aventurine", "Citrine", "Jasper"], desc: "Practical, detailed, and service-oriented, you benefit from stones that quiet a busy mind. Green Aventurine attracts positive energy, Citrine sparks creativity, and Jasper grounds your day-to-day focus." },
+    { name: "Libra", dates: "Sep 23 - Oct 22", element: "Air", planet: "Venus", crystals: ["Rose Quartz", "Lapis", "Citrine"], desc: "Seeking harmony, balance, and connection, you vibrate with peaceful stones. Rose Quartz deepens relationship bonds, Lapis Lazuli aids clear communication, and Citrine keeps your spirits bright." },
+    { name: "Scorpio", dates: "Oct 23 - Nov 21", element: "Water", planet: "Pluto", crystals: ["Obsidian", "Hematite", "Amethyst"], desc: "Intense, transformative, and magnetic, you align with deep protective crystals. Obsidian helps you release old emotional blockages, Hematite grounds your focus, and Amethyst channels spiritual peace." },
+    { name: "Sagittarius", dates: "Nov 22 - Dec 21", element: "Fire", planet: "Jupiter", crystals: ["Amethyst", "Turquoise", "Sodalite"], desc: "Adventurous, philosophical, and optimistic, you thrive with wisdom-enhancing stones. Amethyst deepens your spiritual studies, Turquoise guards your travels, and Sodalite clarifies your ideas." },
+    { name: "Capricorn", dates: "Dec 22 - Jan 19", element: "Earth", planet: "Saturn", crystals: ["Onyx", "Tiger Eye", "Fluorite"], desc: "Ambitious, structured, and disciplined, you match with strong grounding stones. Black Onyx protects your focus, Tiger Eye inspires confidence, and Rainbow Fluorite structure-organizes thoughts." },
+    { name: "Aquarius", dates: "Jan 20 - Feb 18", element: "Air", planet: "Uranus", crystals: ["Amethyst", "Fluorite", "Selenite"], desc: "Visionary, independent, and humanitarian, you connect with high-frequency crystals. Amethyst elevates your intuitive vision, Fluorite organizes ideas, and Selenite sweeps away static energy." },
+    { name: "Pisces", dates: "Feb 19 - Mar 20", element: "Water", planet: "Neptune", crystals: ["Amethyst", "Moonstone", "Rose Quartz"], desc: "Imaginative, empathetic, and spiritual, you align with soft angelic crystals. Amethyst deepens dream connection, Moonstone mirrors emotional tides, and Rose Quartz envelopes you in universal compassion." }
+  ];
+
+  const [selectedZodiac, setSelectedZodiac] = useState(zodiacs[0]);
+  const [allProductsForCustomise, setAllProductsForCustomise] = useState([]);
+  const [loadingCustomise, setLoadingCustomise] = useState(false);
+
+  useEffect(() => {
+    if (activeTab === 'customise') {
+      fetchAllProductsForCustomise();
+    }
+  }, [activeTab]);
+
+  const fetchAllProductsForCustomise = async () => {
+    setLoadingCustomise(true);
+    try {
+      const { data } = await axios.get('/api/products', {
+        params: { category: 'All' }
+      });
+      if (data.success) {
+        setAllProductsForCustomise(data.data);
+      }
+    } catch (err) {
+      console.error('Error loading customize products:', err);
+    } finally {
+      setLoadingCustomise(false);
+    }
+  };
+
+  const getRecommendedProducts = () => {
+    if (!selectedZodiac) return [];
+    return allProductsForCustomise.filter(product => {
+      return selectedZodiac.crystals.some(crystal => {
+        const titleMatch = product.name?.toLowerCase().includes(crystal.toLowerCase());
+        const descMatch = product.description?.toLowerCase().includes(crystal.toLowerCase());
+        return titleMatch || descMatch;
+      });
+    });
+  };
+
   const fetchProducts = async () => {
     setLoading(true);
     try {
@@ -234,6 +287,15 @@ const Shop = () => {
             Shop Crystals
           </button>
           <button
+            onClick={() => setSearchParams({ tab: 'customise' })}
+            className={`text-xs font-bold uppercase tracking-wider pb-2 border-b-2 transition-all flex items-center gap-1.5 ${
+              activeTab === 'customise' ? 'border-gold text-gold' : 'border-transparent text-charcoal/60'
+            }`}
+          >
+            <Compass className="w-3.5 h-3.5" />
+            <span>Horoscope Customiser</span>
+          </button>
+          <button
             onClick={() => setSearchParams({ tab: 'cart' })}
             className={`text-xs font-bold uppercase tracking-wider pb-2 border-b-2 transition-all flex items-center gap-1.5 ${
               activeTab === 'cart' ? 'border-gold text-gold' : 'border-transparent text-charcoal/60'
@@ -384,6 +446,139 @@ const Shop = () => {
                 </div>
               )}
 
+            </div>
+          </div>
+        )}
+
+        {/* Tab 5: Horoscope Customiser */}
+        {activeTab === 'customise' && (
+          <div className="flex flex-col gap-10 text-left animate-fade-in">
+            {/* Header description */}
+            <div className="glass p-6 md:p-8 rounded-2xl border border-cream-dark/50 flex flex-col gap-3">
+              <span className="font-serif italic text-xs text-gold-dark tracking-wider uppercase font-semibold">Customised Recommendations</span>
+              <h2 className="font-serif text-2xl font-bold text-charcoal-dark">Find Your Lucky Crystal Tool</h2>
+              <p className="text-xs text-charcoal-light leading-relaxed font-sans max-w-2xl">
+                Every horoscope sign vibrates at a unique energy frequency. Select your zodiac sign below to discover which therapeutic crystals, protective stones, or energetic bracelets are best suited to balance your body, mind, and spirit.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+              {/* Left Column: 12 Zodiac signs selector */}
+              <div className="lg:col-span-1 flex flex-col gap-4">
+                <h4 className="font-serif text-sm font-bold uppercase tracking-wider text-charcoal-dark border-b border-cream-dark/50 pb-2">
+                  Select Your Zodiac
+                </h4>
+                <div className="grid grid-cols-2 xs:grid-cols-3 lg:grid-cols-2 gap-3">
+                  {zodiacs.map((z) => (
+                    <button
+                      key={z.name}
+                      onClick={() => setSelectedZodiac(z)}
+                      className={`glass p-4 rounded-xl flex flex-col items-center text-center gap-1.5 transition-all duration-300 ${
+                        selectedZodiac.name === z.name 
+                          ? 'border-gold bg-gold/10 shadow-md transform scale-[1.02]' 
+                          : 'border-cream-dark/30 hover:border-gold/30 hover:bg-cream-light/35'
+                      }`}
+                    >
+                      <span className="text-xs font-bold text-charcoal-dark font-serif">{z.name}</span>
+                      <span className="text-[9px] text-charcoal-light font-sans">{z.dates}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right Column: Custom guidance and matching shop products */}
+              <div className="lg:col-span-2 flex flex-col gap-8">
+                {/* Details panel */}
+                <div className="glass p-6 md:p-8 rounded-[24px] border border-cream-dark/65 flex flex-col gap-5 shadow-sm relative overflow-hidden bg-white/70">
+                  <div className="flex flex-wrap justify-between items-center gap-4 border-b border-cream-dark/65 pb-4">
+                    <div className="flex flex-col gap-1">
+                      <span className="text-[10px] text-gold-dark uppercase tracking-wider font-bold">Zodiac Sign Profile</span>
+                      <h3 className="font-serif text-xl font-bold text-charcoal-dark">{selectedZodiac.name}</h3>
+                    </div>
+                    <div className="flex gap-3 text-[10px] uppercase font-bold tracking-wider text-charcoal-light">
+                      <span className="bg-cream/60 p-1.5 px-3 rounded-lg border border-cream-dark/35">Element: <strong className="text-charcoal-dark">{selectedZodiac.element}</strong></span>
+                      <span className="bg-cream/60 p-1.5 px-3 rounded-lg border border-cream-dark/35">Ruling Planet: <strong className="text-charcoal-dark">{selectedZodiac.planet}</strong></span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    <h5 className="font-serif text-xs uppercase tracking-wider text-charcoal-dark font-bold">Energy Balancing Guidance:</h5>
+                    <p className="text-xs text-charcoal-light leading-relaxed font-sans">
+                      {selectedZodiac.desc}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col gap-2 pt-2">
+                    <h5 className="font-serif text-xs uppercase tracking-wider text-charcoal-dark font-bold">Lucky Stones & Crystals:</h5>
+                    <div className="flex gap-2 flex-wrap">
+                      {selectedZodiac.crystals.map((c, idx) => (
+                        <span key={idx} className="bg-gold/15 text-gold-dark text-[10px] font-bold tracking-wide uppercase px-3 py-1 rounded-full border border-gold/20">
+                          {c}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Live Recommended Products list */}
+                <div className="flex flex-col gap-4">
+                  <h4 className="font-serif text-sm font-bold uppercase tracking-wider text-charcoal-dark border-b border-cream-dark/50 pb-2">
+                    Recommended Shop Items
+                  </h4>
+                  {loadingCustomise ? (
+                    <div className="py-12 text-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gold mx-auto"></div>
+                      <p className="text-xs text-charcoal-light mt-3">Scanning active inventory...</p>
+                    </div>
+                  ) : getRecommendedProducts().length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      {getRecommendedProducts().map((product) => (
+                        <div key={product._id} className="glass rounded-2xl overflow-hidden border border-cream-dark/45 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col h-full bg-white/70">
+                          {/* Image container */}
+                          <Link to={`/product/${product._id}`} className="relative h-44 w-full bg-cream overflow-hidden block">
+                            <img 
+                              src={product.images && product.images[0] ? getImageUrl(product.images[0]) : ""} 
+                              alt={product.name} 
+                              className="w-full h-full object-cover transform hover:scale-[1.02] transition-transform duration-300"
+                            />
+                            <span className="absolute top-3 left-3 bg-white/95 text-gold-dark text-[9px] font-bold uppercase tracking-wider py-1 px-2.5 rounded-full border border-cream-dark/50 shadow-xs">
+                              {product.category}
+                            </span>
+                          </Link>
+
+                          {/* Info */}
+                          <div className="p-4 flex flex-col flex-grow gap-2.5 text-left">
+                            <Link to={`/product/${product._id}`} className="font-serif text-xs sm:text-sm font-bold text-charcoal-dark hover:text-gold transition-colors line-clamp-1 block">
+                              {product.name}
+                            </Link>
+                            <p className="text-[10px] text-charcoal-light leading-normal line-clamp-2 font-sans flex-grow">
+                              {product.description}
+                            </p>
+                            <div className="flex items-center justify-between border-t border-cream-dark/35 pt-2.5 mt-auto">
+                              <span className="font-serif font-bold text-gold-dark text-xs sm:text-sm">₹{product.pricing}</span>
+                              
+                              <button
+                                onClick={() => {
+                                  addToCart(product);
+                                  alert(`${product.name} added to cart!`);
+                                }}
+                                className="bg-gold hover:bg-gold-dark text-charcoal-dark font-bold text-[9px] uppercase tracking-wider py-1.5 px-3 rounded-lg shadow-xs transition-all duration-300"
+                              >
+                                Add to Cart
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="py-12 text-center glass rounded-2xl">
+                      <p className="text-xs text-charcoal-light">No crystals or bracelets currently in stock match these specific zodiac stones. Please check other items or contact our support.</p>
+                    </div>
+                  )}
+                </div>
+
+              </div>
             </div>
           </div>
         )}
