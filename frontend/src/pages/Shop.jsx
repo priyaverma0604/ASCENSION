@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { Search, ShoppingBag, Heart, Trash2, Plus, Minus, CreditCard, Compass, ChevronRight, User, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Trash2, Plus, Minus, CreditCard, Compass, ChevronRight, User, CheckCircle, AlertTriangle, UploadCloud } from 'lucide-react';
 import axios from 'axios';
 import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
@@ -124,6 +124,64 @@ const Shop = () => {
         return titleMatch || descMatch;
       });
     });
+  };
+
+  // Horoscope Upload Form State
+  const [birthDate, setBirthDate] = useState('');
+  const [birthTime, setBirthTime] = useState('');
+  const [birthPlace, setBirthPlace] = useState('');
+  const [custName, setCustName] = useState(user ? user.name : '');
+  const [custContact, setCustContact] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileBase64, setFileBase64] = useState('');
+  const [uploadSubmitting, setUploadSubmitting] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFileBase64(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleUploadSubmit = async (e) => {
+    e.preventDefault();
+    setUploadSubmitting(true);
+    try {
+      const payload = {
+        name: custName,
+        email: user ? user.email : 'horoscope@custom.com',
+        phone: custContact,
+        message: `[HOROSCOPE BRACELET CUSTOMIZATION REQUEST]
+Name: ${custName}
+WhatsApp/Contact: ${custContact}
+Birth Date: ${birthDate}
+Birth Time: ${birthTime}
+Birth Place: ${birthPlace}
+Attached Chart File: ${selectedFile ? selectedFile.name : 'None'}
+Chart Base64 Length: ${fileBase64 ? fileBase64.length : 0}`
+      };
+      
+      const { data } = await axios.post('/api/contacts', payload);
+      if (data.success) {
+        setUploadSuccess(true);
+        setBirthDate('');
+        setBirthTime('');
+        setBirthPlace('');
+        setCustContact('');
+        setSelectedFile(null);
+        setFileBase64('');
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to submit customization request. Please try again.');
+    } finally {
+      setUploadSubmitting(false);
+    }
   };
 
   const fetchProducts = async () => {
@@ -518,6 +576,126 @@ const Shop = () => {
                       ))}
                     </div>
                   </div>
+                </div>
+
+                {/* Upload Horoscope Form */}
+                <div className="glass p-6 md:p-8 rounded-[24px] border border-cream-dark/65 flex flex-col gap-6 shadow-sm bg-white/70">
+                  <div className="flex flex-col gap-1 border-b border-cream-dark/50 pb-3 text-left">
+                    <span className="text-[10px] text-gold-dark uppercase tracking-wider font-bold">Personalised Astrological Alignment</span>
+                    <h3 className="font-serif text-lg font-bold text-charcoal-dark">Upload Birth Chart for Custom Recommendation</h3>
+                    <p className="text-[10px] text-charcoal-light leading-relaxed font-sans mt-1">
+                      Don't want to choose by zodiac alone? Upload your birth chart (Kundli / Natal chart image) or provide your birth details below. Our manifestation and energy coaches will review your placements to recommend the exact custom bracelets you need.
+                    </p>
+                  </div>
+
+                  {uploadSuccess ? (
+                    <div className="flex flex-col items-center justify-center text-center gap-3 py-6 bg-cream/20 rounded-2xl border border-gold/15 animate-fade-in">
+                      <CheckCircle className="w-10 h-10 text-gold animate-bounce" />
+                      <h5 className="font-serif text-sm font-bold text-charcoal-dark">Chart Received Successfully!</h5>
+                      <p className="text-[10px] text-charcoal-light leading-relaxed max-w-sm">
+                        Thank you! Our energy healers will analyze your chart configuration. We will reach out to you on WhatsApp or Email within 24 hours with your custom crystal recommendation report.
+                      </p>
+                      <button
+                        onClick={() => setUploadSuccess(false)}
+                        className="bg-gold hover:bg-gold-dark text-charcoal-dark font-bold text-[9px] uppercase tracking-wider py-2 px-6 rounded-lg mt-2 transition-colors"
+                      >
+                        Upload Another Chart
+                      </button>
+                    </div>
+                  ) : (
+                    <form onSubmit={handleUploadSubmit} className="flex flex-col gap-4 font-sans text-xs text-charcoal text-left">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="flex flex-col gap-1.5">
+                          <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">Your Name</label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="Enter your name"
+                            value={custName}
+                            onChange={(e) => setCustName(e.target.value)}
+                            className="bg-cream-light/60 border border-cream-dark rounded-xl py-2.5 px-3 focus:outline-none focus:border-gold transition-colors text-xs"
+                          />
+                        </div>
+
+                        <div className="flex flex-col gap-1.5">
+                          <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">WhatsApp / Contact</label>
+                          <input
+                            type="tel"
+                            required
+                            placeholder="10-digit number"
+                            value={custContact}
+                            onChange={(e) => setCustContact(e.target.value)}
+                            className="bg-cream-light/60 border border-cream-dark rounded-xl py-2.5 px-3 focus:outline-none focus:border-gold transition-colors text-xs"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className="flex flex-col gap-1.5">
+                          <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">Birth Date</label>
+                          <input
+                            type="date"
+                            required
+                            value={birthDate}
+                            onChange={(e) => setBirthDate(e.target.value)}
+                            className="bg-cream-light/60 border border-cream-dark rounded-xl py-2.5 px-3 focus:outline-none focus:border-gold transition-colors text-xs"
+                          />
+                        </div>
+
+                        <div className="flex flex-col gap-1.5">
+                          <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">Birth Time</label>
+                          <input
+                            type="time"
+                            required
+                            value={birthTime}
+                            onChange={(e) => setBirthTime(e.target.value)}
+                            className="bg-cream-light/60 border border-cream-dark rounded-xl py-2.5 px-3 focus:outline-none focus:border-gold transition-colors text-xs"
+                          />
+                        </div>
+
+                        <div className="flex flex-col gap-1.5">
+                          <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">Birth Place</label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="City, State"
+                            value={birthPlace}
+                            onChange={(e) => setBirthPlace(e.target.value)}
+                            className="bg-cream-light/60 border border-cream-dark rounded-xl py-2.5 px-3 focus:outline-none focus:border-gold transition-colors text-xs"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-1.5">
+                        <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">Upload Birth Chart (Kundli / Natal Chart)</label>
+                        <div className="border border-dashed border-cream-dark/80 rounded-xl p-4 bg-cream-light/30 flex flex-col items-center gap-2 text-center cursor-pointer hover:bg-cream-light/60 transition-colors relative">
+                          <input
+                            type="file"
+                            accept="image/*,application/pdf"
+                            onChange={handleFileChange}
+                            className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                          />
+                          <UploadCloud className="w-6 h-6 text-gold-dark" />
+                          <span className="text-[10px] text-charcoal-light font-medium">
+                            {selectedFile ? `Selected: ${selectedFile.name}` : "Click or drag files here (PNG, JPG, PDF)"}
+                          </span>
+                          {selectedFile && (
+                            <span className="text-[8px] text-sage">
+                              File size: {(selectedFile.size / 1024).toFixed(1)} KB
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={uploadSubmitting}
+                        className="w-full bg-gold hover:bg-gold-dark text-charcoal-dark font-bold py-2.5 rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center gap-1.5 uppercase tracking-wider disabled:opacity-50 text-[10px]"
+                      >
+                        {uploadSubmitting ? 'Uploading details...' : 'Submit Horoscope Request'}
+                      </button>
+                    </form>
+                  )}
                 </div>
 
                 {/* Live Recommended Products list */}
