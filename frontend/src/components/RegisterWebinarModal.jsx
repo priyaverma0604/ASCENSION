@@ -231,7 +231,7 @@ const RegisterWebinarModal = ({ webinar, onClose }) => {
                 </h4>
                 
                 {webinar.upiQrCodeImage ? (
-                  <div className="w-48 h-48 bg-white border border-cream-dark/80 p-2 rounded-xl overflow-hidden shadow-xs">
+                  <div className="w-56 h-56 bg-white border border-cream-dark/80 p-3 rounded-xl overflow-hidden shadow-xs">
                     <img 
                       src={getImageUrl(webinar.upiQrCodeImage)} 
                       alt="UPI QR Code Scan" 
@@ -239,7 +239,7 @@ const RegisterWebinarModal = ({ webinar, onClose }) => {
                     />
                   </div>
                 ) : (
-                  <div className="w-48 h-48 bg-cream border border-dashed border-cream-dark flex flex-col items-center justify-center text-[10px] text-charcoal-light p-4 rounded-xl">
+                  <div className="w-56 h-56 bg-cream border border-dashed border-cream-dark flex flex-col items-center justify-center text-[10px] text-charcoal-light p-4 rounded-xl">
                     <span>QR Code scanner fallback</span>
                   </div>
                 )}
