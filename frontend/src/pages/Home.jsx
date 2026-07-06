@@ -44,11 +44,16 @@ const Home = () => {
       const resWorkshops = await axios.get('/api/workshops');
       const resWebinars = await axios.get('/api/webinars');
       let combined = [];
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+
       if (resWorkshops.data.success) {
-        combined = [...combined, ...resWorkshops.data.data];
+        const activeWorkshops = resWorkshops.data.data.filter(w => new Date(w.date) >= todayStart);
+        combined = [...combined, ...activeWorkshops];
       }
       if (resWebinars.data.success) {
-        combined = [...combined, ...resWebinars.data.data];
+        const activeWebinars = resWebinars.data.data.filter(w => new Date(w.date) >= todayStart);
+        combined = [...combined, ...activeWebinars];
       }
       combined.sort((a, b) => new Date(a.date) - new Date(b.date));
       setWorkshops(combined);
