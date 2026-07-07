@@ -87,6 +87,7 @@ const AdminDashboard = ({ user, onLogout }) => {
     { id: 'workshops', label: 'Workshops', icon: <Calendar className="w-4 h-4" /> },
     { id: 'webinars', label: 'Webinars', icon: <Calendar className="w-4 h-4" /> },
     { id: 'webinar-registrations', label: 'Webinar Registrations', icon: <FileText className="w-4 h-4" /> },
+    { id: 'workshop-registrations', label: 'Workshop Registrations', icon: <FileText className="w-4 h-4" /> },
     { id: 'retreats', label: 'Retreats', icon: <MapPin className="w-4 h-4" /> },
     { id: 'donations', label: 'Donations', icon: <DollarSign className="w-4 h-4" /> },
     { id: 'community', label: 'Community', icon: <MessageCircle className="w-4 h-4" /> },
@@ -105,6 +106,7 @@ const AdminDashboard = ({ user, onLogout }) => {
       let endpoint = `/api/${activeTab}`;
       if (activeTab === 'community') endpoint = '/api/community';
       if (activeTab === 'webinar-registrations') endpoint = '/api/webinars/registrations';
+      if (activeTab === 'workshop-registrations') endpoint = '/api/workshops/registrations';
       
       const { data } = await axios.get(endpoint);
       if (data.success) {
@@ -123,6 +125,7 @@ const AdminDashboard = ({ user, onLogout }) => {
       let endpoint = `/api/${activeTab}/${id}`;
       if (activeTab === 'community') endpoint = `/api/community/${id}`;
       if (activeTab === 'webinar-registrations') endpoint = `/api/webinars/registrations/${id}`;
+      if (activeTab === 'workshop-registrations') endpoint = `/api/workshops/registrations/${id}`;
 
       const { data } = await axios.delete(endpoint);
       if (data.success) {
@@ -375,6 +378,32 @@ const AdminDashboard = ({ user, onLogout }) => {
     }
   };
 
+  const handleApproveWorkshopRegistration = async (id) => {
+    if (!window.confirm('Are you sure you want to approve this workshop registration?')) return;
+    try {
+      const { data } = await axios.put(`/api/workshops/registrations/${id}/approve`);
+      if (data.success) {
+        alert('Workshop registration approved successfully.');
+        fetchTabData();
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Approval failed');
+    }
+  };
+
+  const handleRejectWorkshopRegistration = async (id) => {
+    if (!window.confirm('Are you sure you want to reject this workshop registration?')) return;
+    try {
+      const { data } = await axios.put(`/api/workshops/registrations/${id}/reject`);
+      if (data.success) {
+        alert('Workshop registration rejected successfully.');
+        fetchTabData();
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Rejection failed');
+    }
+  };
+
   const handleUpdateStatus = async (id, field, value) => {
     try {
       await axios.put(`/api/${activeTab}/${id}/${field}`, { [field]: value });
@@ -481,7 +510,7 @@ const AdminDashboard = ({ user, onLogout }) => {
                             {item.title || item.name || `Log ID: ${item._id.substring(0, 10)}`}
                           </p>
                           <p className="text-[10px] text-charcoal-light line-clamp-1 max-w-sm mt-0.5">
-                            {activeTab === 'webinar-registrations' 
+                            {['webinar-registrations', 'workshop-registrations'].includes(activeTab) 
                               ? `Email: ${item.email} | Phone: ${item.phone}` 
                               : item.description || item.shortDescription || item.reviewText || item.message || item.content || `Date: ${new Date(item.createdAt).toLocaleDateString()}`}
                           </p>
@@ -502,6 +531,22 @@ const AdminDashboard = ({ user, onLogout }) => {
                           {activeTab === 'webinar-registrations' && (
                             <div className="flex flex-col gap-1">
                               <span className="font-medium text-charcoal-dark">Webinar: {item.webinar?.title || 'Unknown'}</span>
+                              <span className="font-mono text-[10px] text-charcoal-light">TxID: {item.transactionId}</span>
+                              {item.paymentScreenshot && (
+                                <a 
+                                  href={getImageUrl(item.paymentScreenshot)} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-sage hover:underline font-bold text-[10px] uppercase flex items-center gap-0.5"
+                                >
+                                  View Screenshot ↗
+                                </a>
+                              )}
+                            </div>
+                          )}
+                          {activeTab === 'workshop-registrations' && (
+                            <div className="flex flex-col gap-1">
+                              <span className="font-medium text-charcoal-dark">Workshop: {item.workshop?.title || 'Unknown'}</span>
                               <span className="font-mono text-[10px] text-charcoal-light">TxID: {item.transactionId}</span>
                               {item.paymentScreenshot && (
                                 <a 
@@ -581,7 +626,6 @@ const AdminDashboard = ({ user, onLogout }) => {
                               Resolve
                             </button>
                           )}
-
                           {/* Webinar Approval/Rejection Buttons */}
                           {activeTab === 'webinar-registrations' && item.paymentStatus === 'Pending' && (
                             <div className="flex gap-1 shrink-0">
@@ -600,8 +644,26 @@ const AdminDashboard = ({ user, onLogout }) => {
                             </div>
                           )}
 
+                          {/* Workshop Approval/Rejection Buttons */}
+                          {activeTab === 'workshop-registrations' && item.paymentStatus === 'Pending' && (
+                            <div className="flex gap-1 shrink-0">
+                              <button
+                                onClick={() => handleApproveWorkshopRegistration(item._id)}
+                                className="p-1 text-sage hover:text-sage-dark focus:outline-none font-bold text-[9px] uppercase border border-sage/40 rounded px-1.5 bg-sage/5"
+                              >
+                                Approve
+                              </button>
+                              <button
+                                onClick={() => handleRejectWorkshopRegistration(item._id)}
+                                className="p-1 text-red-500 hover:text-red-700 focus:outline-none font-bold text-[9px] uppercase border border-red-500/40 rounded px-1.5 bg-red-500/5"
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          )}
+
                           {/* Delete Button */}
-                          {['services', 'programs', 'products', 'workshops', 'retreats', 'community', 'testimonials', 'webinars', 'webinar-registrations'].includes(activeTab) && (
+                          {['services', 'programs', 'products', 'workshops', 'retreats', 'community', 'testimonials', 'webinars', 'webinar-registrations', 'workshop-registrations'].includes(activeTab) && (
                             <button
                               onClick={() => handleDelete(item._id)}
                               className="p-1.5 hover:text-red-600 text-charcoal/60 transition-colors focus:outline-none"

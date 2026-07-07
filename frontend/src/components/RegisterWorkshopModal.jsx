@@ -141,39 +141,27 @@ const RegisterWorkshopModal = ({ workshop, onClose }) => {
 
     setLoading(true);
     try {
-      // 1. Submit email inquiry to contact admin with proof screenshot
-      const contactPayload = {
-        name: name,
-        email: email,
-        phone: phone,
-        message: `[WORKSHOP MANUAL UPI PAYMENT]
-Workshop: ${workshop.title}
-Transaction Reference ID: ${cleanedTxId}
-Participant Name: ${name}
-Participant Contact: ${phone}
-Receipt Screenshot: Attached Base64 length ${fileBase64 ? fileBase64.length : 0}`
-      };
-      await axios.post('/api/contacts', contactPayload);
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('email', email);
+      formData.append('phone', phone);
+      formData.append('transactionId', cleanedTxId);
+      formData.append('paymentScreenshot', selectedFile);
+      if (user) {
+        formData.append('userId', user._id);
+      }
 
-      // 2. Register user in database
-      const verifyPayload = {
-        razorpay_payment_id: `UPI_${cleanedTxId}`,
-        razorpay_order_id: orderDetails.orderId,
-        razorpay_signature: 'manual_upi_signature',
-        user_details: {
-          name,
-          email,
-          phone,
-          userId: user ? user._id : null
+      const { data } = await axios.post(`/api/workshops/${workshop._id}/register`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
         }
-      };
+      });
 
-      const { data } = await axios.post(`/api/workshops/${workshop._id}/verify`, verifyPayload);
       if (data.success) {
         setSuccess(true);
       }
     } catch (err) {
-      alert(err.response?.data?.message || 'Verification of UPI transaction failed');
+      alert(err.response?.data?.message || 'Failed to submit payment verification request.');
     } finally {
       setLoading(false);
     }
