@@ -1,7 +1,16 @@
 import React, { useState, useContext } from 'react';
-import { X, CheckCircle, Compass, AlertTriangle } from 'lucide-react';
+import { X, CheckCircle, Compass, AlertTriangle, UploadCloud, CreditCard } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
+
+const getImageUrl = (path) => {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
+    return path;
+  }
+  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  return `${apiBase}${path}`;
+};
 
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
@@ -22,6 +31,23 @@ const RegisterWorkshopModal = ({ workshop, onClose }) => {
   const [success, setSuccess] = useState(false);
   const [simulationMode, setSimulationMode] = useState(false);
   const [orderDetails, setOrderDetails] = useState(null);
+
+  // Custom UPI QR States
+  const [transactionId, setTransactionId] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileBase64, setFileBase64] = useState('');
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFileBase64(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -101,13 +127,39 @@ const RegisterWorkshopModal = ({ workshop, onClose }) => {
     }
   };
 
-  const handleSimulatePayment = async () => {
+  const handleSimulatePayment = async (e) => {
+    if (e) e.preventDefault();
+    if (!transactionId || !selectedFile) {
+      alert('Please upload your payment screenshot and enter the 12-digit transaction ID.');
+      return;
+    }
+    const cleanedTxId = transactionId.trim();
+    if (!/^\d{12}$/.test(cleanedTxId)) {
+      alert('Please enter a valid 12-digit transaction ID.');
+      return;
+    }
+
     setLoading(true);
     try {
+      // 1. Submit email inquiry to contact admin with proof screenshot
+      const contactPayload = {
+        name: name,
+        email: email,
+        phone: phone,
+        message: `[WORKSHOP MANUAL UPI PAYMENT]
+Workshop: ${workshop.title}
+Transaction Reference ID: ${cleanedTxId}
+Participant Name: ${name}
+Participant Contact: ${phone}
+Receipt Screenshot: Attached Base64 length ${fileBase64 ? fileBase64.length : 0}`
+      };
+      await axios.post('/api/contacts', contactPayload);
+
+      // 2. Register user in database
       const verifyPayload = {
-        razorpay_payment_id: `sim_pay_${Math.random().toString(36).substring(7)}`,
+        razorpay_payment_id: `UPI_${cleanedTxId}`,
         razorpay_order_id: orderDetails.orderId,
-        razorpay_signature: 'simulated_signature',
+        razorpay_signature: 'manual_upi_signature',
         user_details: {
           name,
           email,
@@ -121,7 +173,7 @@ const RegisterWorkshopModal = ({ workshop, onClose }) => {
         setSuccess(true);
       }
     } catch (err) {
-      alert(err.response?.data?.message || 'Simulation verification failed');
+      alert(err.response?.data?.message || 'Verification of UPI transaction failed');
     } finally {
       setLoading(false);
     }
@@ -164,37 +216,89 @@ const RegisterWorkshopModal = ({ workshop, onClose }) => {
             </button>
           </div>
         ) : simulationMode ? (
-          /* Simulation Mode Screen */
-          <div className="p-6 flex flex-col gap-4 text-xs text-charcoal">
-            <div className="bg-lavender-light/40 border border-lavender p-4 rounded-xl flex gap-3">
-              <AlertTriangle className="w-6 h-6 text-lavender-dark shrink-0" />
-              <div>
-                <p className="font-bold uppercase tracking-wider text-[10px]">Payment Simulation</p>
-                <p className="mt-1 leading-relaxed text-charcoal-light">
-                  Confirm mock payment transaction below to enroll in this workshop.
-                </p>
-              </div>
-            </div>
-            <div className="bg-cream p-3 rounded-xl border border-cream-dark flex justify-between items-center font-sans">
-              <span className="text-charcoal-light">Fees</span>
+          /* Custom UPI QR code Payment Screen */
+          <form onSubmit={handleSimulatePayment} className="p-6 flex flex-col gap-4 text-xs text-charcoal max-h-[75vh] overflow-y-auto scrollbar-thin">
+            
+            <div className="bg-cream p-3 rounded-xl border border-cream-dark flex justify-between items-center text-charcoal">
+              <span className="text-charcoal-light">Registration Fees</span>
               <span className="font-serif font-bold text-gold-dark text-sm">₹{workshop.pricing}</span>
             </div>
-            <div className="flex gap-3">
+
+            <div className="flex flex-col items-center text-center gap-3">
+              <h4 className="font-bold text-charcoal-dark text-[11px] uppercase tracking-wider flex items-center gap-1.5 justify-center">
+                <CreditCard className="w-4 h-4 text-gold-dark" />
+                <span>UPI QR Code Payment</span>
+              </h4>
+              
+              <div className="w-56 h-56 bg-white border border-cream-dark/80 p-3 rounded-xl overflow-hidden shadow-xs flex items-center justify-center">
+                <img 
+                  src={getImageUrl('/uploads/default_upi_qr.jpg')} 
+                  alt="UPI QR Code Scan" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1 text-[11px] text-charcoal-dark font-sans leading-relaxed border-t border-cream-dark/45 pt-3 w-full text-left">
+                <p className="flex justify-between border-b border-cream-dark/30 pb-1.5">
+                  <span className="text-charcoal-light font-medium">Payee UPI ID:</span>
+                  <strong className="select-all text-gold-dark">sonalibhasinkumar@ptaxis</strong>
+                </p>
+              </div>
+
+              <div className="bg-lavender-light/40 border border-lavender p-3 rounded-xl flex gap-2 text-left text-[10px]">
+                <AlertTriangle className="w-4.5 h-4.5 text-lavender-dark shrink-0 mt-0.5" />
+                <span className="leading-relaxed text-charcoal-light">
+                  Scan the QR code above using GPay, PhonePe, Paytm, or BHIM. After making the payment, enter the 12-digit transaction ID and upload the receipt screenshot below.
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5 text-left">
+              <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">UPI Transaction ID</label>
+              <input
+                type="text"
+                required
+                value={transactionId}
+                onChange={(e) => setTransactionId(e.target.value)}
+                placeholder="Enter 12-digit UPI reference number"
+                className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none focus:border-gold transition-colors text-xs"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5 text-left">
+              <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">Upload Receipt Screenshot</label>
+              <div className="border border-dashed border-cream-dark/80 rounded-xl p-3 bg-cream-light/30 flex flex-col items-center gap-1 text-center cursor-pointer hover:bg-cream-light/60 transition-colors relative">
+                <input
+                  type="file"
+                  required
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                />
+                <UploadCloud className="w-5 h-5 text-gold-dark" />
+                <span className="text-[10px] text-charcoal-light font-medium">
+                  {selectedFile ? `Selected: ${selectedFile.name}` : "Choose receipt screenshot"}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-2">
               <button
+                type="button"
                 onClick={onClose}
-                className="w-1/3 bg-cream hover:bg-cream-dark border border-cream-dark/50 text-charcoal font-bold py-2.5 rounded-xl transition-colors duration-200"
+                className="w-1/3 bg-cream hover:bg-cream-dark border border-cream-dark/50 text-charcoal font-bold py-2.5 rounded-xl transition-colors duration-200 uppercase tracking-wider text-[9px]"
               >
                 Cancel
               </button>
               <button
-                onClick={handleSimulatePayment}
+                type="submit"
                 disabled={loading}
-                className="w-2/3 bg-sage hover:bg-sage-dark text-white font-bold py-2.5 rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center"
+                className="w-2/3 bg-sage hover:bg-sage-dark text-white font-bold py-2.5 rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center uppercase tracking-wider text-[9px]"
               >
-                {loading ? 'Registering...' : 'Confirm Simulation'}
+                {loading ? 'Submitting...' : 'Submit Payment Details'}
               </button>
             </div>
-          </div>
+          </form>
         ) : (
           /* Registration Form Screen */
           <form onSubmit={handleRegister} className="p-6 flex flex-col gap-4 font-sans text-xs">
