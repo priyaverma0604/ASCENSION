@@ -27,6 +27,10 @@ const workshopSchema = new mongoose.Schema({
     type: Number,
     required: [true, 'Please specify maximum capacity']
   },
+  zoomLink: {
+    type: String,
+    default: ''
+  },
   registeredUsers: [
     {
       user: {

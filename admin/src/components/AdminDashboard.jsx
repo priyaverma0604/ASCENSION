@@ -45,6 +45,7 @@ const AdminDashboard = ({ user, onLogout }) => {
   const [workshopTime, setWorkshopTime] = useState('');
   const [workshopPrice, setWorkshopPrice] = useState('');
   const [workshopCapacity, setWorkshopCapacity] = useState('');
+  const [workshopZoomLink, setWorkshopZoomLink] = useState('');
 
   const [programTitle, setProgramTitle] = useState('');
   const [programDesc, setProgramDesc] = useState('');
@@ -175,6 +176,7 @@ const AdminDashboard = ({ user, onLogout }) => {
     setWorkshopTime('');
     setWorkshopPrice('');
     setWorkshopCapacity('30');
+    setWorkshopZoomLink('');
 
     setProgramTitle('');
     setProgramDesc('');
@@ -229,6 +231,7 @@ const AdminDashboard = ({ user, onLogout }) => {
       setWorkshopTime(item.time);
       setWorkshopPrice(item.pricing);
       setWorkshopCapacity(item.capacity);
+      setWorkshopZoomLink(item.zoomLink || '');
     } else if (activeTab === 'programs') {
       setProgramTitle(item.title);
       setProgramDesc(item.description);
@@ -312,7 +315,8 @@ const AdminDashboard = ({ user, onLogout }) => {
           date: workshopDate,
           time: workshopTime,
           pricing: workshopPrice,
-          capacity: workshopCapacity
+          capacity: workshopCapacity,
+          zoomLink: workshopZoomLink
         };
       } else if (activeTab === 'programs') {
         payload = {
@@ -994,6 +998,10 @@ const AdminDashboard = ({ user, onLogout }) => {
                           <label className="font-bold text-charcoal-light uppercase text-[10px]">Capacity</label>
                           <input type="number" required value={workshopCapacity} onChange={(e) => setWorkshopCapacity(e.target.value)} className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none" />
                         </div>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="font-bold text-charcoal-light uppercase text-[10px]">Zoom Link (Optional)</label>
+                        <input type="url" value={workshopZoomLink} onChange={(e) => setWorkshopZoomLink(e.target.value)} placeholder="Enter Zoom link for tomorrow's emails" className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none" />
                       </div>
                     </>
                   )}

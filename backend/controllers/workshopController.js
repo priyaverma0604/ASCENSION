@@ -37,7 +37,7 @@ exports.getWorkshopById = async (req, res, next) => {
 // @access  Private/Admin
 exports.createWorkshop = async (req, res, next) => {
   try {
-    const { title, description, date, time, pricing, capacity } = req.body;
+    const { title, description, date, time, pricing, capacity, zoomLink } = req.body;
 
     const workshop = await Workshop.create({
       title,
@@ -45,7 +45,8 @@ exports.createWorkshop = async (req, res, next) => {
       date,
       time,
       pricing,
-      capacity
+      capacity,
+      zoomLink: zoomLink || ''
     });
 
     res.status(201).json({ success: true, data: workshop });
@@ -64,7 +65,7 @@ exports.updateWorkshop = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Workshop not found' });
     }
 
-    const { title, description, date, time, pricing, capacity } = req.body;
+    const { title, description, date, time, pricing, capacity, zoomLink } = req.body;
 
     workshop.title = title || workshop.title;
     workshop.description = description || workshop.description;
@@ -72,6 +73,7 @@ exports.updateWorkshop = async (req, res, next) => {
     workshop.time = time || workshop.time;
     workshop.pricing = pricing !== undefined ? pricing : workshop.pricing;
     workshop.capacity = capacity !== undefined ? capacity : workshop.capacity;
+    if (zoomLink !== undefined) workshop.zoomLink = zoomLink;
 
     const updatedWorkshop = await workshop.save();
     res.json({ success: true, data: updatedWorkshop });
@@ -307,7 +309,7 @@ exports.approveWorkshopRegistration = async (req, res, next) => {
     const emailOptions = {
       to: registration.email,
       subject: 'Your Workshop Registration is Confirmed',
-      text: `Hello ${registration.name},\n\nThank you for registering.\n\nYour registration has been successfully confirmed.\n\nWorkshop Details:\n- Workshop Name: ${registration.workshop.title}\n- Date: ${formattedDate}\n- Time: ${registration.workshop.time}\n\nWe look forward to having you. Details on joining will be shared prior to the workshop.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
+      text: `Hello ${registration.name},\n\nThank you for registering.\n\nYour registration has been successfully confirmed.\n\nWorkshop Details:\n- Workshop Name: ${registration.workshop.title}\n- Date: ${formattedDate}\n- Time: ${registration.workshop.time}\n\nThe Zoom Meeting Link will automatically be sent to you one day before the workshop.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
       html: `<p>Hello <strong>${registration.name}</strong>,</p>
              <p>Thank you for registering.</p>
              <p>Your registration has been successfully confirmed.</p>
@@ -317,7 +319,7 @@ exports.approveWorkshopRegistration = async (req, res, next) => {
                <li><strong>Date:</strong> ${formattedDate}</li>
                <li><strong>Time:</strong> ${registration.workshop.time}</li>
              </ul>
-             <p>We look forward to having you. Details on joining will be shared prior to the workshop.</p>
+             <p>The Zoom Meeting Link will automatically be sent to you one day before the workshop.</p>
              <p>Regards,<br/><strong>Ascension by Sonali Bhasin Kumar</strong></p>`
     };
 
@@ -325,6 +327,38 @@ exports.approveWorkshopRegistration = async (req, res, next) => {
       await sendEmail(emailOptions);
     } catch (emailErr) {
       console.error('Approval email sending failed:', emailErr.message);
+    }
+
+    // If the workshop starts in less than 24 hours, send the Zoom link email immediately
+    const now = new Date();
+    const workshopDate = new Date(registration.workshop.date);
+    const timeDiff = workshopDate.getTime() - now.getTime();
+    const hoursDiff = timeDiff / (1000 * 60 * 60);
+
+    if (hoursDiff <= 24 && registration.workshop.zoomLink) {
+      console.log(`Workshop is in less than 24 hours (${hoursDiff.toFixed(2)}h). Sending Zoom link immediately.`);
+      const reminderEmailOptions = {
+        to: registration.email,
+        subject: 'Your Workshop Zoom Link - Starts Soon',
+        text: `Hello ${registration.name},\n\nYour registered workshop starts soon.\n\nWorkshop Details:\n- Workshop Name: ${registration.workshop.title}\n- Date: ${formattedDate}\n- Time: ${registration.workshop.time}\n\nZoom Meeting Link:\n${registration.workshop.zoomLink}\n\nPlease join 10 minutes early.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
+        html: `<p>Hello <strong>${registration.name}</strong>,</p>
+               <p>Your registered workshop starts soon.</p>
+               <h4>Workshop Details:</h4>
+               <ul>
+                 <li><strong>Workshop Name:</strong> ${registration.workshop.title}</li>
+                 <li><strong>Date:</strong> ${formattedDate}</li>
+                 <li><strong>Time:</strong> ${registration.workshop.time}</li>
+               </ul>
+               <p><strong>Zoom Meeting Link:</strong> <a href="${registration.workshop.zoomLink}">${registration.workshop.zoomLink}</a></p>
+               <p>Please join 10 minutes early.</p>
+               <p>Regards,<br/><strong>Ascension by Sonali Bhasin Kumar</strong></p>`
+      };
+
+      try {
+        await sendEmail(reminderEmailOptions);
+      } catch (emailErr) {
+        console.error('Zoom link email sending failed:', emailErr.message);
+      }
     }
 
     res.json({ success: true, message: 'Registration approved successfully.', data: registration });
