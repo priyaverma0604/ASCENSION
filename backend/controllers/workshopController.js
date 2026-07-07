@@ -115,14 +115,6 @@ exports.registerForWorkshop = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Workshop capacity is full' });
     }
 
-    // Check if already registered
-    const alreadyRegistered = workshop.registeredUsers.find(
-      u => u.email.toLowerCase() === email.toLowerCase()
-    );
-    if (alreadyRegistered) {
-      return res.status(400).json({ success: false, message: 'You have already registered for this workshop' });
-    }
-
     const amount = workshop.pricing;
 
     // Free registration
@@ -212,22 +204,15 @@ exports.verifyWorkshopPayment = async (req, res, next) => {
     // Add user to registered list
     const payId = razorpay_payment_id || `mock_pay_${crypto.randomBytes(6).toString('hex')}`;
     
-    // Check if email already registered to avoid duplicates
-    const alreadyRegistered = workshop.registeredUsers.find(
-      u => u.email.toLowerCase() === user_details.email.toLowerCase()
-    );
-
-    if (!alreadyRegistered) {
-      workshop.registeredUsers.push({
-        user: user_details.userId || null,
-        name: user_details.name,
-        email: user_details.email,
-        phone: user_details.phone,
-        paymentStatus: 'paid',
-        paymentId: payId
-      });
-      await workshop.save();
-    }
+    workshop.registeredUsers.push({
+      user: user_details.userId || null,
+      name: user_details.name,
+      email: user_details.email,
+      phone: user_details.phone,
+      paymentStatus: 'paid',
+      paymentId: payId
+    });
+    await workshop.save();
 
     res.json({
       success: true,
