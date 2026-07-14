@@ -20,7 +20,7 @@ const Navbar = () => {
   const location = useLocation();
 
   const isHomePage = location.pathname === '/';
-  const isSevaActive = ['/ngo', '/community', '/donate'].includes(location.pathname);
+  const isSevaActive = ['/ngo', '/community', '/donate', '/csr'].includes(location.pathname);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -112,6 +112,14 @@ const Navbar = () => {
                     }`}
                 >
                   Seva NGO
+                </Link>
+                <Link
+                  to="/csr"
+                  onClick={() => setSevaDropdownOpen(false)}
+                  className={`block px-5 py-2.5 text-[10px] font-bold uppercase tracking-wider hover:bg-cream-light/60 hover:text-gold-dark transition-colors duration-200 ${location.pathname === '/csr' ? 'text-gold-dark bg-cream-light/35' : 'text-charcoal/85'
+                    }`}
+                >
+                  CSR Seva
                 </Link>
                 <Link
                   to="/community"
@@ -301,6 +309,13 @@ const Navbar = () => {
                     className={`text-xs font-semibold py-1.5 hover:text-gold transition-colors ${location.pathname === '/ngo' ? 'text-gold' : 'text-charcoal-light'}`}
                   >
                     Seva NGO
+                  </Link>
+                  <Link
+                    to="/csr"
+                    onClick={() => setIsOpen(false)}
+                    className={`text-xs font-semibold py-1.5 hover:text-gold transition-colors ${location.pathname === '/csr' ? 'text-gold' : 'text-charcoal-light'}`}
+                  >
+                    CSR Seva
                   </Link>
                   <Link
                     to="/community"
