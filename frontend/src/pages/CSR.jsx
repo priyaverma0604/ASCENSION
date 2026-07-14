@@ -389,13 +389,13 @@ const CSR = () => {
                 <span className="bg-gold/15 p-2 rounded-xl text-gold-dark shrink-0">
                   <Phone className="w-4 h-4" />
                 </span>
-                <a href="tel:+918929061557" className="hover:text-gold transition-colors font-medium">+91 89290 61557</a>
+                <a href="tel:+919818577751" className="hover:text-gold transition-colors font-medium">+91 98185 77751</a>
               </div>
               <div className="flex items-center gap-3">
                 <span className="bg-gold/15 p-2 rounded-xl text-gold-dark shrink-0">
                   <Mail className="w-4 h-4" />
                 </span>
-                <a href="mailto:ascensionseva@gmail.com" className="hover:text-gold transition-colors font-medium">ascensionseva@gmail.com</a>
+                <a href="mailto:ascension.seva@gmail.com" className="hover:text-gold transition-colors font-medium">ascension.seva@gmail.com</a>
               </div>
             </div>
           </div>
