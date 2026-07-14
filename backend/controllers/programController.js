@@ -57,7 +57,7 @@ exports.createProgram = async (req, res, next) => {
 
     const images = getImagesPaths(req);
     if (images.length === 0 && req.body.images) {
-      # If links were sent directly
+      // If links were sent directly
       if (Array.isArray(req.body.images)) {
         images.push(...req.body.images);
       } else {
