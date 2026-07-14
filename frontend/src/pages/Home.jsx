@@ -625,7 +625,7 @@ const Home = () => {
 
           <div className="flex flex-col gap-6 text-left">
             <span className="font-serif italic text-xs text-gold-dark tracking-wider uppercase font-semibold">Healing Humanity</span>
-            <img src={sevaLogo} alt="Ascension Seva" className="h-16 md:h-20 w-auto object-contain text-left" />
+            <img src={`${sevaLogo}?v=2`} alt="Ascension Seva" className="h-24 md:h-32 w-auto object-contain text-left" />
             <div className="w-12 h-[1px] bg-gold-dark/40"></div>
             <p className="text-xs text-charcoal-light leading-relaxed font-sans">
               We believe true spirituality extends beyond personal healing—it is reflected in selfless service (Seva) to humanity. Founded by Sonali Bhasin Kumar, our NGO initiatives support underprivileged families, feed local communities, mentor school children, and foster animal compassion.
