@@ -7,10 +7,17 @@ const {
   updateProgram,
   deleteProgram,
   createEnrollmentOrder,
-  verifyEnrollmentPayment
+  verifyEnrollmentPayment,
+  enrollProgramQR,
+  getProgramRegistrations,
+  verifyProgramRegistration
 } = require('../controllers/programController');
 const { protect, admin } = require('../middleware/auth');
 const upload = require('../middleware/upload');
+
+// Admin Registrations management (Must be defined before /:id routes)
+router.get('/registrations', protect, admin, getProgramRegistrations);
+router.post('/registrations/:regId/verify', protect, admin, verifyProgramRegistration);
 
 router.route('/')
   .get(getPrograms)
@@ -24,5 +31,6 @@ router.route('/:id')
 
 router.post('/:id/enroll-order', protect, createEnrollmentOrder);
 router.post('/:id/enroll-verify', protect, verifyEnrollmentPayment);
+router.post('/:id/enroll-qr', protect, upload.single('paymentScreenshot'), enrollProgramQR);
 
 module.exports = router;

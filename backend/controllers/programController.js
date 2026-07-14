@@ -1,5 +1,6 @@
 const Program = require('../models/Program');
 const User = require('../models/User');
+const ProgramRegistration = require('../models/ProgramRegistration');
 const { razorpayInstance, isRazorpayConfigured } = require('../config/razorpay');
 const { isCloudinaryConfigured } = require('../config/cloudinary');
 const crypto = require('crypto');
@@ -261,6 +262,120 @@ exports.verifyEnrollmentPayment = async (req, res, next) => {
       message: 'Payment verified and enrolled successfully!',
       program
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Submit program manual UPI/QR enrollment request
+// @route   POST /api/programs/:id/enroll-qr
+// @access  Private
+exports.enrollProgramQR = async (req, res, next) => {
+  try {
+    const program = await Program.findById(req.params.id);
+    if (!program) {
+      return res.status(404).json({ success: false, message: 'Program not found' });
+    }
+
+    // Check if user is already enrolled
+    if (program.enrolledUsers.includes(req.user._id)) {
+      return res.status(400).json({ success: false, message: 'You are already enrolled in this program' });
+    }
+
+    // Check capacity
+    if (program.enrolledUsers.length >= program.enrollmentCapacity) {
+      return res.status(400).json({ success: false, message: 'Program capacity has been reached' });
+    }
+
+    const { transactionId } = req.body;
+    if (!transactionId) {
+      return res.status(400).json({ success: false, message: 'Please provide UPI Transaction Reference ID' });
+    }
+
+    let paymentScreenshot = '';
+    if (req.file) {
+      if (isCloudinaryConfigured) {
+        paymentScreenshot = req.file.path;
+      } else {
+        paymentScreenshot = `/uploads/${req.file.filename}`;
+      }
+    } else {
+      return res.status(400).json({ success: false, message: 'Please upload payment receipt screenshot' });
+    }
+
+    // Check if a registration already exists for this program + user combo that is pending
+    const existing = await ProgramRegistration.findOne({
+      program: program._id,
+      user: req.user._id,
+      paymentStatus: 'Pending'
+    });
+    if (existing) {
+      return res.status(400).json({ success: false, message: 'You already have a pending registration request for this program.' });
+    }
+
+    const registration = await ProgramRegistration.create({
+      program: program._id,
+      user: req.user._id,
+      name: req.user.name,
+      email: req.user.email,
+      phone: req.body.phone || req.user.phone || '0000000000',
+      transactionId,
+      paymentScreenshot
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Your registration request has been submitted for verification!',
+      data: registration
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get all program manual registrations
+// @route   GET /api/programs/registrations
+// @access  Private/Admin
+exports.getProgramRegistrations = async (req, res, next) => {
+  try {
+    const registrations = await ProgramRegistration.find()
+      .populate('program', 'title pricing')
+      .populate('user', 'name email')
+      .sort('-createdAt');
+    res.json({ success: true, data: registrations });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Verify (Approve/Reject) program registration
+// @route   POST /api/programs/registrations/:regId/verify
+// @access  Private/Admin
+exports.verifyProgramRegistration = async (req, res, next) => {
+  try {
+    const { status } = req.body; // 'Paid' or 'Rejected'
+    if (!['Paid', 'Rejected'].includes(status)) {
+      return res.status(400).json({ success: false, message: 'Invalid registration status. Use Paid or Rejected.' });
+    }
+
+    const reg = await ProgramRegistration.findById(req.params.regId);
+    if (!reg) {
+      return res.status(404).json({ success: false, message: 'Registration record not found' });
+    }
+
+    reg.paymentStatus = status;
+    await reg.save();
+
+    if (status === 'Paid') {
+      // Add user to program's enrolledUsers array if not already present
+      const program = await Program.findById(reg.program);
+      if (program && !program.enrolledUsers.includes(reg.user)) {
+        program.enrolledUsers.push(reg.user);
+        await program.save();
+      }
+    }
+
+    res.json({ success: true, message: `Registration successfully marked as ${status}!`, data: reg });
   } catch (error) {
     next(error);
   }

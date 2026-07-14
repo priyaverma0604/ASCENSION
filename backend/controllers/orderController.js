@@ -1,6 +1,7 @@
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const { razorpayInstance, isRazorpayConfigured } = require('../config/razorpay');
+const { isCloudinaryConfigured } = require('../config/cloudinary');
 const crypto = require('crypto');
 
 // @desc    Create a new order & initiate Razorpay order
@@ -8,7 +9,14 @@ const crypto = require('crypto');
 // @access  Private
 exports.createOrder = async (req, res, next) => {
   try {
-    const { items, shippingAddress } = req.body;
+    let { items, shippingAddress, transactionId } = req.body;
+
+    if (typeof items === 'string') {
+      items = JSON.parse(items);
+    }
+    if (typeof shippingAddress === 'string') {
+      shippingAddress = JSON.parse(shippingAddress);
+    }
 
     if (!items || items.length === 0) {
       return res.status(400).json({ success: false, message: 'No items in cart' });
@@ -56,6 +64,15 @@ exports.createOrder = async (req, res, next) => {
       console.log(`Razorpay simulated order created, total: Rs. ${calculatedTotal}`);
     }
 
+    let paymentScreenshot = '';
+    if (req.file) {
+      if (isCloudinaryConfigured) {
+        paymentScreenshot = req.file.path;
+      } else {
+        paymentScreenshot = `/uploads/${req.file.filename}`;
+      }
+    }
+
     // Save order in database with pending status
     const order = await Order.create({
       user: req.user._id,
@@ -63,6 +80,9 @@ exports.createOrder = async (req, res, next) => {
       totalAmount: calculatedTotal,
       shippingAddress,
       orderId: orderResponseId,
+      transactionId: transactionId || '',
+      paymentScreenshot: paymentScreenshot || '',
+      paymentType: transactionId ? 'UPI_QR' : 'RAZORPAY',
       paymentStatus: 'pending'
     });
 
@@ -182,6 +202,25 @@ exports.updateOrderStatus = async (req, res, next) => {
     await order.save();
 
     res.json({ success: true, message: 'Order status updated successfully', data: order });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Verify (Approve) UPI manual order payment
+// @route   POST /api/orders/:id/verify-upi
+// @access  Private/Admin
+exports.verifyOrderPaymentUPI = async (req, res, next) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    order.paymentStatus = 'paid';
+    await order.save();
+
+    res.json({ success: true, message: 'Order payment successfully verified and marked as paid!', data: order });
   } catch (error) {
     next(error);
   }

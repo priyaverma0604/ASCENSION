@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { Search, ShoppingBag, Heart, Trash2, Plus, Minus, CreditCard, Compass, ChevronRight, User, CheckCircle, AlertTriangle, UploadCloud } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Trash2, Plus, Minus, CreditCard, Compass, ChevronRight, User, CheckCircle, AlertTriangle, UploadCloud, Smartphone } from 'lucide-react';
 import axios from 'axios';
 import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
@@ -55,6 +55,9 @@ const Shop = () => {
   const [checkoutSuccess, setCheckoutSuccess] = useState(false);
   const [simulationMode, setSimulationMode] = useState(false);
   const [orderDetails, setOrderDetails] = useState(null);
+  const [transactionId, setTransactionId] = useState('');
+  const [screenshot, setScreenshot] = useState(null);
+  const [screenshotPreview, setScreenshotPreview] = useState('');
 
   const categories = [
     'All', 'Crystals', 'Lamps', 'Candles', 'Crystal Trees', 'Pendants',
@@ -235,96 +238,38 @@ Chart Base64 Length: ${fileBase64 ? fileBase64.length : 0}`
       navigate('/login');
       return;
     }
-    setCheckoutLoading(true);
-
-    try {
-      const payload = {
-        items: cart.map(item => ({ product: item.product._id, quantity: item.quantity })),
-        shippingAddress: {
-          address,
-          city,
-          state: stateName,
-          postalCode,
-          country,
-          phone
-        }
-      };
-
-      const { data } = await axios.post('/api/orders', payload);
-      setOrderDetails(data.data);
-
-      if (data.data.orderId.startsWith('mock_order_')) {
-        setSimulationMode(true);
-        setCheckoutLoading(false);
-      } else {
-        const scriptLoaded = await loadRazorpayScript();
-        if (!scriptLoaded) {
-          alert('Failed to load Razorpay SDK');
-          setCheckoutLoading(false);
-          return;
-        }
-
-        const options = {
-          key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_ascensionKeyId123',
-          amount: data.data.amount,
-          currency: data.data.currency,
-          name: 'Ascension by Sonali',
-          description: 'Spiritual Products Purchase',
-          order_id: data.data.orderId,
-          handler: async (response) => {
-            setCheckoutLoading(true);
-            try {
-              const verifyPayload = {
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_signature: response.razorpay_signature
-              };
-              const verification = await axios.post('/api/orders/verify', verifyPayload);
-              if (verification.data.success) {
-                clearCart();
-                setCheckoutSuccess(true);
-              }
-            } catch (verifyErr) {
-              alert(verifyErr.response?.data?.message || 'Payment validation failed');
-            } finally {
-              setCheckoutLoading(false);
-            }
-          },
-          prefill: {
-            name: user.name,
-            email: user.email,
-            contact: phone
-          },
-          theme: { color: '#D4AF37' }
-        };
-
-        const rzp = new window.Razorpay(options);
-        rzp.open();
-        setCheckoutLoading(false);
-      }
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to place order');
-      setCheckoutLoading(false);
+    if (!transactionId || !screenshot) {
+      alert('Please enter your transaction Reference ID and upload the receipt screenshot.');
+      return;
     }
-  };
-
-  const handleSimulatePayment = async () => {
     setCheckoutLoading(true);
-    try {
-      const verifyPayload = {
-        razorpay_payment_id: `sim_pay_${Math.random().toString(36).substring(7)}`,
-        razorpay_order_id: orderDetails.orderId,
-        razorpay_signature: 'simulated_signature'
-      };
 
-      const { data } = await axios.post('/api/orders/verify', verifyPayload);
+    try {
+      const formData = new FormData();
+      formData.append('items', JSON.stringify(cart.map(item => ({ product: item.product._id, quantity: item.quantity }))));
+      formData.append('shippingAddress', JSON.stringify({
+        address,
+        city,
+        state: stateName,
+        postalCode,
+        country,
+        phone
+      }));
+      formData.append('transactionId', transactionId);
+      formData.append('paymentScreenshot', screenshot);
+
+      const { data } = await axios.post('/api/orders', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
       if (data.success) {
         clearCart();
         setCheckoutSuccess(true);
-        setSimulationMode(false);
       }
     } catch (err) {
-      alert(err.response?.data?.message || 'Simulation verification failed');
+      alert(err.response?.data?.message || 'Failed to place order');
     } finally {
       setCheckoutLoading(false);
     }
@@ -779,7 +724,7 @@ Chart Base64 Length: ${fileBase64 ? fileBase64.length : 0}`
                     Order Placed Successfully!
                   </h4>
                   <p className="text-xs text-charcoal-light leading-relaxed max-w-md">
-                    Thank you for your purchase! Your order is being processed, and we will dispatch your spiritual items shortly. An email confirmation has been sent to your address.
+                    Thank you for your purchase! Your manual payment checkout request has been logged successfully. Once our team verifies your receipt screenshot, we will confirm the order and dispatch your spiritual items. You can view progress in your Order History.
                   </p>
                   <button
                     onClick={() => {
@@ -888,27 +833,8 @@ Chart Base64 Length: ${fileBase64 ? fileBase64.length : 0}`
                       Shipping Details
                     </h4>
 
-                    {simulationMode ? (
-                      /* Simulation Pay Trigger */
-                      <div className="flex flex-col gap-4 text-center items-center py-2">
-                        <div className="bg-lavender-light/40 border border-lavender p-3.5 rounded-xl flex gap-2 text-left">
-                          <AlertTriangle className="w-5 h-5 text-lavender-dark shrink-0 mt-0.5" />
-                          <span className="leading-relaxed">
-                            No credentials config detected. Complete mock checkout verification simulation below.
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={handleSimulatePayment}
-                          disabled={checkoutLoading}
-                          className="w-full bg-sage hover:bg-sage-dark text-white font-bold py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center"
-                        >
-                          {checkoutLoading ? 'Processing...' : 'Confirm Simulation checkout'}
-                        </button>
-                      </div>
-                    ) : (
-                      /* Shipping Address Form */
-                      <div className="flex flex-col gap-3">
+                      /* Shipping Address & UPI Payment Form */
+                      <div className="flex flex-col gap-3 text-left">
                         <div className="flex flex-col gap-1">
                           <label className="text-[10px] font-bold text-charcoal-light uppercase">Street Address</label>
                           <input
@@ -979,16 +905,81 @@ Chart Base64 Length: ${fileBase64 ? fileBase64.length : 0}`
                             className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all"
                           />
                         </div>
+
+                        {/* UPI QR Details */}
+                        <div className="bg-cream/60 border border-cream-dark/60 p-3 rounded-xl flex gap-3 text-charcoal-light font-sans leading-relaxed text-left mt-2">
+                          <Smartphone className="w-4 h-4 text-gold-dark shrink-0 mt-0.5" />
+                          <div>
+                            <p className="font-bold uppercase tracking-wider text-[8px] text-charcoal-dark">Scan & Pay via UPI</p>
+                            <p className="text-[9px] mt-0.5">
+                              Scan the QR below or pay using UPI ID: <strong className="text-charcoal-dark">sonalibhasinkumar@ptaxis</strong>. 
+                              Upload the receipt screenshot and transaction ID to submit order.
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* QR Image */}
+                        <div className="flex justify-center py-2 bg-white/40 rounded-xl border border-cream-dark/40 max-w-[150px] mx-auto">
+                          <img 
+                            src={getImageUrl('/uploads/default_upi_qr.jpg')} 
+                            alt="Payment QR Code" 
+                            className="w-32 h-32 object-contain"
+                          />
+                        </div>
+
+                        {/* Transaction ID */}
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[10px] font-bold text-charcoal-light uppercase">Transaction Reference ID</label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="Enter 12-digit transaction ID"
+                            value={transactionId}
+                            onChange={(e) => setTransactionId(e.target.value)}
+                            className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all"
+                          />
+                        </div>
+
+                        {/* Screenshot upload */}
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[10px] font-bold text-charcoal-light uppercase">Upload Payment Screenshot</label>
+                          <div className="flex items-center gap-3">
+                            <label className="flex-1 flex flex-col items-center justify-center border border-dashed border-cream-dark/60 rounded-xl py-2 px-3 bg-cream-light hover:bg-cream cursor-pointer transition-colors duration-200">
+                              <UploadCloud className="w-4 h-4 text-gold-dark mb-1" />
+                              <span className="text-[9px] text-charcoal-light">
+                                {screenshot ? screenshot.name : 'Choose receipt image'}
+                              </span>
+                              <input 
+                                type="file"
+                                required
+                                accept="image/*"
+                                onChange={(e) => {
+                                  const file = e.target.files[0];
+                                  if (file) {
+                                    setScreenshot(file);
+                                    setScreenshotPreview(URL.createObjectURL(file));
+                                  }
+                                }}
+                                className="hidden"
+                              />
+                            </label>
+                            {screenshotPreview && (
+                              <div className="w-10 h-10 rounded-lg overflow-hidden border border-cream-dark shrink-0">
+                                <img src={screenshotPreview} alt="Receipt preview" className="w-full h-full object-cover" />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
                         <button
                           type="submit"
                           disabled={checkoutLoading}
-                          className="w-full bg-gold hover:bg-gold-dark text-white font-bold py-3 rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center gap-2 mt-2"
+                          className="w-full bg-gold hover:bg-gold-dark text-charcoal-dark border border-gold-dark/20 font-bold py-3 rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center gap-2 mt-2 uppercase tracking-wider text-[10px]"
                         >
-                          {checkoutLoading && <Compass className="w-4 h-4 animate-spin" />}
-                          <span>{checkoutLoading ? 'Placing Order...' : 'Pay with Razorpay'}</span>
+                          {checkoutLoading && <Compass className="w-4 h-4 animate-spin text-charcoal-dark" />}
+                          <span>{checkoutLoading ? 'Submitting...' : 'Submit Order Receipt'}</span>
                         </button>
                       </div>
-                    )}
                   </form>
                 )}
 
