@@ -375,7 +375,7 @@ const Home = () => {
             {/* Service 2: Sound Healing */}
             <div className="group bg-white rounded-[24px] p-6 shadow-md border border-cream-dark/40 hover:border-gold-dark/45 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 flex flex-col text-left">
               <div className="h-40 rounded-xl overflow-hidden mb-5 relative">
-                <img src="https://images.unsplash.com/photo-1519817650390-64a93db51149?auto=format&fit=crop&w=600&q=80" alt="Sound Healing" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <img src={getImageUrl('/uploads/sound_healing_service.png')} alt="Sound Healing" className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500" />
                 <div className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/90 backdrop-blur-xs flex items-center justify-center text-gold shadow-sm">
                   <Compass className="w-4 h-4" />
                 </div>
@@ -563,7 +563,7 @@ const Home = () => {
               <div className="flex items-center gap-3 mt-6 font-sans text-left">
                 {testimonials[activeTestimonial].image ? (
                   <img
-                    src={testimonials[activeTestimonial].image}
+                    src={getImageUrl(testimonials[activeTestimonial].image)}
                     alt={testimonials[activeTestimonial].name}
                     className="w-12 h-12 rounded-full object-cover border border-cream-dark"
                   />
@@ -574,7 +574,11 @@ const Home = () => {
                 )}
                 <div>
                   <p className="text-xs font-bold text-charcoal-dark">{testimonials[activeTestimonial].name}</p>
-                  <p className="text-[10px] text-charcoal-light">Verified Client</p>
+                  {testimonials[activeTestimonial].designation && (
+                    <p className="text-[9px] text-gold-dark uppercase tracking-wider font-bold mt-0.5">
+                      {testimonials[activeTestimonial].designation}
+                    </p>
+                  )}
                 </div>
               </div>
 

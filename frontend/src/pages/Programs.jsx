@@ -107,18 +107,30 @@ const Programs = () => {
 
                   {/* Enrollment CTA */}
                   <div className="border-t border-cream-dark/65 pt-6 flex justify-between items-center font-sans mt-4">
-                    <div className="flex flex-col">
-                      <span className="text-[10px] text-charcoal-light uppercase tracking-wider">Program Investment</span>
-                      <span className="font-serif font-bold text-base text-gold-dark">₹{program.pricing}</span>
+                    <div className="flex flex-col text-left">
+                      <span className="text-[10px] text-charcoal-light uppercase tracking-wider mb-1">Program Investment</span>
+                      <div className="flex flex-col leading-tight">
+                        <span className="line-through text-charcoal-light/60 text-xs">₹{new Intl.NumberFormat('en-IN').format(program.originalPrice !== undefined ? program.originalPrice : program.pricing)}</span>
+                        <span className="font-serif font-bold text-base text-gold-dark mt-0.5">₹{new Intl.NumberFormat('en-IN').format(program.sellingPrice !== undefined ? program.sellingPrice : program.pricing)}</span>
+                      </div>
                     </div>
 
-                    <button
-                      onClick={() => setSelectedProgram(program)}
-                      className="bg-sage hover:bg-sage-dark text-white font-bold uppercase tracking-wider py-3 px-8 rounded-xl transition-all duration-300 text-xs shadow-sm flex items-center gap-1.5 group"
-                    >
-                      <span>Enroll Now</span>
-                      <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                    </button>
+                    {['guided meditations', '21 days mirror work for self love program', '21 days release work program'].includes(program.title.toLowerCase().trim()) ? (
+                      <button
+                        disabled
+                        className="bg-charcoal-light/10 text-charcoal-light/40 border border-cream-dark/40 font-bold uppercase tracking-wider py-3 px-8 rounded-xl text-xs cursor-not-allowed font-sans"
+                      >
+                        Coming Soon
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => setSelectedProgram(program)}
+                        className="bg-sage hover:bg-sage-dark text-white font-bold uppercase tracking-wider py-3 px-8 rounded-xl transition-all duration-300 text-xs shadow-sm flex items-center gap-1.5 group"
+                      >
+                        <span>Enroll Now</span>
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                      </button>
+                    )}
                   </div>
 
                 </div>

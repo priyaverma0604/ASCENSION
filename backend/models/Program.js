@@ -18,6 +18,18 @@ const programSchema = new mongoose.Schema({
     type: Number,
     required: [true, 'Please specify pricing in INR']
   },
+  originalPrice: {
+    type: Number,
+    default: 0
+  },
+  sellingPrice: {
+    type: Number,
+    default: 0
+  },
+  zoomLink: {
+    type: String,
+    default: ''
+  },
   images: [
     {
       type: String

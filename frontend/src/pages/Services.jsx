@@ -3,6 +3,15 @@ import { Compass, Clock, CheckCircle, ArrowRight } from 'lucide-react';
 import axios from 'axios';
 import BookSessionModal from '../components/BookSessionModal';
 
+const getImageUrl = (path) => {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
+    return path;
+  }
+  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  return `${apiBase}${path}`;
+};
+
 const Services = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -58,9 +67,9 @@ const Services = () => {
                 {/* Image */}
                 <div className="h-56 bg-cream overflow-hidden relative">
                   <img 
-                    src={service.image} 
+                    src={getImageUrl(service.image)} 
                     alt={service.title} 
-                    className="w-full h-full object-cover hover:scale-102 transition-transform duration-700" 
+                    className={`w-full h-full object-cover hover:scale-102 transition-transform duration-700 ${service.title === 'Sound Healing' ? 'object-top' : ''}`}
                   />
                   <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm text-sage font-bold py-1 px-3.5 rounded-full flex items-center gap-1.5 shadow-sm text-[10px] font-sans">
                     <Clock className="w-3.5 h-3.5 text-sage" />

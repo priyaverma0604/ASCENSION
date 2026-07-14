@@ -50,11 +50,14 @@ exports.getProgramById = async (req, res, next) => {
 // @access  Private/Admin
 exports.createProgram = async (req, res, next) => {
   try {
-    const { title, description, duration, pricing, enrollmentCapacity, youtubeUrl } = req.body;
+    const { title, description, duration, pricing, enrollmentCapacity, youtubeUrl, originalPrice, sellingPrice, zoomLink } = req.body;
+
+    const finalSellingPrice = sellingPrice !== undefined ? Number(sellingPrice) : (pricing !== undefined ? Number(pricing) : 0);
+    const finalOriginalPrice = originalPrice !== undefined ? Number(originalPrice) : finalSellingPrice;
 
     const images = getImagesPaths(req);
     if (images.length === 0 && req.body.images) {
-      // If links were sent directly
+      # If links were sent directly
       if (Array.isArray(req.body.images)) {
         images.push(...req.body.images);
       } else {
@@ -66,7 +69,10 @@ exports.createProgram = async (req, res, next) => {
       title,
       description,
       duration,
-      pricing,
+      pricing: finalSellingPrice,
+      originalPrice: finalOriginalPrice,
+      sellingPrice: finalSellingPrice,
+      zoomLink: zoomLink || '',
       enrollmentCapacity,
       images,
       youtubeUrl
@@ -88,12 +94,28 @@ exports.updateProgram = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Program not found' });
     }
 
-    const { title, description, duration, pricing, enrollmentCapacity, youtubeUrl } = req.body;
+    const { title, description, duration, pricing, enrollmentCapacity, youtubeUrl, originalPrice, sellingPrice, zoomLink } = req.body;
 
     program.title = title || program.title;
     program.description = description || program.description;
     program.duration = duration || program.duration;
-    program.pricing = pricing !== undefined ? pricing : program.pricing;
+    
+    if (sellingPrice !== undefined) {
+      program.sellingPrice = Number(sellingPrice);
+      program.pricing = Number(sellingPrice);
+    } else if (pricing !== undefined) {
+      program.pricing = Number(pricing);
+      program.sellingPrice = Number(pricing);
+    }
+    
+    if (originalPrice !== undefined) {
+      program.originalPrice = Number(originalPrice);
+    }
+
+    if (zoomLink !== undefined) {
+      program.zoomLink = zoomLink;
+    }
+    
     program.enrollmentCapacity = enrollmentCapacity !== undefined ? enrollmentCapacity : program.enrollmentCapacity;
     if (youtubeUrl !== undefined) {
       program.youtubeUrl = youtubeUrl;

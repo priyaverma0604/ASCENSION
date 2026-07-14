@@ -23,6 +23,10 @@ const testimonialSchema = new mongoose.Schema({
   isFeatured: {
     type: Boolean,
     default: false
+  },
+  designation: {
+    type: String,
+    default: ''
   }
 }, {
   timestamps: true

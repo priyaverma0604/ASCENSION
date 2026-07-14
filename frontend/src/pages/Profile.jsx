@@ -178,17 +178,34 @@ const Profile = () => {
               <div className="flex flex-col gap-4">
                 {myPrograms.map((prog) => (
                   <div key={prog._id} className="glass p-5 rounded-2xl border border-cream-dark/50 flex items-center justify-between gap-4 font-sans text-xs text-charcoal">
-                    <div className="flex flex-col gap-1">
+                    <div className="flex flex-col gap-1 text-left">
                       <h4 className="font-serif font-bold text-sm text-charcoal-dark">{prog.title}</h4>
                       <p className="text-charcoal-light line-clamp-1">{prog.description}</p>
                       <div className="flex items-center gap-3 mt-1.5 text-[10px] text-sage">
                         <span className="font-semibold uppercase tracking-wider bg-sage/10 py-0.5 px-2 rounded">{prog.duration}</span>
                         <span>Enrolled successfully</span>
                       </div>
+                      {prog.zoomLink && (
+                        <div className="mt-3 bg-gold/15 border border-gold/20 text-gold-dark text-[10px] py-1.5 px-3 rounded-lg flex items-center gap-2 font-medium max-w-fit">
+                          <span className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse shrink-0"></span>
+                          <span>This program contains only live sessions conducted on Zoom.</span>
+                        </div>
+                      )}
                     </div>
-                    <span className="bg-sage/10 p-2 rounded-full inline-block shrink-0 text-sage">
-                      <ShieldCheck className="w-5 h-5" />
-                    </span>
+                    {prog.zoomLink ? (
+                      <a
+                        href={prog.zoomLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-gold hover:bg-gold-dark text-charcoal-dark font-bold py-2.5 px-4 rounded-xl transition-all shadow-sm shrink-0 flex items-center gap-1.5 uppercase tracking-wider text-[10px] font-sans border border-gold-dark/20"
+                      >
+                        <span>Join Live</span>
+                      </a>
+                    ) : (
+                      <span className="bg-sage/10 p-2 rounded-full inline-block shrink-0 text-sage">
+                        <ShieldCheck className="w-5 h-5" />
+                      </span>
+                    )}
                   </div>
                 ))}
               </div>

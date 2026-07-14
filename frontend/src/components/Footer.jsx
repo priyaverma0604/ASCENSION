@@ -19,7 +19,7 @@ const Footer = () => {
   return (
     <footer className="bg-cream-dark/40 pt-16 pb-8 border-t border-cream-dark/60 mt-20">
       <div className="max-w-7xl mx-auto px-6 md:px-12 grid grid-cols-1 md:grid-cols-4 gap-10">
-        
+
         {/* Brand & Story */}
         <div className="flex flex-col gap-4">
           <div className="flex items-center">

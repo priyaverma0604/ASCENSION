@@ -77,7 +77,7 @@ const servicesData = [
     ],
     duration: 60,
     pricing: 2500,
-    image: "https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&w=800&q=80"
+    image: "/uploads/sound_healing_service.png"
   }
 ];
 
@@ -123,24 +123,28 @@ const retreatsData = [
 
 const testimonialsData = [
   {
-    name: "Meera Nair",
+    name: "Megha Chadha",
     rating: 5,
-    reviewText: "The Theta Healing session with Sonali was eye-opening. I released childhood blocks that I didn't even realize I had. My anxiety levels have dropped significantly.",
+    reviewText: "Ascension – the name sums it up. If you want to become a better version of yourself and ascend spiritually, this is the best platform for you. Sonali was a god sent for me. My journey started during the first few weeks of the lockdown when Sonali launched her first ‘spiritual laws’ session. Her way of explaining the laws, the structure she followed and the discussions that went on were so amazing. I even ended up taking notes and filling an entire book!! I went on to do her 21 days affirmations, monthly full moon meditations, weekly meditations, angels workshops, 21 days gratitude, and now looking forward to the ancestral healing workshop. It's been a great learning. I feel I have become more aware of my reactions and more calm in situations. She really taught me to believe in the universe and think from my higher self. If I've become a calmer person it's only thanks to Sonali. She is always there to talk and give advice. She is truly gifted and a wonderful person. So glad I found her this lifetime.",
     isFeatured: true,
-    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=150&q=80"
+    image: "/uploads/megha_chadha.png",
+    designation: ""
   },
   {
-    name: "Rohan Sharma",
+    name: "Amit Bhasin",
     rating: 5,
-    reviewText: "Her Manifestation Workshop is practical and energetic. Within two weeks of applying the abundance mapping, I manifested a career role that matches my goals perfectly!",
+    reviewText: "Theta, Access Consciousness were already in our life when Sonali included us in her energy circle of Ascension. They say ‘When the student is ready, the teacher appears’. Little did we know that my young elfin sister Sonali would soar so high into the sky and root herself so deep beneath, that she could spread light all around her. Sonali's positive snippets are often what one wants to read, whether on whatsapp or on Instagram. She touches a chord, which remain hidden. She inspires one to trust the Universe and its limitless fountain of energy and to drink from it. My journey into meditation began with Sonali and continues with Ascension. Its an exciting journey I can see and I am looking forward to it.",
     isFeatured: true,
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80"
+    image: "/uploads/amit_bhasin.png",
+    designation: "ADVOCATE"
   },
   {
-    name: "Kriti Sen",
+    name: "Shuchi Bhasin",
     rating: 5,
-    reviewText: "The Sound Healing bath was magic. I fell into the deepest rest I've had in years. Highly recommend her services to anyone seeking peace in chaotic New Delhi.",
+    reviewText: "COVID-19 brought with it fear,depression, anxiety, panic, worry, loneliness and uncertainty. All these negative emotions were playing havoc with my Parkinson's too.I was miserable mentally and emotionally. I started getting panic attacks and my anxiety levels were going off the roof. Sonali's invite for Spiritual laws sessions changed everything. She was God send and a miracle that happened to me. I'm a different person now ,on the spiritual path trying to evolve. All thanks to Sonali. I'm forever in gratitude. She is so eloquent, passionate, thought provoking, honest, relentless, sensitive and knowledgeable. I have learnt so much from her and my whole perspective towards life has changed and I'm ascending. I owe a lot to her. May she ascend to the top and be a spiritual guide and a master,awakening the divine in all.May she spread love n light to us mortal beings so that our journey towards the ultimate divine becomes easier.",
     isFeatured: true,
+    image: "/uploads/shuchi_bhasin.png",
+    designation: ""
   }
 ];
 
@@ -149,16 +153,21 @@ const programsData = [
     title: "Ancestral Healing Workshop",
     description: "Ancestral Healing, or healing our intergenerational trauma is the belief that we are not merely the blood and bones of parents and our cultures, but that we carry our memories, traumas, pain as well gifts from our ancestors through Family Karma. Popular Culture tells us that we’re independent beings, set free in all ways, but in reality, we all face challenges in our lives as a consequence of Ancestral Blocks and Family Karma. It is, however, possible to get into a process to bring cleaning, healing, and empowerment through repair work with our ancestral lineages. In Ascension's most ambitious program thus far, Join Sonali in not only connecting you to your ancestors but in clearing Pitrudosh and other Ancestral Blocks to bring peace in your lives and for your ancestors.",
     duration: "3 Sessions",
-    pricing: 4500,
+    pricing: 19999,
+    originalPrice: 29999,
+    sellingPrice: 19999,
     enrollmentCapacity: 30,
     images: ["https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80"],
-    youtubeUrl: "https://www.youtube.com/embed/jIs3IH-brtg"
+    youtubeUrl: "https://www.youtube.com/embed/jIs3IH-brtg",
+    zoomLink: "https://zoom.us/j/1234567890"
   },
   {
     title: "Guided Meditations",
     description: "Meditations are a channel for one to go within and better their relationships with their own mental, spiritual, and physical bodies. At Ascension, Sonali makes her meditations enable introspective work to access greater consciousness by releasing negative beliefs and in turn, integrating holistic beliefs into one fold. Through meditations on balancing Chakric Fields, Prosperity Consciousness, Integration the power of Peace in Relationships, Karmic Dispensation and Ancestral Healing, she has produced a stock of guided meditations that push everyone to their Ascension.",
     duration: "1 Session",
     pricing: 2100,
+    originalPrice: 2100,
+    sellingPrice: 2100,
     enrollmentCapacity: 50,
     images: ["https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&w=800&q=80"],
     youtubeUrl: "https://www.youtube.com/embed/MERkgMlwkJs"
@@ -167,16 +176,21 @@ const programsData = [
     title: "Angel Therapy workshops",
     description: "Our Planet is governed by a host of Angels, Spirit Guides, and other Ascended Beings who help us transmute the negativity, dispense negative karma and, operate from unconditional love and light. One such set of Angels are the Archangels, whose existence can be traced to Abrahamic religions particularly in Central Asia and Western Europe. Interestingly, both The Bible and The Quran talk about these angels. Through simple rituals like hosting angels, creating altars to honor them and, meditations to invoke them to beautify one's lives, Ascension consistently strives to spread their message of Tranquility and Unity across the Globe.",
     duration: "1 Session",
-    pricing: 2500,
+    pricing: 17777,
+    originalPrice: 41111,
+    sellingPrice: 17777,
     enrollmentCapacity: 25,
     images: ["https://images.unsplash.com/photo-1447452001602-7090c7ab2db3?auto=format&fit=crop&w=800&q=80"],
-    youtubeUrl: "https://www.youtube.com/embed/rrcE3NIe66Q"
+    youtubeUrl: "https://www.youtube.com/embed/rrcE3NIe66Q",
+    zoomLink: "https://zoom.us/j/1234567890"
   },
   {
     title: "21 days affirmations program",
     description: "Affirmations are positive phrases or mantras that we repeat to ourselves, which describe a specific outcome or who we want to be. At first, these affirmations might appear untrue, but with constant repetition, our subconscious mind will start to believe them and eventually these affirmations become powerful tools for manifesting dreams. Through her vast pool of knowledge, Sonali has produced immaculate results through these Affirmations in only 21 days!",
     duration: "21 Days",
-    pricing: 3500,
+    pricing: 1555,
+    originalPrice: 3333,
+    sellingPrice: 1555,
     enrollmentCapacity: 100,
     images: ["https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=800&q=80"],
     youtubeUrl: "https://www.youtube.com/embed/yA7uD1DXeaU"
@@ -185,7 +199,9 @@ const programsData = [
     title: "30 days gratitude program",
     description: "Gratitude is a high vibrational action, which means giving thanks from your heart. When you do this, energy flows from your heart and activates certain responses from other people as well as the Universe. Through the 21-day Gratitude Programme, Ascension works towards drawing your attention to the multiple blessings you have in your life and enables you to cope with limiting beliefs by giving you the tools to be able to take on every challenge to the best of your ability.",
     duration: "30 Days",
-    pricing: 4200,
+    pricing: 1111,
+    originalPrice: 2222,
+    sellingPrice: 1111,
     enrollmentCapacity: 80,
     images: ["https://images.unsplash.com/photo-1490730141103-6cac27aaab94?auto=format&fit=crop&w=800&q=80"],
     youtubeUrl: "https://www.youtube.com/embed/w3m7qjInPpY"
@@ -194,7 +210,9 @@ const programsData = [
     title: "21 days mirror work for self love program",
     description: "A Prayer is a tool to communicate with God. Whether we realize it or not, God is on the other end of the phone line, listening to us all the time. Every word and every thought we send along is a prayer, which helps transmute negative Karmic Cycles. Through guided and curated prayers, Sonali takes us one step closer to God through the power of Ascension by our side, with prayers for ourselves, our friends, families, and Mother Earth.",
     duration: "21 Days",
-    pricing: 3500,
+    pricing: 888,
+    originalPrice: 2222,
+    sellingPrice: 888,
     enrollmentCapacity: 100,
     images: ["https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80"],
     youtubeUrl: "https://www.youtube.com/embed/prtjHYiifEQ"
@@ -203,7 +221,9 @@ const programsData = [
     title: "21 days prayers",
     description: "A Prayer is a tool to communicate with God. Whether we realize it or not, God is on the other end of the phone line, listening to us all the time. Every word and every thought we send along is a prayer, which helps transmute negative Karmic Cycles. Through guided and curated prayers, Sonali takes us one step closer to God through the power of Ascension by our side, with prayers for ourselves, our friends, families, and Mother Earth.",
     duration: "21 Days",
-    pricing: 3500,
+    pricing: 777,
+    originalPrice: 2222,
+    sellingPrice: 777,
     enrollmentCapacity: 100,
     images: ["https://images.unsplash.com/photo-1490730141103-6cac27aaab94?auto=format&fit=crop&w=800&q=80"],
     youtubeUrl: "https://www.youtube.com/embed/SK_mLIaVfao"
@@ -212,7 +232,9 @@ const programsData = [
     title: "21 days release work program",
     description: "As the term itself explains, through exercises and meditations, we release what isn't serving us and we release all past traumas and pains which are deeply embedded into our being and causing harm, by increasing our consciousness and inculcating positivity into our fold.",
     duration: "21 Days",
-    pricing: 3500,
+    pricing: 1555,
+    originalPrice: 3333,
+    sellingPrice: 1555,
     enrollmentCapacity: 100,
     images: ["https://images.unsplash.com/photo-1499209974431-9dddcece7f88?auto=format&fit=crop&w=800&q=80"],
     youtubeUrl: ""
@@ -221,7 +243,9 @@ const programsData = [
     title: "21 days forgiveness program",
     description: "Forgiveness, much like Gratitude is one of the most empowering tools, that can help individuals emancipate themselves from the shackles of the aggressor's wrath, regain control of their life's narrative and initiate the process of moving on to recovering the power they lost. In Ascension's upcoming venture, join Sonali in healing the wounds of the past, forgiving your inner demons and the actions of those who have hurt you.",
     duration: "21 Days",
-    pricing: 3500,
+    pricing: 1555,
+    originalPrice: 3333,
+    sellingPrice: 1555,
     enrollmentCapacity: 100,
     images: ["https://images.unsplash.com/photo-1522881197257-40fcd4855a76?auto=format&fit=crop&w=800&q=80"],
     youtubeUrl: ""
