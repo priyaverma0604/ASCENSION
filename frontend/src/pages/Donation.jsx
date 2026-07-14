@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Copy, Heart, CheckCircle, Smartphone, HelpCircle, ArrowRight, DollarSign, Compass } from 'lucide-react';
 import axios from 'axios';
-import sevaLogo from '../assets/seva_logo.png';
 
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
@@ -24,7 +23,7 @@ const Donation = () => {
   const [amount, setAmount] = useState('');
   const [message, setMessage] = useState('');
   const [transactionId, setTransactionId] = useState(''); // for manual UPI reference
-  
+
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
@@ -175,7 +174,7 @@ const Donation = () => {
   return (
     <div className="min-h-screen py-16 px-6 font-sans">
       <div className="max-w-4xl mx-auto flex flex-col gap-12">
-        
+
         {/* Title */}
         <div className="text-center flex flex-col gap-3">
           <span className="font-serif italic text-xs text-sage tracking-wider uppercase font-semibold">Make an Impact</span>
@@ -192,9 +191,9 @@ const Donation = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="glass rounded-[24px] overflow-hidden border border-cream-dark/50 shadow-sm flex flex-col group transition-all duration-300 hover:shadow-lg">
             <div className="h-44 overflow-hidden bg-cream">
-              <img 
-                src="https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=600&q=80" 
-                alt="Delhi Food Distribution Drive" 
+              <img
+                src="https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=600&q=80"
+                alt="Delhi Food Distribution Drive"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
             </div>
@@ -210,9 +209,9 @@ const Donation = () => {
 
           <div className="glass rounded-[24px] overflow-hidden border border-cream-dark/50 shadow-sm flex flex-col group transition-all duration-300 hover:shadow-lg">
             <div className="h-44 overflow-hidden bg-cream">
-              <img 
-                src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=600&q=80" 
-                alt="Children Education and Welfare" 
+              <img
+                src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=600&q=80"
+                alt="Children Education and Welfare"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
             </div>
@@ -228,9 +227,9 @@ const Donation = () => {
 
           <div className="glass rounded-[24px] overflow-hidden border border-cream-dark/50 shadow-sm flex flex-col group transition-all duration-300 hover:shadow-lg">
             <div className="h-44 overflow-hidden bg-cream">
-              <img 
-                src="https://images.unsplash.com/photo-1509099836639-18ba1795216d?auto=format&fit=crop&w=600&q=80" 
-                alt="Elderly Welfare Support" 
+              <img
+                src="https://images.unsplash.com/photo-1509099836639-18ba1795216d?auto=format&fit=crop&w=600&q=80"
+                alt="Elderly Welfare Support"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
             </div>
@@ -264,33 +263,31 @@ const Donation = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-            
+
             {/* Left: Donation Mode Options */}
             <div className="flex flex-col gap-6 text-left">
               <div className="glass p-5 rounded-2xl border border-cream-dark/50 flex flex-col gap-4">
                 <h3 className="font-serif text-base font-bold text-charcoal-dark uppercase tracking-wider border-b border-cream-dark pb-2">
                   Select Donation Method
                 </h3>
-                
+
                 {/* Method selector */}
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => setActiveMode('razorpay')}
-                    className={`py-3 px-4 rounded-xl border text-xs font-bold uppercase tracking-wider transition-all focus:outline-none ${
-                      activeMode === 'razorpay'
+                    className={`py-3 px-4 rounded-xl border text-xs font-bold uppercase tracking-wider transition-all focus:outline-none ${activeMode === 'razorpay'
                         ? 'bg-sage text-white border-sage shadow-sm'
                         : 'bg-cream/40 border-cream-dark/60 text-charcoal hover:bg-cream'
-                    }`}
+                      }`}
                   >
                     Online Cards / UPI
                   </button>
                   <button
                     onClick={() => setActiveMode('upi_qr')}
-                    className={`py-3 px-4 rounded-xl border text-xs font-bold uppercase tracking-wider transition-all focus:outline-none ${
-                      activeMode === 'upi_qr'
+                    className={`py-3 px-4 rounded-xl border text-xs font-bold uppercase tracking-wider transition-all focus:outline-none ${activeMode === 'upi_qr'
                         ? 'bg-sage text-white border-sage shadow-sm'
                         : 'bg-cream/40 border-cream-dark/60 text-charcoal hover:bg-cream'
-                    }`}
+                      }`}
                   >
                     UPI QR Code
                   </button>
@@ -302,7 +299,7 @@ const Donation = () => {
                     <p className="text-[10px] text-center text-charcoal-light font-sans max-w-[180px] leading-relaxed">
                       Scan QR code below using GPay, PhonePe, Paytm, or any BHIM UPI App.
                     </p>
-                    
+
                     {/* Simulated High Quality QR code */}
                     <div className="w-40 h-40 bg-white border border-cream-dark p-2 rounded-xl flex items-center justify-center relative">
                       <div className="w-full h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-charcoal-dark/5 via-charcoal-dark/30 to-charcoal-dark/70 rounded flex flex-col items-center justify-center gap-1">
@@ -336,7 +333,7 @@ const Donation = () => {
 
             {/* Right: Donation Forms details */}
             <div className="glass p-6 rounded-2xl border border-cream-dark/50">
-              
+
               <h3 className="font-serif text-base font-bold text-charcoal-dark uppercase tracking-wider text-left border-b border-cream-dark pb-2 mb-4">
                 Donation Details
               </h3>
@@ -413,7 +410,7 @@ const Donation = () => {
               ) : (
                 /* Manual UPI Logging Form */
                 <form onSubmit={handleManualUpiSubmit} className="flex flex-col gap-4 font-sans text-xs text-left text-charcoal">
-                  
+
                   <div className="flex flex-col gap-1.5">
                     <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Transferred Amount (INR)</label>
                     <input

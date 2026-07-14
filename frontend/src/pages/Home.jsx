@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  Compass, Calendar, ArrowRight, MessageCircle, ChevronLeft, ChevronRight, Check, 
-  ShieldCheck, UserCheck, Heart, Lock, Sparkles, Award, Users, Shield, Star, Leaf, 
+import {
+  Compass, Calendar, ArrowRight, MessageCircle, ChevronLeft, ChevronRight, Check,
+  ShieldCheck, UserCheck, Heart, Lock, Sparkles, Award, Users, Shield, Star, Leaf,
   TrendingUp, ShoppingBag, Eye, HeartHandshake, MapPin, Mail, Phone, CalendarRange,
   Moon, Sun
 } from 'lucide-react';
@@ -12,7 +12,6 @@ import RegisterWebinarModal from '../components/RegisterWebinarModal';
 import waterfallBg from '../assets/waterfall_bg.jpg';
 import founderImg from '../assets/founder.jpg';
 import foodSeva from '../assets/food_seva.png';
-import sevaLogo from '../assets/seva_logo.png';
 
 const getImageUrl = (path) => {
   if (!path) return '';
@@ -243,7 +242,7 @@ const Home = () => {
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
-            
+
             {/* Card 1: Who We Are */}
             <Link to="/about" className="group bg-white rounded-[24px] p-8 shadow-md border border-cream-dark/50 hover:border-gold-dark/45 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 flex flex-col items-center text-center">
               <div className="w-14 h-14 rounded-full bg-gold/10 text-gold flex items-center justify-center mb-6 transform group-hover:scale-110 transition-transform duration-300">
@@ -296,7 +295,7 @@ const Home = () => {
       {/* 3. Meet the Founder */}
       <section className="py-24 bg-cream/20 px-6 md:px-12 border-b border-cream-dark/30 w-full">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-          
+
           {/* Left: Picture */}
           <div className="relative justify-self-center">
             <div className="w-72 h-[420px] rounded-3xl overflow-hidden shadow-xl border border-gold-dark/20 relative">
@@ -324,7 +323,7 @@ const Home = () => {
             <p className="text-xs text-charcoal-light leading-relaxed font-sans">
               Her ultimate mission is to help individuals transcend deep-seated emotional trauma, clear karmic residue, and align with the light of their true essence, nurturing a peaceful recovery.
             </p>
-            
+
             <div className="grid grid-cols-2 gap-4 border-t border-b border-cream-dark/50 py-4 mt-2">
               <div className="flex flex-col gap-0.5">
                 <span className="font-serif text-gold-dark font-bold text-lg">10+ Years</span>
@@ -354,7 +353,7 @@ const Home = () => {
           <h2 className="font-serif text-3xl md:text-4xl font-bold text-charcoal-dark mt-2 mb-16">Healing Services</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            
+
             {/* Service 1: Theta Healing */}
             <div className="group bg-white rounded-[24px] p-6 shadow-md border border-cream-dark/40 hover:border-gold-dark/45 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 flex flex-col text-left">
               <div className="h-40 rounded-xl overflow-hidden mb-5 relative">
@@ -474,7 +473,7 @@ const Home = () => {
           <h2 className="font-serif text-3xl md:text-4xl font-bold text-charcoal-dark mt-2 mb-16">Why Choose Ascension</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            
+
             {/* Feature 1 */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-cream-dark/30 hover:border-gold-dark/45 transition-all duration-300 text-left flex flex-col gap-3">
               <div className="w-10 h-10 rounded-full bg-gold/10 text-gold flex items-center justify-center">
@@ -560,7 +559,7 @@ const Home = () => {
               <p className="font-serif italic text-sm md:text-base text-charcoal-light leading-relaxed max-w-2xl">
                 "{testimonials[activeTestimonial].reviewText}"
               </p>
-              
+
               <div className="flex items-center gap-3 mt-6 font-sans text-left">
                 {testimonials[activeTestimonial].image ? (
                   <img
@@ -622,7 +621,7 @@ const Home = () => {
       {/* 7. Ascension Seva NGO */}
       <section className="py-24 bg-cream/20 px-6 md:px-12 border-b border-cream-dark/30 w-full">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-          
+
           <div className="flex flex-col gap-6 text-left">
             <span className="font-serif italic text-xs text-gold-dark tracking-wider uppercase font-semibold">Healing Humanity</span>
             <img src={sevaLogo} alt="Ascension Seva" className="h-10 md:h-12 w-auto object-contain text-left" />
@@ -648,7 +647,7 @@ const Home = () => {
                 </div>
               ))}
             </div>
-            
+
             <div className="flex items-center gap-6 mt-4 font-sans">
               <Link
                 to="/ngo"
@@ -686,10 +685,10 @@ const Home = () => {
               {workshops.slice(0, 3).map((workshop) => (
                 <div key={workshop._id} className="group bg-white rounded-3xl overflow-hidden shadow-md border border-cream-dark/50 hover:shadow-2xl hover:border-gold-dark/45 hover:-translate-y-1 transition-all duration-300 flex flex-col text-left">
                   <div className="h-48 overflow-hidden bg-cream relative">
-                    <img 
-                      src={getImageUrl(workshop.coverImage || workshop.image)} 
-                      alt={workshop.title} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                    <img
+                      src={getImageUrl(workshop.coverImage || workshop.image)}
+                      alt={workshop.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-xs px-3 py-1 rounded-full text-[9px] font-bold tracking-widest uppercase text-sage-dark shadow-sm flex items-center gap-1 font-sans">
                       <Calendar className="w-3 h-3" />
@@ -701,7 +700,7 @@ const Home = () => {
                     <p className="text-xs text-charcoal-light leading-relaxed font-sans line-clamp-3 mb-6">
                       {workshop.description || workshop.shortDescription}
                     </p>
-                    
+
                     <div className="mt-auto border-t border-cream-dark/40 pt-4 flex justify-between items-center font-sans text-xs">
                       <div className="flex flex-col">
                         <span className="text-[9px] text-charcoal-light uppercase">Investment</span>
@@ -743,10 +742,10 @@ const Home = () => {
               {products.map((product) => (
                 <div key={product._id} className="group bg-white rounded-3xl overflow-hidden shadow-md border border-cream-dark/50 hover:shadow-2xl hover:border-gold-dark/45 hover:-translate-y-1 transition-all duration-300 flex flex-col text-left">
                   <div className="h-56 overflow-hidden bg-cream-light relative">
-                    <img 
-                      src={getImageUrl(product.images[0])} 
-                      alt={product.name} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                    <img
+                      src={getImageUrl(product.images[0])}
+                      alt={product.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-xs rounded-full p-2 text-gold shadow-sm">
                       <ShoppingBag className="w-3.5 h-3.5" />
@@ -755,11 +754,11 @@ const Home = () => {
                   <div className="p-5 flex flex-col flex-grow">
                     <span className="text-[9px] uppercase tracking-wider text-sage font-medium font-sans mb-1">{product.category}</span>
                     <h3 className="font-serif text-sm font-bold text-charcoal-dark mb-3 line-clamp-1">{product.name}</h3>
-                    
+
                     <div className="mt-auto pt-3 border-t border-cream-dark/30 flex justify-between items-center font-sans text-xs">
                       <span className="font-serif font-bold text-gold-dark text-sm">₹{product.price}</span>
-                      <Link 
-                        to={`/product/${product._id}`} 
+                      <Link
+                        to={`/product/${product._id}`}
                         className="text-sage hover:text-gold font-bold uppercase tracking-wider flex items-center gap-1 text-[10px]"
                       >
                         <span>View Product</span>
@@ -782,7 +781,7 @@ const Home = () => {
 
       {/* 10. Donation CTA Banner (Premium placement near bottom) */}
       <section className="py-24 bg-[#FFFDF7] px-6 md:px-12 border-b border-cream-dark/30 w-full text-center">
-        <div 
+        <div
           className="max-w-5xl mx-auto rounded-3xl text-white p-10 md:p-14 shadow-2xl relative overflow-hidden flex flex-col items-center gap-8 animate-fade-in bg-cover bg-center border border-cream-dark/30"
           style={{ backgroundImage: `url(${foodSeva})` }}
         >

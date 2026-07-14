@@ -3,7 +3,6 @@ import { Compass, CheckCircle, Heart, Users, BookOpen, Smile, ShieldAlert, Gradu
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
 import founderImg from '../assets/founder.jpg';
-import sevaLogo from '../assets/seva_logo.png';
 
 const NGO = () => {
   const { user } = useContext(AuthContext);
@@ -26,7 +25,7 @@ const NGO = () => {
         phone,
         message: `[VOLUNTEER APPLICATION]\nSelected Area: ${interest}\nMessage: ${message}`
       };
-      
+
       const { data } = await axios.post('/api/contacts', payload);
       if (data.success) {
         setSuccess(true);
@@ -94,7 +93,7 @@ const NGO = () => {
   return (
     <div className="min-h-screen py-16 px-6 font-sans">
       <div className="max-w-5xl mx-auto flex flex-col gap-16">
-        
+
         {/* Title */}
         <div className="text-center flex flex-col gap-3">
           <span className="font-serif italic text-xs text-sage tracking-wider uppercase font-semibold">Selfless Service</span>
@@ -109,10 +108,10 @@ const NGO = () => {
         {/* NGO Banner and Mission */}
         <div className="glass p-8 rounded-2xl grid grid-cols-1 md:grid-cols-2 gap-10 items-start border border-cream-dark/65">
           <div className="h-96 md:h-full md:min-h-[480px] rounded-2xl overflow-hidden bg-cream shadow-sm group">
-            <img 
-              src={founderImg} 
-              alt="Sonali Bhasin Kumar - Founder" 
-              className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" 
+            <img
+              src={founderImg}
+              alt="Sonali Bhasin Kumar - Founder"
+              className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
             />
           </div>
           <div className="flex flex-col gap-4 text-left">
@@ -197,7 +196,7 @@ const NGO = () => {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4 font-sans text-xs text-charcoal">
-              
+
               {/* Name */}
               <div className="flex flex-col gap-1.5 text-left">
                 <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Your Name</label>
