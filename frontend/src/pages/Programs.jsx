@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Compass, Calendar, CheckCircle, ArrowRight, UserCheck } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { AuthContext } from '../context/AuthContext';
 import EnrollProgramModal from '../components/EnrollProgramModal';
 
 const getImageUrl = (path) => {
@@ -13,9 +15,19 @@ const getImageUrl = (path) => {
 };
 
 const Programs = () => {
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [programs, setPrograms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedProgram, setSelectedProgram] = useState(null);
+
+  const handleEnrollClick = (program) => {
+    if (!user) {
+      navigate('/login');
+    } else {
+      setSelectedProgram(program);
+    }
+  };
 
   useEffect(() => {
     fetchPrograms();
@@ -124,7 +136,7 @@ const Programs = () => {
                       </button>
                     ) : (
                       <button
-                        onClick={() => setSelectedProgram(program)}
+                        onClick={() => handleEnrollClick(program)}
                         className="bg-sage hover:bg-sage-dark text-white font-bold uppercase tracking-wider py-3 px-8 rounded-xl transition-all duration-300 text-xs shadow-sm flex items-center gap-1.5 group"
                       >
                         <span>Enroll Now</span>
