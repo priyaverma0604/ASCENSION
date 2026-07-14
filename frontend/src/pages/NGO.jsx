@@ -3,6 +3,7 @@ import { Compass, CheckCircle, Heart, Users, BookOpen, Smile, ShieldAlert, Gradu
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
 import founderImg from '../assets/founder.jpg';
+import sevaLogo from '../assets/seva_logo.png';
 
 const NGO = () => {
   const { user } = useContext(AuthContext);
@@ -97,8 +98,8 @@ const NGO = () => {
         {/* Title */}
         <div className="text-center flex flex-col gap-3">
           <span className="font-serif italic text-xs text-sage tracking-wider uppercase font-semibold">Selfless Service</span>
-          <h1 className="font-serif text-3xl md:text-4xl font-bold tracking-wide text-charcoal-dark leading-tight">
-            Ascension Seva NGO
+          <h1 className="font-serif text-3xl md:text-4xl font-bold tracking-wide text-charcoal-dark leading-tight flex justify-center">
+            <img src={sevaLogo} alt="Ascension Seva" className="h-12 md:h-14 w-auto object-contain" />
           </h1>
           <p className="max-w-xl mx-auto text-xs text-charcoal-light leading-relaxed">
             At Ascension, we believe that true spirituality is reflected in service to humanity. Through Seva, we create ripples of healing and compassion across Delhi's underprivileged communities.

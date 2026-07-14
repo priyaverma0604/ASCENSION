@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Copy, Heart, CheckCircle, Smartphone, HelpCircle, ArrowRight, DollarSign, Compass } from 'lucide-react';
 import axios from 'axios';
+import sevaLogo from '../assets/seva_logo.png';
 
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
@@ -178,8 +179,9 @@ const Donation = () => {
         {/* Title */}
         <div className="text-center flex flex-col gap-3">
           <span className="font-serif italic text-xs text-sage tracking-wider uppercase font-semibold">Make an Impact</span>
-          <h1 className="font-serif text-3xl md:text-4xl font-bold tracking-wide text-charcoal-dark leading-tight">
-            Support Ascension Seva NGO
+          <h1 className="font-serif text-3xl md:text-4xl font-bold tracking-wide text-charcoal-dark leading-tight flex justify-center items-center gap-2 flex-wrap">
+            <span>Support</span>
+            <img src={sevaLogo} alt="Ascension Seva" className="h-10 md:h-12 w-auto object-contain inline-block" />
           </h1>
           <p className="max-w-xl mx-auto text-xs text-charcoal-light leading-relaxed">
             Every contribution directly funds our local Delhi food distribution campaigns, underprivileged children tutoring drives, women confidence workshops, and stray animal care circles.
