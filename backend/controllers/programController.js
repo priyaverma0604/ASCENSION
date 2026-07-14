@@ -187,7 +187,7 @@ exports.createEnrollmentOrder = async (req, res, next) => {
       currency: 'INR'
     };
 
-    if (isRazorpayConfigured) {
+    if (false && isRazorpayConfigured) { // Disabled for programs per user request
       const options = {
         amount: amount * 100, // paise
         currency: 'INR',
@@ -229,7 +229,7 @@ exports.verifyEnrollmentPayment = async (req, res, next) => {
 
     const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
 
-    if (isRazorpayConfigured) {
+    if (false && isRazorpayConfigured) { // Disabled for programs per user request
       if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
         return res.status(400).json({ success: false, message: 'Please provide all payment verification fields' });
       }

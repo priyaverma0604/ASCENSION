@@ -43,7 +43,7 @@ exports.createOrder = async (req, res, next) => {
     // Initialize Razorpay Order id
     let orderResponseId = `mock_order_${crypto.randomBytes(6).toString('hex')}`;
     
-    if (isRazorpayConfigured) {
+    if (false && isRazorpayConfigured) { // Disabled for shop per user request
       const options = {
         amount: Math.round(calculatedTotal * 100), // in paise
         currency: 'INR',
@@ -93,7 +93,7 @@ exports.verifyPayment = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Order record not found' });
     }
 
-    if (isRazorpayConfigured) {
+    if (false && isRazorpayConfigured) { // Disabled for shop per user request
       if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
         return res.status(400).json({ success: false, message: 'Missing payment details' });
       }
