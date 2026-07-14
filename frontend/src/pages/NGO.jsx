@@ -3,6 +3,7 @@ import { Compass, CheckCircle, Heart, Users, BookOpen, Smile, ShieldAlert, Gradu
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
 import founderImg from '../assets/founder.jpg';
+import sevaLogo from '../assets/seva_logo.png';
 
 const NGO = () => {
   const { user } = useContext(AuthContext);

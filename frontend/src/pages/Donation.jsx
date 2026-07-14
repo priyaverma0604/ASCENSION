@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Copy, Heart, CheckCircle, Smartphone, HelpCircle, ArrowRight, DollarSign, Compass } from 'lucide-react';
 import axios from 'axios';
+import sevaLogo from '../assets/seva_logo.png';
 
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {

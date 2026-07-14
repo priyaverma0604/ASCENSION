@@ -12,6 +12,7 @@ import RegisterWebinarModal from '../components/RegisterWebinarModal';
 import waterfallBg from '../assets/waterfall_bg.jpg';
 import founderImg from '../assets/founder.jpg';
 import foodSeva from '../assets/food_seva.png';
+import sevaLogo from '../assets/seva_logo.png';
 
 const getImageUrl = (path) => {
   if (!path) return '';
