@@ -68,7 +68,7 @@ const BookSessionModal = ({ service, onClose }) => {
             </p>
             <div className="flex flex-col gap-2 w-full mt-4 font-sans">
               <a
-                href={`https://wa.me/919818577751?text=Hi%20Sonali,%20I%20have%20submitted%20a%20booking%20request%20for%20${encodeURIComponent(service.title)}.%20Looking%20forward%20to%20scheduling%20it!`}
+                href={`https://wa.me/918929061557?text=Hi%20Sonali,%20I%20have%20submitted%20a%20booking%20request%20for%20${encodeURIComponent(service.title)}.%20Looking%20forward%20to%20scheduling%20it!`}
                 target="_blank"
                 rel="noreferrer"
                 className="w-full flex items-center justify-center gap-2 bg-sage hover:bg-sage-dark text-white text-xs font-bold py-2.5 rounded-xl transition-all duration-300 shadow-sm"

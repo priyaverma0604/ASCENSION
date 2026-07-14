@@ -78,7 +78,7 @@ const Contact = () => {
                 <Phone className="w-5 h-5 text-sage shrink-0 mt-0.5" />
                 <div className="flex flex-col gap-0.5">
                   <span className="font-bold text-[10px] text-charcoal-light uppercase">WhatsApp / Call</span>
-                  <a href="tel:+919818577751" className="hover:text-gold transition-colors font-medium">+91 98185 77751</a>
+                  <a href="tel:+918929061557" className="hover:text-gold transition-colors font-medium">+91 89290 61557</a>
                 </div>
               </div>
 
@@ -98,7 +98,7 @@ const Contact = () => {
                 <span className="text-xs font-bold text-charcoal-dark uppercase tracking-wide">Direct WhatsApp Chat</span>
               </div>
               <a
-                href="https://wa.me/919818577751?text=Hi%20Sonali,%20I'd%20like%20to%20inquire%20about%20your%20spiritual%20healing%20services."
+                href="https://wa.me/918929061557?text=Hi%20Sonali,%20I'd%20like%20to%20inquire%20about%20your%20spiritual%20healing%20services."
                 target="_blank"
                 rel="noreferrer"
                 className="bg-sage hover:bg-sage-dark text-white text-[10px] font-bold uppercase tracking-wider py-2 px-4 rounded-xl shadow-sm transition-all duration-300"
