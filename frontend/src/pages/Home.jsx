@@ -639,7 +639,8 @@ const Home = () => {
             )}
           </div>
         </section>
-          {/* 7. Ascension Seva NGO */}
+      )}
+      {/* 7. Ascension Seva NGO */}
       <section ref={sevaRef} className="py-24 bg-[#FCFBF7] px-6 md:px-12 border-b border-cream-dark/30 w-full relative overflow-hidden">
         {/* Subtle Mandala Watermark */}
         <div 
