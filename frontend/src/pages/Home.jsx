@@ -623,9 +623,9 @@ const Home = () => {
       <section className="py-24 bg-cream/20 px-6 md:px-12 border-b border-cream-dark/30 w-full">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
 
-          <div className="flex flex-col gap-4 text-left">
+          <div className="flex flex-col gap-6 text-left">
             <span className="font-serif italic text-xs text-gold-dark tracking-wider uppercase font-semibold">Healing Humanity</span>
-            <img src={`${sevaLogo}?v=3`} alt="Ascension Seva" className="h-12 md:h-16 w-auto object-contain text-left" />
+            <img src={`${sevaLogo}?v=3`} alt="Ascension Seva" className="h-24 md:h-32 w-auto object-contain text-left" />
             <div className="w-12 h-[1px] bg-gold-dark/40"></div>
             <p className="text-xs text-charcoal-light leading-relaxed font-sans">
               We believe true spirituality extends beyond personal healing—it is reflected in selfless service (Seva) to humanity. Founded by Sonali Bhasin Kumar, our NGO initiatives support underprivileged families, feed local communities, mentor school children, and foster animal compassion.
@@ -665,7 +665,7 @@ const Home = () => {
             </div>
           </div>
 
-          <div className="h-[460px] rounded-3xl overflow-hidden shadow-xl border border-cream-dark/50 bg-cream order-first md:order-last">
+          <div className="h-[540px] md:h-[580px] rounded-3xl overflow-hidden shadow-xl border border-cream-dark/50 bg-cream order-first md:order-last">
             <img
               src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80"
               alt="Ascension Seva NGO"
