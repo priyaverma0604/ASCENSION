@@ -103,3 +103,37 @@ a.bg-sage svg,
   color: #1f1d1a !important;
   fill: #1f1d1a !important;
 }
+
+/* Custom Seva Section Animations */
+@keyframes float-slow {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes float-slower {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+  100% { transform: translateY(0px); }
+}
+
+.animate-float-slow {
+  animation: float-slow 6s ease-in-out infinite;
+}
+
+.animate-float-slower {
+  animation: float-slower 8s ease-in-out infinite;
+}
+
+.delay-400 {
+  transition-delay: 400ms;
+}
+
+.delay-600 {
+  transition-delay: 600ms;
+}
+
+.delay-800 {
+  transition-delay: 800ms;
+}
+

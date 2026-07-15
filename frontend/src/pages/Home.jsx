@@ -13,6 +13,7 @@ import waterfallBg from '../assets/waterfall_bg.jpg';
 import founderImg from '../assets/founder.jpg';
 import foodSeva from '../assets/food_seva.png';
 import sevaLogo from '../assets/seva_logo.png';
+import mandalaWatermark from '../assets/mandala_watermark.png';
 
 const getImageUrl = (path) => {
   if (!path) return '';
@@ -36,8 +37,29 @@ const Home = () => {
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
 
+  // Seva Section Animation State & Ref
+  const [sevaVisible, setSevaVisible] = useState(false);
+  const sevaRef = React.useRef(null);
+
   useEffect(() => {
     fetchHomeData();
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setSevaVisible(true);
+        }
+      },
+      { threshold: 0.15 }
+    );
+    if (sevaRef.current) {
+      observer.observe(sevaRef.current);
+    }
+    return () => {
+      if (sevaRef.current) {
+        observer.unobserve(sevaRef.current);
+      }
+    };
   }, []);
 
   const fetchHomeData = async () => {
@@ -617,60 +639,123 @@ const Home = () => {
             )}
           </div>
         </section>
-      )}
+          {/* 7. Ascension Seva NGO */}
+      <section ref={sevaRef} className="py-24 bg-[#FCFBF7] px-6 md:px-12 border-b border-cream-dark/30 w-full relative overflow-hidden">
+        {/* Subtle Mandala Watermark */}
+        <div 
+          className="absolute left-0 top-1/2 -translate-y-1/2 w-[520px] h-[520px] pointer-events-none opacity-[0.05] bg-contain bg-no-repeat bg-left z-0 mix-blend-multiply"
+          style={{ backgroundImage: `url(${mandalaWatermark})` }}
+        />
 
-      {/* 7. Ascension Seva NGO */}
-      <section className="py-12 md:py-16 bg-cream/20 px-6 md:px-12 border-b border-cream-dark/30 w-full">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center relative z-10">
+          <div className={`flex flex-col gap-6 text-left transition-all duration-[1s] transform ${sevaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            {/* Eyebrow */}
+            <span className="font-sans text-[10px] tracking-[0.25em] font-bold text-gold-dark uppercase select-none">
+              Healing Humanity
+            </span>
 
-          <div className="flex flex-col gap-4 text-left">
-            <span className="font-serif italic text-xs text-gold-dark tracking-wider uppercase font-semibold">Healing Humanity</span>
-            <img src={`${sevaLogo}?v=3`} alt="Ascension Seva" className="h-16 md:h-22 w-auto object-contain text-left" />
-            <div className="w-12 h-[1px] bg-gold-dark/40"></div>
-            <p className="text-xs text-charcoal-light leading-relaxed font-sans">
-              We believe true spirituality extends beyond personal healing—it is reflected in selfless service (Seva) to humanity. Founded by Sonali Bhasin Kumar, our NGO initiatives support underprivileged families, feed local communities, mentor school children, and foster animal compassion.
+            {/* Logo */}
+            <div className="flex justify-start w-full">
+              <img 
+                src={`${sevaLogo}?v=3`} 
+                alt="Ascension Seva Logo" 
+                className="h-28 md:h-36 w-auto object-contain transition-all duration-300 transform hover:scale-[1.02]" 
+              />
+            </div>
+
+            {/* Mission Statement */}
+            <p className="text-xs sm:text-sm text-charcoal-light leading-relaxed font-sans max-w-[520px] my-2">
+              True spirituality extends beyond personal healing—it is reflected in selfless service to humanity. Through Ascension Seva, we uplift underprivileged families, educate children, empower women, and nurture communities with compassion.
             </p>
-            <div className="flex flex-col gap-2 mt-1 font-sans text-xs">
+
+            {/* Cards */}
+            <div className="flex flex-col gap-4 mt-2">
               {[
-                { label: 'Daily Food Seva Drives', desc: 'Distributing warm, nutritious meals to disadvantaged families.' },
-                { label: 'Women Empowerment & Skill Building', desc: 'Providing craft training to secure independent livelihood options.' },
-                { label: 'Shiksha Kendra Child Mentorship', desc: 'Free educational classes and tutoring for underprivileged kids.' },
-                { label: 'Holistic Health & Healing Camps', desc: 'Bringing free sound baths, meditation, and stress-release to target circles.' }
-              ].map((item) => (
-                <div key={item.label} className="flex gap-3 items-start">
-                  <span className="bg-sage/10 p-1.5 rounded-full inline-flex text-sage mt-0.5">
-                    <Check className="w-3.5 h-3.5 font-bold" />
-                  </span>
-                  <div className="flex flex-col">
-                    <span className="font-bold text-charcoal-dark">{item.label}</span>
-                    <span className="text-charcoal-light font-light text-[11px] mt-0.5">{item.desc}</span>
+                { 
+                  icon: "🍲", 
+                  title: "Daily Food Seva Drives", 
+                  desc: "Distributing warm nutritious meals to underprivileged families." 
+                },
+                { 
+                  icon: "🎓", 
+                  title: "Education & Child Mentorship", 
+                  desc: "Providing free education, books and mentoring." 
+                },
+                { 
+                  icon: "🌿", 
+                  title: "Women Empowerment & Skill Development", 
+                  desc: "Helping women become financially independent." 
+                }
+              ].map((card, idx) => (
+                <div 
+                  key={card.title} 
+                  className={`glass bg-white/70 hover:bg-white/95 border border-cream-dark/30 hover:border-gold/40 p-4 rounded-2xl flex items-start gap-4 transition-all duration-500 hover:-translate-y-1 hover:shadow-md group ${sevaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+                  style={{ transitionDelay: `${(idx + 1) * 200}ms` }}
+                >
+                  <span className="text-2xl mt-0.5 filter drop-shadow-sm select-none">{card.icon}</span>
+                  <div className="flex flex-col text-left">
+                    <h4 className="font-bold text-xs uppercase tracking-wide text-charcoal-dark font-sans group-hover:text-gold-dark transition-colors">
+                      {card.title}
+                    </h4>
+                    <p className="text-charcoal-light font-light text-[11px] leading-relaxed mt-1 font-sans">
+                      {card.desc}
+                    </p>
                   </div>
                 </div>
               ))}
             </div>
 
-            <div className="flex items-center gap-6 mt-2 font-sans">
-              <Link
-                to="/ngo"
-                className="bg-sage hover:bg-sage-dark text-white text-xs font-bold uppercase tracking-wider py-3.5 px-8 rounded-xl transition-all duration-300 shadow-md"
-              >
-                Learn More
-              </Link>
+            {/* Quote */}
+            <div className={`my-4 text-center md:text-left py-2 border-l border-gold/30 pl-4 transition-all duration-700 delay-800 ${sevaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+              <p className="font-serif italic text-sm sm:text-base text-charcoal-dark/90 tracking-wide">
+                "Compassion is the highest form of spirituality."
+              </p>
+            </div>
+
+            {/* CTA Buttons */}
+            <div className={`flex items-center gap-6 mt-2 font-sans transition-all duration-700 delay-1000 ${sevaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
               <Link
                 to="/donate"
-                className="text-xs font-bold text-gold-dark uppercase tracking-wider hover:text-sage transition-colors duration-200"
+                className="bg-gradient-to-r from-gold via-gold-light to-gold-dark hover:brightness-[1.03] text-charcoal-dark font-bold text-xs uppercase tracking-wider py-3.5 px-8 rounded-xl transition-all duration-300 shadow-md transform hover:scale-[1.02] active:scale-[0.98]"
               >
-                Donate Now →
+                Donate Now
+              </Link>
+              <Link
+                to="/ngo"
+                className="bg-transparent hover:bg-cream-light/30 border border-cream-dark/80 text-charcoal-dark font-bold text-xs uppercase tracking-wider py-3.5 px-8 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+              >
+                Become a Volunteer
               </Link>
             </div>
           </div>
 
-          <div className="h-[460px] md:h-[500px] rounded-3xl overflow-hidden shadow-xl border border-cream-dark/50 bg-cream order-first md:order-last">
-            <img
-              src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80"
-              alt="Ascension Seva NGO"
-              className="w-full h-full object-cover transform hover:scale-[1.02] transition-transform duration-500"
-            />
+          <div className={`relative z-10 w-full flex items-center justify-center transition-all duration-[1.2s] transform ${sevaVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'}`}>
+            {/* Image Wrapper */}
+            <div className="relative w-full h-[520px] md:h-[580px] rounded-[32px] overflow-hidden shadow-2xl border border-cream-dark/50 bg-cream group">
+              <img
+                src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80"
+                alt="Ascension Seva NGO"
+                className="w-full h-full object-cover transform hover:scale-[1.03] transition-transform duration-[1.2s] ease-out"
+              />
+              
+              {/* Floating Badge Top Left */}
+              <div className="absolute top-6 left-6 z-20 backdrop-blur-md bg-white/75 border border-cream-dark/40 shadow-lg rounded-2xl p-3 px-4 flex items-center gap-2.5 animate-float-slow select-none">
+                <span className="text-xl filter drop-shadow-xs">🍲</span>
+                <div className="flex flex-col text-left">
+                  <span className="text-[10px] font-bold text-charcoal-dark uppercase tracking-wider">Meals</span>
+                  <span className="text-[9px] text-sage font-semibold uppercase tracking-wide">Distributed</span>
+                </div>
+              </div>
+
+              {/* Floating Badge Bottom Right */}
+              <div className="absolute bottom-6 right-6 z-20 backdrop-blur-md bg-white/75 border border-cream-dark/40 shadow-lg rounded-2xl p-3 px-4 flex items-center gap-2.5 animate-float-slower select-none">
+                <span className="text-xl filter drop-shadow-xs">❤️</span>
+                <div className="flex flex-col text-left">
+                  <span className="text-[10px] font-bold text-charcoal-dark uppercase tracking-wider">500+</span>
+                  <span className="text-[9px] text-sage font-semibold uppercase tracking-wide">Volunteers</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
