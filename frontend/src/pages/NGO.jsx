@@ -99,7 +99,7 @@ const NGO = () => {
         <div className="text-center flex flex-col gap-3">
           <span className="font-serif italic text-xs text-sage tracking-wider uppercase font-semibold">Selfless Service</span>
           <h1 className="font-serif text-3xl md:text-4xl font-bold tracking-wide text-charcoal-dark leading-tight flex justify-center">
-            <img src={`${sevaLogo}?v=2`} alt="Ascension Seva" className="h-28 md:h-36 w-auto object-contain" />
+            <img src={`${sevaLogo}?v=3`} alt="Ascension Seva" className="h-28 md:h-36 w-auto object-contain" />
           </h1>
           <p className="max-w-xl mx-auto text-xs text-charcoal-light leading-relaxed">
             At Ascension, we believe that true spirituality is reflected in service to humanity. Through Seva, we create ripples of healing and compassion across Delhi's underprivileged communities.

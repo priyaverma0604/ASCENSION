@@ -181,7 +181,7 @@ const Donation = () => {
           <span className="font-serif italic text-xs text-sage tracking-wider uppercase font-semibold">Make an Impact</span>
           <h1 className="font-serif text-3xl md:text-4xl font-bold tracking-wide text-charcoal-dark leading-tight flex justify-center items-center gap-2 flex-wrap">
             <span>Support</span>
-            <img src={`${sevaLogo}?v=2`} alt="Ascension Seva" className="h-24 md:h-32 w-auto object-contain inline-block" />
+            <img src={`${sevaLogo}?v=3`} alt="Ascension Seva" className="h-24 md:h-32 w-auto object-contain inline-block" />
           </h1>
           <p className="max-w-xl mx-auto text-xs text-charcoal-light leading-relaxed">
             Every contribution directly funds our local Delhi food distribution campaigns, underprivileged children tutoring drives, women confidence workshops, and stray animal care circles.
