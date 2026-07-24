@@ -458,7 +458,7 @@ Chart Base64 Length: ${fileBase64 ? fileBase64.length : 0}`
           <div className="flex flex-col gap-10 text-left animate-fade-in">
             {/* Header description */}
             <div className="glass p-6 md:p-8 rounded-2xl border border-cream-dark/50 flex flex-col gap-3">
-              <span className="font-serif italic text-xs text-gold-dark tracking-wider uppercase font-semibold">Customised Recommendations</span>
+              <span className="font-sans text-[10px] sm:text-xs text-gold-dark tracking-[0.25em] font-bold uppercase">Customised Recommendations</span>
               <h2 className="font-serif text-2xl font-bold text-charcoal-dark">Find Your Lucky Crystal Tool</h2>
               <p className="text-xs text-charcoal-light leading-relaxed font-sans max-w-2xl">
                 Every horoscope sign vibrates at a unique energy frequency. Select your zodiac sign below to discover which therapeutic crystals, protective stones, or energetic bracelets are best suited to balance your body, mind, and spirit.

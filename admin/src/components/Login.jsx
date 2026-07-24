@@ -64,6 +64,8 @@ const Login = ({ onLoginSuccess }) => {
               </span>
               <input
                 type="email"
+                name="email"
+                autoComplete="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -81,6 +83,8 @@ const Login = ({ onLoginSuccess }) => {
               </span>
               <input
                 type={showPassword ? 'text' : 'password'}
+                name="password"
+                autoComplete="current-password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

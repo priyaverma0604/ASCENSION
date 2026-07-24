@@ -395,7 +395,7 @@ const CSR = () => {
                 <span className="bg-gold/15 p-2 rounded-xl text-gold-dark shrink-0">
                   <Mail className="w-4 h-4" />
                 </span>
-                <a href="mailto:ascension.seva@gmail.com" className="hover:text-gold transition-colors font-medium">ascension.seva@gmail.com</a>
+                <a href="mailto:ascensionseva@gmail.com" className="hover:text-gold transition-colors font-medium">ascensionseva@gmail.com</a>
               </div>
             </div>
           </div>

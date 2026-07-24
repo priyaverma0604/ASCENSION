@@ -20,6 +20,12 @@ const contactSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please add a message']
   },
+  transactionId: {
+    type: String
+  },
+  paymentScreenshot: {
+    type: String
+  },
   status: {
     type: String,
     enum: ['unread', 'read', 'resolved'],

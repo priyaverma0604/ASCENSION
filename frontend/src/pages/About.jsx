@@ -27,7 +27,7 @@ const About = () => {
         
         {/* Title */}
         <div className="text-center flex flex-col gap-3">
-          <span className="font-serif italic text-xs text-sage tracking-wider uppercase font-semibold">About Ascension</span>
+          <span className="font-sans text-[10px] sm:text-xs text-sage tracking-[0.25em] font-bold uppercase">About Ascension</span>
           <h1 className="font-serif text-3xl md:text-4xl font-bold tracking-wide text-charcoal-dark leading-tight">
             A Journey of Healing, Light & <br />
             <span className="text-gold-dark italic">Spiritual Awakening</span>
@@ -88,7 +88,7 @@ const About = () => {
 
         {/* Section 3: Healing Philosophy */}
         <section className="bg-cream/30 border border-cream-dark/60 p-8 rounded-2xl text-center">
-          <span className="font-serif italic text-xs text-sage tracking-wider uppercase font-semibold">Underlying Wisdom</span>
+          <span className="font-sans text-[10px] sm:text-xs text-sage tracking-[0.25em] font-bold uppercase">Underlying Wisdom</span>
           <h3 className="font-serif text-xl font-bold text-charcoal-dark mt-1 mb-8">Our Healing Philosophy</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

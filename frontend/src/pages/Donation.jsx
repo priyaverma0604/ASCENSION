@@ -29,7 +29,7 @@ const Donation = () => {
   const [success, setSuccess] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
 
-  const upiId = 'info@ascension.ind.in';
+  const upiId = 'ascensionseva@gmail.com';
 
   const handleCopyUpi = () => {
     navigator.clipboard.writeText(upiId);
@@ -178,10 +178,10 @@ const Donation = () => {
 
         {/* Title */}
         <div className="text-center flex flex-col gap-3">
-          <span className="font-serif italic text-xs text-sage tracking-wider uppercase font-semibold">Make an Impact</span>
-          <h1 className="font-serif text-3xl md:text-4xl font-bold tracking-wide text-charcoal-dark leading-tight flex justify-center items-center gap-2 flex-wrap">
-            <span>Support</span>
-            <img src={`${sevaLogo}?v=3`} alt="Ascension Seva" className="h-24 md:h-32 w-auto object-contain inline-block" />
+          <span className="font-sans text-[10px] sm:text-xs text-sage tracking-[0.25em] font-bold uppercase">Make an Impact</span>
+          <h1 className="flex flex-col items-center gap-1">
+            <span className="font-cormorant text-4xl md:text-5xl font-light uppercase tracking-widest text-charcoal-dark select-none">SUPPORT</span>
+            <img src={`${sevaLogo}?v=3`} alt="Ascension Seva" className="h-10 md:h-14 w-auto object-contain" />
           </h1>
           <p className="max-w-xl mx-auto text-xs text-charcoal-light leading-relaxed">
             Every contribution directly funds our local Delhi food distribution campaigns, underprivileged children tutoring drives, women confidence workshops, and stray animal care circles.

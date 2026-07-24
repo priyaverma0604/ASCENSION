@@ -65,6 +65,8 @@ const Register = () => {
             <div className="relative">
               <input
                 type="text"
+                name="name"
+                autoComplete="name"
                 required
                 placeholder="Enter name"
                 value={name}
@@ -81,6 +83,8 @@ const Register = () => {
             <div className="relative">
               <input
                 type="email"
+                name="email"
+                autoComplete="email"
                 required
                 placeholder="Enter email"
                 value={email}
@@ -97,6 +101,8 @@ const Register = () => {
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
+                name="password"
+                autoComplete="new-password"
                 required
                 placeholder="Must be at least 6 characters"
                 value={password}

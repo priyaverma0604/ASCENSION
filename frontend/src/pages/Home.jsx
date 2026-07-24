@@ -14,6 +14,17 @@ import founderImg from '../assets/founder.jpg';
 import foodSeva from '../assets/food_seva.png';
 import sevaLogo from '../assets/seva_logo.png';
 import mandalaWatermark from '../assets/mandala_watermark.png';
+import foodDistribution from '../assets/gallery/food_distribution.png';
+import sanitaryDistribution1 from '../assets/gallery/sanitary_distribution_1.png';
+import cowFeeding1 from '../assets/gallery/cow_feeding_1.png';
+import sanitaryDistribution2 from '../assets/gallery/sanitary_distribution_2.png';
+import cowFeeding2 from '../assets/gallery/cow_feeding_2.png';
+import dogCare1 from '../assets/gallery/dog_care_1.png';
+import educationSeva from '../assets/gallery/education_seva.png';
+import dogCare2 from '../assets/gallery/dog_care_2.png';
+import whoWeAreBg from '../assets/who_we_are_bg.jpg';
+import whatWeDo from '../assets/what_we_do.jpg';
+import whyChooseAscension from '../assets/why_choose_ascension.jpg';
 
 const getImageUrl = (path) => {
   if (!path) return '';
@@ -32,6 +43,7 @@ const Home = () => {
   const [testimonials, setTestimonials] = useState([]);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // Newsletter state
   const [newsletterEmail, setNewsletterEmail] = useState('');
@@ -40,6 +52,59 @@ const Home = () => {
   // Seva Section Animation State & Ref
   const [sevaVisible, setSevaVisible] = useState(false);
   const sevaRef = React.useRef(null);
+
+  // Gallery Carousel State
+  const [galleryIndex, setGalleryIndex] = useState(0);
+  const [galleryVisibleItems, setGalleryVisibleItems] = useState(3);
+
+  const galleryImages = [
+    foodDistribution,
+    sanitaryDistribution1,
+    cowFeeding1,
+    sanitaryDistribution2,
+    cowFeeding2,
+    dogCare1,
+    educationSeva,
+    dogCare2
+  ];
+
+  const galleryMaxIndex = Math.max(0, galleryImages.length - galleryVisibleItems);
+
+  const nextGallerySlide = () => {
+    setGalleryIndex((prev) => (prev >= galleryMaxIndex ? 0 : prev + 1));
+  };
+
+  const prevGallerySlide = () => {
+    setGalleryIndex((prev) => (prev === 0 ? galleryMaxIndex : prev - 1));
+  };
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 640) {
+        setGalleryVisibleItems(1);
+      } else if (window.innerWidth < 1024) {
+        setGalleryVisibleItems(2);
+      } else {
+        setGalleryVisibleItems(3);
+      }
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (galleryIndex > galleryMaxIndex) {
+      setGalleryIndex(galleryMaxIndex);
+    }
+  }, [galleryVisibleItems, galleryMaxIndex]);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      nextGallerySlide();
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [galleryIndex, galleryVisibleItems, galleryMaxIndex]);
 
   useEffect(() => {
     fetchHomeData();
@@ -97,6 +162,8 @@ const Home = () => {
       }
     } catch (err) {
       console.error('Error fetching home data:', err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -258,7 +325,7 @@ const Home = () => {
       </section>
       <section className="py-24 bg-[#FFFDF7] px-6 md:px-12 border-b border-cream-dark/30 w-full text-center">
         <div className="max-w-6xl mx-auto">
-          <span className="font-serif italic text-xs text-gold-dark tracking-wider uppercase font-semibold">Discover Ascension</span>
+          <span className="font-sans text-[10px] sm:text-xs text-gold-dark tracking-[0.25em] font-bold uppercase">Discover Ascension</span>
           <h2 className="font-serif text-3xl md:text-4xl font-bold text-charcoal-dark mt-2">Begin Your Healing Journey</h2>
           <p className="max-w-xl mx-auto text-xs sm:text-sm text-charcoal-light leading-relaxed font-sans mt-3">
             Discover who we are, what we offer, and why thousands trust Ascension.
@@ -267,48 +334,60 @@ const Home = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
 
             {/* Card 1: Who We Are */}
-            <Link to="/about" className="group bg-white rounded-[24px] p-8 shadow-md border border-cream-dark/50 hover:border-gold-dark/45 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 flex flex-col items-center text-center">
-              <div className="w-14 h-14 rounded-full bg-gold/10 text-gold flex items-center justify-center mb-6 transform group-hover:scale-110 transition-transform duration-300">
-                <Award className="w-6 h-6" />
+            <Link to="/about" className="group relative rounded-[24px] p-8 shadow-md border border-cream-dark/50 overflow-hidden hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 flex flex-col items-center text-center h-[340px] min-h-[340px]">
+              <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: `url(${whoWeAreBg})` }} />
+              <div className="absolute inset-0 bg-charcoal/50 group-hover:bg-charcoal/65 transition-colors duration-300" />
+              <div className="relative z-10 flex flex-col items-center h-full text-white">
+                <div className="w-14 h-14 rounded-full bg-white/20 text-white flex items-center justify-center mb-6 transform group-hover:scale-110 transition-transform duration-300 backdrop-blur-sm">
+                  <Award className="w-6 h-6" />
+                </div>
+                <h3 className="font-serif text-lg font-bold text-white mb-4">Who We Are</h3>
+                <p className="text-xs text-cream-light/95 leading-relaxed font-sans mb-8 flex-grow">
+                  Learn about our mission, values, vision, and the purpose behind Ascension.
+                </p>
+                <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1 group-hover:text-gold transition-colors duration-200 mt-auto">
+                  <span>Learn More</span>
+                  <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1.5 transition-transform duration-300" />
+                </span>
               </div>
-              <h3 className="font-serif text-lg font-bold text-charcoal-dark mb-4">Who We Are</h3>
-              <p className="text-xs text-charcoal-light leading-relaxed font-sans mb-8 flex-grow">
-                Learn about our mission, values, vision, and the purpose behind Ascension.
-              </p>
-              <span className="text-xs font-bold text-sage-dark uppercase tracking-wider flex items-center gap-1 group-hover:text-gold transition-colors duration-200 mt-auto">
-                <span>Learn More</span>
-                <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1.5 transition-transform duration-300" />
-              </span>
             </Link>
 
             {/* Card 2: What We Do */}
-            <Link to="/services" className="group bg-white rounded-[24px] p-8 shadow-md border border-cream-dark/50 hover:border-gold-dark/45 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 flex flex-col items-center text-center">
-              <div className="w-14 h-14 rounded-full bg-gold/10 text-gold flex items-center justify-center mb-6 transform group-hover:scale-110 transition-transform duration-300">
-                <Sparkles className="w-6 h-6" />
+            <Link to="/services" className="group relative rounded-[24px] p-8 shadow-md border border-cream-dark/50 overflow-hidden hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 flex flex-col items-center text-center h-[340px] min-h-[340px]">
+              <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: `url(${whatWeDo})` }} />
+              <div className="absolute inset-0 bg-charcoal/50 group-hover:bg-charcoal/65 transition-colors duration-300" />
+              <div className="relative z-10 flex flex-col items-center h-full text-white">
+                <div className="w-14 h-14 rounded-full bg-white/20 text-white flex items-center justify-center mb-6 transform group-hover:scale-110 transition-transform duration-300 backdrop-blur-sm">
+                  <Sparkles className="w-6 h-6" />
+                </div>
+                <h3 className="font-serif text-lg font-bold text-white mb-4">What We Do</h3>
+                <p className="text-xs text-cream-light/95 leading-relaxed font-sans mb-8 flex-grow">
+                  Explore our healing therapies, meditation, sound healing, workshops, retreats, and wellness programs.
+                </p>
+                <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1 group-hover:text-gold transition-colors duration-200 mt-auto">
+                  <span>Explore Services</span>
+                  <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1.5 transition-transform duration-300" />
+                </span>
               </div>
-              <h3 className="font-serif text-lg font-bold text-charcoal-dark mb-4">What We Do</h3>
-              <p className="text-xs text-charcoal-light leading-relaxed font-sans mb-8 flex-grow">
-                Explore our healing therapies, meditation, sound healing, workshops, retreats, and wellness programs.
-              </p>
-              <span className="text-xs font-bold text-sage-dark uppercase tracking-wider flex items-center gap-1 group-hover:text-gold transition-colors duration-200 mt-auto">
-                <span>Explore Services</span>
-                <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1.5 transition-transform duration-300" />
-              </span>
             </Link>
 
             {/* Card 3: Why Choose Ascension */}
-            <a href="#why-choose" className="group bg-white rounded-[24px] p-8 shadow-md border border-cream-dark/50 hover:border-gold-dark/45 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 flex flex-col items-center text-center">
-              <div className="w-14 h-14 rounded-full bg-gold/10 text-gold flex items-center justify-center mb-6 transform group-hover:scale-110 transition-transform duration-300">
-                <Users className="w-6 h-6" />
+            <a href="#why-choose" className="group relative rounded-[24px] p-8 shadow-md border border-cream-dark/50 overflow-hidden hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 flex flex-col items-center text-center h-[340px] min-h-[340px]">
+              <div className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" style={{ backgroundImage: `url(${whyChooseAscension})` }} />
+              <div className="absolute inset-0 bg-charcoal/50 group-hover:bg-charcoal/65 transition-colors duration-300" />
+              <div className="relative z-10 flex flex-col items-center h-full text-white">
+                <div className="w-14 h-14 rounded-full bg-white/20 text-white flex items-center justify-center mb-6 transform group-hover:scale-110 transition-transform duration-300 backdrop-blur-sm">
+                  <Users className="w-6 h-6" />
+                </div>
+                <h3 className="font-serif text-lg font-bold text-white mb-4">Why Choose Ascension</h3>
+                <p className="text-xs text-cream-light/95 leading-relaxed font-sans mb-8 flex-grow">
+                  Discover why people trust Ascension for holistic healing, spiritual guidance, and a safe confidential environment.
+                </p>
+                <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1 group-hover:text-gold transition-colors duration-200 mt-auto">
+                  <span>Discover More</span>
+                  <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1.5 transition-transform duration-300" />
+                </span>
               </div>
-              <h3 className="font-serif text-lg font-bold text-charcoal-dark mb-4">Why Choose Ascension</h3>
-              <p className="text-xs text-charcoal-light leading-relaxed font-sans mb-8 flex-grow">
-                Discover why people trust Ascension for holistic healing, spiritual guidance, and a safe confidential environment.
-              </p>
-              <span className="text-xs font-bold text-sage-dark uppercase tracking-wider flex items-center gap-1 group-hover:text-gold transition-colors duration-200 mt-auto">
-                <span>Discover More</span>
-                <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1.5 transition-transform duration-300" />
-              </span>
             </a>
 
           </div>
@@ -337,7 +416,7 @@ const Home = () => {
 
           {/* Right: Content */}
           <div className="flex flex-col gap-6 text-left">
-            <span className="font-serif italic text-xs text-gold-dark tracking-wider uppercase font-semibold">Meet The Founder</span>
+            <span className="font-sans text-[10px] sm:text-xs text-gold-dark tracking-[0.25em] font-bold uppercase">Meet The Founder</span>
             <h2 className="font-serif text-3xl md:text-4xl font-bold text-charcoal-dark">Sonali Bhasin Kumar</h2>
             <div className="w-12 h-[1px] bg-gold-dark/40"></div>
             <p className="text-xs text-charcoal-light leading-relaxed font-sans">
@@ -372,7 +451,7 @@ const Home = () => {
       {/* 4. Healing Services */}
       <section className="py-24 bg-[#FFFDF7] px-6 md:px-12 border-b border-cream-dark/30 w-full text-center">
         <div className="max-w-6xl mx-auto">
-          <span className="font-serif italic text-xs text-gold-dark tracking-wider uppercase font-semibold">Premium Modalities</span>
+          <span className="font-sans text-[10px] sm:text-xs text-gold-dark tracking-[0.25em] font-bold uppercase">Premium Modalities</span>
           <h2 className="font-serif text-3xl md:text-4xl font-bold text-charcoal-dark mt-2 mb-16">Healing Services</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -492,7 +571,7 @@ const Home = () => {
       {/* 5. Why Choose Ascension */}
       <section id="why-choose" className="py-24 bg-cream/20 px-6 md:px-12 border-b border-cream-dark/30 w-full text-center scroll-mt-20">
         <div className="max-w-6xl mx-auto">
-          <span className="font-serif italic text-xs text-gold-dark tracking-wider uppercase font-semibold">Sacred Safety & Experienced Care</span>
+          <span className="font-sans text-[10px] sm:text-xs text-gold-dark tracking-[0.25em] font-bold uppercase">Sacred Safety & Experienced Care</span>
           <h2 className="font-serif text-3xl md:text-4xl font-bold text-charcoal-dark mt-2 mb-16">Why Choose Ascension</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -568,64 +647,83 @@ const Home = () => {
       </section>
 
       {/* 6. Testimonials Section */}
-      {testimonials.length > 0 && (
+      {(loading || testimonials.length > 0) && (
         <section className="py-24 bg-[#FFFDF7] px-6 md:px-12 border-b border-cream-dark/30 w-full text-center">
           <div className="max-w-4xl mx-auto">
-            <span className="font-serif italic text-xs text-gold-dark tracking-wider uppercase font-semibold">Testimonials</span>
+            <span className="font-sans text-[10px] sm:text-xs text-gold-dark tracking-[0.25em] font-bold uppercase">Testimonials</span>
             <h2 className="font-serif text-3xl font-bold text-charcoal-dark mt-2 mb-12">Client Experiences</h2>
 
             <div className="bg-white p-8 md:p-12 rounded-[24px] shadow-md border border-cream-dark/40 min-h-[260px] flex flex-col justify-center items-center gap-4 relative animate-fade-in">
-              {/* Star Rating */}
-              <div className="flex text-gold text-sm gap-1 mb-2">
-                {'★'.repeat(testimonials[activeTestimonial].rating || 5)}
-              </div>
-              <p className="font-serif italic text-sm md:text-base text-charcoal-light leading-relaxed max-w-2xl">
-                "{testimonials[activeTestimonial].reviewText}"
-              </p>
-
-              <div className="flex items-center gap-3 mt-6 font-sans text-left">
-                {testimonials[activeTestimonial].image ? (
-                  <img
-                    src={getImageUrl(testimonials[activeTestimonial].image)}
-                    alt={testimonials[activeTestimonial].name}
-                    className="w-12 h-12 rounded-full object-cover border border-cream-dark"
-                  />
-                ) : (
-                  <div className="w-12 h-12 rounded-full bg-gold/10 text-gold flex items-center justify-center border border-cream-dark font-serif font-bold text-sm">
-                    {testimonials[activeTestimonial].name.charAt(0)}
+              {loading ? (
+                <div className="flex flex-col items-center gap-4 w-full animate-pulse">
+                  <div className="h-4 bg-cream-dark rounded-full w-24"></div>
+                  <div className="h-4 bg-cream-dark rounded-full w-3/4"></div>
+                  <div className="h-4 bg-cream-dark rounded-full w-1/2"></div>
+                  <div className="flex items-center gap-3 mt-6">
+                    <div className="w-12 h-12 bg-cream-dark rounded-full"></div>
+                    <div className="flex flex-col gap-2">
+                      <div className="h-3 bg-cream-dark rounded-full w-20"></div>
+                      <div className="h-2 bg-cream-dark rounded-full w-12"></div>
+                    </div>
                   </div>
-                )}
-                <div>
-                  <p className="text-xs font-bold text-charcoal-dark">{testimonials[activeTestimonial].name}</p>
-                  {testimonials[activeTestimonial].designation && (
-                    <p className="text-[9px] text-gold-dark uppercase tracking-wider font-bold mt-0.5">
-                      {testimonials[activeTestimonial].designation}
+                </div>
+              ) : (
+                <>
+                  {/* Star Rating */}
+                  <div className="flex text-gold text-sm gap-1 mb-2">
+                    {'★'.repeat(testimonials[activeTestimonial].rating || 5)}
+                  </div>
+                  <div className="h-[220px] sm:h-[180px] md:h-[140px] flex items-center justify-center overflow-y-auto py-2 w-full">
+                    <p className="font-serif italic text-sm md:text-base text-charcoal-light leading-relaxed max-w-2xl text-center">
+                      "{testimonials[activeTestimonial].reviewText}"
                     </p>
-                  )}
-                </div>
-              </div>
+                  </div>
 
-              {/* Slider Arrows */}
-              {testimonials.length > 1 && (
-                <div className="absolute inset-y-0 w-full flex items-center justify-between pointer-events-none px-2 sm:px-4">
-                  <button
-                    onClick={() => setActiveTestimonial((prev) => (prev === 0 ? testimonials.length - 1 : prev - 1))}
-                    className="pointer-events-auto w-8 h-8 rounded-full bg-white hover:bg-cream-light border border-cream-dark/50 flex items-center justify-center text-charcoal hover:text-gold transition-colors focus:outline-none shadow-sm"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => setActiveTestimonial((prev) => (prev === testimonials.length - 1 ? 0 : prev + 1))}
-                    className="pointer-events-auto w-8 h-8 rounded-full bg-white hover:bg-cream-light border border-cream-dark/50 flex items-center justify-center text-charcoal hover:text-gold transition-colors focus:outline-none shadow-sm"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
+                  <div className="flex items-center gap-3 mt-6 font-sans text-left">
+                    {testimonials[activeTestimonial].image ? (
+                      <img
+                        src={getImageUrl(testimonials[activeTestimonial].image)}
+                        alt={testimonials[activeTestimonial].name}
+                        className="w-12 h-12 rounded-full object-cover border border-cream-dark"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 rounded-full bg-gold/10 text-gold flex items-center justify-center border border-cream-dark font-serif font-bold text-sm">
+                        {testimonials[activeTestimonial].name.charAt(0)}
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-xs font-bold text-charcoal-dark">{testimonials[activeTestimonial].name}</p>
+                      {testimonials[activeTestimonial].designation && (
+                        <p className="text-[9px] text-gold-dark uppercase tracking-wider font-bold mt-0.5">
+                          {testimonials[activeTestimonial].designation}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Slider Arrows */}
+                  {testimonials.length > 1 && (
+                    <div className="absolute inset-y-0 w-full flex items-center justify-between pointer-events-none px-2 sm:px-4">
+                      <button
+                        onClick={() => setActiveTestimonial((prev) => (prev === 0 ? testimonials.length - 1 : prev - 1))}
+                        className="pointer-events-auto w-8 h-8 rounded-full bg-white hover:bg-cream-light border border-cream-dark/50 flex items-center justify-center text-charcoal hover:text-gold transition-colors focus:outline-none shadow-sm"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => setActiveTestimonial((prev) => (prev === testimonials.length - 1 ? 0 : prev + 1))}
+                        className="pointer-events-auto w-8 h-8 rounded-full bg-white hover:bg-cream-light border border-cream-dark/50 flex items-center justify-center text-charcoal hover:text-gold transition-colors focus:outline-none shadow-sm"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
             </div>
 
             {/* Testimonial Indicators */}
-            {testimonials.length > 1 && (
+            {!loading && testimonials.length > 1 && (
               <div className="flex justify-center gap-2 mt-6">
                 {testimonials.map((_, idx) => (
                   <button
@@ -641,98 +739,102 @@ const Home = () => {
         </section>
       )}
       {/* 7. Ascension Seva NGO */}
-      <section ref={sevaRef} className="py-24 bg-[#FCFBF7] px-6 md:px-12 border-b border-cream-dark/30 w-full relative overflow-hidden">
+      <section ref={sevaRef} className="py-10 md:py-14 bg-[#FCFBF7] px-6 md:px-12 border-b border-cream-dark/30 w-full relative overflow-hidden flex items-center md:min-h-[calc(100vh-80px)]">
         {/* Subtle Mandala Watermark */}
         <div 
           className="absolute left-0 top-1/2 -translate-y-1/2 w-[520px] h-[520px] pointer-events-none opacity-[0.05] bg-contain bg-no-repeat bg-left z-0 mix-blend-multiply"
           style={{ backgroundImage: `url(${mandalaWatermark})` }}
         />
 
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center relative z-10">
-          <div className={`flex flex-col gap-6 text-left transition-all duration-[1s] transform ${sevaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            {/* Eyebrow */}
-            <span className="font-sans text-[10px] tracking-[0.25em] font-bold text-gold-dark uppercase select-none">
-              Healing Humanity
-            </span>
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-16 items-stretch w-full relative z-10">
+          <div className={`flex flex-col justify-between h-full gap-4 text-left transition-all duration-[1s] transform ${sevaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+            <div className="flex flex-col gap-2 md:gap-3">
+              {/* Eyebrow */}
+              <span className="font-sans text-[10px] tracking-[0.25em] font-bold text-gold-dark uppercase select-none">
+                Healing Humanity
+              </span>
 
-            {/* Logo */}
-            <div className="flex justify-start w-full">
-              <img 
-                src={`${sevaLogo}?v=3`} 
-                alt="Ascension Seva Logo" 
-                className="h-28 md:h-36 w-auto object-contain transition-all duration-300 transform hover:scale-[1.02]" 
-              />
-            </div>
+              {/* Logo */}
+              <div className="flex justify-start w-full">
+                <img 
+                  src={`${sevaLogo}?v=3`} 
+                  alt="Ascension Seva Logo" 
+                  className="h-16 md:h-20 w-auto object-contain transition-all duration-300 transform hover:scale-[1.02]" 
+                />
+              </div>
 
-            {/* Mission Statement */}
-            <p className="text-xs sm:text-sm text-charcoal-light leading-relaxed font-sans max-w-[520px] my-2">
-              True spirituality extends beyond personal healing—it is reflected in selfless service to humanity. Through Ascension Seva, we uplift underprivileged families, educate children, empower women, and nurture communities with compassion.
-            </p>
-
-            {/* Cards */}
-            <div className="flex flex-col gap-4 mt-2">
-              {[
-                { 
-                  icon: "🍲", 
-                  title: "Daily Food Seva Drives", 
-                  desc: "Distributing warm nutritious meals to underprivileged families." 
-                },
-                { 
-                  icon: "🎓", 
-                  title: "Education & Child Mentorship", 
-                  desc: "Providing free education, books and mentoring." 
-                },
-                { 
-                  icon: "🌿", 
-                  title: "Women Empowerment & Skill Development", 
-                  desc: "Helping women become financially independent." 
-                }
-              ].map((card, idx) => (
-                <div 
-                  key={card.title} 
-                  className={`glass bg-white/70 hover:bg-white/95 border border-cream-dark/30 hover:border-gold/40 p-4 rounded-2xl flex items-start gap-4 transition-all duration-500 hover:-translate-y-1 hover:shadow-md group ${sevaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
-                  style={{ transitionDelay: `${(idx + 1) * 200}ms` }}
-                >
-                  <span className="text-2xl mt-0.5 filter drop-shadow-sm select-none">{card.icon}</span>
-                  <div className="flex flex-col text-left">
-                    <h4 className="font-bold text-xs uppercase tracking-wide text-charcoal-dark font-sans group-hover:text-gold-dark transition-colors">
-                      {card.title}
-                    </h4>
-                    <p className="text-charcoal-light font-light text-[11px] leading-relaxed mt-1 font-sans">
-                      {card.desc}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Quote */}
-            <div className={`my-4 text-center md:text-left py-2 border-l border-gold/30 pl-4 transition-all duration-700 delay-800 ${sevaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-              <p className="font-serif italic text-sm sm:text-base text-charcoal-dark/90 tracking-wide">
-                "Compassion is the highest form of spirituality."
+              {/* Mission Statement */}
+              <p className="text-xs sm:text-[13px] text-charcoal-light leading-relaxed font-sans max-w-[520px] my-1">
+                True spirituality extends beyond personal healing—it is reflected in selfless service to humanity. Through Ascension Seva, we uplift underprivileged families, educate children, empower women, and nurture communities with compassion.
               </p>
+
+              {/* Cards */}
+              <div className="flex flex-col gap-3">
+                {[
+                  { 
+                    icon: "🍲", 
+                    title: "Daily Food Seva Drives", 
+                    desc: "Distributing warm nutritious meals to underprivileged families." 
+                  },
+                  { 
+                    icon: "🎓", 
+                    title: "Education & Child Mentorship", 
+                    desc: "Providing free education, books and mentoring." 
+                  },
+                  { 
+                    icon: "🌿", 
+                    title: "Women Empowerment & Skill Development", 
+                    desc: "Helping women become financially independent." 
+                  }
+                ].map((card, idx) => (
+                  <div 
+                    key={card.title} 
+                    className={`glass bg-white/70 hover:bg-white/95 border border-cream-dark/30 hover:border-gold/40 p-3 rounded-xl flex items-start gap-3 transition-all duration-500 hover:-translate-y-0.5 hover:shadow-sm group ${sevaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+                    style={{ transitionDelay: `${(idx + 1) * 200}ms` }}
+                  >
+                    <span className="text-xl mt-0.5 filter drop-shadow-sm select-none">{card.icon}</span>
+                    <div className="flex flex-col text-left">
+                      <h4 className="font-bold text-[11px] uppercase tracking-wide text-charcoal-dark font-sans group-hover:text-gold-dark transition-colors">
+                        {card.title}
+                      </h4>
+                      <p className="text-charcoal-light font-light text-[10px] leading-relaxed mt-0.5 font-sans">
+                        {card.desc}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {/* CTA Buttons */}
-            <div className={`flex items-center gap-6 mt-2 font-sans transition-all duration-700 delay-1000 ${sevaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
-              <Link
-                to="/donate"
-                className="bg-gradient-to-r from-gold via-gold-light to-gold-dark hover:brightness-[1.03] text-charcoal-dark font-bold text-xs uppercase tracking-wider py-3.5 px-8 rounded-xl transition-all duration-300 shadow-md transform hover:scale-[1.02] active:scale-[0.98]"
-              >
-                Donate Now
-              </Link>
-              <Link
-                to="/ngo"
-                className="bg-transparent hover:bg-cream-light/30 border border-cream-dark/80 text-charcoal-dark font-bold text-xs uppercase tracking-wider py-3.5 px-8 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
-              >
-                Become a Volunteer
-              </Link>
+            <div className="flex flex-col gap-3 mt-auto pt-2">
+              {/* Quote */}
+              <div className={`my-2 text-center md:text-left py-1 border-l border-gold/30 pl-4 transition-all duration-700 delay-800 ${sevaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                <p className="font-serif italic text-xs sm:text-sm text-charcoal-dark/90 tracking-wide">
+                  "Compassion is the highest form of spirituality."
+                </p>
+              </div>
+
+              {/* CTA Buttons */}
+              <div className={`flex items-center gap-4 mt-1 font-sans transition-all duration-700 delay-1000 ${sevaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
+                <Link
+                  to="/donate"
+                  className="bg-gradient-to-r from-gold via-gold-light to-gold-dark hover:brightness-[1.03] text-charcoal-dark font-bold text-xs uppercase tracking-wider py-2.5 px-6 rounded-xl transition-all duration-300 shadow-md transform hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  Donate Now
+                </Link>
+                <Link
+                  to="/ngo"
+                  className="bg-transparent hover:bg-cream-light/30 border border-cream-dark/80 text-charcoal-dark font-bold text-xs uppercase tracking-wider py-2.5 px-6 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  Become a Volunteer
+                </Link>
+              </div>
             </div>
           </div>
 
           <div className={`relative z-10 w-full flex items-center justify-center transition-all duration-[1.2s] transform ${sevaVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-12'}`}>
             {/* Image Wrapper */}
-            <div className="relative w-full h-[520px] md:h-[580px] rounded-[32px] overflow-hidden shadow-2xl border border-cream-dark/50 bg-cream group">
+            <div className="relative w-full h-[420px] md:h-[480px] rounded-[32px] overflow-hidden shadow-2xl border border-cream-dark/50 bg-cream group">
               <img
                 src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80"
                 alt="Ascension Seva NGO"
@@ -762,51 +864,63 @@ const Home = () => {
       </section>
 
       {/* 8. Upcoming Workshops */}
-      {workshops.length > 0 && (
+      {(loading || workshops.length > 0) && (
         <section className="py-24 bg-[#FFFDF7] px-6 md:px-12 border-b border-cream-dark/30 w-full text-center">
           <div className="max-w-6xl mx-auto">
-            <span className="font-serif italic text-xs text-gold-dark tracking-wider uppercase font-semibold">Sacred Gatherings</span>
+            <span className="font-sans text-[10px] sm:text-xs text-gold-dark tracking-[0.25em] font-bold uppercase">Sacred Gatherings</span>
             <h2 className="font-serif text-3xl font-bold text-charcoal-dark mt-2 mb-12">Upcoming Workshops</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {workshops.slice(0, 3).map((workshop) => (
-                <div key={workshop._id} className="group bg-white rounded-3xl overflow-hidden shadow-md border border-cream-dark/50 hover:shadow-2xl hover:border-gold-dark/45 hover:-translate-y-1 transition-all duration-300 flex flex-col text-left">
-                  <div className="h-48 overflow-hidden bg-cream relative">
-                    <img
-                      src={getImageUrl(workshop.coverImage || workshop.image)}
-                      alt={workshop.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-xs px-3 py-1 rounded-full text-[9px] font-bold tracking-widest uppercase text-sage-dark shadow-sm flex items-center gap-1 font-sans">
-                      <Calendar className="w-3 h-3" />
-                      <span>{new Date(workshop.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
-                    </div>
+              {loading ? (
+                [1, 2, 3].map((n) => (
+                  <div key={n} className="bg-white rounded-3xl overflow-hidden shadow-md border border-cream-dark/50 p-6 flex flex-col gap-4 animate-pulse h-[400px]">
+                    <div className="h-48 bg-cream rounded-2xl w-full"></div>
+                    <div className="h-6 bg-cream rounded-full w-3/4 mt-2"></div>
+                    <div className="h-4 bg-cream rounded-full w-full"></div>
+                    <div className="h-4 bg-cream rounded-full w-1/2"></div>
+                    <div className="mt-auto h-10 bg-cream rounded-xl w-full"></div>
                   </div>
-                  <div className="p-6 flex flex-col flex-grow">
-                    <h3 className="font-serif text-base font-bold text-charcoal-dark mb-2 leading-snug">{workshop.title}</h3>
-                    <p className="text-xs text-charcoal-light leading-relaxed font-sans line-clamp-3 mb-6">
-                      {workshop.description || workshop.shortDescription}
-                    </p>
-
-                    <div className="mt-auto border-t border-cream-dark/40 pt-4 flex justify-between items-center font-sans text-xs">
-                      <div className="flex flex-col">
-                        <span className="text-[9px] text-charcoal-light uppercase">Investment</span>
-                        <span className="font-serif font-bold text-gold-dark text-sm">₹{workshop.pricing || workshop.price}</span>
+                ))
+              ) : (
+                workshops.slice(0, 3).map((workshop) => (
+                  <div key={workshop._id} className="group bg-white rounded-3xl overflow-hidden shadow-md border border-cream-dark/50 hover:shadow-2xl hover:border-gold-dark/45 hover:-translate-y-1 transition-all duration-300 flex flex-col text-left">
+                    <div className="h-48 overflow-hidden bg-cream relative">
+                      <img
+                        src={getImageUrl(workshop.coverImage || workshop.image)}
+                        alt={workshop.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-xs px-3 py-1 rounded-full text-[9px] font-bold tracking-widest uppercase text-sage-dark shadow-sm flex items-center gap-1 font-sans">
+                        <Calendar className="w-3 h-3" />
+                        <span>{new Date(workshop.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
                       </div>
-                      <button
-                        onClick={() => setActiveWorkshop(workshop)}
-                        className="bg-sage hover:bg-sage-dark text-white text-[10px] font-bold uppercase tracking-wider py-2.5 px-5 rounded-lg transition-all duration-300 shadow-sm"
-                      >
-                        Register Now
-                      </button>
+                    </div>
+                    <div className="p-6 flex flex-col flex-grow">
+                      <h3 className="font-serif text-base font-bold text-charcoal-dark mb-2 leading-snug">{workshop.title}</h3>
+                      <p className="text-xs text-charcoal-light leading-relaxed font-sans line-clamp-3 mb-6">
+                        {workshop.description || workshop.shortDescription}
+                      </p>
+
+                      <div className="mt-auto border-t border-cream-dark/40 pt-4 flex justify-between items-center font-sans text-xs">
+                        <div className="flex flex-col">
+                          <span className="text-[9px] text-charcoal-light uppercase">Investment</span>
+                          <span className="font-serif font-bold text-gold-dark text-sm">₹{workshop.pricing || workshop.price}</span>
+                        </div>
+                        <button
+                          onClick={() => setActiveWorkshop(workshop)}
+                          className="bg-sage hover:bg-sage-dark text-white text-[10px] font-bold uppercase tracking-wider py-2.5 px-5 rounded-lg transition-all duration-300 shadow-sm"
+                        >
+                          Register Now
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
 
             {/* If more than 3, redirect to programs page */}
-            {workshops.length > 3 && (
+            {!loading && workshops.length > 3 && (
               <div className="mt-12">
                 <Link to="/programs" className="text-xs font-bold text-sage-dark uppercase tracking-wider hover:text-gold flex items-center justify-center gap-1">
                   <span>View All Upcoming Gatherings</span>
@@ -819,49 +933,62 @@ const Home = () => {
       )}
 
       {/* 9. Featured Shop */}
-      {products.length > 0 && (
+      {(loading || products.length > 0) && (
         <section className="py-24 bg-cream/20 px-6 md:px-12 border-b border-cream-dark/30 w-full text-center">
           <div className="max-w-6xl mx-auto">
-            <span className="font-serif italic text-xs text-gold-dark tracking-wider uppercase font-semibold">Spiritual Tools</span>
+            <span className="font-sans text-[10px] sm:text-xs text-gold-dark tracking-[0.25em] font-bold uppercase">Spiritual Tools</span>
             <h2 className="font-serif text-3xl font-bold text-charcoal-dark mt-2 mb-12">Sacred Intentions Shop</h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {products.map((product) => (
-                <div key={product._id} className="group bg-white rounded-3xl overflow-hidden shadow-md border border-cream-dark/50 hover:shadow-2xl hover:border-gold-dark/45 hover:-translate-y-1 transition-all duration-300 flex flex-col text-left">
-                  <div className="h-56 overflow-hidden bg-cream-light relative">
-                    <img
-                      src={getImageUrl(product.images[0])}
-                      alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-xs rounded-full p-2 text-gold shadow-sm">
-                      <ShoppingBag className="w-3.5 h-3.5" />
+              {loading ? (
+                [1, 2, 3, 4].map((n) => (
+                  <div key={n} className="bg-white rounded-3xl overflow-hidden shadow-md border border-cream-dark/50 p-5 flex flex-col gap-4 animate-pulse h-[360px]">
+                    <div className="h-56 bg-cream-light rounded-2xl w-full"></div>
+                    <div className="h-4 bg-cream-light rounded-full w-20 mt-2"></div>
+                    <div className="h-5 bg-cream-light rounded-full w-3/4"></div>
+                    <div className="mt-auto h-8 bg-cream-light rounded-lg w-full"></div>
+                  </div>
+                ))
+              ) : (
+                products.map((product) => (
+                  <div key={product._id} className="group bg-white rounded-3xl overflow-hidden shadow-md border border-cream-dark/50 hover:shadow-2xl hover:border-gold-dark/45 hover:-translate-y-1 transition-all duration-300 flex flex-col text-left">
+                    <div className="h-56 overflow-hidden bg-cream-light relative">
+                      <img
+                        src={getImageUrl(product.images[0])}
+                        alt={product.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-xs rounded-full p-2 text-gold shadow-sm">
+                        <ShoppingBag className="w-3.5 h-3.5" />
+                      </div>
+                    </div>
+                    <div className="p-5 flex flex-col flex-grow">
+                      <span className="text-[9px] uppercase tracking-wider text-sage font-medium font-sans mb-1">{product.category}</span>
+                      <h3 className="font-serif text-sm font-bold text-charcoal-dark mb-3 line-clamp-1">{product.name}</h3>
+
+                      <div className="mt-auto pt-3 border-t border-cream-dark/30 flex justify-between items-center font-sans text-xs">
+                        <span className="font-serif font-bold text-gold-dark text-sm">₹{product.price}</span>
+                        <Link
+                          to={`/product/${product._id}`}
+                          className="text-sage hover:text-gold font-bold uppercase tracking-wider flex items-center gap-1 text-[10px]"
+                        >
+                          <span>View Product</span>
+                          <ArrowRight className="w-3 h-3" />
+                        </Link>
+                      </div>
                     </div>
                   </div>
-                  <div className="p-5 flex flex-col flex-grow">
-                    <span className="text-[9px] uppercase tracking-wider text-sage font-medium font-sans mb-1">{product.category}</span>
-                    <h3 className="font-serif text-sm font-bold text-charcoal-dark mb-3 line-clamp-1">{product.name}</h3>
-
-                    <div className="mt-auto pt-3 border-t border-cream-dark/30 flex justify-between items-center font-sans text-xs">
-                      <span className="font-serif font-bold text-gold-dark text-sm">₹{product.price}</span>
-                      <Link
-                        to={`/product/${product._id}`}
-                        className="text-sage hover:text-gold font-bold uppercase tracking-wider flex items-center gap-1 text-[10px]"
-                      >
-                        <span>View Product</span>
-                        <ArrowRight className="w-3 h-3" />
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
 
-            <div className="mt-12">
-              <Link to="/shop" className="bg-white hover:bg-cream-light text-gold-dark border border-gold/45 text-xs font-bold uppercase tracking-wider py-4 px-8 rounded-xl transition-all duration-300 self-center hover:-translate-y-0.5 inline-block shadow-sm">
-                Explore Full Sacred Collection
-              </Link>
-            </div>
+            {!loading && (
+              <div className="mt-12">
+                <Link to="/shop" className="bg-white hover:bg-cream-light text-gold-dark border border-gold/45 text-xs font-bold uppercase tracking-wider py-4 px-8 rounded-xl transition-all duration-300 self-center hover:-translate-y-0.5 inline-block shadow-sm">
+                  Explore Full Sacred Collection
+                </Link>
+              </div>
+            )}
           </div>
         </section>
       )}
@@ -920,35 +1047,77 @@ const Home = () => {
       </section>
 
       {/* 11. Instagram / Community Gallery */}
-      <section className="py-24 bg-cream/20 px-6 md:px-12 border-b border-cream-dark/30 w-full text-center">
-        <div className="max-w-6xl mx-auto">
-          <span className="font-serif italic text-xs text-gold-dark tracking-wider uppercase font-semibold">Ascension Circles</span>
+      <section className="py-24 bg-cream/20 px-6 md:px-12 border-b border-cream-dark/30 w-full text-center relative overflow-hidden">
+        <div className="max-w-6xl mx-auto px-4 sm:px-12 relative">
+          <span className="font-sans text-[10px] sm:text-xs text-gold-dark tracking-[0.25em] font-bold uppercase">Ascension Circles</span>
           <h2 className="font-serif text-3xl font-bold text-charcoal-dark mt-2 mb-12">Community Gallery</h2>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {[
-              { src: 'https://images.unsplash.com/photo-1519817650390-64a93db51149?auto=format&fit=crop&w=600&q=80', tag: 'Sound Healing' },
-              { src: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=600&q=80', tag: 'Women Circles' },
-              { src: 'https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=600&q=80', tag: 'Sacred Crystals' },
-              { src: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=600&q=80', tag: 'Seva Drives' },
-              { src: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=600&q=80', tag: 'Meditation' },
-              { src: 'https://images.unsplash.com/photo-1603006905003-be475563bc59?auto=format&fit=crop&w=600&q=80', tag: 'Intention Candles' }
-            ].map((pic, idx) => (
-              <div key={idx} className="group relative h-48 rounded-2xl overflow-hidden shadow-sm border border-cream-dark/50">
-                <img src={pic.src} alt={pic.tag} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                <div className="absolute inset-0 bg-charcoal/45 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
-                  <span className="font-sans text-[10px] uppercase tracking-widest text-white font-bold">{pic.tag}</span>
+          {/* Carousel Wrapper */}
+          <div className="relative overflow-hidden w-full">
+            <div 
+              className="flex transition-transform duration-500 ease-in-out"
+              style={{ transform: `translateX(-${galleryIndex * (100 / galleryVisibleItems)}%)` }}
+            >
+              {galleryImages.map((img, idx) => (
+                <div 
+                  key={idx} 
+                  style={{ width: `${100 / galleryVisibleItems}%` }}
+                  className="shrink-0 p-2 sm:p-3"
+                >
+                  <div className="h-64 rounded-2xl overflow-hidden shadow-sm border border-cream-dark/50 hover:shadow-md transition-shadow duration-300">
+                    <img 
+                      src={img} 
+                      alt="Community Gallery" 
+                      className="w-full h-full object-cover hover:scale-102 transition-transform duration-500" 
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+
+            {/* Navigation Arrows */}
+            {galleryMaxIndex > 0 && (
+              <>
+                <button
+                  onClick={prevGallerySlide}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 -ml-2 sm:-ml-4 z-10 p-2.5 rounded-full bg-white/90 hover:bg-white border border-cream-dark/40 shadow-sm hover:shadow-md text-charcoal hover:scale-105 transition-all duration-300"
+                  aria-label="Previous slide"
+                >
+                  <ChevronLeft className="w-5 h-5 text-charcoal" />
+                </button>
+                <button
+                  onClick={nextGallerySlide}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 -mr-2 sm:-mr-4 z-10 p-2.5 rounded-full bg-white/90 hover:bg-white border border-cream-dark/40 shadow-sm hover:shadow-md text-charcoal hover:scale-105 transition-all duration-300"
+                  aria-label="Next slide"
+                >
+                  <ChevronRight className="w-5 h-5 text-charcoal" />
+                </button>
+              </>
+            )}
           </div>
+
+          {/* Indicator Dots */}
+          {galleryMaxIndex > 0 && (
+            <div className="flex justify-center items-center gap-2 mt-8">
+              {Array.from({ length: galleryMaxIndex + 1 }).map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setGalleryIndex(idx)}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    galleryIndex === idx ? 'bg-gold-dark w-6' : 'bg-cream-dark/60 w-2 hover:bg-gold-light'
+                  }`}
+                  aria-label={`Go to slide ${idx + 1}`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
       {/* 12. Newsletter Section */}
       <section className="py-24 bg-[#FFFDF7] px-6 md:px-12 text-center w-full">
         <div className="max-w-xl mx-auto flex flex-col items-center gap-4 font-sans">
-          <span className="font-serif italic text-xs text-gold-dark tracking-wider uppercase font-semibold">Stay Aligned</span>
+          <span className="font-sans text-[10px] sm:text-xs text-gold-dark tracking-[0.25em] font-bold uppercase">Stay Aligned</span>
           <h2 className="font-serif text-2xl font-bold text-charcoal-dark">Subscribe to the Ascension Newsletter</h2>
           <p className="text-xs text-charcoal-light leading-relaxed max-w-sm">
             Receive monthly newsletters detailing full Moon rituals, energy forecasts, and upcoming retreats.
