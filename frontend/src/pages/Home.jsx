@@ -25,6 +25,7 @@ import dogCare2 from '../assets/gallery/dog_care_2.png';
 import whoWeAreBg from '../assets/who_we_are_bg.jpg';
 import whatWeDo from '../assets/what_we_do.jpg';
 import whyChooseAscension from '../assets/why_choose_ascension.jpg';
+import lionsGatePortalImg from '../assets/lions_gate_portal.jpg';
 
 const getImageUrl = (path) => {
   if (!path) return '';
@@ -175,6 +176,29 @@ const Home = () => {
   const prevWorkshop = () => {
     if (workshops.length === 0) return;
     setCarouselIndex((prev) => (prev === 0 ? workshops.length - 1 : prev - 1));
+  };
+
+  const handleLionsGateRegister = () => {
+    const found = workshops.find(w => w.title && w.title.toLowerCase().includes("lion's gate"));
+    if (found) {
+      setActiveWorkshop(found);
+    } else {
+      setActiveWorkshop({
+        _id: "mockup-lions-gate-webinar-id",
+        title: "Lion's Gate Portal Webinar: 8:8 Gateway of Abundance & Awakening",
+        price: 2100,
+        speakerName: "Sonali Bhasin Kumar",
+        date: new Date('2026-08-08T18:00:00Z'),
+        time: "6:00 PM - 7:30 PM IST",
+        duration: "90 minutes",
+        upiQrCodeImage: "/uploads/default_upi_qr.jpg",
+        upiId: "sonalibhasinkumar@ptaxis",
+        mobileNumber: "9999999999",
+        zoomLink: "https://zoom.us/mock-link",
+        maxSeats: 100,
+        isWebinar: true
+      });
+    }
   };
 
   // Auto-scroll testimonials
@@ -882,40 +906,89 @@ const Home = () => {
                   </div>
                 ))
               ) : (
-                workshops.slice(0, 3).map((workshop) => (
-                  <div key={workshop._id} className="group bg-white rounded-3xl overflow-hidden shadow-md border border-cream-dark/50 hover:shadow-2xl hover:border-gold-dark/45 hover:-translate-y-1 transition-all duration-300 flex flex-col text-left">
+                <>
+                  {/* Premium Featured Lion's Gate Portal Webinar Card */}
+                  <div className="group bg-[#FFFDF7]/75 backdrop-blur-md rounded-3xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(212,160,23,0.12)] border border-[#EAE3D2] hover:border-[#D4A017]/40 transition-all duration-500 hover:-translate-y-1.5 flex flex-col text-left h-full">
+                    {/* Image Section */}
                     <div className="h-48 overflow-hidden bg-cream relative">
                       <img
-                        src={getImageUrl(workshop.coverImage || workshop.image)}
-                        alt={workshop.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        src={lionsGatePortalImg}
+                        alt="Lion's Gate Portal Webinar"
+                        className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-[800ms] ease-out"
                       />
-                      <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-xs px-3 py-1 rounded-full text-[9px] font-bold tracking-widest uppercase text-sage-dark shadow-sm flex items-center gap-1 font-sans">
-                        <Calendar className="w-3 h-3" />
-                        <span>{new Date(workshop.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
+                      
+                      {/* Floating Date Badge */}
+                      <div className="absolute top-4 left-4 bg-[#FCFBF7]/90 backdrop-blur-md px-3 py-1 rounded-full text-[9px] font-bold tracking-widest uppercase text-sage-dark shadow-sm flex items-center gap-1 font-sans border border-cream-dark/30 select-none">
+                        <Calendar className="w-3 h-3 text-sage" />
+                        <span>AUG 8</span>
                       </div>
                     </div>
+
+                    {/* Content Section */}
                     <div className="p-6 flex flex-col flex-grow">
-                      <h3 className="font-serif text-base font-bold text-charcoal-dark mb-2 leading-snug">{workshop.title}</h3>
+                      <h3 className="font-serif text-base font-bold text-charcoal-dark mb-2 leading-snug">
+                        Lion's Gate Portal Webinar: 8:8 Gateway of Abundance & Awakening
+                      </h3>
                       <p className="text-xs text-charcoal-light leading-relaxed font-sans line-clamp-3 mb-6">
-                        {workshop.description || workshop.shortDescription}
+                        Step into the powerful energies of the Lion's Gate Portal 2026. Discover how this cosmic alignment opens the doors to manifestation, spiritual awakening, and divine transformation.
                       </p>
 
+                      {/* Footer Section */}
                       <div className="mt-auto border-t border-cream-dark/40 pt-4 flex justify-between items-center font-sans text-xs">
-                        <div className="flex flex-col">
-                          <span className="text-[9px] text-charcoal-light uppercase">Investment</span>
-                          <span className="font-serif font-bold text-gold-dark text-sm">₹{workshop.pricing || workshop.price}</span>
+                        <div className="flex flex-col text-left">
+                          <span className="text-[9px] text-charcoal-light uppercase tracking-wider font-semibold">INVESTMENT</span>
+                          <span className="font-serif font-bold text-gold-dark text-sm mt-0.5">₹2100</span>
                         </div>
+                        
                         <button
-                          onClick={() => setActiveWorkshop(workshop)}
-                          className="bg-sage hover:bg-sage-dark text-white text-[10px] font-bold uppercase tracking-wider py-2.5 px-5 rounded-lg transition-all duration-300 shadow-sm"
+                          onClick={handleLionsGateRegister}
+                          className="bg-[#D4A017] hover:bg-[#B38610] text-[#111111] text-[10px] font-bold uppercase tracking-wider py-2.5 px-5 rounded-lg transition-all duration-300 shadow-sm"
                         >
-                          Register Now
+                          REGISTER NOW
                         </button>
                       </div>
                     </div>
                   </div>
-                ))
+
+                  {/* Other Database-fetched Workshops/Webinars */}
+                  {workshops
+                    .filter((workshop) => !workshop.title || !workshop.title.toLowerCase().includes("lion's gate"))
+                    .slice(0, 2)
+                    .map((workshop) => (
+                      <div key={workshop._id} className="group bg-white rounded-3xl overflow-hidden shadow-md border border-cream-dark/50 hover:shadow-2xl hover:border-gold-dark/45 hover:-translate-y-1 transition-all duration-300 flex flex-col text-left h-full">
+                        <div className="h-48 overflow-hidden bg-cream relative">
+                          <img
+                            src={getImageUrl(workshop.coverImage || workshop.image)}
+                            alt={workshop.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                          <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-xs px-3 py-1 rounded-full text-[9px] font-bold tracking-widest uppercase text-sage-dark shadow-sm flex items-center gap-1 font-sans">
+                            <Calendar className="w-3.5 h-3.5 text-sage" />
+                            <span>{new Date(workshop.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
+                          </div>
+                        </div>
+                        <div className="p-6 flex flex-col flex-grow">
+                          <h3 className="font-serif text-base font-bold text-charcoal-dark mb-2 leading-snug">{workshop.title}</h3>
+                          <p className="text-xs text-charcoal-light leading-relaxed font-sans line-clamp-3 mb-6">
+                            {workshop.description || workshop.shortDescription}
+                          </p>
+
+                          <div className="mt-auto border-t border-cream-dark/40 pt-4 flex justify-between items-center font-sans text-xs">
+                            <div className="flex flex-col text-left">
+                              <span className="text-[9px] text-charcoal-light uppercase tracking-wider">Investment</span>
+                              <span className="font-serif font-bold text-gold-dark text-sm mt-0.5">₹{workshop.pricing || workshop.price}</span>
+                            </div>
+                            <button
+                              onClick={() => setActiveWorkshop(workshop)}
+                              className="bg-sage hover:bg-sage-dark text-white text-[10px] font-bold uppercase tracking-wider py-2.5 px-5 rounded-lg transition-all duration-300 shadow-sm"
+                            >
+                              Register Now
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                </>
               )}
             </div>
 
@@ -931,6 +1004,8 @@ const Home = () => {
           </div>
         </section>
       )}
+
+
 
       {/* 9. Featured Shop */}
       {(loading || products.length > 0) && (
