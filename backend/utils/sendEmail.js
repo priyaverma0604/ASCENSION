@@ -1,6 +1,34 @@
 const nodemailer = require('nodemailer');
+const axios = require('axios');
 
 const sendEmail = async (options) => {
+  // 1. If Resend API Key is configured, use Resend API (HTTP-based, never blocked by Render)
+  if (process.env.RESEND_API_KEY) {
+    try {
+      const fromEmail = process.env.EMAIL_SENDER || 'bookings@ascension.ind.in';
+      const response = await axios.post(
+        'https://api.resend.com/emails',
+        {
+          from: `"Ascension by Sonali" <${fromEmail}>`,
+          to: [options.to],
+          subject: options.subject,
+          html: options.html || `<p>${options.text}</p>`
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+      console.log(`Email sent successfully via Resend API: ${response.data.id}`);
+      return response.data;
+    } catch (err) {
+      console.error('Resend API email sending failed, trying SMTP fallback:', err.response?.data || err.message);
+      // Fallback to SMTP if Resend API call fails
+    }
+  }
+
   const isMailConfigured = 
     process.env.EMAIL_USER && 
     process.env.EMAIL_USER !== 'your_email@gmail.com' &&
@@ -39,7 +67,7 @@ const sendEmail = async (options) => {
   };
 
   const info = await transporter.sendMail(mailOptions);
-  console.log(`Email sent successfully: ${info.messageId}`);
+  console.log(`Email sent successfully via SMTP: ${info.messageId}`);
   return info;
 };
 
