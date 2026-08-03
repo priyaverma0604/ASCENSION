@@ -59,9 +59,19 @@ const Home = () => {
     return "AUG 8";
   };
 
-  // Newsletter state
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+
+  // Rotating upcoming events notification state and transition timer
+  const [notificationIndex, setNotificationIndex] = useState(0);
+
+  useEffect(() => {
+    if (workshops.length <= 1) return;
+    const interval = setInterval(() => {
+      setNotificationIndex((prev) => (prev + 1) % workshops.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [workshops]);
 
   // Seva Section Animation State & Ref
   const [sevaVisible, setSevaVisible] = useState(false);
@@ -234,6 +244,37 @@ const Home = () => {
 
   return (
     <div className="flex flex-col min-h-screen">
+
+      {/* 0. Top Dynamic Announcement Bar */}
+      {workshops.length > 0 && workshops[notificationIndex] && (
+        <div className="bg-[#D4A017]/10 border-b border-[#EAE3D2] py-2.5 px-4 text-center text-xs text-charcoal-dark font-sans flex items-center justify-center gap-2 relative z-20 hover:bg-[#D4A017]/15 transition-all select-none animate-fade-in shrink-0">
+          <Sparkles className="w-3.5 h-3.5 text-gold-dark animate-pulse shrink-0" />
+          <div className="flex flex-wrap items-center justify-center gap-1.5 leading-relaxed">
+            <span className="font-bold uppercase tracking-wider text-[9px] bg-gold/20 px-1.5 py-0.5 rounded text-gold-dark shrink-0">
+              {workshops[notificationIndex].isWebinar ? 'Webinar' : 'Workshop'}
+            </span>
+            <span className="font-medium text-charcoal-dark">
+              {workshops[notificationIndex].title}
+            </span>
+            <span className="text-charcoal-light">
+              starts on {workshops[notificationIndex].date ? new Date(workshops[notificationIndex].date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : ''} at {workshops[notificationIndex].time}
+            </span>
+            <span className="font-bold text-gold-dark ml-1">
+              (₹{workshops[notificationIndex].price || workshops[notificationIndex].pricing || 0})
+            </span>
+          </div>
+          <button
+            onClick={() => {
+              document.getElementById('upcoming-events')?.scrollIntoView({ behavior: 'smooth' });
+              setActiveWorkshop(workshops[notificationIndex]);
+            }}
+            className="text-[10px] font-bold text-sage hover:text-sage-dark uppercase tracking-wider flex items-center gap-0.5 ml-2 transition-colors shrink-0 group border-b border-sage hover:border-sage-dark focus:outline-none"
+          >
+            <span>Register Now</span>
+            <ArrowRight className="w-3 h-3 transform group-hover:translate-x-0.5 transition-transform" />
+          </button>
+        </div>
+      )}
 
       {/* 1. Hero Section */}
       <section className="relative min-h-[500px] lg:h-screen lg:min-h-[600px] lg:max-h-[960px] flex flex-col justify-center items-center px-6 md:px-12 lg:px-20 text-center overflow-hidden border-b border-cream-dark/30 bg-cream-light py-12 lg:py-0">
@@ -902,7 +943,7 @@ const Home = () => {
 
       {/* 8. Upcoming Workshops */}
       {(loading || workshops.length > 0) && (
-        <section className="py-24 bg-[#FFFDF7] px-6 md:px-12 border-b border-cream-dark/30 w-full text-center">
+        <section id="upcoming-events" className="py-24 bg-[#FFFDF7] px-6 md:px-12 border-b border-cream-dark/30 w-full text-center">
           <div className="max-w-6xl mx-auto">
             <span className="font-sans text-[10px] sm:text-xs text-gold-dark tracking-[0.25em] font-bold uppercase">Sacred Gatherings</span>
             <h2 className="font-serif text-3xl font-bold text-charcoal-dark mt-2 mb-12">Upcoming Workshops</h2>
