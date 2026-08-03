@@ -46,6 +46,19 @@ const Home = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Dynamic check for Lion's Gate webinar details
+  const lionsGateWebinar = workshops.find(w => w.title && w.title.toLowerCase().includes("lion's gate"));
+  
+  const getLionsGateDateText = () => {
+    if (lionsGateWebinar && lionsGateWebinar.date) {
+      const d = new Date(lionsGateWebinar.date);
+      const day = d.getDate();
+      const month = d.toLocaleDateString(undefined, { month: 'short' }).toUpperCase();
+      return `${month} ${day}`;
+    }
+    return "AUG 8";
+  };
+
   // Newsletter state
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
@@ -920,24 +933,24 @@ const Home = () => {
                       {/* Floating Date Badge */}
                       <div className="absolute top-4 left-4 bg-[#FCFBF7]/90 backdrop-blur-md px-3 py-1 rounded-full text-[9px] font-bold tracking-widest uppercase text-sage-dark shadow-sm flex items-center gap-1 font-sans border border-cream-dark/30 select-none">
                         <Calendar className="w-3 h-3 text-sage" />
-                        <span>AUG 8</span>
+                        <span>{getLionsGateDateText()}</span>
                       </div>
                     </div>
 
                     {/* Content Section */}
                     <div className="p-6 flex flex-col flex-grow">
                       <h3 className="font-serif text-base font-bold text-charcoal-dark mb-2 leading-snug">
-                        Lion's Gate Portal Webinar: 8:8 Gateway of Abundance & Awakening
+                        {lionsGateWebinar ? lionsGateWebinar.title : "Lion's Gate Portal Webinar: 8:8 Gateway of Abundance & Awakening"}
                       </h3>
                       <p className="text-xs text-charcoal-light leading-relaxed font-sans line-clamp-3 mb-6">
-                        Step into the powerful energies of the Lion's Gate Portal 2026. Discover how this cosmic alignment opens the doors to manifestation, spiritual awakening, and divine transformation.
+                        {lionsGateWebinar ? lionsGateWebinar.shortDescription : "Step into the powerful energies of the Lion's Gate Portal 2026. Discover how this cosmic alignment opens the doors to manifestation, spiritual awakening, and divine transformation."}
                       </p>
 
                       {/* Footer Section */}
                       <div className="mt-auto border-t border-cream-dark/40 pt-4 flex justify-between items-center font-sans text-xs">
                         <div className="flex flex-col text-left">
                           <span className="text-[9px] text-charcoal-light uppercase tracking-wider font-semibold">INVESTMENT</span>
-                          <span className="font-serif font-bold text-gold-dark text-sm mt-0.5">₹2100</span>
+                          <span className="font-serif font-bold text-gold-dark text-sm mt-0.5">₹{lionsGateWebinar ? lionsGateWebinar.price : 2100}</span>
                         </div>
                         
                         <button
