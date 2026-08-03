@@ -18,7 +18,7 @@ if (isRazorpayConfigured) {
     console.error('Error initializing Razorpay client:', error.message);
   }
 } else {
-  console.warn('WARNING: Razorpay credentials not configured. Payment transactions will run in simulation mode.');
+  // Razorpay fallback
 }
 
 module.exports = {

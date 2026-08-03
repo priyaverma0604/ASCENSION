@@ -13,7 +13,7 @@ if (isCloudinaryConfigured) {
   });
   console.log('Cloudinary Configured successfully.');
 } else {
-  console.warn('WARNING: Cloudinary credentials not configured. Image uploads will use local/mock storage fallback.');
+  // Cloudinary fallback
 }
 
 module.exports = {
