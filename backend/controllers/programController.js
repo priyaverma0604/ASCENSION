@@ -4,6 +4,7 @@ const ProgramRegistration = require('../models/ProgramRegistration');
 const { razorpayInstance, isRazorpayConfigured } = require('../config/razorpay');
 const { isCloudinaryConfigured } = require('../config/cloudinary');
 const crypto = require('crypto');
+const sendEmail = require('../utils/sendEmail');
 
 // Helper to get image paths from req.files
 const getImagesPaths = (req) => {
@@ -358,7 +359,7 @@ exports.verifyProgramRegistration = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Invalid registration status. Use Paid or Rejected.' });
     }
 
-    const reg = await ProgramRegistration.findById(req.params.regId);
+    const reg = await ProgramRegistration.findById(req.params.regId).populate('program');
     if (!reg) {
       return res.status(404).json({ success: false, message: 'Registration record not found' });
     }
@@ -372,6 +373,41 @@ exports.verifyProgramRegistration = async (req, res, next) => {
       if (program && !program.enrolledUsers.includes(reg.user)) {
         program.enrolledUsers.push(reg.user);
         await program.save();
+      }
+
+      // Send program confirmation email
+      const emailOptions = {
+        to: reg.email,
+        subject: `Your Program Enrollment is Confirmed: ${reg.program.title}`,
+        text: `Hello ${reg.name},\n\nThank you for enrolling.\n\nYour payment has been verified, and your enrollment for the program "${reg.program.title}" has been successfully confirmed.\n\nYou can access your program content and zoom links inside your dashboard profile.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
+        html: `<p>Hello <strong>${reg.name}</strong>,</p>
+               <p>Thank you for enrolling.</p>
+               <p>Your payment has been verified, and your enrollment for the program "<strong>${reg.program.title}</strong>" has been successfully confirmed.</p>
+               <p>You can access your program content and zoom links inside your dashboard profile.</p>
+               <p>Regards,<br/><strong>Ascension by Sonali Bhasin Kumar</strong></p>`
+      };
+
+      try {
+        await sendEmail(emailOptions);
+      } catch (emailErr) {
+        console.error('Program enrollment approval email sending failed:', emailErr.message);
+      }
+    } else if (status === 'Rejected') {
+      // Send program rejection email
+      const emailOptions = {
+        to: reg.email,
+        subject: `Program Enrollment Declined: ${reg.program.title}`,
+        text: `Hello ${reg.name},\n\nYour registration request for the program "${reg.program.title}" has been declined.\n\nThis could be due to a mismatched transaction reference ID or invalid screenshot proof. Please re-register or contact support if you believe this was an error.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
+        html: `<p>Hello <strong>${reg.name}</strong>,</p>
+               <p>Your registration request for the program "<strong>${reg.program.title}</strong>" has been declined.</p>
+               <p>This could be due to a mismatched transaction reference ID or invalid screenshot proof. Please re-register or contact support if you believe this was an error.</p>
+               <p>Regards,<br/><strong>Ascension by Sonali Bhasin Kumar</strong></p>`
+      };
+
+      try {
+        await sendEmail(emailOptions);
+      } catch (emailErr) {
+        console.error('Program enrollment rejection email sending failed:', emailErr.message);
       }
     }
 
