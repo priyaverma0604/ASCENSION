@@ -36,6 +36,10 @@ const webinarRegistrationSchema = new mongoose.Schema({
     enum: ['Pending', 'Paid', 'Rejected'],
     default: 'Pending'
   },
+  zoomLinkSent: {
+    type: Boolean,
+    default: false
+  },
   registeredAt: {
     type: Date,
     default: Date.now

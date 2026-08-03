@@ -20,7 +20,7 @@ const insertLionsGateWebinar = async () => {
       shortDescription: "Step into the powerful energies of the Lion's Gate Portal 2026. Discover how this cosmic alignment opens the doors to manifestation, spiritual awakening, and divine transformation.",
       detailedDescription: "The Lion's Gate Portal reaches its peak on August 8th (8:8), bringing a massive influx of high-frequency cosmic light. In this powerful webinar, Sonali Bhasin Kumar will guide you through energy clearing, manifestation alignments, and DNA activation to help you co-create abundance and spiritual transformation in this lifetime.",
       speakerName: "Sonali Bhasin Kumar",
-      date: new Date('2026-08-08T18:00:00Z'), // August 8, 2026 at 6:00 PM UTC / 11:30 PM IST (or custom)
+      date: new Date('2026-08-08T18:00:00+05:30'), // August 8, 2026 at 6:00 PM IST
       time: "6:00 PM - 7:30 PM IST",
       duration: "90 minutes",
       price: 2100,

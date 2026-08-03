@@ -323,10 +323,14 @@ const RegisterWebinarModal = ({ webinar, onClose }) => {
               <h4 className="font-serif text-lg font-bold text-charcoal-dark">
                 Registration Submitted!
               </h4>
-              <p className="text-xs text-charcoal-light leading-relaxed px-4">
-                Thank you, **{name}**! Your manual payment proof has been successfully submitted and is currently pending admin validation.
+              <p className="text-xs text-charcoal-light leading-relaxed px-4 border-b border-cream-dark/50 pb-3">
+                Thank you, <strong>{name}</strong>! Your manual payment proof has been successfully submitted and is pending admin validation.
               </p>
-              <p className="text-[10px] text-sage font-semibold uppercase tracking-wide bg-sage/10 px-3 py-1 rounded-full border border-sage/20 mt-1">
+              <div className="text-[11px] text-charcoal-light leading-relaxed px-2 flex flex-col gap-1">
+                <p>Once approved, a confirmation email will be sent to you.</p>
+                <p className="font-semibold text-gold-dark">Your Zoom Link will be emailed exactly 1 hour before the webinar starts.</p>
+              </div>
+              <p className="text-[10px] text-sage font-semibold uppercase tracking-wide bg-sage/10 px-3 py-1 rounded-full border border-sage/20 mt-1.5">
                 Status: Pending Approval
               </p>
               <button

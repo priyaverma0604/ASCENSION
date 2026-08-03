@@ -253,7 +253,7 @@ exports.approveRegistration = async (req, res, next) => {
     const emailOptions = {
       to: registration.email,
       subject: 'Your Webinar Registration is Confirmed',
-      text: `Hello ${registration.name},\n\nThank you for registering.\n\nYour registration has been successfully confirmed.\n\nWebinar Details:\n- Webinar Name: ${registration.webinar.title}\n- Date: ${formattedDate}\n- Time: ${registration.webinar.time}\n- Speaker: ${registration.webinar.speakerName}\n\nThe Zoom Meeting Link will automatically be sent to you one day before the webinar.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
+      text: `Hello ${registration.name},\n\nThank you for registering.\n\nYour registration has been successfully confirmed.\n\nWebinar Details:\n- Webinar Name: ${registration.webinar.title}\n- Date: ${formattedDate}\n- Time: ${registration.webinar.time}\n- Speaker: ${registration.webinar.speakerName}\n\nThe Zoom Meeting Link will automatically be sent to you 1 hour before the webinar.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
       html: `<p>Hello <strong>${registration.name}</strong>,</p>
              <p>Thank you for registering.</p>
              <p>Your registration has been successfully confirmed.</p>
@@ -264,7 +264,7 @@ exports.approveRegistration = async (req, res, next) => {
                <li><strong>Time:</strong> ${registration.webinar.time}</li>
                <li><strong>Speaker:</strong> ${registration.webinar.speakerName}</li>
              </ul>
-             <p>The Zoom Meeting Link will automatically be sent to you one day before the webinar.</p>
+             <p>The Zoom Meeting Link will automatically be sent to you 1 hour before the webinar.</p>
              <p>Regards,<br/><strong>Ascension by Sonali Bhasin Kumar</strong></p>`
     };
 
@@ -274,14 +274,14 @@ exports.approveRegistration = async (req, res, next) => {
       console.error('Approval email sending failed:', emailErr.message);
     }
 
-    // If the webinar starts in less than 24 hours, send the Zoom link email immediately as well
+    // If the webinar starts in less than 1 hour (up to 1h 5m window), send the Zoom link email immediately as well
     const now = new Date();
     const webinarDate = new Date(registration.webinar.date);
     const timeDiff = webinarDate.getTime() - now.getTime();
     const hoursDiff = timeDiff / (1000 * 60 * 60);
 
-    if (hoursDiff <= 24) {
-      console.log(`Webinar is in less than 24 hours (${hoursDiff.toFixed(2)}h). Sending Zoom link immediately.`);
+    if (hoursDiff <= 1.08 && hoursDiff >= -0.5) {
+      console.log(`Webinar is in less than 1 hour (${hoursDiff.toFixed(2)}h). Sending Zoom link immediately.`);
       const reminderEmailOptions = {
         to: registration.email,
         subject: 'Your Webinar Zoom Link - Starts Soon',
@@ -302,6 +302,8 @@ exports.approveRegistration = async (req, res, next) => {
 
       try {
         await sendEmail(reminderEmailOptions);
+        registration.zoomLinkSent = true;
+        await registration.save();
       } catch (emailErr) {
         console.error('Zoom link email sending failed:', emailErr.message);
       }

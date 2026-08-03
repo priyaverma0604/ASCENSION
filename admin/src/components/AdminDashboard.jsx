@@ -600,6 +600,39 @@ const AdminDashboard = ({ user, onLogout }) => {
                                   View Screenshot ↗
                                 </a>
                               )}
+                              {item.webinar && (
+                                <div className="mt-2 pt-2 border-t border-cream-dark/40 flex flex-col sm:flex-row sm:items-center gap-1.5">
+                                  <span className="text-[10px] font-bold text-charcoal-light uppercase tracking-wider">Zoom Link:</span>
+                                  <div className="flex gap-1.5 items-center">
+                                    <input
+                                      type="url"
+                                      id={`zoom-link-${item._id}`}
+                                      defaultValue={item.webinar.zoomLink || ''}
+                                      placeholder="Paste Zoom Link here"
+                                      className="bg-cream-light border border-cream-dark/80 rounded px-2 py-0.5 text-[10px] w-48 sm:w-64 focus:outline-none focus:border-sage font-mono text-charcoal"
+                                    />
+                                    <button
+                                      onClick={async () => {
+                                        const inputVal = document.getElementById(`zoom-link-${item._id}`)?.value;
+                                        if (!inputVal) {
+                                          alert('Please enter a Zoom Link before saving.');
+                                          return;
+                                        }
+                                        try {
+                                          await axios.put(`/api/webinars/${item.webinar._id}`, { zoomLink: inputVal });
+                                          alert('Webinar Zoom Link updated successfully.');
+                                          fetchTabData();
+                                        } catch (err) {
+                                          alert(err.response?.data?.message || 'Failed to update Zoom Link.');
+                                        }
+                                      }}
+                                      className="bg-sage hover:bg-sage-dark text-white px-2 py-0.5 rounded text-[9px] font-bold uppercase transition-colors shrink-0"
+                                    >
+                                      Save
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           )}
                           {activeTab === 'workshop-registrations' && (
