@@ -141,6 +141,28 @@ const Home = () => {
     };
   }, []);
 
+  // Smooth scroll to webinars/workshops if page loads with hash
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash === '#upcoming-events' || hash === '#webinars' || hash === '#workshops') {
+      let attempts = 0;
+      const interval = setInterval(() => {
+        const element = document.getElementById('upcoming-events');
+        if (element) {
+          clearInterval(interval);
+          setTimeout(() => {
+            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 100);
+        }
+        attempts++;
+        if (attempts > 20) {
+          clearInterval(interval);
+        }
+      }, 100);
+      return () => clearInterval(interval);
+    }
+  }, [loading, window.location.hash]);
+
   const fetchHomeData = async () => {
     try {
       const resWorkshops = await axios.get('/api/workshops');
@@ -902,7 +924,7 @@ const Home = () => {
 
       {/* 8. Upcoming Workshops */}
       {(loading || workshops.length > 0) && (
-        <section className="py-24 bg-[#FFFDF7] px-6 md:px-12 border-b border-cream-dark/30 w-full text-center">
+        <section id="upcoming-events" className="py-24 bg-[#FFFDF7] px-6 md:px-12 border-b border-cream-dark/30 w-full text-center">
           <div className="max-w-6xl mx-auto">
             <span className="font-sans text-[10px] sm:text-xs text-gold-dark tracking-[0.25em] font-bold uppercase">Sacred Gatherings</span>
             <h2 className="font-serif text-3xl font-bold text-charcoal-dark mt-2 mb-12">Upcoming Workshops</h2>
