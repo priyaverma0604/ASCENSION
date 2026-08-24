@@ -24,6 +24,9 @@ const AdminDashboard = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('create'); // 'create', 'edit', 'view'
   const [selectedItem, setSelectedItem] = useState(null);
+  const [programProgressList, setProgramProgressList] = useState([]);
+  const [loadingProgressList, setLoadingProgressList] = useState(false);
+  const [selectedUserProgress, setSelectedUserProgress] = useState(null);
 
   // Form State
   const [serviceTitle, setServiceTitle] = useState('');
@@ -146,10 +149,26 @@ const AdminDashboard = () => {
     setShowModal(true);
   };
 
-  const handleOpenView = (item) => {
+  const handleOpenView = async (item) => {
     setModalMode('view');
     setSelectedItem(item);
     setShowModal(true);
+    
+    if (activeTab === 'programs') {
+      setLoadingProgressList(true);
+      setProgramProgressList([]);
+      setSelectedUserProgress(null);
+      try {
+        const { data } = await axios.get(`/api/programs/${item._id}/progress/all`);
+        if (data.success) {
+          setProgramProgressList(data.data);
+        }
+      } catch (err) {
+        console.error('Error fetching program progress list:', err.message);
+      } finally {
+        setLoadingProgressList(false);
+      }
+    }
   };
 
   const clearFormFields = () => {
@@ -616,7 +635,11 @@ const AdminDashboard = () => {
                 {modalMode === 'view' ? 'Review Details' : modalMode === 'edit' ? 'Edit Details' : 'Create Record'}
               </h3>
               <button 
-                onClick={() => setShowModal(false)}
+                onClick={() => {
+                  setShowModal(false);
+                  setSelectedUserProgress(null);
+                  setProgramProgressList([]);
+                }}
                 className="p-1 text-charcoal hover:text-gold transition-colors focus:outline-none"
               >
                 <X className="w-5 h-5" />
@@ -702,18 +725,92 @@ const AdminDashboard = () => {
 
                   {/* Program enrollment list */}
                   {activeTab === 'programs' && (
-                    <div className="flex flex-col gap-3">
-                      <h4 className="font-bold text-charcoal-dark border-b pb-1">Enrolled Students</h4>
-                      {selectedItem.enrolledUsers?.length > 0 ? (
-                        <div className="flex flex-col gap-2 max-h-60 overflow-y-auto">
-                          {selectedItem.enrolledUsers.map((stu, idx) => (
-                            <div key={idx} className="bg-cream p-2 px-3.5 rounded-xl border flex justify-between items-center text-[11px]">
-                              <span>{stu.name}</span>
-                              <span className="text-sage font-medium">{stu.email}</span>
+                    <div className="flex flex-col gap-3 text-left">
+                      {selectedUserProgress ? (
+                        <div className="flex flex-col gap-4">
+                          <div className="flex justify-between items-center border-b pb-2">
+                            <h4 className="font-bold text-charcoal-dark text-[12px] uppercase tracking-wider">
+                              Submissions: {selectedUserProgress.user?.name}
+                            </h4>
+                            <button
+                              onClick={() => setSelectedUserProgress(null)}
+                              className="text-[9px] bg-cream hover:bg-cream-dark border py-1 px-3 rounded-lg font-bold transition-all uppercase tracking-wider"
+                            >
+                              ← Back to Students
+                            </button>
+                          </div>
+                          
+                          <p className="text-[10px] text-charcoal-light">
+                            Current Day: <strong className="text-charcoal-dark">Day {selectedUserProgress.currentDay}</strong> | Completed: <strong className="text-charcoal-dark">{selectedUserProgress.completed ? 'Yes' : 'No'}</strong>
+                          </p>
+
+                          {selectedUserProgress.submissions?.length > 0 ? (
+                            <div className="grid grid-cols-3 gap-3 max-h-64 overflow-y-auto pt-2">
+                              {selectedUserProgress.submissions.map((sub, idx) => (
+                                <div key={idx} className="border rounded-lg overflow-hidden bg-cream p-1 text-[10px] flex flex-col gap-1">
+                                  <div className="h-16 bg-cream-dark/20 relative">
+                                    <img 
+                                      src={getImageUrl(sub.photo)} 
+                                      alt={`Day ${sub.day}`} 
+                                      className="w-full h-full object-cover" 
+                                    />
+                                    <a
+                                      href={getImageUrl(sub.photo)}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="absolute inset-0 bg-charcoal/20 opacity-0 hover:opacity-100 flex items-center justify-center text-white text-[9px] font-bold"
+                                    >
+                                      Full Image ↗
+                                    </a>
+                                  </div>
+                                  <div className="flex justify-between font-bold text-charcoal-dark px-1">
+                                    <span>Day {sub.day}</span>
+                                  </div>
+                                </div>
+                              ))}
                             </div>
-                          ))}
+                          ) : (
+                            <p className="text-charcoal-light py-4 text-center font-medium">No assignments submitted yet.</p>
+                          )}
                         </div>
-                      ) : <p className="text-charcoal-light">No students enrolled yet.</p>}
+                      ) : (
+                        <div className="flex flex-col gap-3">
+                          <h4 className="font-bold text-charcoal-dark border-b pb-1">Enrolled Students</h4>
+                          {loadingProgressList ? (
+                            <div className="shimmer h-24 rounded-xl"></div>
+                          ) : selectedItem.enrolledUsers?.length > 0 ? (
+                            <div className="flex flex-col gap-2 max-h-60 overflow-y-auto">
+                              {selectedItem.enrolledUsers.map((stu, idx) => {
+                                // Find progress
+                                const userProg = programProgressList.find(p => p.user?._id === stu._id);
+                                return (
+                                  <div key={idx} className="bg-cream p-2.5 px-3.5 rounded-xl border flex justify-between items-center text-[11px] gap-2">
+                                    <div className="flex flex-col gap-0.5 min-w-0">
+                                      <span className="font-bold text-charcoal-dark truncate">{stu.name}</span>
+                                      <span className="text-charcoal-light truncate text-[10px]">{stu.email}</span>
+                                      {userProg && (
+                                        <span className="text-[9px] text-sage font-bold uppercase mt-0.5">
+                                          Progress: Day {userProg.currentDay} / 30 {userProg.completed && '✓'}
+                                        </span>
+                                      )}
+                                    </div>
+                                    {selectedItem.title.toLowerCase().includes('gratitude') && userProg ? (
+                                      <button
+                                        onClick={() => setSelectedUserProgress(userProg)}
+                                        className="bg-sage/10 text-sage hover:bg-sage hover:text-white text-xs font-bold py-1.5 px-3 rounded-lg border border-sage/20 shrink-0 transition-all"
+                                      >
+                                        View Submissions
+                                      </button>
+                                    ) : (
+                                      <span className="text-charcoal-light text-[9px] italic shrink-0">No active progress</span>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          ) : <p className="text-charcoal-light">No students enrolled yet.</p>}
+                        </div>
+                      )}
                     </div>
                   )}
 

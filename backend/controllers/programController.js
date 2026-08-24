@@ -1,6 +1,7 @@
 const Program = require('../models/Program');
 const User = require('../models/User');
 const ProgramRegistration = require('../models/ProgramRegistration');
+const UserProgramProgress = require('../models/UserProgramProgress');
 const { razorpayInstance, isRazorpayConfigured } = require('../config/razorpay');
 const { isCloudinaryConfigured } = require('../config/cloudinary');
 const crypto = require('crypto');
@@ -416,3 +417,148 @@ exports.verifyProgramRegistration = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Get user program progress
+// @route   GET /api/programs/:id/progress
+// @access  Private
+exports.getProgramProgress = async (req, res, next) => {
+  try {
+    const program = await Program.findById(req.params.id);
+    if (!program) {
+      return res.status(404).json({ success: false, message: 'Program not found' });
+    }
+
+    // Check if user is enrolled
+    const isEnrolled = program.enrolledUsers.some(
+      (userId) => userId._id ? userId._id.toString() === req.user._id.toString() : userId.toString() === req.user._id.toString()
+    );
+    if (!isEnrolled) {
+      return res.status(403).json({ success: false, message: 'You are not enrolled in this program' });
+    }
+
+    let progress = await UserProgramProgress.findOne({
+      user: req.user._id,
+      program: program._id
+    });
+
+    if (!progress) {
+      progress = await UserProgramProgress.create({
+        user: req.user._id,
+        program: program._id,
+        currentDay: 1,
+        completed: false,
+        submissions: []
+      });
+    }
+
+    const AssignmentSubmission = require('../models/AssignmentSubmission');
+    const currentSubmission = await AssignmentSubmission.findOne({
+      user: req.user._id,
+      program: program._id,
+      dayNumber: progress.currentDay
+    }).sort({ createdAt: -1 });
+
+    const progressObj = progress.toObject();
+    progressObj.currentSubmission = currentSubmission;
+
+    res.json({ success: true, data: progressObj });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Submit day photo/assignment progress
+// @route   POST /api/programs/:id/progress/submit
+// @access  Private
+exports.submitProgramProgressDay = async (req, res, next) => {
+  try {
+    const program = await Program.findById(req.params.id);
+    if (!program) {
+      return res.status(404).json({ success: false, message: 'Program not found' });
+    }
+
+    // Check if user is enrolled
+    const isEnrolled = program.enrolledUsers.some(
+      (userId) => userId._id ? userId._id.toString() === req.user._id.toString() : userId.toString() === req.user._id.toString()
+    );
+    if (!isEnrolled) {
+      return res.status(403).json({ success: false, message: 'You are not enrolled in this program' });
+    }
+
+    let progress = await UserProgramProgress.findOne({
+      user: req.user._id,
+      program: program._id
+    });
+
+    if (!progress) {
+      progress = await UserProgramProgress.create({
+        user: req.user._id,
+        program: program._id,
+        currentDay: 1,
+        completed: false,
+        submissions: []
+      });
+    }
+
+    if (progress.completed) {
+      return res.status(400).json({ success: false, message: 'You have already completed this 30-day program!' });
+    }
+
+    let photoUrl = '';
+    if (req.file) {
+      if (isCloudinaryConfigured) {
+        photoUrl = req.file.path;
+      } else {
+        photoUrl = `/uploads/${req.file.filename}`;
+      }
+    } else {
+      return res.status(400).json({ success: false, message: 'Please upload a photo of your work' });
+    }
+
+    const daySubmitted = progress.currentDay;
+    
+    // Push submission
+    progress.submissions.push({
+      day: daySubmitted,
+      photo: photoUrl,
+      submittedAt: new Date()
+    });
+
+    if (daySubmitted >= 30) {
+      progress.completed = true;
+    } else {
+      progress.currentDay += 1;
+    }
+
+    await progress.save();
+
+    res.json({
+      success: true,
+      message: `Day ${daySubmitted} assignment submitted successfully!`,
+      data: progress
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get all users progress for a specific program (Admin view)
+// @route   GET /api/programs/:id/progress/all
+// @access  Private/Admin
+exports.getAllProgramProgress = async (req, res, next) => {
+  try {
+    const program = await Program.findById(req.params.id);
+    if (!program) {
+      return res.status(404).json({ success: false, message: 'Program not found' });
+    }
+
+    const progresses = await UserProgramProgress.find({ program: program._id })
+      .populate('user', 'name email')
+      .sort('-updatedAt');
+
+    res.json({ success: true, data: progresses });
+  } catch (error) {
+    next(error);
+  }
+};
+

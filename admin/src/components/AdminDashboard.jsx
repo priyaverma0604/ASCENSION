@@ -21,10 +21,26 @@ const AdminDashboard = ({ user, onLogout }) => {
   const [listData, setListData] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [gratitudeProgramId, setGratitudeProgramId] = useState('');
+  
+  // Assignment form states
+  const [assignmentDayNumber, setAssignmentDayNumber] = useState('');
+  const [assignmentTitle, setAssignmentTitle] = useState('');
+  const [assignmentContent, setAssignmentContent] = useState('');
+  const [assignmentDuration, setAssignmentDuration] = useState('20 minutes');
+  const [assignmentStatus, setAssignmentStatus] = useState('Active');
+  const [assignmentImage, setAssignmentImage] = useState(null);
+  
+  // Submission review state
+  const [reviewComment, setReviewComment] = useState('');
+
   // Form Modals
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState('create'); // 'create', 'edit', 'view'
   const [selectedItem, setSelectedItem] = useState(null);
+  const [programProgressList, setProgramProgressList] = useState([]);
+  const [loadingProgressList, setLoadingProgressList] = useState(false);
+  const [selectedUserProgress, setSelectedUserProgress] = useState(null);
 
   // Form State
   const [serviceTitle, setServiceTitle] = useState('');
@@ -83,6 +99,8 @@ const AdminDashboard = ({ user, onLogout }) => {
   const tabs = [
     { id: 'services', label: 'Services', icon: <Layers className="w-4 h-4" /> },
     { id: 'programs', label: 'Programs', icon: <ShieldCheck className="w-4 h-4" /> },
+    { id: 'gratitude-assignments', label: 'Gratitude Assignments', icon: <FileText className="w-4 h-4" /> },
+    { id: 'gratitude-submissions', label: 'Gratitude Submissions', icon: <CheckCircle className="w-4 h-4" /> },
     { id: 'products', label: 'Products', icon: <ShoppingBag className="w-4 h-4" /> },
     { id: 'orders', label: 'Orders', icon: <ShoppingBag className="w-4 h-4" /> },
     { id: 'workshops', label: 'Workshops', icon: <Calendar className="w-4 h-4" /> },
@@ -99,8 +117,26 @@ const AdminDashboard = ({ user, onLogout }) => {
   ];
 
   useEffect(() => {
+    fetchGratitudeProgramId();
+  }, []);
+
+  const fetchGratitudeProgramId = async () => {
+    try {
+      const { data } = await axios.get('/api/programs');
+      if (data.success) {
+        const gratProg = data.data.find(p => p.title.toLowerCase().includes('gratitude'));
+        if (gratProg) {
+          setGratitudeProgramId(gratProg._id);
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching programs for gratitude id:', err.message);
+    }
+  };
+
+  useEffect(() => {
     fetchTabData();
-  }, [activeTab]);
+  }, [activeTab, gratitudeProgramId]);
 
   const fetchTabData = async () => {
     setLoading(true);
@@ -112,6 +148,21 @@ const AdminDashboard = ({ user, onLogout }) => {
       if (activeTab === 'workshop-registrations') endpoint = '/api/workshops/registrations';
       if (activeTab === 'program-registrations') endpoint = '/api/programs/registrations';
       if (activeTab === 'service-bookings') endpoint = '/api/contacts';
+
+      if (activeTab === 'gratitude-assignments') {
+        if (!gratitudeProgramId) {
+          setLoading(false);
+          return;
+        }
+        endpoint = `/api/programs/${gratitudeProgramId}/assignments/admin`;
+      }
+      if (activeTab === 'gratitude-submissions') {
+        if (!gratitudeProgramId) {
+          setLoading(false);
+          return;
+        }
+        endpoint = `/api/programs/${gratitudeProgramId}/submissions/admin`;
+      }
       
       const { data } = await axios.get(endpoint);
       if (data.success) {
@@ -130,6 +181,14 @@ const AdminDashboard = ({ user, onLogout }) => {
   };
 
   const handleDelete = async (id) => {
+    if (activeTab === 'gratitude-assignments') {
+      const itemToDelete = listData.find(i => i._id === id);
+      if (itemToDelete && itemToDelete.stats?.total > 0) {
+        alert("Cannot permanently delete this assignment because submissions already exist. You can deactivate it by editing the status instead.");
+        return;
+      }
+    }
+
     if (!window.confirm('Are you sure you want to delete this item?')) return;
     try {
       let endpoint = `/api/${activeTab}/${id}`;
@@ -138,6 +197,7 @@ const AdminDashboard = ({ user, onLogout }) => {
       if (activeTab === 'workshop-registrations') endpoint = `/api/workshops/registrations/${id}`;
       if (activeTab === 'program-registrations') endpoint = `/api/programs/registrations/${id}`;
       if (activeTab === 'service-bookings') endpoint = `/api/contacts/${id}`;
+      if (activeTab === 'gratitude-assignments') endpoint = `/api/programs/assignments/${id}`;
 
       const { data } = await axios.delete(endpoint);
       if (data.success) {
@@ -162,10 +222,26 @@ const AdminDashboard = ({ user, onLogout }) => {
     setShowModal(true);
   };
 
-  const handleOpenView = (item) => {
+  const handleOpenView = async (item) => {
     setModalMode('view');
     setSelectedItem(item);
     setShowModal(true);
+    
+    if (activeTab === 'programs') {
+      setLoadingProgressList(true);
+      setProgramProgressList([]);
+      setSelectedUserProgress(null);
+      try {
+        const { data } = await axios.get(`/api/programs/${item._id}/progress/all`);
+        if (data.success) {
+          setProgramProgressList(data.data);
+        }
+      } catch (err) {
+        console.error('Error fetching program progress list:', err.message);
+      } finally {
+        setLoadingProgressList(false);
+      }
+    }
   };
 
   const clearFormFields = () => {
@@ -220,6 +296,14 @@ const AdminDashboard = ({ user, onLogout }) => {
     setWebinarStatus('Upcoming');
     setWebinarCover(null);
     setWebinarQr(null);
+
+    setAssignmentDayNumber('');
+    setAssignmentTitle('');
+    setAssignmentContent('');
+    setAssignmentDuration('20 minutes');
+    setAssignmentStatus('Active');
+    setAssignmentImage(null);
+    setReviewComment('');
   };
 
   const populateFormFields = (item) => {
@@ -273,6 +357,13 @@ const AdminDashboard = ({ user, onLogout }) => {
       setWebinarUpiId(item.upiId);
       setWebinarZoomLink(item.zoomLink);
       setWebinarStatus(item.status);
+    } else if (activeTab === 'gratitude-assignments') {
+      setAssignmentDayNumber(item.dayNumber);
+      setAssignmentTitle(item.title);
+      setAssignmentContent(item.content);
+      setAssignmentDuration(item.estimatedDuration);
+      setAssignmentStatus(item.status);
+      setAssignmentImage(null);
     }
   };
 
@@ -344,26 +435,55 @@ const AdminDashboard = ({ user, onLogout }) => {
           content: postContent,
           type: postType
         };
-      } else if (activeTab === 'retreats') {
-        payload = {
-          title: retreatTitle,
-          description: retreatDesc,
-          pricing: retreatPrice,
-          capacity: retreatCapacity,
-          itinerary: JSON.parse(retreatItinerary)
-        };
+      } else if (activeTab === 'gratitude-assignments') {
+        payload = new FormData();
+        payload.append('dayNumber', assignmentDayNumber);
+        payload.append('title', assignmentTitle);
+        payload.append('content', assignmentContent);
+        payload.append('estimatedDuration', assignmentDuration);
+        payload.append('status', assignmentStatus);
+        if (assignmentImage) {
+          payload.append('image', assignmentImage);
+        }
+        config = { headers: { 'Content-Type': 'multipart/form-data' } };
+        endpoint = `/api/programs/${gratitudeProgramId}/assignments`;
+
+        if (modalMode === 'edit') {
+          endpoint = `/api/programs/assignments/${selectedItem._id}`;
+        }
       }
 
       if (modalMode === 'create') {
         await axios.post(endpoint, payload, config);
       } else {
-        await axios.put(`${endpoint}/${selectedItem._id}`, payload, config);
+        if (activeTab === 'gratitude-assignments') {
+          await axios.put(endpoint, payload, config);
+        } else {
+          await axios.put(`${endpoint}/${selectedItem._id}`, payload, config);
+        }
       }
 
       setShowModal(false);
       fetchTabData();
     } catch (err) {
       alert(err.response?.data?.message || 'Form submission failed');
+    }
+  };
+
+  const handleReviewSubmission = async (status) => {
+    try {
+      const { data } = await axios.patch(`/api/programs/submissions/${selectedItem._id}/review`, {
+        status,
+        adminComment: reviewComment
+      });
+      if (data.success) {
+        alert(`Submission marked as ${status} successfully.`);
+        setShowModal(false);
+        setReviewComment('');
+        fetchTabData();
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Review failed');
     }
   };
 
@@ -533,7 +653,7 @@ const AdminDashboard = ({ user, onLogout }) => {
                 >
                   <RefreshCw className="w-4 h-4" />
                 </button>
-                {['services', 'programs', 'products', 'workshops', 'retreats', 'community', 'webinars'].includes(activeTab) && (
+                {['services', 'programs', 'products', 'workshops', 'retreats', 'community', 'webinars', 'gratitude-assignments'].includes(activeTab) && (
                   <button
                     onClick={handleOpenCreate}
                     className="flex items-center gap-1.5 bg-sage hover:bg-sage-dark text-white font-semibold py-2 px-4 rounded-xl text-xs uppercase tracking-wider shadow-sm transition-all"
@@ -565,17 +685,46 @@ const AdminDashboard = ({ user, onLogout }) => {
                         {/* Column 1: Details */}
                         <td className="py-3 px-4">
                           <p className="font-bold text-charcoal-dark">
-                            {item.title || item.name || `Log ID: ${item._id.substring(0, 10)}`}
+                            {activeTab === 'gratitude-assignments'
+                              ? `Day ${item.dayNumber}: ${item.title}`
+                              : activeTab === 'gratitude-submissions'
+                                ? `Student: ${item.user?.name} - Day ${item.dayNumber}`
+                                : item.title || item.name || `Log ID: ${item._id.substring(0, 10)}`}
                           </p>
                           <p className="text-[10px] text-charcoal-light line-clamp-1 max-w-sm mt-0.5">
-                            {['webinar-registrations', 'workshop-registrations', 'program-registrations', 'service-bookings'].includes(activeTab) 
-                              ? `Email: ${item.email} | Phone: ${item.phone}` 
-                              : item.description || item.shortDescription || item.reviewText || item.message || item.content || `Date: ${new Date(item.createdAt).toLocaleDateString()}`}
+                            {activeTab === 'gratitude-assignments'
+                              ? item.content
+                              : activeTab === 'gratitude-submissions'
+                                ? `Assignment: ${item.assignment?.title || 'Unknown'}`
+                                : ['webinar-registrations', 'workshop-registrations', 'program-registrations', 'service-bookings'].includes(activeTab) 
+                                  ? `Email: ${item.email} | Phone: ${item.phone}` 
+                                  : item.description || item.shortDescription || item.reviewText || item.message || item.content || `Date: ${new Date(item.createdAt).toLocaleDateString()}`}
                           </p>
                         </td>
 
                         {/* Column 2: Details 2 */}
                         <td className="py-3 px-4">
+                          {activeTab === 'gratitude-assignments' && (
+                            <div className="flex flex-col gap-0.5">
+                              <span className="text-sage font-medium">Submissions: {item.stats?.total || 0}</span>
+                              <span className="text-[10px] text-charcoal-light">Approved: {item.stats?.approved || 0} | Pending: {item.stats?.pending || 0}</span>
+                            </div>
+                          )}
+                          {activeTab === 'gratitude-submissions' && (
+                            <div className="flex flex-col gap-0.5">
+                              <span className="text-charcoal-dark font-medium">{item.user?.email}</span>
+                              {item.imageUrl && (
+                                <a 
+                                  href={getImageUrl(item.imageUrl)} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-sage hover:underline font-bold text-[10px] uppercase inline-block mt-0.5"
+                                >
+                                  View Work Proof ↗
+                                </a>
+                              )}
+                            </div>
+                          )}
                           {activeTab === 'products' && <span className="bg-cream-dark text-charcoal-light py-0.5 px-2 rounded-md font-semibold">{item.category} (Stock: {item.stock})</span>}
                           {activeTab === 'workshops' && <span className="text-sage font-medium">Slots: {item.registeredUsers?.length} / {item.capacity}</span>}
                           {activeTab === 'retreats' && <span className="text-sage font-medium">Interested: {item.interestedUsers?.length} logged</span>}
@@ -708,6 +857,24 @@ const AdminDashboard = ({ user, onLogout }) => {
 
                         {/* Column 3: Pricing / Status */}
                         <td className="py-3 px-4">
+                          {activeTab === 'gratitude-assignments' && (
+                            <span className={`py-0.5 px-2.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
+                              item.status === 'Active' ? 'bg-sage/10 text-sage' : 'bg-red-500/10 text-red-600'
+                            }`}>
+                              {item.status}
+                            </span>
+                          )}
+                          {activeTab === 'gratitude-submissions' && (
+                            <span className={`py-0.5 px-2.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
+                              item.status === 'approved' 
+                                ? 'bg-sage/10 text-sage' 
+                                : item.status === 'rejected'
+                                  ? 'bg-red-500/10 text-red-600'
+                                  : 'bg-gold/15 text-gold-dark'
+                            }`}>
+                              {item.status}
+                            </span>
+                          )}
                           {item.pricing !== undefined && <span className="font-bold text-gold-dark">₹{item.pricing}</span>}
                           {item.price !== undefined && <span className="font-bold text-gold-dark">₹{item.price}</span>}
                           {item.totalAmount !== undefined && <span className="font-bold text-gold-dark">₹{item.totalAmount}</span>}
@@ -732,7 +899,7 @@ const AdminDashboard = ({ user, onLogout }) => {
                               {item.status === 'resolved' ? 'Approved / Resolved' : 'Pending Verification'}
                             </span>
                           )}
-                          {item.status && !item.paymentStatus && activeTab !== 'service-bookings' && (
+                          {item.status && !item.paymentStatus && !['gratitude-assignments', 'gratitude-submissions', 'service-bookings'].includes(activeTab) && (
                             <span className="bg-cream-dark text-charcoal-light py-0.5 px-2 rounded-full text-[9px] font-bold uppercase tracking-wider ml-1">
                               {item.status}
                             </span>
@@ -742,7 +909,7 @@ const AdminDashboard = ({ user, onLogout }) => {
                         {/* Column 4: Actions */}
                         <td className="py-3 px-4 text-right flex justify-end gap-1.5 items-center">
                           {/* View Registrants/Inquiries Button */}
-                          {['workshops', 'retreats', 'programs', 'orders', 'contacts', 'donations', 'service-bookings'].includes(activeTab) && (
+                          {['workshops', 'retreats', 'programs', 'orders', 'contacts', 'donations', 'service-bookings', 'gratitude-assignments', 'gratitude-submissions'].includes(activeTab) && (
                             <button
                               onClick={() => handleOpenView(item)}
                               className="p-1.5 hover:text-sage text-charcoal/60 transition-colors focus:outline-none"
@@ -753,7 +920,7 @@ const AdminDashboard = ({ user, onLogout }) => {
                           )}
 
                           {/* Edit Button */}
-                          {['services', 'programs', 'products', 'workshops', 'retreats', 'community', 'webinars'].includes(activeTab) && (
+                          {['services', 'programs', 'products', 'workshops', 'retreats', 'community', 'webinars', 'gratitude-assignments'].includes(activeTab) && (
                             <button
                               onClick={() => handleOpenEdit(item)}
                               className="p-1.5 hover:text-gold text-charcoal/60 transition-colors focus:outline-none"
@@ -852,7 +1019,7 @@ const AdminDashboard = ({ user, onLogout }) => {
                           )}
 
                           {/* Delete Button */}
-                          {['services', 'programs', 'products', 'workshops', 'retreats', 'community', 'testimonials', 'webinars', 'webinar-registrations', 'workshop-registrations', 'program-registrations', 'service-bookings'].includes(activeTab) && (
+                          {['services', 'programs', 'products', 'workshops', 'retreats', 'community', 'testimonials', 'webinars', 'webinar-registrations', 'workshop-registrations', 'program-registrations', 'service-bookings', 'gratitude-assignments'].includes(activeTab) && (
                             <button
                               onClick={() => handleDelete(item._id)}
                               className="p-1.5 hover:text-red-600 text-charcoal/60 transition-colors focus:outline-none"
@@ -888,7 +1055,11 @@ const AdminDashboard = ({ user, onLogout }) => {
                 {modalMode === 'view' ? 'Review Details' : modalMode === 'edit' ? 'Edit Details' : 'Create Record'}
               </h3>
               <button 
-                onClick={() => setShowModal(false)}
+                onClick={() => {
+                  setShowModal(false);
+                  setSelectedUserProgress(null);
+                  setProgramProgressList([]);
+                }}
                 className="p-1 text-charcoal hover:text-gold transition-colors focus:outline-none"
               >
                 <X className="w-5 h-5" />
@@ -972,20 +1143,178 @@ const AdminDashboard = ({ user, onLogout }) => {
                     </div>
                   )}
 
+                  {/* Gratitude Assignments detail view */}
+                  {activeTab === 'gratitude-assignments' && (
+                    <div className="flex flex-col gap-3">
+                      <h4 className="font-bold text-charcoal-dark border-b pb-1">Assignment Details</h4>
+                      <div className="flex flex-col gap-1.5 leading-relaxed text-[11.5px]">
+                        <p><strong>Day Number:</strong> {selectedItem.dayNumber}</p>
+                        <p><strong>Title:</strong> {selectedItem.title}</p>
+                        <p><strong>Estimated Duration:</strong> {selectedItem.estimatedDuration}</p>
+                        <p><strong>Status:</strong> {selectedItem.status}</p>
+                        {selectedItem.image && (
+                          <div className="mt-2">
+                            <span className="font-bold block mb-1">Image:</span>
+                            <img src={getImageUrl(selectedItem.image)} className="w-full h-32 object-cover rounded-xl border" />
+                          </div>
+                        )}
+                        <div className="mt-2">
+                          <span className="font-bold block mb-1">Content:</span>
+                          <div className="bg-cream p-3 rounded-lg border whitespace-pre-wrap max-h-48 overflow-y-auto font-medium">
+                            {selectedItem.content}
+                          </div>
+                        </div>
+                        <div className="mt-2 border-t pt-2">
+                          <h5 className="font-bold text-charcoal-dark uppercase text-[9px] tracking-wider">Submissions Statistics</h5>
+                          <p className="mt-1">Total Submissions: <strong>{selectedItem.stats?.total || 0}</strong></p>
+                          <p>Approved: <strong>{selectedItem.stats?.approved || 0}</strong> | Pending: <strong>{selectedItem.stats?.pending || 0}</strong></p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Gratitude Submissions review/detail view */}
+                  {activeTab === 'gratitude-submissions' && (
+                    <div className="flex flex-col gap-3">
+                      <h4 className="font-bold text-charcoal-dark border-b pb-1">Review User Submission</h4>
+                      <div className="bg-cream p-3.5 rounded-xl border flex flex-col gap-1.5 leading-relaxed text-[11.5px]">
+                        <p><strong>User:</strong> {selectedItem.user?.name} ({selectedItem.user?.email})</p>
+                        <p><strong>Assignment:</strong> Day {selectedItem.dayNumber} - {selectedItem.assignment?.title}</p>
+                        <p><strong>Submitted At:</strong> {new Date(selectedItem.submittedAt).toLocaleString()}</p>
+                        <p><strong>Status:</strong> <span className="font-bold uppercase">{selectedItem.status}</span></p>
+                        {selectedItem.adminComment && (
+                          <p className="bg-white p-2 rounded border italic"><strong>Comment:</strong> "{selectedItem.adminComment}"</p>
+                        )}
+                        {selectedItem.imageUrl && (
+                          <div className="mt-2">
+                            <span className="font-bold block mb-1">Uploaded Proof:</span>
+                            <a href={getImageUrl(selectedItem.imageUrl)} target="_blank" rel="noopener noreferrer">
+                              <img src={getImageUrl(selectedItem.imageUrl)} className="w-full max-h-64 object-contain rounded-xl border bg-white cursor-zoom-in" />
+                            </a>
+                            <span className="text-[9px] text-charcoal-light block text-center mt-1">(Click image to view full resolution ↗)</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {selectedItem.status === 'pending' && (
+                        <div className="flex flex-col gap-3 mt-2 border-t pt-3">
+                          <div className="flex flex-col gap-1">
+                            <label className="font-bold text-charcoal-light uppercase text-[10px]">Admin Review Comments (Optional for approval, recommended for rejection)</label>
+                            <textarea
+                              rows="2"
+                              placeholder="Add feedback for the student..."
+                              value={reviewComment}
+                              onChange={(e) => setReviewComment(e.target.value)}
+                              className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none text-[11px]"
+                            />
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleReviewSubmission('approved')}
+                              className="flex-1 bg-sage hover:bg-sage-dark text-white font-bold py-2.5 rounded-xl text-center text-xs uppercase tracking-wider transition-colors shadow-sm"
+                            >
+                              Approve
+                            </button>
+                            <button
+                              onClick={() => handleReviewSubmission('rejected')}
+                              className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-center text-xs uppercase tracking-wider transition-colors shadow-sm"
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {/* Program enrollment list */}
                   {activeTab === 'programs' && (
-                    <div className="flex flex-col gap-3">
-                      <h4 className="font-bold text-charcoal-dark border-b pb-1">Enrolled Students</h4>
-                      {selectedItem.enrolledUsers?.length > 0 ? (
-                        <div className="flex flex-col gap-2 max-h-60 overflow-y-auto">
-                          {selectedItem.enrolledUsers.map((stu, idx) => (
-                            <div key={idx} className="bg-cream p-2 px-3.5 rounded-xl border flex justify-between items-center text-[11px]">
-                              <span>{stu.name}</span>
-                              <span className="text-sage font-medium">{stu.email}</span>
+                    <div className="flex flex-col gap-3 text-left">
+                      {selectedUserProgress ? (
+                        <div className="flex flex-col gap-4">
+                          <div className="flex justify-between items-center border-b pb-2">
+                            <h4 className="font-bold text-charcoal-dark text-[12px] uppercase tracking-wider">
+                              Submissions: {selectedUserProgress.user?.name}
+                            </h4>
+                            <button
+                              onClick={() => setSelectedUserProgress(null)}
+                              className="text-[9px] bg-cream hover:bg-cream-dark border py-1 px-3 rounded-lg font-bold transition-all uppercase tracking-wider"
+                            >
+                              ← Back to Students
+                            </button>
+                          </div>
+                          
+                          <p className="text-[10px] text-charcoal-light">
+                            Current Day: <strong className="text-charcoal-dark">Day {selectedUserProgress.currentDay}</strong> | Completed: <strong className="text-charcoal-dark">{selectedUserProgress.completed ? 'Yes' : 'No'}</strong>
+                          </p>
+
+                          {selectedUserProgress.submissions?.length > 0 ? (
+                            <div className="grid grid-cols-3 gap-3 max-h-64 overflow-y-auto pt-2">
+                              {selectedUserProgress.submissions.map((sub, idx) => (
+                                <div key={idx} className="border rounded-lg overflow-hidden bg-cream p-1 text-[10px] flex flex-col gap-1">
+                                  <div className="h-16 bg-cream-dark/20 relative">
+                                    <img 
+                                      src={getImageUrl(sub.photo)} 
+                                      alt={`Day ${sub.day}`} 
+                                      className="w-full h-full object-cover" 
+                                    />
+                                    <a
+                                      href={getImageUrl(sub.photo)}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="absolute inset-0 bg-charcoal/20 opacity-0 hover:opacity-100 flex items-center justify-center text-white text-[9px] font-bold"
+                                    >
+                                      Full Image ↗
+                                    </a>
+                                  </div>
+                                  <div className="flex justify-between font-bold text-charcoal-dark px-1">
+                                    <span>Day {sub.day}</span>
+                                  </div>
+                                </div>
+                              ))}
                             </div>
-                          ))}
+                          ) : (
+                            <p className="text-charcoal-light py-4 text-center font-medium">No assignments submitted yet.</p>
+                          )}
                         </div>
-                      ) : <p className="text-charcoal-light">No students enrolled yet.</p>}
+                      ) : (
+                        <div className="flex flex-col gap-3">
+                          <h4 className="font-bold text-charcoal-dark border-b pb-1">Enrolled Students</h4>
+                          {loadingProgressList ? (
+                            <div className="shimmer h-24 rounded-xl"></div>
+                          ) : selectedItem.enrolledUsers?.length > 0 ? (
+                            <div className="flex flex-col gap-2 max-h-60 overflow-y-auto">
+                              {selectedItem.enrolledUsers.map((stu, idx) => {
+                                // Find progress
+                                const userProg = programProgressList.find(p => p.user?._id === stu._id);
+                                return (
+                                  <div key={idx} className="bg-cream p-2.5 px-3.5 rounded-xl border flex justify-between items-center text-[11px] gap-2">
+                                    <div className="flex flex-col gap-0.5 min-w-0">
+                                      <span className="font-bold text-charcoal-dark truncate">{stu.name}</span>
+                                      <span className="text-charcoal-light truncate text-[10px]">{stu.email}</span>
+                                      {userProg && (
+                                        <span className="text-[9px] text-sage font-bold uppercase mt-0.5">
+                                          Progress: Day {userProg.currentDay} / 30 {userProg.completed && '✓'}
+                                        </span>
+                                      )}
+                                    </div>
+                                    {selectedItem.title.toLowerCase().includes('gratitude') && userProg ? (
+                                      <button
+                                        onClick={() => setSelectedUserProgress(userProg)}
+                                        className="bg-sage/10 text-sage hover:bg-sage hover:text-white text-xs font-bold py-1.5 px-3 rounded-lg border border-sage/20 shrink-0 transition-all"
+                                      >
+                                        View Submissions
+                                      </button>
+                                    ) : (
+                                      <span className="text-charcoal-light text-[9px] italic shrink-0">No active progress</span>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          ) : <p className="text-charcoal-light">No students enrolled yet.</p>}
+                        </div>
+                      )}
                     </div>
                   )}
 
@@ -1137,6 +1466,43 @@ const AdminDashboard = ({ user, onLogout }) => {
               ) : (
                 /* ---------------- CREATE / EDIT FORM FIELDS ---------------- */
                 <form onSubmit={handleFormSubmit} className="flex flex-col gap-4 text-[11.5px] text-charcoal">
+                  {/* GRATITUDE ASSIGNMENTS Form */}
+                  {activeTab === 'gratitude-assignments' && (
+                    <>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="flex flex-col gap-1">
+                          <label className="font-bold text-charcoal-light uppercase text-[10px]">Day Number</label>
+                          <input type="number" required value={assignmentDayNumber} onChange={(e) => setAssignmentDayNumber(e.target.value)} className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none" />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <label className="font-bold text-charcoal-light uppercase text-[10px]">Estimated Duration</label>
+                          <input type="text" required placeholder="e.g. 20 minutes" value={assignmentDuration} onChange={(e) => setAssignmentDuration(e.target.value)} className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none" />
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="font-bold text-charcoal-light uppercase text-[10px]">Assignment Title</label>
+                        <input type="text" required value={assignmentTitle} onChange={(e) => setAssignmentTitle(e.target.value)} className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none" />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="font-bold text-charcoal-light uppercase text-[10px]">Assignment Content (Journal Prompts / Instructions)</label>
+                        <textarea required rows="8" value={assignmentContent} onChange={(e) => setAssignmentContent(e.target.value)} className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none leading-relaxed text-[11px]" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="flex flex-col gap-1">
+                          <label className="font-bold text-charcoal-light uppercase text-[10px]">Optional Image File</label>
+                          <input type="file" accept="image/*" onChange={(e) => setAssignmentImage(e.target.files[0])} className="text-xs file:bg-cream file:border file:border-cream-dark file:rounded-lg file:py-1 file:px-2" />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <label className="font-bold text-charcoal-light uppercase text-[10px]">Status</label>
+                          <select value={assignmentStatus} onChange={(e) => setAssignmentStatus(e.target.value)} className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                          </select>
+                        </div>
+                      </div>
+                    </>
+                  )}
+
                   {/* SERVICES Form */}
                   {activeTab === 'services' && (
                     <>

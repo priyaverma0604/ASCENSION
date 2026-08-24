@@ -126,7 +126,7 @@ const Programs = () => {
                           ₹{new Intl.NumberFormat('en-IN').format(program.sellingPrice !== undefined ? program.sellingPrice : program.pricing)}
                         </span>
                         {program.originalPrice !== undefined && program.originalPrice > (program.sellingPrice !== undefined ? program.sellingPrice : program.pricing) && (
-                          <span className="line-through text-charcoal-dark text-[12px] font-serif font-medium decoration-red-500/70 decoration-2 leading-none select-none">
+                          <span className="line-through text-charcoal-dark text-[15px] font-serif font-medium decoration-red-500/70 decoration-2 leading-none select-none">
                             ₹{new Intl.NumberFormat('en-IN').format(program.originalPrice)}
                           </span>
                         )}

@@ -9,7 +9,7 @@ const migrationData = [
   {
     title: "Ancestral Healing Workshop",
     originalPrice: 29999,
-    sellingPrice: 19999
+    sellingPrice: 15555
   },
   {
     title: "Guided Meditations",

@@ -48,7 +48,11 @@ const programSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'
     }
-  ]
+  ],
+  requiresAssignmentApproval: {
+    type: Boolean,
+    default: true
+  }
 }, {
   timestamps: true
 });

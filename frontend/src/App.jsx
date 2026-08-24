@@ -23,6 +23,7 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 import AdminDashboard from './pages/AdminDashboard';
 import ProductDetails from './pages/ProductDetails';
+import ProgramDashboard from './pages/ProgramDashboard';
 
 // Context Providers
 import { AuthProvider } from './context/AuthContext';
@@ -68,6 +69,15 @@ function App() {
                     element={
                       <ProtectedRoute>
                         <Profile />
+                      </ProtectedRoute>
+                    } 
+                  />
+
+                  <Route 
+                    path="/programs/:id/dashboard" 
+                    element={
+                      <ProtectedRoute>
+                        <ProgramDashboard />
                       </ProtectedRoute>
                     } 
                   />

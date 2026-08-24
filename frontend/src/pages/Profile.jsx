@@ -2,8 +2,10 @@ import React, { useState, useContext, useEffect } from 'react';
 import { Compass, User, Mail, Lock, ShieldCheck, CheckCircle, Clock } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
+  const navigate = useNavigate();
   const { user, updateProfile } = useContext(AuthContext);
   const [name, setName] = useState(user ? user.name : '');
   const [email, setEmail] = useState(user ? user.email : '');
@@ -192,7 +194,14 @@ const Profile = () => {
                         </div>
                       )}
                     </div>
-                    {prog.zoomLink ? (
+                    {prog.title.toLowerCase().includes('gratitude') ? (
+                      <button
+                        onClick={() => navigate(`/programs/${prog._id}/dashboard`)}
+                        className="bg-sage hover:bg-sage-dark text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-sm shrink-0 flex items-center gap-1 uppercase tracking-wider text-[10px] font-sans border border-sage-dark/10"
+                      >
+                        <span>View Tasks</span>
+                      </button>
+                    ) : prog.zoomLink ? (
                       <a
                         href={prog.zoomLink}
                         target="_blank"
