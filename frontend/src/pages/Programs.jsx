@@ -127,14 +127,19 @@ const Programs = () => {
                     <div className="border-t border-cream-dark/65 pt-6 flex justify-between items-center font-sans mt-4">
                       <div className="flex flex-col text-left">
                         <span className="text-[10px] text-charcoal-light uppercase tracking-wider mb-1">Program Investment</span>
-                        <div className="flex items-baseline gap-2 mt-1">
-                          <span className="font-serif font-bold text-lg text-gold-dark leading-none">
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
+                          <span className="font-serif font-bold text-xl text-gold-dark leading-none">
                             ₹{new Intl.NumberFormat('en-IN').format(program.sellingPrice !== undefined ? program.sellingPrice : program.pricing)}
                           </span>
                           {program.originalPrice !== undefined && program.originalPrice > (program.sellingPrice !== undefined ? program.sellingPrice : program.pricing) && (
-                            <span className="line-through text-charcoal-dark text-[15px] font-serif font-medium decoration-red-500/70 decoration-2 leading-none select-none">
-                              ₹{new Intl.NumberFormat('en-IN').format(program.originalPrice)}
-                            </span>
+                            <>
+                              <span className="line-through text-charcoal-light/70 text-sm font-medium leading-none select-none">
+                                ₹{new Intl.NumberFormat('en-IN').format(program.originalPrice)}
+                              </span>
+                              <span className="text-red-500 font-sans font-bold text-[11px] leading-none shrink-0">
+                                (₹{new Intl.NumberFormat('en-IN').format(program.originalPrice - (program.sellingPrice !== undefined ? program.sellingPrice : program.pricing))} OFF)
+                              </span>
+                            </>
                           )}
                         </div>
                       </div>
