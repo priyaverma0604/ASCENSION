@@ -237,6 +237,34 @@ const ProgramDashboard = () => {
           
           {/* LEFT: Active Assignment Card */}
           <div className="lg:col-span-2 flex flex-col gap-6">
+
+            {/* Intro Welcome Video Card for Gratitude Program */}
+            {program && (program.title.toLowerCase().includes('gratitude') || program._id === '6a4963f49e941f93f91f5abf') && (
+              <div className="glass p-5 md:p-6 rounded-3xl border border-cream-dark/50 flex flex-col gap-4 text-left relative overflow-hidden">
+                <div className="flex items-center justify-between border-b border-cream-dark/60 pb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="bg-gold/10 text-gold-dark font-bold py-1 px-3 rounded-full text-[9px] uppercase tracking-wider flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 animate-pulse" /> Welcome Video
+                    </span>
+                    <span className="font-serif text-sm font-bold text-charcoal-dark">
+                      Introduction to 30 Days Gratitude Program
+                    </span>
+                  </div>
+                </div>
+                <div className="w-full aspect-video rounded-2xl overflow-hidden border border-cream-dark/40 shadow-sm">
+                  <iframe 
+                    src="https://www.youtube.com/embed/KeUipjriX50" 
+                    title="Introduction to Gratitude Program"
+                    className="w-full h-full border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowFullScreen
+                  />
+                </div>
+                <p className="text-[11px] text-charcoal-light leading-relaxed">
+                  Before you begin your practice, watch this welcome video from Sonali Bhasin to understand the power of gratitude and how to get the most out of your 30-day journey!
+                </p>
+              </div>
+            )}
             
             {isCompleted ? (
               /* Success / Completed state */
