@@ -354,6 +354,15 @@ exports.submitAssignment = async (req, res, next) => {
       });
     }
 
+    // Check expiration: 35 days limit for Gratitude Program
+    if (program.title.toLowerCase().includes('gratitude') || program._id.toString() === '6a4963f49e941f93f91f5abf') {
+      const startDate = progress.createdAt || new Date();
+      const expirationDate = new Date(startDate.getTime() + 35 * 24 * 60 * 60 * 1000);
+      if (new Date() > expirationDate) {
+        return res.status(403).json({ success: false, message: 'Your enrollment in this program has expired (maximum 35 days limit).' });
+      }
+    }
+
     if (progress.completed) {
       return res.status(400).json({ success: false, message: 'You have already completed this 30-day program!' });
     }

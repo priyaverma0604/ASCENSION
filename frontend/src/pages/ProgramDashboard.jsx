@@ -155,11 +155,26 @@ const ProgramDashboard = () => {
   }
 
   if (error || !program) {
+    const isExpired = error && error.toLowerCase().includes('expired');
     return (
-      <div className="min-h-screen py-16 px-6 font-sans flex flex-col items-center justify-center text-center gap-4">
-        <AlertCircle className="w-12 h-12 text-red-500" />
-        <h2 className="font-serif text-2xl font-bold text-charcoal-dark">Something went wrong</h2>
-        <p className="text-xs text-charcoal-light max-w-md">{error || 'Program details could not be found.'}</p>
+      <div className="min-h-screen py-16 px-6 font-sans flex flex-col items-center justify-center text-center gap-4 bg-[#FFFDF7]">
+        {isExpired ? (
+          <div className="glass p-8 rounded-3xl border-2 border-red-500/20 text-center flex flex-col items-center justify-center gap-5 py-16 bg-red-500/5 max-w-md shadow-sm">
+            <div className="bg-red-500/10 p-4 rounded-full text-red-500">
+              <Calendar className="w-10 h-10 animate-pulse" />
+            </div>
+            <h3 className="font-serif text-2xl font-bold text-charcoal-dark">Program Access Expired</h3>
+            <p className="text-xs text-charcoal-light leading-relaxed">
+              Your 35-day access period to this program has expired. Please contact the administrator or re-enroll to gain access!
+            </p>
+          </div>
+        ) : (
+          <>
+            <AlertCircle className="w-12 h-12 text-red-500" />
+            <h2 className="font-serif text-2xl font-bold text-charcoal-dark">Something went wrong</h2>
+            <p className="text-xs text-charcoal-light max-w-md">{error || 'Program details could not be found.'}</p>
+          </>
+        )}
         <button 
           onClick={() => navigate('/profile')}
           className="mt-4 bg-sage hover:bg-sage-dark text-white font-bold py-2.5 px-6 rounded-xl text-xs uppercase tracking-wider transition-all"

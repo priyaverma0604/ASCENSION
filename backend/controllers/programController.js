@@ -451,6 +451,19 @@ exports.getProgramProgress = async (req, res, next) => {
       });
     }
 
+    // Check expiration: 35 days limit for Gratitude Program
+    if (program.title.toLowerCase().includes('gratitude') || program._id.toString() === '6a4963f49e941f93f91f5abf') {
+      const startDate = progress.createdAt || new Date();
+      const expirationDate = new Date(startDate.getTime() + 35 * 24 * 60 * 60 * 1000);
+      if (new Date() > expirationDate) {
+        return res.status(403).json({ 
+          success: false, 
+          code: 'PROGRAM_EXPIRED', 
+          message: 'Your 35-day access to this program has expired. Please contact support or re-enroll to gain access.' 
+        });
+      }
+    }
+
     const AssignmentSubmission = require('../models/AssignmentSubmission');
     const currentSubmission = await AssignmentSubmission.findOne({
       user: req.user._id,
