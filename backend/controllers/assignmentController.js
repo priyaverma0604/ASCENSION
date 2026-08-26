@@ -390,10 +390,12 @@ exports.submitAssignment = async (req, res, next) => {
       });
     }
 
+    const isPrayerProgram = program.title.toLowerCase().includes('prayer') || program._id.toString() === '6a4963f49e941f93f91f5ac1';
+
     let photoUrl = '';
     if (req.file) {
       photoUrl = isCloudinaryConfigured ? req.file.path : `/uploads/${req.file.filename}`;
-    } else {
+    } else if (!isPrayerProgram) {
       return res.status(400).json({ success: false, message: 'Please upload a photo of your work' });
     }
 

@@ -21,8 +21,7 @@ const assignmentSubmissionSchema = new mongoose.Schema({
     required: true
   },
   imageUrl: {
-    type: String,
-    required: [true, 'Please upload an image of your work']
+    type: String
   },
   status: {
     type: String,

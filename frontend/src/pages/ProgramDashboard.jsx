@@ -107,7 +107,9 @@ const ProgramDashboard = () => {
   const handleUploadSubmit = async (e) => {
     e.preventDefault();
 
-    if (!selectedFile) {
+    const isPrayer = program && (program.title.toLowerCase().includes('prayer') || program._id === '6a4963f49e941f93f91f5ac1');
+
+    if (!isPrayer && !selectedFile) {
       alert('Please select a photo of your work to upload.');
       return;
     }
@@ -120,7 +122,9 @@ const ProgramDashboard = () => {
     setUploading(true);
     try {
       const formData = new FormData();
-      formData.append('photo', selectedFile);
+      if (selectedFile) {
+        formData.append('photo', selectedFile);
+      }
 
       const { data } = await axios.post(`/api/programs/assignments/${activeAssignment._id}/submit`, formData, {
         headers: {
@@ -131,7 +135,7 @@ const ProgramDashboard = () => {
       if (data.success) {
         setSelectedFile(null);
         setPreviewUrl('');
-        alert(data.message || 'Great job! Assignment completed successfully. 🎉');
+        alert(data.message || 'Great job! Completed successfully. 🎉');
         await fetchProgramAndProgress();
       }
     } catch (err) {
@@ -197,6 +201,8 @@ const ProgramDashboard = () => {
 
   const isPendingApproval = currentSubmission && currentSubmission.status === 'pending';
   const isRejected = currentSubmission && currentSubmission.status === 'rejected';
+
+  const isPrayerProgram = program && (program.title.toLowerCase().includes('prayer') || program._id === '6a4963f49e941f93f91f5ac1');
 
   const getRemainingDaysText = () => {
     if (!progress || !progress.createdAt) return '';
@@ -384,45 +390,56 @@ const ProgramDashboard = () => {
                 {/* Upload Form / Completion Status (Show if the selected day is the active day and we haven't completed the program) */}
                 {isSelectedActive ? (
                   <form onSubmit={handleUploadSubmit} className="border-t border-cream-dark/65 pt-6 flex flex-col gap-4">
-                    <h4 className="text-[10px] text-charcoal-dark font-bold uppercase tracking-wider">Complete Assignment</h4>
-                    <p className="text-[11px] text-charcoal-light leading-relaxed">
-                      Read the instructions above. Once you complete the task, select and upload a photo of your work, then click complete to immediately unlock the next day!
-                    </p>
+                    {isPrayerProgram ? (
+                      <>
+                        <h4 className="text-[10px] text-charcoal-dark font-bold uppercase tracking-wider">Prayer Progress</h4>
+                        <p className="text-[11px] text-charcoal-light leading-relaxed">
+                          Click below once you have completed today's prayer to mark this day as complete and unlock the next day's prayer!
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <h4 className="text-[10px] text-charcoal-dark font-bold uppercase tracking-wider">Complete Assignment</h4>
+                        <p className="text-[11px] text-charcoal-light leading-relaxed">
+                          Read the instructions above. Once you complete the task, select and upload a photo of your work, then click complete to immediately unlock the next day!
+                        </p>
 
-                    <div className="flex flex-col md:flex-row gap-4 items-center">
-                      {/* File chooser */}
-                      <label className="w-full md:flex-1 flex flex-col items-center justify-center border-2 border-dashed border-cream-dark/60 rounded-xl py-6 px-4 bg-cream-light hover:bg-cream cursor-pointer transition-colors duration-200">
-                        <UploadCloud className="w-7 h-7 text-sage mb-2" />
-                        <span className="text-xs font-bold text-charcoal-dark">
-                          {selectedFile ? 'Change Photo' : 'Select Photo from Device'}
-                        </span>
-                        <span className="text-[9px] text-charcoal-light mt-1">
-                          {selectedFile ? selectedFile.name : 'PNG, JPG, JPEG or WEBP (Max 5MB)'}
-                        </span>
-                        <input 
-                          type="file"
-                          accept="image/*"
-                          onChange={handleFileChange}
-                          className="hidden"
-                        />
-                      </label>
+                        <div className="flex flex-col md:flex-row gap-4 items-center">
+                          {/* File chooser */}
+                          <label className="w-full md:flex-1 flex flex-col items-center justify-center border-2 border-dashed border-cream-dark/60 rounded-xl py-6 px-4 bg-cream-light hover:bg-cream cursor-pointer transition-colors duration-200">
+                            <UploadCloud className="w-7 h-7 text-sage mb-2" />
+                            <span className="text-xs font-bold text-charcoal-dark">
+                              {selectedFile ? 'Change Photo' : 'Select Photo from Device'}
+                            </span>
+                            <span className="text-[9px] text-charcoal-light mt-1">
+                              {selectedFile ? selectedFile.name : 'PNG, JPG, JPEG or WEBP (Max 5MB)'}
+                            </span>
+                            <input 
+                              type="file"
+                              accept="image/*"
+                              onChange={handleFileChange}
+                              className="hidden"
+                            />
+                          </label>
 
-                      {/* Preview box */}
-                      {previewUrl && (
-                        <div className="w-32 h-32 rounded-xl overflow-hidden border border-cream-dark shrink-0 relative group">
-                          <img src={previewUrl} alt="Journal entry preview" className="w-full h-full object-cover" />
-                          <div className="absolute inset-0 bg-charcoal/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity pointer-events-none">
-                            <span className="text-[9px] text-white font-bold uppercase">Ready</span>
-                          </div>
+                          {/* Preview box */}
+                          {previewUrl && (
+                            <div className="w-32 h-32 rounded-xl overflow-hidden border border-cream-dark shrink-0 relative group">
+                              <img src={previewUrl} alt="Journal entry preview" className="w-full h-full object-cover" />
+                              <div className="absolute inset-0 bg-charcoal/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity pointer-events-none">
+                                <span className="text-[9px] text-white font-bold uppercase">Ready</span>
+                              </div>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
+                      </>
+                    )}
 
                     <button
                       type="submit"
-                      disabled={uploading || !selectedFile}
+                      disabled={uploading || (!isPrayerProgram && !selectedFile)}
                       className={`w-full font-bold uppercase tracking-wider py-3.5 rounded-xl transition-all duration-300 text-xs shadow-sm flex items-center justify-center gap-1.5 font-sans mt-2 ${
-                        uploading || !selectedFile 
+                        uploading || (!isPrayerProgram && !selectedFile)
                           ? 'bg-charcoal-light/10 text-charcoal-light/40 cursor-not-allowed' 
                           : 'bg-sage hover:bg-sage-dark text-white'
                       }`}
@@ -430,11 +447,11 @@ const ProgramDashboard = () => {
                       {uploading ? (
                         <>
                           <Compass className="w-4 h-4 animate-spin text-white" />
-                          <span>Saving Completion...</span>
+                          <span>Saving Progress...</span>
                         </>
                       ) : (
                         <>
-                          <span>Complete Assignment & Unlock Next Day</span>
+                          <span>{isPrayerProgram ? "Mark as Read & Unlock Next Day" : "Complete Assignment & Unlock Next Day"}</span>
                           <ArrowRight className="w-4 h-4" />
                         </>
                       )}
@@ -448,7 +465,9 @@ const ProgramDashboard = () => {
                         <span>Day Completed!</span>
                       </div>
                       <p className="text-xs text-charcoal-light leading-relaxed">
-                        Great work keeping up the practice. You have completed the reflections and tasks for Day {selectedAssignment.dayNumber}!
+                        {isPrayerProgram 
+                          ? `Great work keeping up the practice. You have read and completed the prayer for Day ${selectedAssignment.dayNumber}!`
+                          : `Great work keeping up the practice. You have completed the reflections and tasks for Day ${selectedAssignment.dayNumber}!`}
                       </p>
                       {/* If they uploaded a photo, display it here */}
                       {progress.submissions.find(s => s.day === selectedAssignment.dayNumber)?.photo && (
