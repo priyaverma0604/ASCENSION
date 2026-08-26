@@ -198,6 +198,29 @@ const ProgramDashboard = () => {
   const isPendingApproval = currentSubmission && currentSubmission.status === 'pending';
   const isRejected = currentSubmission && currentSubmission.status === 'rejected';
 
+  const getRemainingDaysText = () => {
+    if (!progress || !progress.createdAt) return '';
+    const startDate = new Date(progress.createdAt);
+    const expirationDate = new Date(startDate.getTime() + 35 * 24 * 60 * 60 * 1000);
+    const today = new Date();
+    const diffTime = expirationDate - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    const formattedExpiryDate = expirationDate.toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    });
+
+    if (diffDays <= 0) {
+      return `Expired on ${formattedExpiryDate}`;
+    } else if (diffDays === 1) {
+      return `Expires tomorrow (Expiry: ${formattedExpiryDate})`;
+    } else {
+      return `${diffDays} days remaining (Expiry: ${formattedExpiryDate})`;
+    }
+  };
+
   const isSelectedCompleted = selectedAssignment && progress && progress.submissions.some(sub => sub.day === selectedAssignment.dayNumber);
   const isSelectedActive = selectedAssignment && progress && selectedAssignment.dayNumber === progress.currentDay && !progress.completed;
 
@@ -231,6 +254,11 @@ const ProgramDashboard = () => {
             <span className="font-serif text-lg font-bold text-charcoal-dark">
               {completedDaysCount} of {totalDays} Days Completed ({progressPercent}%)
             </span>
+            {program && (program.title.toLowerCase().includes('gratitude') || program._id === '6a4963f49e941f93f91f5abf') && (
+              <span className="text-[10px] text-red-500 font-bold uppercase tracking-wider mt-0.5 flex items-center gap-1 font-sans">
+                ⏳ {getRemainingDaysText()}
+              </span>
+            )}
           </div>
           <div className="w-full sm:w-2/3 flex flex-col gap-1.5">
             <div className="w-full h-3 bg-cream-dark/40 rounded-full overflow-hidden">
