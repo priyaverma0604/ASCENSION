@@ -118,6 +118,12 @@ const prayerAssignments = [
     title: "Prayer - 20",
     description: "Dear God,\nThank you for making this world so interesting. It all seems like a puzzle and each day, we are Given our clues, sometimes, we solve it easily and other times we question our abilities. Either way, I do know that the picture is perfect. Thank you for making it perfect. My job is now, only to find the faith and keep toiling until I find meaning in all of it. I am eternally grateful for every trust and turn of my life because it has all led to an adventure. Now what remains is my learning to trust the timing. Dear god, Help me enjoy the journey.",
     action: "Practice for today:\nRead this prayer silently or aloud. Embrace the mystery and timing of your life today. Acknowledge life as a perfect, unfolding adventure and practice finding joy in the journey itself."
+  },
+  {
+    day: 21,
+    title: "Prayer - 21",
+    description: "Dear God, I thank you for this beautiful journey where I have learned to communicate with you. Maybe I always knew this but in the last few days, I have discovered that lost connection and I cannot deny that it feels good. I don't know who you are or where you exist. You are formless or you may have a form, some people call you the universe but for me, this communication has been a sacred relationship with my higher self. It is me who I talk to each day and beckon for all the guidance I need.\n\nI wake up to that higher self now and realise that I am infinite. I am Eternal, I am Divine, I am Sacred, I am the Truth. I am everything. Everything I say and believe is bound to manifest. Because I'm none other than god itself; that is how powerful I am. I hereby promise to use this power for the higher good of all mankind. I hereby promise to change the world by living from my higher self. I hereby choose to share my light. Thank you for this Beautiful Journey.",
+    action: "Practice for today:\n1. You can write your wish and keep it on your altar before starting this prayer.\n2. After the prayer, write down 21 things that are going well in your life and say, \"Thank You, God\" after each one."
   }
 ];
 
