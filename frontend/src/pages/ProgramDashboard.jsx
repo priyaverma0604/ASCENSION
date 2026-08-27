@@ -211,6 +211,23 @@ const ProgramDashboard = () => {
     return match ? `https://www.youtube.com/embed/${match[1]}` : null;
   };
 
+  const getWelcomeVideoUrl = () => {
+    if (!program) return null;
+    const title = program.title.toLowerCase();
+    const id = program._id.toString();
+    
+    if (title.includes('gratitude') || id === '6a4963f49e941f93f91f5abf') {
+      return "https://www.youtube.com/embed/KeUipjriX50";
+    }
+    if (title.includes('affirmation') || id === '6a4963f49e941f93f91f5abe') {
+      return "https://www.youtube.com/embed/c97Tg9DfPNA";
+    }
+    if (title.includes('prayer') || id === '6a4963f49e941f93f91f5ac1') {
+      return "https://www.youtube.com/embed/YcvoQIqX6_U";
+    }
+    return null;
+  };
+
   const getRemainingDaysText = () => {
     if (!progress || !progress.createdAt) return '';
     const startDate = new Date(progress.createdAt);
@@ -294,11 +311,8 @@ const ProgramDashboard = () => {
           {/* LEFT: Active Assignment Card */}
           <div className="lg:col-span-2 flex flex-col gap-6">
 
-            {/* Intro Welcome Video Card for Gratitude and Affirmation Programs */}
-            {program && (
-              (program.title.toLowerCase().includes('gratitude') || program._id === '6a4963f49e941f93f91f5abf') ||
-              (program.title.toLowerCase().includes('affirmation') || program._id === '6a4963f49e941f93f91f5abe')
-            ) && (
+            {/* Intro Welcome Video Card */}
+            {getWelcomeVideoUrl() && (
               <div className="glass p-5 md:p-6 rounded-3xl border border-cream-dark/50 flex flex-col gap-4 text-left relative overflow-hidden">
                 <div className="flex items-center justify-between border-b border-cream-dark/60 pb-3">
                   <div className="flex items-center gap-2">
@@ -312,7 +326,7 @@ const ProgramDashboard = () => {
                 </div>
                 <div className="w-full aspect-video rounded-2xl overflow-hidden border border-cream-dark/40 shadow-sm">
                   <iframe 
-                    src={program.title.toLowerCase().includes('affirmation') ? "https://www.youtube.com/embed/c97Tg9DfPNA" : "https://www.youtube.com/embed/KeUipjriX50"} 
+                    src={getWelcomeVideoUrl()} 
                     title={`Introduction to ${program.title}`}
                     className="w-full h-full border-0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
