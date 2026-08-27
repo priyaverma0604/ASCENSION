@@ -40,6 +40,30 @@ const prayerAssignments = [
     title: "Prayer - 7",
     description: "Dear God Today, I say thanks to you for all the relationships I have. The good ones and the not-so-good ones (and even the ones I am tolerating and have caused me to hurt). I now realise that all the relationships in my life are only a reflection of my relationship with myself. Blaming the other person and hoping he or she would change (and also that they would realise their mistake and regret it) is just another way of my ego feeling safe.\n\nIf I change the way of my ego, my ego feels threatened when things go sour and convince me that it is someone else's fault and that I am incapable of taking responsibility. In some relations, the deep resignation has already set in and the ego feels victorious.",
     action: "Practice for today:\nRead this prayer silently or aloud. Take a few deep breaths, absorb its message about relationships and the ego, and spend a few quiet moments reflecting on your connection with yourself."
+  },
+  {
+    day: 8,
+    title: "Prayer - 8",
+    description: "Dear God today is a new day and I thank you for the million blessings I have been receiving each day. My life is quite easy and the occasional speed breakers are just meant for me to slow down and ponder over my path. However, today I pray for my fellow humans who are struggling in their lives. Some are struggling for health and others for money. While quite a few of us struggle in relationships and others in seeking their life purpose.\n\nWhoever they are and whatever they may be let them know in your way that they are not alone, someone knows their pain, someone cares, remind them of the power of faith, hope and prayers. Thank you for the goodness of life.\n\nThank You. Thank You. Thank You.",
+    action: "Practice for today:\n1. You can write your wish and keep it on your altar before starting this prayer.\n2. After the prayer, write down 21 things that are going well in your life and say, \"Thank You, God\" after each one."
+  },
+  {
+    day: 9,
+    title: "Prayer - 9",
+    description: "Dear God, I just remind myself over and over again about the power of forgiveness. When I realise that each one of us is doing our best with the best possible knowledge and awareness in that situation. More than often, we hurt each other sometimes unknowingly and often knowingly. Revenge does seem to be giving us some sort of fulfillment and we feel that we did something to protect ourselves when we are only protecting our ego and the fulfillment is as fragile as a snowflake. When I am now aware of the truth of why people behave the way they do, I do not hold anything against them and in that case, I do not have to forgive anyone.\n\nWhile this is so simple, I often forget this truth. During these moments, forgiveness becomes necessary. Dear God, please make this easy for me. I am willing to forgive. I am also willing to love so much that I don't need to forgive because I never would condemn.",
+    action: "Practice for today:\nRead this prayer silently or aloud. Sit with its message of deep understanding and forgiveness, reflecting on any situations or people you are ready to let go of without judgment."
+  },
+  {
+    day: 10,
+    title: "Prayer - 10",
+    description: "Hello God ! Is it always necessary for mankind to. have diseases, pain, and suffering? If not, then teach us the way to our wholeness and our truth. If they are a part of life (which I think they are), grant us the wisdom to learn. Our lessons to heal our bodies, that's all for today. This prayer is for the entire mankind and not just for me and I am not asking for too much, am I?",
+    action: "Practice for today:\nRead this prayer silently or aloud. Take a few deep breaths, directing your intentions toward healing, wholeness, and peace for yourself and all of humanity."
+  },
+  {
+    day: 11,
+    title: "Prayer - 11",
+    description: "Dear God today on this beautiful day, I pray for nothing. I mean, everything is in such beautiful harmony and in such divine order that I feel anything else would be a dishonour to the wholeness of this world. However, I also understand that these prayers are my communication with you and the answer that I need to resolve. As I share my areas of concern, I just want to let you know that I also trust my abilities to find an answer. However, if you feel like guiding me, I shall be paying attention and I will consider them seriously.\n\nAll these years you have taught me to believe in myself and I am a good student. I now feel adequate to handle all my situations and I also believe in my higher good. You had the choice to make me worship you and be 'My God' my ultimate supreme saviour. But you so rightfully taught me otherwise, \"The power lies within me\". I shall be forever indebted to you for this priceless lesson.",
+    action: "Practice for today:\nRead this prayer silently or aloud. Meditate on the idea that the power lies within you, and take a moment to acknowledge your strength, resilience, and inner wisdom."
   }
 ];
 
