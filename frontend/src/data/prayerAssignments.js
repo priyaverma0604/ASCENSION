@@ -88,6 +88,18 @@ const prayerAssignments = [
     title: "Prayer - 15",
     description: "Dear God I begin this week with enthusiasm and zeal. I promise to give my 100% to everything I pursue while I shall make all my efforts. I wish for some guidance from your side. Please remind me of what is important to my spirit and what isn't. Often I give in to my fears and start pursuing my ego's agenda, some times other people's agenda. I do not wish to shy away from my roles in other people's lives and I am willing to fulfill my responsibilities but I need to be reminded that I do not have to succumb to their expectations or definitions.",
     action: "Practice for today:\nRead this prayer silently or aloud. Today, focus on keeping your spirit aligned with what truly matters, releasing any need to conform to other people's expectations or definitions."
+  },
+  {
+    day: 16,
+    title: "Prayer - 16",
+    description: "Dear God Today is the day when I seek your guidance for all unfinished businesses. Let it be relationships, tasks, a pending decision, an incomplete project, financial debt, and even credit. Today, I seek your help because I will need a whole lot of courage as well as forgiveness, to stand on this side. Hence I choose not to step in and touch this area but deep down I know that these unfinished businesses cause a lot of turmoil.\n\nDear god, please guide me in crossing this river easily. Please build me a bridge and guide me on what to do next. Help me find the courage to deal with all of this without blame, fear or anger, and guilt. Help me to forgive and then help me to bring a peaceful closure to it. Peace, not just for me but all involved. I know that I am asking for too much today, but this is not too much for you. However, thank you for reminding me that this is just as easy as I choose to make it. So, today, we both have a lot of work to finish, let's get on the job!",
+    action: "Practice for today:\nRead this prayer silently or aloud. List down any unfinished business, tasks, or pending decisions, and visualize yourself releasing them with courage and a sense of peaceful closure."
+  },
+  {
+    day: 17,
+    title: "Prayer - 17",
+    description: "Dear God, I often wonder how in nature, there is an abundance of everything while in my life (rather human life) there isn't. Nobody controls nature nor does anyone guide it. It almost seems effortless. One thing follows another while there are consequences, there is no emotion, baggage, no tears, no guilt and no rage. What I gather from this is that there must be some invisible power that must be behind this effortless manifestation of beauty and abundance. All is in perfect divine order. I am also assuming that this power is capable of working its wonders in my life as well, only if I get out of its way.\n\nDear god I pray for the faith and the courage that can keep reminding me to trust and to keep getting out of the way. Joy and abundance will be a natural outcome of the magical wonders this divine power plays in my life. Thank you again for today, I shall sit back and take only intuitive actions while the divine power works its magic.",
+    action: "Practice for today:\nRead this prayer silently or aloud. Sit back, take a few deep breaths, and practice letting go of control, allowing yourself to follow intuitive guidance throughout the day."
   }
 ];
 
