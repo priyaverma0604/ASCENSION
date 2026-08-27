@@ -28,6 +28,18 @@ const prayerAssignments = [
     title: "Prayer - 5",
     description: "Part 1:\nDear God, I wonder how my mind thinks so many thoughts. If you have made me and every other human being, I must admit that you are a miracle maker. So many functions go on in our body all without our knowledge and yet they do their job perfectly.\n\nSo in my mind, a zillion thoughts come at the speed of light. Every thought is a seed to a whole new experience. Only if I had known that I could choose these thoughts, could I be the master of all my experiences.\n\nThank You. Thank You. Thank You.\n\nPart 2:\nDear God, just for today, keep reminding me of the infallible power of my thoughts and that I can choose my thoughts in any given situation. In other words, remind me that I and only I am in the driving seat of my car. Thank you for this miracle called \"ME\" I love you.\n\nYOU ARE THE CREATOR OF YOUR REALITY",
     action: "Practice for today:\n1. You can write your wish and keep it on your altar before starting this prayer.\n2. After the prayer, write down 21 things that are going well in your life and say, \"Thank You, God\" after each one.\n3. Make a conscious choice to choose only uplifting, energetic thoughts all day today. If you catch yourself thinking negative thoughts, go back to making a choice and doing the prayer again."
+  },
+  {
+    day: 6,
+    title: "Prayer - 6",
+    description: "Dear God, A new day is here and I am looking forward to it. I often tend to clutter my day (and my life as well) with a lot of stuff, some necessary and some avoidable. Often, I do so because I live in a perpetual scarcity of time. The constant anxiety of 'what if' keeps engulfing my joy. 'Unfortunately' the world I live in also believes so and hence I feel I might be correct. But, deep down dear God I know that the truth is, that time is eternal and everything is falling in place in divine order. Help me find my faith and strengthen my Spirit's voice such that when the 'ego' screams into my head about how time is little and I can do nothing. Peace still prevails and the spirit eventually wins. Thank u god for this daily communication. I love you.",
+    action: "Practice for today:\nSit in silence, closing your eyes today for 5 minutes, just with yourself trying to think of nothing (you can do this anytime in the entire day)."
+  },
+  {
+    day: 7,
+    title: "Prayer - 7",
+    description: "Dear God Today, I say thanks to you for all the relationships I have. The good ones and the not-so-good ones (and even the ones I am tolerating and have caused me to hurt). I now realise that all the relationships in my life are only a reflection of my relationship with myself. Blaming the other person and hoping he or she would change (and also that they would realise their mistake and regret it) is just another way of my ego feeling safe.\n\nIf I change the way of my ego, my ego feels threatened when things go sour and convince me that it is someone else's fault and that I am incapable of taking responsibility. In some relations, the deep resignation has already set in and the ego feels victorious.",
+    action: "Practice for today:\nRead this prayer silently or aloud. Take a few deep breaths, absorb its message about relationships and the ego, and spend a few quiet moments reflecting on your connection with yourself."
   }
 ];
 
