@@ -22,6 +22,12 @@ const prayerAssignments = [
     title: "Prayer - 4",
     description: "Dear God, Help me find peace when I can't see it. Help me find love when I can't feel it and help me find faith when I can't believe it. I know they all exist and it is just a matter of time before they shall be revealed to me. Until then God please keep me reminded of the goodness in life. I love you God and Thank you...",
     action: "Practice for today:\nTake your journal and write out 21 things that are going well for you. After each statement, write: Thank you! Thank you! Thank you! (3 times)"
+  },
+  {
+    day: 5,
+    title: "Prayer - 5",
+    description: "Part 1:\nDear God, I wonder how my mind thinks so many thoughts. If you have made me and every other human being, I must admit that you are a miracle maker. So many functions go on in our body all without our knowledge and yet they do their job perfectly.\n\nSo in my mind, a zillion thoughts come at the speed of light. Every thought is a seed to a whole new experience. Only if I had known that I could choose these thoughts, could I be the master of all my experiences.\n\nThank You. Thank You. Thank You.\n\nPart 2:\nDear God, just for today, keep reminding me of the infallible power of my thoughts and that I can choose my thoughts in any given situation. In other words, remind me that I and only I am in the driving seat of my car. Thank you for this miracle called \"ME\" I love you.\n\nYOU ARE THE CREATOR OF YOUR REALITY",
+    action: "Practice for today:\n1. You can write your wish and keep it on your altar before starting this prayer.\n2. After the prayer, write down 21 things that are going well in your life and say, \"Thank You, God\" after each one.\n3. Make a conscious choice to choose only uplifting, energetic thoughts all day today. If you catch yourself thinking negative thoughts, go back to making a choice and doing the prayer again."
   }
 ];
 
