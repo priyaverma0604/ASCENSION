@@ -64,6 +64,30 @@ const prayerAssignments = [
     title: "Prayer - 11",
     description: "Dear God today on this beautiful day, I pray for nothing. I mean, everything is in such beautiful harmony and in such divine order that I feel anything else would be a dishonour to the wholeness of this world. However, I also understand that these prayers are my communication with you and the answer that I need to resolve. As I share my areas of concern, I just want to let you know that I also trust my abilities to find an answer. However, if you feel like guiding me, I shall be paying attention and I will consider them seriously.\n\nAll these years you have taught me to believe in myself and I am a good student. I now feel adequate to handle all my situations and I also believe in my higher good. You had the choice to make me worship you and be 'My God' my ultimate supreme saviour. But you so rightfully taught me otherwise, \"The power lies within me\". I shall be forever indebted to you for this priceless lesson.",
     action: "Practice for today:\nRead this prayer silently or aloud. Meditate on the idea that the power lies within you, and take a moment to acknowledge your strength, resilience, and inner wisdom."
+  },
+  {
+    day: 12,
+    title: "Prayer - 12",
+    description: "Dear God, it's been a long week and a lot of us are tired. Physically, emotionally and spiritually, quite; a few of us are joyful as well but live in perpetual fear of losing that but deep down I know that eventually, it all falls in place. Time and love shall heal everything. It is just a matter of faith. Dear god, please remind my fellowmen about this eventuality and let their souls and bodies rest while your love heals them in the darkness of the night.\n\nI trust you in doing your job well and I trust myself for the same. I surely am the faith keeper and I shall believe in the goodness of life until each one of us learns to believe it.",
+    action: "Practice for today:\n1. You can write your wish and keep it on your altar before starting this prayer.\n2. After the prayer, write down 21 things that are going well in your life and say, \"Thank You, God\" after each one."
+  },
+  {
+    day: 13,
+    title: "Prayer - 13",
+    description: "\"Dear God. Every cloud has a silver lining and behind the ones that don't, rainbows grow. Today on this cheerful day, I'd like to remind myself that I do have the ability to see beauty in everything. In any situation, I have two choices, to be grumpy and complain or to be joyful and celebrate. Now that I have this magic wand of choice, I can turn every situation into a celebration and miracles shall follow. So if it rains today, I shall enjoy the rains, and if it doesn't I shall enjoy the sun, either way nothing outside of me will have the capacity to disrupt my eternal happiness because that is my true nature.\n\nBecause that's how; you made me, eternally joyful, loving, and eternally abundant. Thank you for making me that way. I shall remember my truth and in case I don't, a gentle nudge won't be too much for you would it? I love you and so it is!!!\"",
+    action: "Practice for today:\nRead this prayer silently or aloud. Carry the magic wand of choice with you today—choose joy, celebration, and appreciation in every situation you encounter."
+  },
+  {
+    day: 14,
+    title: "Prayer - 14",
+    description: "Dear God, Today is the day of blessings. While I am aware of all blessings I enjoy each day and I am grateful for them. Please guide me on my path to my life's purpose whatever that may be. I am willing to move beyond my petty nuances and pay attention to my higher purpose. Please make my life matter. Show me my path.",
+    action: "Practice for today:\nDo a small visualization: close your eyes and affirm \"I am at peace\" while gently breathing. Once your mind is quiet, ask gently: \"What is my purpose in this life?\" Listen for the answer. If no answer comes, that is completely okay—simply proceed with your day full of blessings."
+  },
+  {
+    day: 15,
+    title: "Prayer - 15",
+    description: "Dear God I begin this week with enthusiasm and zeal. I promise to give my 100% to everything I pursue while I shall make all my efforts. I wish for some guidance from your side. Please remind me of what is important to my spirit and what isn't. Often I give in to my fears and start pursuing my ego's agenda, some times other people's agenda. I do not wish to shy away from my roles in other people's lives and I am willing to fulfill my responsibilities but I need to be reminded that I do not have to succumb to their expectations or definitions.",
+    action: "Practice for today:\nRead this prayer silently or aloud. Today, focus on keeping your spirit aligned with what truly matters, releasing any need to conform to other people's expectations or definitions."
   }
 ];
 
