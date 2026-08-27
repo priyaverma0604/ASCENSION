@@ -10,6 +10,18 @@ const prayerAssignments = [
     title: "Prayer - 2",
     description: "Dear God Today, I count my blessings and there are so many. With each passing day, may my ability to seek my blessings grow. I know that even in the worst of situations, there is a hidden treasure. It is for me to learn to spot it. I now also know that it is easy to complain and crib because that is what I have learned over all these years and with practice, I have mastered it. If I had put these many years of effort into being grateful, I would have mastered that.\n\nJust so that you know, that I am now ready to change, please guide me on my path. Thank you...\n\nThank You. Thank You. Thank You.",
     action: "Practice for today:\n1. You can write your wish and keep it on your altar before starting this prayer.\n2. Write down 21 things you are grateful for (this is only for today)."
+  },
+  {
+    day: 3,
+    title: "Prayer - 3",
+    description: "Dear God, a beautiful season is beginning. Thank you for showering your love on us and showing us that abundance is our true nature. It is truly magical to see just with the first few drops of rain, Mother Earth is covered in green reminding us of the infinite abundance we truly deserve. For today, Please remind me of this abundance I deserve. I shall pay attention to all details and make an effort to remember. But a few miracles will help to rejoice in advance.",
+    action: "Practice for today:\n1. After saying this prayer, visualise what it is that you think you deserve from the universe in terms of love, relationship, career, or health.\n2. Put it out into the universe and forget about it. Do not put any fear or doubtful thoughts after that and leave it (this is only a visualisation, no writing of your wish is needed)."
+  },
+  {
+    day: 4,
+    title: "Prayer - 4",
+    description: "Dear God, Help me find peace when I can't see it. Help me find love when I can't feel it and help me find faith when I can't believe it. I know they all exist and it is just a matter of time before they shall be revealed to me. Until then God please keep me reminded of the goodness in life. I love you God and Thank you...",
+    action: "Practice for today:\nTake your journal and write out 21 things that are going well for you. After each statement, write: Thank you! Thank you! Thank you! (3 times)"
   }
 ];
 
