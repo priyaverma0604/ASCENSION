@@ -390,12 +390,12 @@ exports.submitAssignment = async (req, res, next) => {
       });
     }
 
-    const isPrayerProgram = program.title.toLowerCase().includes('prayer') || program._id.toString() === '6a4963f49e941f93f91f5ac1';
+    const isGratitudeProgram = program.title.toLowerCase().includes('gratitude') || program._id.toString() === '6a4963f49e941f93f91f5abf';
 
     let photoUrl = '';
     if (req.file) {
       photoUrl = isCloudinaryConfigured ? req.file.path : `/uploads/${req.file.filename}`;
-    } else if (!isPrayerProgram) {
+    } else if (isGratitudeProgram) {
       return res.status(400).json({ success: false, message: 'Please upload a photo of your work' });
     }
 

@@ -107,9 +107,9 @@ const ProgramDashboard = () => {
   const handleUploadSubmit = async (e) => {
     e.preventDefault();
 
-    const isPrayer = program && (program.title.toLowerCase().includes('prayer') || program._id === '6a4963f49e941f93f91f5ac1');
+    const isPhotoRequired = program && (program.title.toLowerCase().includes('gratitude') || program._id === '6a4963f49e941f93f91f5abf');
 
-    if (!isPrayer && !selectedFile) {
+    if (isPhotoRequired && !selectedFile) {
       alert('Please select a photo of your work to upload.');
       return;
     }
@@ -195,14 +195,21 @@ const ProgramDashboard = () => {
   const currentSubmission = progress ? progress.currentSubmission : null;
 
   // Compute progress percentage
-  const totalDays = 30;
+  const totalDays = program && program.duration ? program.duration : 30;
   const completedDaysCount = progress ? progress.submissions.length : 0;
   const progressPercent = Math.round((completedDaysCount / totalDays) * 100);
 
   const isPendingApproval = currentSubmission && currentSubmission.status === 'pending';
   const isRejected = currentSubmission && currentSubmission.status === 'rejected';
 
+  const isPhotoRequired = program && (program.title.toLowerCase().includes('gratitude') || program._id === '6a4963f49e941f93f91f5abf');
   const isPrayerProgram = program && (program.title.toLowerCase().includes('prayer') || program._id === '6a4963f49e941f93f91f5ac1');
+
+  const getEmbedVideoUrl = (contentString) => {
+    if (!contentString) return null;
+    const match = contentString.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+    return match ? `https://www.youtube.com/embed/${match[1]}` : null;
+  };
 
   const getRemainingDaysText = () => {
     if (!progress || !progress.createdAt) return '';
@@ -287,8 +294,11 @@ const ProgramDashboard = () => {
           {/* LEFT: Active Assignment Card */}
           <div className="lg:col-span-2 flex flex-col gap-6">
 
-            {/* Intro Welcome Video Card for Gratitude Program */}
-            {program && (program.title.toLowerCase().includes('gratitude') || program._id === '6a4963f49e941f93f91f5abf') && (
+            {/* Intro Welcome Video Card for Gratitude and Affirmation Programs */}
+            {program && (
+              (program.title.toLowerCase().includes('gratitude') || program._id === '6a4963f49e941f93f91f5abf') ||
+              (program.title.toLowerCase().includes('affirmation') || program._id === '6a4963f49e941f93f91f5abe')
+            ) && (
               <div className="glass p-5 md:p-6 rounded-3xl border border-cream-dark/50 flex flex-col gap-4 text-left relative overflow-hidden">
                 <div className="flex items-center justify-between border-b border-cream-dark/60 pb-3">
                   <div className="flex items-center gap-2">
@@ -296,21 +306,21 @@ const ProgramDashboard = () => {
                       <Sparkles className="w-3 h-3 animate-pulse" /> Welcome Video
                     </span>
                     <span className="font-serif text-sm font-bold text-charcoal-dark">
-                      Introduction to 30 Days Gratitude Program
+                      Introduction to {program.title}
                     </span>
                   </div>
                 </div>
                 <div className="w-full aspect-video rounded-2xl overflow-hidden border border-cream-dark/40 shadow-sm">
                   <iframe 
-                    src="https://www.youtube.com/embed/KeUipjriX50" 
-                    title="Introduction to Gratitude Program"
+                    src={program.title.toLowerCase().includes('affirmation') ? "https://www.youtube.com/embed/c97Tg9DfPNA" : "https://www.youtube.com/embed/KeUipjriX50"} 
+                    title={`Introduction to ${program.title}`}
                     className="w-full h-full border-0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
                     allowFullScreen
                   />
                 </div>
                 <p className="text-[11px] text-charcoal-light leading-relaxed">
-                  Before you begin your practice, watch this welcome video from Sonali Bhasin to understand the power of gratitude and how to get the most out of your 30-day journey!
+                  Before you begin your practice, watch this welcome video from Sonali Bhasin to understand the power of this journey and how to get the most out of it!
                 </p>
               </div>
             )}
@@ -378,6 +388,18 @@ const ProgramDashboard = () => {
                       <img src={getImageUrl(selectedAssignment.image)} alt={selectedAssignment.title} className="max-w-full max-h-80 object-contain" />
                     </div>
                   )}
+
+                  {getEmbedVideoUrl(selectedAssignment.content) && (
+                    <div className="w-full aspect-video rounded-xl overflow-hidden border border-cream-dark/45 shadow-sm mb-4 bg-black">
+                      <iframe 
+                        src={getEmbedVideoUrl(selectedAssignment.content)}
+                        title={selectedAssignment.title}
+                        className="w-full h-full border-0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                        allowFullScreen
+                      />
+                    </div>
+                  )}
                   
                   {/* Task Content */}
                   <div className="bg-cream/40 border border-cream-dark/40 p-5 rounded-xl leading-relaxed">
@@ -390,11 +412,11 @@ const ProgramDashboard = () => {
                 {/* Upload Form / Completion Status (Show if the selected day is the active day and we haven't completed the program) */}
                 {isSelectedActive ? (
                   <form onSubmit={handleUploadSubmit} className="border-t border-cream-dark/65 pt-6 flex flex-col gap-4">
-                    {isPrayerProgram ? (
+                    {!isPhotoRequired ? (
                       <>
-                        <h4 className="text-[10px] text-charcoal-dark font-bold uppercase tracking-wider">Prayer Progress</h4>
+                        <h4 className="text-[10px] text-charcoal-dark font-bold uppercase tracking-wider">Practice Progress</h4>
                         <p className="text-[11px] text-charcoal-light leading-relaxed">
-                          Click below once you have completed today's prayer to mark this day as complete and unlock the next day's prayer!
+                          Click below once you have completed today's practice session to mark this day as complete and unlock the next day!
                         </p>
                       </>
                     ) : (
@@ -437,9 +459,9 @@ const ProgramDashboard = () => {
 
                     <button
                       type="submit"
-                      disabled={uploading || (!isPrayerProgram && !selectedFile)}
+                      disabled={uploading || (isPhotoRequired && !selectedFile)}
                       className={`w-full font-bold uppercase tracking-wider py-3.5 rounded-xl transition-all duration-300 text-xs shadow-sm flex items-center justify-center gap-1.5 font-sans mt-2 ${
-                        uploading || (!isPrayerProgram && !selectedFile)
+                        uploading || (isPhotoRequired && !selectedFile)
                           ? 'bg-charcoal-light/10 text-charcoal-light/40 cursor-not-allowed' 
                           : 'bg-sage hover:bg-sage-dark text-white'
                       }`}
