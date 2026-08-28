@@ -195,7 +195,7 @@ const ProgramDashboard = () => {
   const currentSubmission = progress ? progress.currentSubmission : null;
 
   // Compute progress percentage
-  const totalDays = program && program.duration ? program.duration : 30;
+  const totalDays = program && program.duration ? (parseInt(program.duration, 10) || 30) : 30;
   const completedDaysCount = progress ? progress.submissions.length : 0;
   const progressPercent = Math.round((completedDaysCount / totalDays) * 100);
 
