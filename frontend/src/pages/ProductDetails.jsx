@@ -2,7 +2,8 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
   Heart, ShoppingBag, Share2, Plus, Minus, 
-  ChevronRight, CheckCircle, AlertCircle, Star, MessageSquare 
+  ChevronRight, CheckCircle, AlertCircle, Star, MessageSquare,
+  Sparkles, Moon, Sun, Flame, ShieldAlert
 } from 'lucide-react';
 import axios from 'axios';
 import { CartContext } from '../context/CartContext';
@@ -84,34 +85,70 @@ const ProductDetails = () => {
   };
 
   const parseDescription = (desc) => {
-    if (!desc) return { shortDesc: '', benefits: [], ingredients: '', howToUse: '' };
+    if (!desc) {
+      return {
+        tagline: '',
+        shortDesc: '',
+        benefits: [],
+        ingredients: '',
+        howToUse: '',
+        whenToUse: [],
+        ritual: '',
+        ascensionWay: '',
+        safety: ''
+      };
+    }
     
+    let tagline = '';
     let shortDesc = '';
     let benefits = [];
     let ingredients = '';
     let howToUse = '';
-    
-    // Try to split by sections using lookahead
-    const sections = desc.split(/\n+(?=Benefits:|Ingredients:|How to Use:)/i);
+    let whenToUse = [];
+    let ritual = '';
+    let ascensionWay = '';
+    let safety = '';
+
+    let remaining = desc.trim();
+    const taglineMatch = remaining.match(/^Tagline:\s*(.*?)(?=\n\n|\n[A-Z]|$)/is);
+    if (taglineMatch) {
+      tagline = taglineMatch[1].trim();
+      remaining = remaining.substring(taglineMatch[0].length).trim();
+    }
+
+    const headerRegex = /\n+(?=(?:Why Use|Benefits|Ingredients|How to Use|When to Use It|When to Use|Create Your Ritual|Make It a Ritual|The Ascension Way|Important Information|Important Safety Information|Candle Safety):)/i;
+    const sections = remaining.split(headerRegex);
+
     shortDesc = sections[0].trim();
-    
-    sections.forEach(section => {
+
+    sections.slice(1).forEach(section => {
       const trimmed = section.trim();
-      if (trimmed.startsWith('Benefits:')) {
-        const lines = trimmed.replace(/^Benefits:\s*/i, '').split('\n');
-        benefits = lines.map(line => line.replace(/^-\s*/, '').trim()).filter(Boolean);
-      } else if (trimmed.startsWith('Ingredients:')) {
+      if (/^(?:Why Use|Benefits):/i.test(trimmed)) {
+        const body = trimmed.replace(/^(?:Why Use|Benefits):\s*/i, '');
+        benefits = body
+          .split('\n')
+          .map(line => line.replace(/^[-•*]\s*/, '').trim())
+          .filter(Boolean);
+      } else if (/^Ingredients:/i.test(trimmed)) {
         ingredients = trimmed.replace(/^Ingredients:\s*/i, '').trim();
-      } else if (trimmed.startsWith('How to Use:')) {
+      } else if (/^How to Use:/i.test(trimmed)) {
         howToUse = trimmed.replace(/^How to Use:\s*/i, '').trim();
+      } else if (/^(?:When to Use It|When to Use):/i.test(trimmed)) {
+        const body = trimmed.replace(/^(?:When to Use It|When to Use):\s*/i, '');
+        whenToUse = body
+          .split('\n')
+          .map(line => line.replace(/^[-•*]\s*/, '').trim())
+          .filter(Boolean);
+      } else if (/^(?:Create Your Ritual|Make It a Ritual):/i.test(trimmed)) {
+        ritual = trimmed.replace(/^(?:Create Your Ritual|Make It a Ritual):\s*/i, '').trim();
+      } else if (/^The Ascension Way:/i.test(trimmed)) {
+        ascensionWay = trimmed.replace(/^The Ascension Way:\s*/i, '').trim();
+      } else if (/^(?:Important Information|Important Safety Information|Candle Safety):/i.test(trimmed)) {
+        safety = trimmed.replace(/^(?:Important Information|Important Safety Information|Candle Safety):\s*/i, '').trim();
       }
     });
 
-    if (benefits.length === 0 && !ingredients && !howToUse) {
-      shortDesc = desc;
-    }
-    
-    return { shortDesc, benefits, ingredients, howToUse };
+    return { tagline, shortDesc, benefits, ingredients, howToUse, whenToUse, ritual, ascensionWay, safety };
   };
 
   const handleQuantityChange = (type) => {
@@ -185,7 +222,7 @@ const ProductDetails = () => {
     );
   }
 
-  const { shortDesc, benefits, ingredients, howToUse } = parseDescription(product.description);
+  const { tagline, shortDesc, benefits, ingredients, howToUse, whenToUse, ritual, ascensionWay, safety } = parseDescription(product.description);
   const isOutOfStock = product.stock <= 0;
 
   return (
@@ -207,7 +244,7 @@ const ProductDetails = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
           
           {/* Left Column: Image Gallery */}
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 sticky top-24">
             <div className="h-[400px] md:h-[500px] bg-cream rounded-3xl overflow-hidden shadow-sm border border-cream-dark/40 relative">
               <img 
                 src={activeImage ? getImageUrl(activeImage) : "https://images.unsplash.com/photo-1615627121117-e3278bc8b1db?auto=format&fit=crop&w=800&q=80"} 
@@ -239,13 +276,22 @@ const ProductDetails = () => {
             )}
           </div>
 
-          {/* Right Column: Info & Form */}
+          {/* Right Column: Info & Details */}
           <div className="flex flex-col text-left gap-5">
             
-            <div className="flex flex-col gap-1 border-b border-cream-dark/40 pb-4">
-              <span className="text-[10px] uppercase tracking-widest text-sage font-bold font-sans">
-                {product.category}
-              </span>
+            <div className="flex flex-col gap-1.5 border-b border-cream-dark/40 pb-4">
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] uppercase tracking-widest text-sage font-bold font-sans">
+                  {product.category}
+                </span>
+                {tagline && (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-gold/15 text-gold-dark rounded-full text-[10px] font-serif font-bold border border-gold/30">
+                    <Sparkles className="w-2.5 h-2.5" />
+                    <span>{tagline}</span>
+                  </span>
+                )}
+              </div>
+
               <h1 className="font-serif text-2xl md:text-3xl font-bold text-charcoal-dark leading-tight mt-1">
                 {product.name}
               </h1>
@@ -265,44 +311,9 @@ const ProductDetails = () => {
               </div>
             </div>
 
-            {/* Description & Details Accordions */}
-            <div className="flex flex-col gap-4 text-xs leading-relaxed text-charcoal/80">
-              <p className="italic border-l-2 border-gold/45 pl-3 text-charcoal-light font-sans">
-                {shortDesc}
-              </p>
-
-              {/* Benefits */}
-              {benefits.length > 0 && (
-                <div className="glass p-4.5 rounded-2xl border border-cream-dark/40">
-                  <h4 className="font-serif text-charcoal-dark font-bold mb-2 uppercase tracking-wide text-[10px]">Benefits & Properties</h4>
-                  <ul className="list-disc list-inside flex flex-col gap-1 text-charcoal/70 pl-1.5">
-                    {benefits.map((b, i) => (
-                      <li key={i} className="text-left">{b}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Ingredients */}
-              {ingredients && (
-                <div className="glass p-4.5 rounded-2xl border border-cream-dark/40">
-                  <h4 className="font-serif text-charcoal-dark font-bold mb-2 uppercase tracking-wide text-[10px]">Ingredients & Crystals</h4>
-                  <p className="text-charcoal/70">{ingredients}</p>
-                </div>
-              )}
-
-              {/* How to Use */}
-              {howToUse && (
-                <div className="glass p-4.5 rounded-2xl border border-cream-dark/40">
-                  <h4 className="font-serif text-charcoal-dark font-bold mb-2 uppercase tracking-wide text-[10px]">How to Use / Ritual</h4>
-                  <p className="text-charcoal/70">{howToUse}</p>
-                </div>
-              )}
-            </div>
-
-            {/* Order Controls */}
+            {/* Order Controls & Actions */}
             {!isOutOfStock && (
-              <div className="flex flex-wrap items-center gap-4 mt-2">
+              <div className="flex flex-wrap items-center gap-4">
                 <div className="flex items-center border border-cream-dark/80 rounded-xl bg-cream-light overflow-hidden shrink-0">
                   <button 
                     onClick={() => handleQuantityChange('dec')}
@@ -336,8 +347,8 @@ const ProductDetails = () => {
               </div>
             )}
 
-            {/* Wishlist, Share Toolbar */}
-            <div className="flex items-center gap-3 border-t border-cream-dark/40 pt-4 mt-2">
+            {/* Wishlist & Share Toolbar */}
+            <div className="flex items-center gap-3 border-b border-cream-dark/40 pb-4">
               <button 
                 onClick={() => toggleWishlist(product)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider border shadow-sm transition-all focus:outline-none ${
@@ -362,6 +373,117 @@ const ProductDetails = () => {
                   </span>
                 )}
               </button>
+            </div>
+
+            {/* Description & Detailed Sections */}
+            <div className="flex flex-col gap-4 text-xs leading-relaxed text-charcoal/80">
+              
+              {/* Product Overview / Description */}
+              {shortDesc && (
+                <div className="bg-cream/50 p-4.5 rounded-2xl border border-cream-dark/40 space-y-2.5 text-charcoal/85">
+                  {shortDesc.split('\n\n').map((para, i) => (
+                    <p key={i} className="leading-relaxed">{para}</p>
+                  ))}
+                </div>
+              )}
+
+              {/* Sacred Benefits */}
+              {benefits.length > 0 && (
+                <div className="glass p-5 rounded-2xl border border-cream-dark/40">
+                  <h4 className="font-serif text-charcoal-dark font-bold mb-3 uppercase tracking-wide text-[11px] flex items-center gap-2">
+                    <Sparkles className="w-3.5 h-3.5 text-gold-dark" />
+                    <span>Sacred Benefits & Purpose</span>
+                  </h4>
+                  <ul className="flex flex-col gap-2 text-charcoal/80 pl-1">
+                    {benefits.map((b, i) => (
+                      <li key={i} className="flex items-start gap-2.5">
+                        <span className="text-sage font-bold shrink-0 mt-0.5">•</span>
+                        <span>{b}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Ingredients & Composition */}
+              {ingredients && (
+                <div className="glass p-5 rounded-2xl border border-cream-dark/40">
+                  <h4 className="font-serif text-charcoal-dark font-bold mb-2 uppercase tracking-wide text-[11px] flex items-center gap-2">
+                    <Sparkles className="w-3.5 h-3.5 text-sage" />
+                    <span>Ingredients & Composition</span>
+                  </h4>
+                  <p className="text-charcoal/80 leading-relaxed text-xs pl-1">{ingredients}</p>
+                </div>
+              )}
+
+              {/* How to Use / Ritual Application */}
+              {howToUse && (
+                <div className="glass p-5 rounded-2xl border border-cream-dark/40">
+                  <h4 className="font-serif text-charcoal-dark font-bold mb-3 uppercase tracking-wide text-[11px] flex items-center gap-2">
+                    <Flame className="w-3.5 h-3.5 text-amber-600" />
+                    <span>How to Use & Ritual Application</span>
+                  </h4>
+                  <div className="text-charcoal/80 whitespace-pre-line leading-relaxed pl-1">
+                    {howToUse}
+                  </div>
+                </div>
+              )}
+
+              {/* When to Use It */}
+              {whenToUse.length > 0 && (
+                <div className="glass p-5 rounded-2xl border border-cream-dark/40">
+                  <h4 className="font-serif text-charcoal-dark font-bold mb-3 uppercase tracking-wide text-[11px] flex items-center gap-2">
+                    <Moon className="w-3.5 h-3.5 text-lavender-dark" />
+                    <span>When to Use</span>
+                  </h4>
+                  <ul className="flex flex-col gap-2 text-charcoal/80 pl-1">
+                    {whenToUse.map((item, i) => (
+                      <li key={i} className="flex items-start gap-2.5">
+                        <span className="text-lavender-dark font-bold shrink-0 mt-0.5">✦</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Create Your Ritual */}
+              {ritual && (
+                <div className="p-5 rounded-2xl bg-linear-to-br from-cream to-gold/10 border border-gold/30">
+                  <h4 className="font-serif text-charcoal-dark font-bold mb-2.5 uppercase tracking-wide text-[11px] flex items-center gap-2">
+                    <Sun className="w-3.5 h-3.5 text-gold-dark" />
+                    <span>Create Your Ritual</span>
+                  </h4>
+                  <div className="text-charcoal/85 whitespace-pre-line leading-relaxed italic">
+                    {ritual}
+                  </div>
+                </div>
+              )}
+
+              {/* The Ascension Way */}
+              {ascensionWay && (
+                <div className="p-5 rounded-2xl bg-charcoal-dark text-white border border-gold/30 shadow-sm">
+                  <div className="flex items-center gap-2 text-gold text-xs font-serif uppercase tracking-widest font-bold mb-2">
+                    <Heart className="w-3.5 h-3.5 fill-current" />
+                    <span>The Ascension Way</span>
+                  </div>
+                  <div className="text-cream/90 whitespace-pre-line leading-relaxed font-serif text-xs">
+                    {ascensionWay}
+                  </div>
+                </div>
+              )}
+
+              {/* Important Information / Safety */}
+              {safety && (
+                <div className="p-4.5 rounded-2xl bg-amber-50/90 border border-amber-200/80 text-amber-950">
+                  <h4 className="font-bold uppercase tracking-wide text-[10px] mb-1.5 flex items-center gap-1.5 text-amber-900">
+                    <ShieldAlert className="w-3.5 h-3.5 text-amber-700" />
+                    <span>Important Safety & Use Information</span>
+                  </h4>
+                  <p className="text-amber-900/90 leading-relaxed text-[11px]">{safety}</p>
+                </div>
+              )}
+
             </div>
 
           </div>

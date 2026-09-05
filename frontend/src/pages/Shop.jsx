@@ -60,10 +60,7 @@ const Shop = () => {
   const [screenshotPreview, setScreenshotPreview] = useState('');
 
   const categories = [
-    'All', 'Crystals', 'Lamps', 'Candles', 'Crystal Trees', 'Pendants',
-    'Bracelets', 'Healing Stones', 'Selenite Products', 'Trays',
-    'Decorative Pieces', 'Wax Melts', 'Bath Salts', 'Healing Oils',
-    'Healing Camphor', 'Wax Tablets', 'Sage Leaves'
+    'All', 'Bath Salts', 'Healing Camphor', 'Healing Oils', 'Candles'
   ];
 
   useEffect(() => {
