@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { X, CheckCircle, Compass, AlertTriangle, Upload, CreditCard } from 'lucide-react';
+import { X, CheckCircle, Compass, AlertTriangle, Upload, CreditCard, MessageCircle, Copy, Check } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
 
@@ -23,6 +23,7 @@ const RegisterWebinarModal = ({ webinar, onClose }) => {
   const [screenshotPreview, setScreenshotPreview] = useState('');
   const [transactionId, setTransactionId] = useState('');
   const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const handleInfoSubmit = (e) => {
     e.preventDefault();
@@ -318,24 +319,69 @@ const RegisterWebinarModal = ({ webinar, onClose }) => {
 
           {step === 3 && (
             /* Step 3: Success Screen */
-            <div className="p-8 flex flex-col items-center justify-center text-center gap-4">
-              <CheckCircle className="w-12 h-12 text-sage animate-pulse-subtle" />
+            <div className="p-6 flex flex-col items-center justify-center text-center gap-3.5">
+              <CheckCircle className="w-11 h-11 text-sage animate-pulse-subtle" />
               <h4 className="font-serif text-lg font-bold text-charcoal-dark">
                 Registration Submitted!
               </h4>
-              <p className="text-xs text-charcoal-light leading-relaxed px-4 border-b border-cream-dark/50 pb-3">
+              <p className="text-xs text-charcoal-light leading-relaxed px-2 border-b border-cream-dark/50 pb-2.5">
                 Thank you, <strong>{name}</strong>! Your manual payment proof has been successfully submitted and is pending admin validation.
               </p>
-              <div className="text-[11px] text-charcoal-light leading-relaxed px-2 flex flex-col gap-1">
-                <p>Once approved, a confirmation email will be sent to you.</p>
+
+              {/* WhatsApp Community Group Banner */}
+              {(() => {
+                const isAncestral = webinar.title && webinar.title.toLowerCase().includes('ancestral');
+                const whatsappLink = webinar.whatsappGroupLink || (isAncestral ? 'https://chat.whatsapp.com/J4nXj2mznEfLCj2YZd1v16' : '');
+
+                if (!whatsappLink) return null;
+
+                return (
+                  <div className="w-full bg-[#25D366]/10 border border-[#25D366]/30 rounded-2xl p-4 flex flex-col items-center text-center gap-2.5 my-1">
+                    <div className="flex items-center gap-1.5 text-[#128C7E] font-bold text-xs">
+                      <MessageCircle className="w-4 h-4 text-[#25D366] fill-[#25D366]/20" />
+                      <span>Join Webinar WhatsApp Group</span>
+                    </div>
+                    <p className="text-[11px] text-charcoal-light leading-relaxed">
+                      Please join our official WhatsApp group for live meeting links, session preparation updates, and announcements.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-2 w-full mt-1">
+                      <a
+                        href={whatsappLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all shadow-xs active:scale-98"
+                      >
+                        <MessageCircle className="w-3.5 h-3.5 fill-white" />
+                        <span>Join WhatsApp Group</span>
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(whatsappLink);
+                          setCopied(true);
+                          setTimeout(() => setCopied(false), 2500);
+                        }}
+                        className="bg-white hover:bg-cream border border-cream-dark/80 text-charcoal-dark font-medium py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1 transition-all"
+                      >
+                        {copied ? <Check className="w-3.5 h-3.5 text-sage" /> : <Copy className="w-3.5 h-3.5 text-charcoal-light" />}
+                        <span>{copied ? 'Copied Link' : 'Copy Link'}</span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              <div className="text-[11px] text-charcoal-light leading-relaxed px-2 flex flex-col gap-1 mt-1">
+                <p>Once approved, a confirmation email will also be sent to your email.</p>
                 <p className="font-semibold text-gold-dark">Your Zoom Link will be emailed exactly 1 hour before the webinar starts.</p>
               </div>
-              <p className="text-[10px] text-sage font-semibold uppercase tracking-wide bg-sage/10 px-3 py-1 rounded-full border border-sage/20 mt-1.5">
+
+              <p className="text-[10px] text-sage font-semibold uppercase tracking-wide bg-sage/10 px-3 py-1 rounded-full border border-sage/20 mt-1">
                 Status: Pending Approval
               </p>
               <button
                 onClick={onClose}
-                className="w-full bg-sage hover:bg-sage-dark text-white text-xs font-bold py-2.5 rounded-xl transition-all duration-300 shadow-sm mt-6"
+                className="w-full bg-sage hover:bg-sage-dark text-white text-xs font-bold py-2.5 rounded-xl transition-all duration-300 shadow-sm mt-3"
               >
                 Close Window
               </button>

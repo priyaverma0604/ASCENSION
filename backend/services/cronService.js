@@ -68,11 +68,22 @@ const startWebinarReminderCron = () => {
             day: 'numeric'
           });
 
+          const isAncestral = webinar.title && webinar.title.toLowerCase().includes('ancestral');
+          const whatsappLink = webinar.whatsappGroupLink || (isAncestral ? 'https://chat.whatsapp.com/J4nXj2mznEfLCj2YZd1v16' : '');
+          const whatsappSectionText = whatsappLink ? `\n\nOfficial Webinar WhatsApp Group (Join for updates & notifications):\n${whatsappLink}\n` : '';
+          const whatsappSectionHtml = whatsappLink ? `
+            <div style="margin: 20px 0; padding: 16px; background-color: #f0fdf4; border: 1.5px solid #86efac; border-radius: 12px; text-align: center;">
+              <p style="color: #166534; margin: 0 0 6px 0; font-size: 14px; font-weight: bold;">📲 Webinar WhatsApp Community Group</p>
+              <p style="color: #15803d; font-size: 12px; margin: 0 0 12px 0;">Join to receive live updates, session details, and instant notifications.</p>
+              <a href="${whatsappLink}" target="_blank" style="background-color: #25D366; color: #ffffff; padding: 8px 18px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block; font-size: 12px;">Join WhatsApp Group</a>
+            </div>
+          ` : '';
+
           for (const reg of paidRegistrations) {
             const emailOptions = {
               to: reg.email,
-              subject: 'Reminder: Your Webinar Starts Tomorrow',
-              text: `Hello ${reg.name},\n\nThis is a reminder that your webinar is tomorrow.\n\nWebinar Details:\n- Webinar Name: ${webinar.title}\n- Date: ${formattedDate}\n- Time: ${webinar.time}\n- Speaker: ${webinar.speakerName}\n\nYour Zoom Meeting Link will automatically be sent to you 1 hour before the webinar starts.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
+              subject: `Reminder: Your Webinar Starts Tomorrow - ${webinar.title}`,
+              text: `Hello ${reg.name},\n\nThis is a reminder that your webinar is tomorrow.\n\nWebinar Details:\n- Webinar Name: ${webinar.title}\n- Date: ${formattedDate}\n- Time: ${webinar.time}\n- Speaker: ${webinar.speakerName}${whatsappSectionText}\nYour Zoom Meeting Link will automatically be sent to you 1 hour before the webinar starts.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
               html: `<p>Hello <strong>${reg.name}</strong>,</p>
                      <p>This is a reminder that your webinar is tomorrow.</p>
                      <h4>Webinar Details:</h4>
@@ -82,6 +93,7 @@ const startWebinarReminderCron = () => {
                        <li><strong>Time:</strong> ${webinar.time}</li>
                        <li><strong>Speaker:</strong> ${webinar.speakerName}</li>
                      </ul>
+                     ${whatsappSectionHtml}
                      <p>Your Zoom Meeting Link will automatically be sent to you 1 hour before the webinar starts.</p>
                      <p>Please join 10 minutes early.</p>
                      <p>Regards,<br/><strong>Ascension by Sonali Bhasin Kumar</strong></p>`
@@ -180,6 +192,17 @@ const startWebinarReminderCron = () => {
             day: 'numeric'
           });
 
+          const isAncestral = webinar.title && webinar.title.toLowerCase().includes('ancestral');
+          const whatsappLink = webinar.whatsappGroupLink || (isAncestral ? 'https://chat.whatsapp.com/J4nXj2mznEfLCj2YZd1v16' : '');
+          const whatsappSectionText = whatsappLink ? `\n\nOfficial Webinar WhatsApp Group (Join for live updates & recordings):\n${whatsappLink}\n` : '';
+          const whatsappSectionHtml = whatsappLink ? `
+            <div style="margin: 20px 0; padding: 16px; background-color: #f0fdf4; border: 1.5px solid #86efac; border-radius: 12px; text-align: center;">
+              <p style="color: #166534; margin: 0 0 6px 0; font-size: 14px; font-weight: bold;">📲 Webinar WhatsApp Group</p>
+              <p style="color: #15803d; font-size: 12px; margin: 0 0 12px 0;">Join for live guidance, direct access, and webinar announcements.</p>
+              <a href="${whatsappLink}" target="_blank" style="background-color: #25D366; color: #ffffff; padding: 8px 18px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block; font-size: 12px;">Join WhatsApp Group</a>
+            </div>
+          ` : '';
+
           for (const reg of registrations) {
             const meetingInfoText = `${webinar.meetingId ? `\n- Meeting ID: ${webinar.meetingId}` : ''}${webinar.passcode ? `\n- Passcode: ${webinar.passcode}` : ''}${webinar.meetingChatLink ? `\n- Meeting Chat Link: ${webinar.meetingChatLink}` : ''}`;
             const meetingInfoHtml = `${webinar.meetingId ? `<li><strong>Meeting ID:</strong> ${webinar.meetingId}</li>` : ''}${webinar.passcode ? `<li><strong>Passcode:</strong> ${webinar.passcode}</li>` : ''}${webinar.meetingChatLink ? `<li><strong>Meeting Chat:</strong> <a href="${webinar.meetingChatLink}">Chat Link</a></li>` : ''}`;
@@ -187,7 +210,7 @@ const startWebinarReminderCron = () => {
             const emailOptions = {
               to: reg.email,
               subject: `Webinar Alert: Your Zoom Link for "${webinar.title}"`,
-              text: `Hello ${reg.name},\n\nYour registered webinar "${webinar.title}" starts in less than an hour.\n\nWebinar Details:\n- Webinar Name: ${webinar.title}\n- Date: ${formattedDate}\n- Time: ${webinar.time}\n- Speaker: ${webinar.speakerName}\n\nZoom Meeting Link:\n${webinar.zoomLink}${meetingInfoText}\n\nPlease join 10 minutes early.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
+              text: `Hello ${reg.name},\n\nYour registered webinar "${webinar.title}" starts in less than an hour.\n\nWebinar Details:\n- Webinar Name: ${webinar.title}\n- Date: ${formattedDate}\n- Time: ${webinar.time}\n- Speaker: ${webinar.speakerName}\n\nZoom Meeting Link:\n${webinar.zoomLink}${meetingInfoText}${whatsappSectionText}\nPlease join 10 minutes early.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
               html: `<p>Hello <strong>${reg.name}</strong>,</p>
                      <p>Your registered webinar "<strong>${webinar.title}</strong>" starts in less than an hour.</p>
                      <h4>Webinar Details:</h4>
@@ -199,6 +222,7 @@ const startWebinarReminderCron = () => {
                        ${meetingInfoHtml}
                      </ul>
                      <p><strong>Zoom Meeting Link:</strong> <a href="${webinar.zoomLink}">${webinar.zoomLink}</a></p>
+                     ${whatsappSectionHtml}
                      <p>Please join 10 minutes early.</p>
                      <p>Regards,<br/><strong>Ascension by Sonali Bhasin Kumar</strong></p>`
             };

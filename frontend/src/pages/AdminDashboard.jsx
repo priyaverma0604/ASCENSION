@@ -77,6 +77,7 @@ const AdminDashboard = () => {
   const [webinarMaxSeats, setWebinarMaxSeats] = useState('100');
   const [webinarUpiId, setWebinarUpiId] = useState('sonalibhasinkumar@ptaxis');
   const [webinarZoomLink, setWebinarZoomLink] = useState('');
+  const [webinarWhatsappLink, setWebinarWhatsappLink] = useState('');
   const [webinarStatus, setWebinarStatus] = useState('Upcoming');
   const [webinarCover, setWebinarCover] = useState(null);
   const [webinarQr, setWebinarQr] = useState(null);
@@ -219,6 +220,7 @@ const AdminDashboard = () => {
     setWebinarMaxSeats('100');
     setWebinarUpiId('sonalibhasinkumar@ptaxis');
     setWebinarZoomLink('');
+    setWebinarWhatsappLink('');
     setWebinarStatus('Upcoming');
     setWebinarCover(null);
     setWebinarQr(null);
@@ -273,6 +275,7 @@ const AdminDashboard = () => {
       setWebinarMaxSeats(item.maxSeats);
       setWebinarUpiId(item.upiId);
       setWebinarZoomLink(item.zoomLink);
+      setWebinarWhatsappLink(item.whatsappGroupLink || '');
       setWebinarStatus(item.status);
     }
   };
@@ -298,6 +301,7 @@ const AdminDashboard = () => {
         payload.append('maxSeats', webinarMaxSeats);
         payload.append('upiId', webinarUpiId);
         payload.append('zoomLink', webinarZoomLink);
+        payload.append('whatsappGroupLink', webinarWhatsappLink);
         payload.append('status', webinarStatus);
         
         if (webinarCover) payload.append('coverImage', webinarCover);
@@ -680,6 +684,9 @@ const AdminDashboard = () => {
                         <p><strong>Price:</strong> ₹{selectedItem.price}</p>
                         <p><strong>UPI ID:</strong> {selectedItem.upiId}</p>
                         <p><strong>Zoom Link:</strong> <a href={selectedItem.zoomLink} target="_blank" rel="noopener noreferrer" className="text-sage font-bold hover:underline">{selectedItem.zoomLink}</a></p>
+                        {selectedItem.whatsappGroupLink && (
+                          <p><strong>WhatsApp Group:</strong> <a href={selectedItem.whatsappGroupLink} target="_blank" rel="noopener noreferrer" className="text-sage font-bold hover:underline">{selectedItem.whatsappGroupLink}</a></p>
+                        )}
                         <p><strong>Capacity:</strong> {selectedItem.maxSeats} seats max</p>
                         <p><strong>Status:</strong> {selectedItem.status}</p>
                         {selectedItem.coverImage && (
@@ -1057,6 +1064,10 @@ const AdminDashboard = () => {
                       <div className="flex flex-col gap-1">
                         <label className="font-bold text-charcoal-light uppercase text-[10px]">Zoom Meeting Link</label>
                         <input type="url" required value={webinarZoomLink} onChange={(e) => setWebinarZoomLink(e.target.value)} className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none" />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="font-bold text-charcoal-light uppercase text-[10px]">WhatsApp Community Group Link (Optional)</label>
+                        <input type="url" placeholder="https://chat.whatsapp.com/..." value={webinarWhatsappLink} onChange={(e) => setWebinarWhatsappLink(e.target.value)} className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none font-mono" />
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div className="flex flex-col gap-1">

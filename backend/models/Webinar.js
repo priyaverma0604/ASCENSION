@@ -75,6 +75,10 @@ const webinarSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  whatsappGroupLink: {
+    type: String,
+    default: ''
+  },
   maxSeats: {
     type: Number,
     required: [true, 'Please specify the maximum capacity']

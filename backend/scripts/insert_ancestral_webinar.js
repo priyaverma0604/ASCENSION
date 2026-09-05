@@ -57,6 +57,7 @@ https://us06web.zoom.us/meetings/84687921254/invitations?signature=8YAk3kxoAsqr6
   meetingChatLink: "https://us06web.zoom.us/launch/jc/84687921254",
   oneTapMobile: "+13126266799,,84687921254#,,,,*001979# US (Chicago) / +13462487799,,84687921254#,,,,*001979# US (Houston)",
   joinBySip: "84687921254@zoomcrc.com",
+  whatsappGroupLink: "https://chat.whatsapp.com/J4nXj2mznEfLCj2YZd1v16",
   maxSeats: 150,
   status: "Upcoming",
   isWebinar: true

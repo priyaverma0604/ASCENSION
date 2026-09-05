@@ -92,6 +92,7 @@ const AdminDashboard = ({ user, onLogout }) => {
   const [webinarMaxSeats, setWebinarMaxSeats] = useState('100');
   const [webinarUpiId, setWebinarUpiId] = useState('sonalibhasinkumar@ptaxis');
   const [webinarZoomLink, setWebinarZoomLink] = useState('');
+  const [webinarWhatsappLink, setWebinarWhatsappLink] = useState('');
   const [webinarStatus, setWebinarStatus] = useState('Upcoming');
   const [webinarCover, setWebinarCover] = useState(null);
   const [webinarQr, setWebinarQr] = useState(null);
@@ -294,6 +295,7 @@ const AdminDashboard = ({ user, onLogout }) => {
     setWebinarMaxSeats('100');
     setWebinarUpiId('sonalibhasinkumar@ptaxis');
     setWebinarZoomLink('');
+    setWebinarWhatsappLink('');
     setWebinarStatus('Upcoming');
     setWebinarCover(null);
     setWebinarQr(null);
@@ -357,6 +359,7 @@ const AdminDashboard = ({ user, onLogout }) => {
       setWebinarMaxSeats(item.maxSeats);
       setWebinarUpiId(item.upiId);
       setWebinarZoomLink(item.zoomLink);
+      setWebinarWhatsappLink(item.whatsappGroupLink || '');
       setWebinarStatus(item.status);
     } else if (activeTab === 'gratitude-assignments') {
       setAssignmentDayNumber(item.dayNumber);
@@ -389,6 +392,7 @@ const AdminDashboard = ({ user, onLogout }) => {
         payload.append('maxSeats', webinarMaxSeats);
         payload.append('upiId', webinarUpiId);
         payload.append('zoomLink', webinarZoomLink);
+        payload.append('whatsappGroupLink', webinarWhatsappLink);
         payload.append('status', webinarStatus);
         
         if (webinarCover) payload.append('coverImage', webinarCover);
@@ -1665,6 +1669,10 @@ const AdminDashboard = ({ user, onLogout }) => {
                       <div className="flex flex-col gap-1">
                         <label className="font-bold text-charcoal-light uppercase text-[10px]">Zoom Meeting Link</label>
                         <input type="url" required value={webinarZoomLink} onChange={(e) => setWebinarZoomLink(e.target.value)} className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none" />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="font-bold text-charcoal-light uppercase text-[10px]">WhatsApp Group Link (Optional)</label>
+                        <input type="url" placeholder="https://chat.whatsapp.com/..." value={webinarWhatsappLink} onChange={(e) => setWebinarWhatsappLink(e.target.value)} className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none font-mono" />
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div className="flex flex-col gap-1">
