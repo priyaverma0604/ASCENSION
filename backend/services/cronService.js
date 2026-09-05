@@ -5,10 +5,35 @@ const Workshop = require('../models/Workshop');
 const WorkshopRegistration = require('../models/WorkshopRegistration');
 const sendEmail = require('../utils/sendEmail');
 
+// Helper to accurately calculate the exact start Date/Time of a webinar
+const getWebinarExactStartTime = (webinar) => {
+  const d = new Date(webinar.date);
+  if (webinar.time) {
+    const match = webinar.time.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+    if (match) {
+      let hours = parseInt(match[1], 10);
+      const minutes = parseInt(match[2], 10);
+      const meridiem = match[3].toUpperCase();
+      if (meridiem === 'PM' && hours < 12) hours += 12;
+      if (meridiem === 'AM' && hours === 12) hours = 0;
+
+      // Extract Year, Month, Day from webinar.date in UTC/Local
+      const year = d.getFullYear();
+      const month = d.getMonth();
+      const day = d.getDate();
+
+      // IST is UTC + 5h 30m -> UTC is IST minus 5h 30m
+      const utcMs = Date.UTC(year, month, day, hours - 5, minutes - 30);
+      return new Date(utcMs);
+    }
+  }
+  return d;
+};
+
 const startWebinarReminderCron = () => {
-  // Run every day at 9:00 AM: '0 9 * * *'
+  // 1. Run every day at 9:00 AM: '0 9 * * *' (1-Day Before Reminder)
   cron.schedule('0 9 * * *', async () => {
-    console.log('Cron Service: Checking tomorrow\'s webinars and workshops for reminders...');
+    console.log('Cron Service: Checking tomorrow\'s webinars and workshops for 24h reminders...');
     try {
       const today = new Date();
       
@@ -23,54 +48,50 @@ const startWebinarReminderCron = () => {
 
       // 1. Process Webinars
       const webinarsTomorrow = await Webinar.find({
-        date: {
-          $gte: tomorrowStart,
-          $lte: tomorrowEnd
-        },
         status: 'Upcoming'
       });
 
-      console.log(`Cron Service: Found ${webinarsTomorrow.length} webinars scheduled for tomorrow.`);
-
       for (const webinar of webinarsTomorrow) {
-        // Find paid registrations for this webinar
-        const paidRegistrations = await WebinarRegistration.find({
-          webinar: webinar._id,
-          paymentStatus: 'Paid'
-        });
+        const exactStart = getWebinarExactStartTime(webinar);
+        if (exactStart >= tomorrowStart && exactStart <= tomorrowEnd) {
+          const paidRegistrations = await WebinarRegistration.find({
+            webinar: webinar._id,
+            paymentStatus: 'Paid'
+          });
 
-        console.log(`Cron Service: Sending reminders to ${paidRegistrations.length} paid registrations for webinar "${webinar.title}"`);
+          console.log(`Cron Service: Sending 24h reminders to ${paidRegistrations.length} paid registrations for webinar "${webinar.title}"`);
 
-        const formattedDate = new Date(webinar.date).toLocaleDateString(undefined, {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        });
+          const formattedDate = exactStart.toLocaleDateString(undefined, {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          });
 
-        for (const reg of paidRegistrations) {
-          const emailOptions = {
-            to: reg.email,
-            subject: 'Reminder: Your Webinar Starts Tomorrow',
-            text: `Hello ${reg.name},\n\nThis is a reminder that your webinar is tomorrow.\n\nWebinar Details:\n- Webinar Name: ${webinar.title}\n- Date: ${formattedDate}\n- Time: ${webinar.time}\n- Speaker: ${webinar.speakerName}\n\nYour Zoom Meeting Link will automatically be sent to you 1 hour before the webinar starts.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
-            html: `<p>Hello <strong>${reg.name}</strong>,</p>
-                   <p>This is a reminder that your webinar is tomorrow.</p>
-                   <h4>Webinar Details:</h4>
-                   <ul>
-                     <li><strong>Webinar Name:</strong> ${webinar.title}</li>
-                     <li><strong>Date:</strong> ${formattedDate}</li>
-                     <li><strong>Time:</strong> ${webinar.time}</li>
-                     <li><strong>Speaker:</strong> ${webinar.speakerName}</li>
-                   </ul>
-                   <p>Your Zoom Meeting Link will automatically be sent to you 1 hour before the webinar starts.</p>
-                   <p>Please join 10 minutes early.</p>
-                   <p>Regards,<br/><strong>Ascension by Sonali Bhasin Kumar</strong></p>`
-          };
+          for (const reg of paidRegistrations) {
+            const emailOptions = {
+              to: reg.email,
+              subject: 'Reminder: Your Webinar Starts Tomorrow',
+              text: `Hello ${reg.name},\n\nThis is a reminder that your webinar is tomorrow.\n\nWebinar Details:\n- Webinar Name: ${webinar.title}\n- Date: ${formattedDate}\n- Time: ${webinar.time}\n- Speaker: ${webinar.speakerName}\n\nYour Zoom Meeting Link will automatically be sent to you 1 hour before the webinar starts.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
+              html: `<p>Hello <strong>${reg.name}</strong>,</p>
+                     <p>This is a reminder that your webinar is tomorrow.</p>
+                     <h4>Webinar Details:</h4>
+                     <ul>
+                       <li><strong>Webinar Name:</strong> ${webinar.title}</li>
+                       <li><strong>Date:</strong> ${formattedDate}</li>
+                       <li><strong>Time:</strong> ${webinar.time}</li>
+                       <li><strong>Speaker:</strong> ${webinar.speakerName}</li>
+                     </ul>
+                     <p>Your Zoom Meeting Link will automatically be sent to you 1 hour before the webinar starts.</p>
+                     <p>Please join 10 minutes early.</p>
+                     <p>Regards,<br/><strong>Ascension by Sonali Bhasin Kumar</strong></p>`
+            };
 
-          try {
-            await sendEmail(emailOptions);
-          } catch (err) {
-            console.error(`Cron Service: Failed to send reminder email to ${reg.email}:`, err.message);
+            try {
+              await sendEmail(emailOptions);
+            } catch (err) {
+              console.error(`Cron Service: Failed to send reminder email to ${reg.email}:`, err.message);
+            }
           }
         }
       }
@@ -83,16 +104,11 @@ const startWebinarReminderCron = () => {
         }
       });
 
-      console.log(`Cron Service: Found ${workshopsTomorrow.length} workshops scheduled for tomorrow.`);
-
       for (const workshop of workshopsTomorrow) {
-        // Find paid registrations for this workshop
         const paidRegistrations = await WorkshopRegistration.find({
           workshop: workshop._id,
           paymentStatus: 'Paid'
         });
-
-        console.log(`Cron Service: Sending reminders to ${paidRegistrations.length} paid registrations for workshop "${workshop.title}"`);
 
         const formattedDate = new Date(workshop.date).toLocaleDateString(undefined, {
           weekday: 'long',
@@ -102,7 +118,7 @@ const startWebinarReminderCron = () => {
         });
 
         for (const reg of paidRegistrations) {
-          if (!workshop.zoomLink) continue; // Skip if no zoom link is set
+          if (!workshop.zoomLink) continue;
           
           const emailOptions = {
             to: reg.email,
@@ -136,70 +152,65 @@ const startWebinarReminderCron = () => {
 
   // 2. Process 1-hour before webinar Zoom Link dispatcher (runs every 5 minutes)
   cron.schedule('*/5 * * * *', async () => {
-    console.log('Cron Service: Checking for upcoming webinars starting within the next hour for Zoom Link delivery...');
     try {
       const now = new Date();
-      const oneHourAndFiveMinutesFromNow = new Date(now.getTime() + 65 * 60 * 1000);
-      const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000);
+      const allUpcomingWebinars = await Webinar.find({ status: 'Upcoming' });
 
-      // Find upcoming webinars starting in the 1-hour window
-      const webinars = await Webinar.find({
-        date: {
-          $gte: fifteenMinutesAgo,
-          $lte: oneHourAndFiveMinutesFromNow
-        },
-        status: 'Upcoming'
-      });
+      for (const webinar of allUpcomingWebinars) {
+        const exactStartTime = getWebinarExactStartTime(webinar);
+        const timeDiffMs = exactStartTime.getTime() - now.getTime();
+        const minutesDiff = timeDiffMs / (1000 * 60);
 
-      if (webinars.length > 0) {
-        console.log(`Cron Service: Found ${webinars.length} webinars starting soon.`);
-      }
+        // If webinar starts in between -15 minutes (just started) and +65 minutes (starts in an hour)
+        if (minutesDiff <= 65 && minutesDiff >= -15) {
+          const registrations = await WebinarRegistration.find({
+            webinar: webinar._id,
+            paymentStatus: 'Paid',
+            zoomLinkSent: { $ne: true }
+          });
 
-      for (const webinar of webinars) {
-        // Find paid registrations for this webinar that haven't received the zoom link yet
-        const registrations = await WebinarRegistration.find({
-          webinar: webinar._id,
-          paymentStatus: 'Paid',
-          zoomLinkSent: { $ne: true }
-        });
+          if (registrations.length > 0) {
+            console.log(`Cron Service: Delivering Zoom links to ${registrations.length} paid attendees for "${webinar.title}" (Starts in ${Math.round(minutesDiff)} mins)`);
+          }
 
-        if (registrations.length > 0) {
-          console.log(`Cron Service: Sending Zoom link to ${registrations.length} registrations for webinar "${webinar.title}"`);
-        }
+          const formattedDate = exactStartTime.toLocaleDateString(undefined, {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          });
 
-        const formattedDate = new Date(webinar.date).toLocaleDateString(undefined, {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        });
+          for (const reg of registrations) {
+            const meetingInfoText = `${webinar.meetingId ? `\n- Meeting ID: ${webinar.meetingId}` : ''}${webinar.passcode ? `\n- Passcode: ${webinar.passcode}` : ''}${webinar.meetingChatLink ? `\n- Meeting Chat Link: ${webinar.meetingChatLink}` : ''}`;
+            const meetingInfoHtml = `${webinar.meetingId ? `<li><strong>Meeting ID:</strong> ${webinar.meetingId}</li>` : ''}${webinar.passcode ? `<li><strong>Passcode:</strong> ${webinar.passcode}</li>` : ''}${webinar.meetingChatLink ? `<li><strong>Meeting Chat:</strong> <a href="${webinar.meetingChatLink}">Chat Link</a></li>` : ''}`;
 
-        for (const reg of registrations) {
-          const emailOptions = {
-            to: reg.email,
-            subject: 'Webinar Alert: Your Zoom Link is Here!',
-            text: `Hello ${reg.name},\n\nYour registered webinar "${webinar.title}" starts in less than an hour.\n\nWebinar Details:\n- Webinar Name: ${webinar.title}\n- Date: ${formattedDate}\n- Time: ${webinar.time}\n- Speaker: ${webinar.speakerName}\n\nZoom Meeting Link:\n${webinar.zoomLink}\n\nPlease join 10 minutes early.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
-            html: `<p>Hello <strong>${reg.name}</strong>,</p>
-                   <p>Your registered webinar "<strong>${webinar.title}</strong>" starts in less than an hour.</p>
-                   <h4>Webinar Details:</h4>
-                   <ul>
-                     <li><strong>Webinar Name:</strong> ${webinar.title}</li>
-                     <li><strong>Date:</strong> ${formattedDate}</li>
-                     <li><strong>Time:</strong> ${webinar.time}</li>
-                     <li><strong>Speaker:</strong> ${webinar.speakerName}</li>
-                   </ul>
-                   <p><strong>Zoom Meeting Link:</strong> <a href="${webinar.zoomLink}">${webinar.zoomLink}</a></p>
-                   <p>Please join 10 minutes early.</p>
-                   <p>Regards,<br/><strong>Ascension by Sonali Bhasin Kumar</strong></p>`
-          };
+            const emailOptions = {
+              to: reg.email,
+              subject: `Webinar Alert: Your Zoom Link for "${webinar.title}"`,
+              text: `Hello ${reg.name},\n\nYour registered webinar "${webinar.title}" starts in less than an hour.\n\nWebinar Details:\n- Webinar Name: ${webinar.title}\n- Date: ${formattedDate}\n- Time: ${webinar.time}\n- Speaker: ${webinar.speakerName}\n\nZoom Meeting Link:\n${webinar.zoomLink}${meetingInfoText}\n\nPlease join 10 minutes early.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
+              html: `<p>Hello <strong>${reg.name}</strong>,</p>
+                     <p>Your registered webinar "<strong>${webinar.title}</strong>" starts in less than an hour.</p>
+                     <h4>Webinar Details:</h4>
+                     <ul>
+                       <li><strong>Webinar Name:</strong> ${webinar.title}</li>
+                       <li><strong>Date:</strong> ${formattedDate}</li>
+                       <li><strong>Time:</strong> ${webinar.time}</li>
+                       <li><strong>Speaker:</strong> ${webinar.speakerName}</li>
+                       ${meetingInfoHtml}
+                     </ul>
+                     <p><strong>Zoom Meeting Link:</strong> <a href="${webinar.zoomLink}">${webinar.zoomLink}</a></p>
+                     <p>Please join 10 minutes early.</p>
+                     <p>Regards,<br/><strong>Ascension by Sonali Bhasin Kumar</strong></p>`
+            };
 
-          try {
-            await sendEmail(emailOptions);
-            reg.zoomLinkSent = true;
-            await reg.save();
-            console.log(`Cron Service: Successfully sent Zoom link to ${reg.email} for webinar "${webinar.title}"`);
-          } catch (err) {
-            console.error(`Cron Service: Failed to send Zoom link email to ${reg.email}:`, err.message);
+            try {
+              await sendEmail(emailOptions);
+              reg.zoomLinkSent = true;
+              await reg.save();
+              console.log(`Cron Service: Successfully delivered Zoom link email to ${reg.email} for webinar "${webinar.title}"`);
+            } catch (err) {
+              console.error(`Cron Service: Failed to send Zoom link email to ${reg.email}:`, err.message);
+            }
           }
         }
       }

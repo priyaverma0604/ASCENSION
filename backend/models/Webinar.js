@@ -55,6 +55,26 @@ const webinarSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please add the Zoom Meeting Link']
   },
+  meetingId: {
+    type: String,
+    default: ''
+  },
+  passcode: {
+    type: String,
+    default: ''
+  },
+  meetingChatLink: {
+    type: String,
+    default: ''
+  },
+  oneTapMobile: {
+    type: String,
+    default: ''
+  },
+  joinBySip: {
+    type: String,
+    default: ''
+  },
   maxSeats: {
     type: Number,
     required: [true, 'Please specify the maximum capacity']

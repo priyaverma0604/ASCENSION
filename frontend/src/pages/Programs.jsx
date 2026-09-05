@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Compass, Calendar, CheckCircle, ArrowRight, UserCheck } from 'lucide-react';
+import { Calendar, ArrowRight, UserCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
@@ -77,10 +77,12 @@ const Programs = () => {
                 program.enrolledUsers.some(eu => eu === user._id || (eu && eu._id === user._id))
               );
 
+              const isAncestral = program.title && program.title.toLowerCase().includes('ancestral');
+
               return (
                 <div 
                   key={program._id}
-                  className="glass rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 grid grid-cols-1 md:grid-cols-2 border border-cream-dark/50 md:h-[340px]"
+                  className="glass rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 grid grid-cols-1 md:grid-cols-2 border border-cream-dark/50 md:min-h-[350px]"
                 >
                   {/* Video Embed or Static Image */}
                   <div className="h-72 md:h-full bg-cream min-h-[300px] relative overflow-hidden">
@@ -102,15 +104,25 @@ const Programs = () => {
                   </div>
 
                   {/* Details */}
-                  <div className="p-8 flex flex-col justify-between text-left gap-6">
-                    <div className="flex flex-col gap-3 min-h-0 overflow-hidden">
-                      <div className="flex items-center gap-4">
-                        <span className="bg-sage/10 text-sage font-bold py-1 px-3.5 rounded-full text-[10px] uppercase tracking-wider">
-                          {program.duration}
+                  <div className="p-8 flex flex-col justify-between text-left gap-5">
+                    <div className="flex flex-col gap-3 min-h-0">
+                      <div className="flex items-center gap-2.5 flex-wrap">
+                        <span className="bg-sage/10 text-sage font-bold py-1 px-3 rounded-full text-[10px] uppercase tracking-wider">
+                          {isAncestral ? '10 Sessions' : (program.duration || '10 Sessions')}
                         </span>
-                        <span className="text-[10px] text-charcoal-light flex items-center gap-1">
-                          <UserCheck className="w-4 h-4 text-sage shrink-0" />
-                          <span>{program.enrolledUsers?.length || 0} / {program.enrollmentCapacity} enrolled</span>
+                        {(program.startDate || isAncestral) && (
+                          <span className="bg-gold/15 text-gold-dark font-bold py-1 px-3 rounded-full text-[10px] tracking-wider flex items-center gap-1 border border-gold/30">
+                            <Calendar className="w-3.5 h-3.5 text-gold-dark" />
+                            <span>Starts {program.startDate || '24 September'}</span>
+                          </span>
+                        )}
+                        <span className="text-[10px] text-charcoal-light flex items-center gap-1 font-medium bg-cream/70 py-1 px-2.5 rounded-full border border-cream-dark/40">
+                          <UserCheck className="w-3.5 h-3.5 text-sage shrink-0" />
+                          <span>
+                            {program.enrolledCount !== undefined && program.enrolledCount > 0 
+                              ? program.enrolledCount 
+                              : (isAncestral ? 10 : (program.enrolledUsers?.length || 0))} / {program.enrollmentCapacity} enrolled
+                          </span>
                         </span>
                       </div>
 
@@ -118,26 +130,29 @@ const Programs = () => {
                         {program.title}
                       </h3>
                       
-                      <p className="text-xs text-charcoal-light leading-relaxed line-clamp-4">
+                      <p className="text-xs text-charcoal-light leading-relaxed line-clamp-3">
                         {program.description}
                       </p>
                     </div>
 
                     {/* Enrollment CTA */}
-                    <div className="border-t border-cream-dark/65 pt-6 flex justify-between items-center font-sans mt-4">
+                    <div className="border-t border-cream-dark/65 pt-5 flex justify-between items-center font-sans mt-2">
                       <div className="flex flex-col text-left">
-                        <span className="text-[10px] text-charcoal-light uppercase tracking-wider mb-1">Program Investment</span>
-                        <div className="flex items-center gap-2 mt-1 flex-wrap">
-                          <span className="font-serif font-bold text-xl text-gold-dark leading-none">
+                        <span className="text-[10px] text-charcoal-light uppercase tracking-wider mb-1 font-semibold">Program Investment</span>
+                        <div className="flex items-baseline gap-2.5 mt-0.5 flex-wrap">
+                          <span className="font-serif font-bold text-2xl md:text-3xl text-gold-dark leading-none">
                             ₹{new Intl.NumberFormat('en-IN').format(program.sellingPrice !== undefined ? program.sellingPrice : program.pricing)}
                           </span>
                           {program.originalPrice !== undefined && program.originalPrice > (program.sellingPrice !== undefined ? program.sellingPrice : program.pricing) && (
                             <>
-                              <span className="line-through text-charcoal-light/70 text-sm font-medium leading-none select-none">
+                              <span className="relative inline-block font-serif font-bold text-lg md:text-xl text-rose-500 leading-none select-none tracking-tight px-1">
                                 ₹{new Intl.NumberFormat('en-IN').format(program.originalPrice)}
+                                <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                  <span className="w-full h-[2px] bg-rose-500/90 transform -rotate-12 rounded-full"></span>
+                                </span>
                               </span>
-                              <span className="text-red-500 font-sans font-bold text-[11px] leading-none shrink-0">
-                                (₹{new Intl.NumberFormat('en-IN').format(program.originalPrice - (program.sellingPrice !== undefined ? program.sellingPrice : program.pricing))} OFF)
+                              <span className="text-emerald-700 bg-emerald-100/90 border border-emerald-300 font-sans font-extrabold text-xs px-2.5 py-1 rounded-lg leading-none shrink-0 tracking-wide uppercase shadow-xs">
+                                {Math.round(((program.originalPrice - (program.sellingPrice !== undefined ? program.sellingPrice : program.pricing)) / program.originalPrice) * 100)}% OFF
                               </span>
                             </>
                           )}
@@ -191,3 +206,4 @@ const Programs = () => {
 };
 
 export default Programs;
+

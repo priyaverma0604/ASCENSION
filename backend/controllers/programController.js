@@ -53,7 +53,7 @@ exports.getProgramById = async (req, res, next) => {
 // @access  Private/Admin
 exports.createProgram = async (req, res, next) => {
   try {
-    const { title, description, duration, pricing, enrollmentCapacity, youtubeUrl, originalPrice, sellingPrice, zoomLink } = req.body;
+    const { title, description, duration, startDate, enrolledCount, sessions, pricing, enrollmentCapacity, youtubeUrl, originalPrice, sellingPrice, zoomLink } = req.body;
 
     const finalSellingPrice = sellingPrice !== undefined ? Number(sellingPrice) : (pricing !== undefined ? Number(pricing) : 0);
     const finalOriginalPrice = originalPrice !== undefined ? Number(originalPrice) : finalSellingPrice;
@@ -72,6 +72,9 @@ exports.createProgram = async (req, res, next) => {
       title,
       description,
       duration,
+      startDate: startDate || '',
+      enrolledCount: enrolledCount !== undefined ? Number(enrolledCount) : 0,
+      sessions: sessions ? (typeof sessions === 'string' ? JSON.parse(sessions) : sessions) : [],
       pricing: finalSellingPrice,
       originalPrice: finalOriginalPrice,
       sellingPrice: finalSellingPrice,
@@ -97,11 +100,20 @@ exports.updateProgram = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Program not found' });
     }
 
-    const { title, description, duration, pricing, enrollmentCapacity, youtubeUrl, originalPrice, sellingPrice, zoomLink } = req.body;
+    const { title, description, duration, startDate, enrolledCount, sessions, pricing, enrollmentCapacity, youtubeUrl, originalPrice, sellingPrice, zoomLink } = req.body;
 
     program.title = title || program.title;
     program.description = description || program.description;
     program.duration = duration || program.duration;
+    if (startDate !== undefined) {
+      program.startDate = startDate;
+    }
+    if (enrolledCount !== undefined) {
+      program.enrolledCount = Number(enrolledCount);
+    }
+    if (sessions !== undefined) {
+      program.sessions = typeof sessions === 'string' ? JSON.parse(sessions) : sessions;
+    }
     
     if (sellingPrice !== undefined) {
       program.sellingPrice = Number(sellingPrice);

@@ -14,6 +14,22 @@ const programSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please specify program duration (e.g., 4 weeks or 3 sessions)']
   },
+  startDate: {
+    type: String,
+    default: ''
+  },
+  enrolledCount: {
+    type: Number,
+    default: 0
+  },
+  sessions: [
+    {
+      sessionNumber: { type: Number },
+      date: { type: String },
+      title: { type: String },
+      description: { type: String, default: '' }
+    }
+  ],
   pricing: {
     type: Number,
     required: [true, 'Please specify pricing in INR']

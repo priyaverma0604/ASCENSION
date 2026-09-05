@@ -67,7 +67,8 @@ exports.createWebinar = async (req, res, next) => {
   try {
     const { 
       title, shortDescription, detailedDescription, speakerName, 
-      date, time, duration, price, upiId, mobileNumber, zoomLink, maxSeats 
+      date, time, duration, price, upiId, mobileNumber, zoomLink, maxSeats,
+      meetingId, passcode, meetingChatLink, oneTapMobile, joinBySip
     } = req.body;
 
     const coverImage = getSingleImagePath(req, 'coverImage');
@@ -87,6 +88,11 @@ exports.createWebinar = async (req, res, next) => {
       upiId: upiId || 'sonalibhasinkumar@ptaxis',
       mobileNumber,
       zoomLink,
+      meetingId: meetingId || '',
+      passcode: passcode || '',
+      meetingChatLink: meetingChatLink || '',
+      oneTapMobile: oneTapMobile || '',
+      joinBySip: joinBySip || '',
       maxSeats: Number(maxSeats) || 100
     });
 
@@ -108,7 +114,8 @@ exports.updateWebinar = async (req, res, next) => {
 
     const { 
       title, shortDescription, detailedDescription, speakerName, 
-      date, time, duration, price, upiId, mobileNumber, zoomLink, maxSeats, status 
+      date, time, duration, price, upiId, mobileNumber, zoomLink, maxSeats, status,
+      meetingId, passcode, meetingChatLink, oneTapMobile, joinBySip
     } = req.body;
 
     webinar.title = title || webinar.title;
@@ -122,6 +129,11 @@ exports.updateWebinar = async (req, res, next) => {
     webinar.upiId = upiId || webinar.upiId;
     webinar.mobileNumber = mobileNumber || webinar.mobileNumber;
     webinar.zoomLink = zoomLink || webinar.zoomLink;
+    if (meetingId !== undefined) webinar.meetingId = meetingId;
+    if (passcode !== undefined) webinar.passcode = passcode;
+    if (meetingChatLink !== undefined) webinar.meetingChatLink = meetingChatLink;
+    if (oneTapMobile !== undefined) webinar.oneTapMobile = oneTapMobile;
+    if (joinBySip !== undefined) webinar.joinBySip = joinBySip;
     webinar.maxSeats = maxSeats !== undefined ? Number(maxSeats) : webinar.maxSeats;
     webinar.status = status || webinar.status;
 
@@ -132,7 +144,7 @@ exports.updateWebinar = async (req, res, next) => {
     if (newQr) webinar.upiQrCodeImage = newQr;
 
     const updatedWebinar = await webinar.save();
-    res.json({ success: true, data: updatedProduct = updatedWebinar });
+    res.json({ success: true, data: updatedWebinar });
   } catch (error) {
     next(error);
   }
@@ -282,10 +294,13 @@ exports.approveRegistration = async (req, res, next) => {
 
     if (hoursDiff <= 1.08 && hoursDiff >= -0.5) {
       console.log(`Webinar is in less than 1 hour (${hoursDiff.toFixed(2)}h). Sending Zoom link immediately.`);
+      const meetingInfoText = `${registration.webinar.meetingId ? `\n- Meeting ID: ${registration.webinar.meetingId}` : ''}${registration.webinar.passcode ? `\n- Passcode: ${registration.webinar.passcode}` : ''}${registration.webinar.meetingChatLink ? `\n- Meeting Chat Link: ${registration.webinar.meetingChatLink}` : ''}`;
+      const meetingInfoHtml = `${registration.webinar.meetingId ? `<li><strong>Meeting ID:</strong> ${registration.webinar.meetingId}</li>` : ''}${registration.webinar.passcode ? `<li><strong>Passcode:</strong> ${registration.webinar.passcode}</li>` : ''}${registration.webinar.meetingChatLink ? `<li><strong>Meeting Chat:</strong> <a href="${registration.webinar.meetingChatLink}">Chat Link</a></li>` : ''}`;
+
       const reminderEmailOptions = {
         to: registration.email,
         subject: 'Your Webinar Zoom Link - Starts Soon',
-        text: `Hello ${registration.name},\n\nYour registered webinar starts soon.\n\nWebinar Details:\n- Webinar Name: ${registration.webinar.title}\n- Date: ${formattedDate}\n- Time: ${registration.webinar.time}\n- Speaker: ${registration.webinar.speakerName}\n\nZoom Meeting Link:\n${registration.webinar.zoomLink}\n\nPlease join 10 minutes early.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
+        text: `Hello ${registration.name},\n\nYour registered webinar starts soon.\n\nWebinar Details:\n- Webinar Name: ${registration.webinar.title}\n- Date: ${formattedDate}\n- Time: ${registration.webinar.time}\n- Speaker: ${registration.webinar.speakerName}\n\nZoom Meeting Link:\n${registration.webinar.zoomLink}${meetingInfoText}\n\nPlease join 10 minutes early.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
         html: `<p>Hello <strong>${registration.name}</strong>,</p>
                <p>Your registered webinar starts soon.</p>
                <h4>Webinar Details:</h4>
@@ -294,6 +309,7 @@ exports.approveRegistration = async (req, res, next) => {
                  <li><strong>Date:</strong> ${formattedDate}</li>
                  <li><strong>Time:</strong> ${registration.webinar.time}</li>
                  <li><strong>Speaker:</strong> ${registration.webinar.speakerName}</li>
+                 ${meetingInfoHtml}
                </ul>
                <p><strong>Zoom Meeting Link:</strong> <a href="${registration.webinar.zoomLink}">${registration.webinar.zoomLink}</a></p>
                <p>Please join 10 minutes early.</p>

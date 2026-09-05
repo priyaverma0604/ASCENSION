@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import ScrollToTop from './components/ScrollToTop';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import waterfallBg from './assets/waterfall_bg.jpg';
@@ -36,6 +37,7 @@ function App() {
       <CartProvider>
         <WishlistProvider>
           <Router>
+            <ScrollToTop />
             <div className="flex flex-col min-h-screen bg-[#FFFDF7] text-charcoal relative">
               {/* Global Subtle Waterfall Watermark Background */}
               <div 

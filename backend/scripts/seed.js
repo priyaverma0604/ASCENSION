@@ -152,11 +152,25 @@ const programsData = [
   {
     title: "Ancestral Healing Workshop",
     description: "Ancestral Healing, or healing our intergenerational trauma is the belief that we are not merely the blood and bones of parents and our cultures, but that we carry our memories, traumas, pain as well gifts from our ancestors through Family Karma. Popular Culture tells us that we’re independent beings, set free in all ways, but in reality, we all face challenges in our lives as a consequence of Ancestral Blocks and Family Karma. It is, however, possible to get into a process to bring cleaning, healing, and empowerment through repair work with our ancestral lineages. In Ascension's most ambitious program thus far, Join Sonali in not only connecting you to your ancestors but in clearing Pitrudosh and other Ancestral Blocks to bring peace in your lives and for your ancestors.",
-    duration: "3 Sessions",
+    duration: "10 Sessions",
+    startDate: "24 September",
+    enrolledCount: 10,
     pricing: 15555,
     originalPrice: 29999,
     sellingPrice: 15555,
     enrollmentCapacity: 30,
+    sessions: [
+      { sessionNumber: 1, date: "24 September", title: "Introduction to Ancestral Healing", description: "Foundations of intergenerational trauma, understanding family karma, and initiating the connection to your ancestral lineage.", time: "9:00 PM - 11:00 PM IST" },
+      { sessionNumber: 2, date: "26 September", title: "Belief Work", description: "Identifying and transforming core subconscious belief systems passed down across generations.", time: "9:00 PM - 11:00 PM IST" },
+      { sessionNumber: 3, date: "30 September", title: "Shadow Work", description: "Uncovering and integrating the hidden, repressed ancestral shadow patterns and emotional imprints.", time: "9:00 PM - 11:00 PM IST" },
+      { sessionNumber: 4, date: "1 October", title: "Intuitive Method for AH", description: "Developing intuitive faculties, channel connection, and spiritual perception for deep ancestral healing.", time: "9:00 PM - 11:00 PM IST" },
+      { sessionNumber: 5, date: "5 October", title: "Healing Family Line", description: "Releasing generational burdens and harmonizing energies across the maternal and paternal bloodlines.", time: "9:00 PM - 11:00 PM IST" },
+      { sessionNumber: 6, date: "6 October", title: "Healing for Mother Ancestors", description: "Dedicated deep-dive healing for the maternal ancestral lineage, clearing womb trauma and sacred feminine wounds.", time: "9:00 PM - 11:00 PM IST" },
+      { sessionNumber: 7, date: "7 October", title: "Replacing Family Beliefs", description: "Installing empowering, high-vibrational soul affirmations and liberating ancestral belief structures.", time: "9:00 PM - 11:00 PM IST" },
+      { sessionNumber: 8, date: "8 October", title: "Healing for Family Tree", description: "Comprehensive clearing of Pitrudosh and harmonizing roots, branches, and future generations of your family tree.", time: "9:00 PM - 11:00 PM IST" },
+      { sessionNumber: 9, date: "10 October", title: "Celebrating Family Karma", description: "Honoring ancestral wisdom, anchoring divine blessings, gratitude integration, and celebrating ancestral peace.", time: "9:00 PM - 11:00 PM IST" },
+      { sessionNumber: 10, date: "Interactive Session", title: "Live Interactive Session with Sonali Ma'am", description: "Exclusive interactive communication with Sonali Ma'am for personal guidance, live Q&A, and energetic integration.", time: "9:00 PM - 11:00 PM IST", isBonus: true }
+    ],
     images: ["https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80"],
     youtubeUrl: "https://www.youtube.com/embed/jIs3IH-brtg",
     zoomLink: "https://zoom.us/j/1234567890"
