@@ -15,7 +15,7 @@ if (!uri) {
 const ancestralWebinarData = {
   title: "Ancestral Healing Webinar",
   shortDescription: "Join Sonali Bhasin Kumar for a powerful live introductory Ancestral Healing Webinar. Discover the foundations of healing family karma, clearing intergenerational trauma, and receiving sacred ancestral blessings.",
-  detailedDescription: `Ascension Meditations is inviting you to a scheduled Zoom meeting.
+  detailedDescription: `Ascension is inviting you to a scheduled Zoom meeting.
 
 Topic: Ancestral Healing Webinar 
 Time: Sep 23, 2026 07:00 PM Mumbai, Kolkata, New Delhi

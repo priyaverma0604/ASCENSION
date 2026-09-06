@@ -196,7 +196,7 @@ exports.forgotPassword = async (req, res, next) => {
       html: `
         <div style="font-family: 'Georgia', serif, Arial; max-width: 520px; margin: auto; padding: 28px; border: 1px solid #e0d8c3; border-radius: 16px; background-color: #FFFDF7; color: #2C2C2C;">
           <div style="text-align: center; margin-bottom: 20px;">
-            <h2 style="color: #4a5d4e; font-size: 22px; margin: 0; text-transform: uppercase; letter-spacing: 2px;">Ascension Meditations</h2>
+            <h2 style="color: #4a5d4e; font-size: 22px; margin: 0; text-transform: uppercase; letter-spacing: 2px;">Ascension</h2>
             <p style="color: #8C827A; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; margin-top: 4px;">Password Reset Request</p>
           </div>
           <p style="font-size: 14px; line-height: 1.6;">Hello <strong>${user.name || 'Friend'}</strong>,</p>
