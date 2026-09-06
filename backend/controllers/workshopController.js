@@ -1,6 +1,7 @@
 const Workshop = require('../models/Workshop');
 const WorkshopRegistration = require('../models/WorkshopRegistration');
 const sendEmail = require('../utils/sendEmail');
+const { getEventLinks, renderActionBlocksHtml, renderActionBlocksText } = require('../utils/emailTemplates');
 const { isCloudinaryConfigured } = require('../config/cloudinary');
 const { razorpayInstance, isRazorpayConfigured } = require('../config/razorpay');
 const crypto = require('crypto');
@@ -127,6 +128,19 @@ exports.registerForWorkshop = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Workshop capacity is full' });
     }
 
+    // Determine WhatsApp & Intro Video links
+    const { whatsappLink, introLink, introTitle } = getEventLinks(workshop);
+    const actionBlocksHtml = renderActionBlocksHtml({ whatsappLink, introLink, introTitle });
+    const actionBlocksText = renderActionBlocksText({ whatsappLink, introLink, introTitle });
+
+    // Format Date beautifully
+    const formattedDate = new Date(workshop.date).toLocaleDateString(undefined, {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
     // Free registration
     if (workshop.pricing === 0) {
       const registration = await WorkshopRegistration.create({
@@ -150,6 +164,31 @@ exports.registerForWorkshop = async (req, res, next) => {
         paymentId: 'free_registration'
       });
       await workshop.save();
+
+      // Send free confirmation email with WhatsApp & Intro links
+      const freeEmailOptions = {
+        to: email.toLowerCase(),
+        subject: `Your Workshop Registration is Confirmed: ${workshop.title}`,
+        text: `Hello ${name},\n\nThank you for registering.\n\nYour registration for "${workshop.title}" has been successfully confirmed.\n\nWorkshop Details:\n- Workshop Name: ${workshop.title}\n- Date: ${formattedDate}\n- Time: ${workshop.time}${actionBlocksText}\nThe Zoom Meeting Link will automatically be sent to you one day before the workshop.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
+        html: `<p>Hello <strong>${name}</strong>,</p>
+               <p>Thank you for registering.</p>
+               <p>Your registration for <strong>${workshop.title}</strong> has been successfully confirmed.</p>
+               <h4>Workshop Details</h4>
+               <ul>
+                 <li><strong>Workshop Name:</strong> ${workshop.title}</li>
+                 <li><strong>Date:</strong> ${formattedDate}</li>
+                 <li><strong>Time:</strong> ${workshop.time}</li>
+               </ul>
+               ${actionBlocksHtml}
+               <p>The Zoom Meeting Link will automatically be sent to you one day before the workshop.</p>
+               <p>Regards,<br/><strong>Ascension by Sonali Bhasin Kumar</strong></p>`
+      };
+
+      try {
+        await sendEmail(freeEmailOptions);
+      } catch (emailErr) {
+        console.error('Free workshop confirmation email sending failed:', emailErr.message);
+      }
 
       return res.status(201).json({ success: true, free: true, data: registration });
     }
@@ -182,6 +221,31 @@ exports.registerForWorkshop = async (req, res, next) => {
       transactionId: cleanedTxId,
       paymentStatus: 'Pending'
     });
+
+    // Send registration acknowledgment email with WhatsApp & Intro links
+    const regEmailOptions = {
+      to: email.toLowerCase(),
+      subject: `Registration Received: ${workshop.title}`,
+      text: `Hello ${name},\n\nThank you for registering for "${workshop.title}".\n\nYour registration and payment transaction reference ID (${cleanedTxId}) have been received and are currently under verification.\n\nWorkshop Details:\n- Workshop Name: ${workshop.title}\n- Date: ${formattedDate}\n- Time: ${workshop.time}${actionBlocksText}\nOnce approved, your Zoom Meeting Link will automatically be emailed to you one day before the workshop.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
+      html: `<p>Hello <strong>${name}</strong>,</p>
+             <p>Thank you for registering for <strong>${workshop.title}</strong>.</p>
+             <p>Your registration and payment transaction reference ID (<strong>${cleanedTxId}</strong>) have been received and are currently under verification.</p>
+             <h4>Workshop Details</h4>
+             <ul>
+               <li><strong>Workshop Name:</strong> ${workshop.title}</li>
+               <li><strong>Date:</strong> ${formattedDate}</li>
+               <li><strong>Time:</strong> ${workshop.time}</li>
+             </ul>
+             ${actionBlocksHtml}
+             <p>Once approved, your Zoom Meeting Link will automatically be sent to you one day before the workshop.</p>
+             <p>Regards,<br/><strong>Ascension by Sonali Bhasin Kumar</strong></p>`
+    };
+
+    try {
+      await sendEmail(regEmailOptions);
+    } catch (emailErr) {
+      console.error('Workshop registration submission email sending failed:', emailErr.message);
+    }
 
     res.status(201).json({ success: true, data: registration });
   } catch (error) {
@@ -243,6 +307,44 @@ exports.verifyWorkshopPayment = async (req, res, next) => {
     });
     await workshop.save();
 
+    // Format Date beautifully
+    const formattedDate = new Date(workshop.date).toLocaleDateString(undefined, {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    // Determine WhatsApp & Intro Video links
+    const { whatsappLink, introLink, introTitle } = getEventLinks(workshop);
+    const actionBlocksHtml = renderActionBlocksHtml({ whatsappLink, introLink, introTitle });
+    const actionBlocksText = renderActionBlocksText({ whatsappLink, introLink, introTitle });
+
+    // Send confirmation email
+    const emailOptions = {
+      to: user_details.email.toLowerCase(),
+      subject: `Your Workshop Registration is Confirmed: ${workshop.title}`,
+      text: `Hello ${user_details.name},\n\nThank you for registering.\n\nYour payment has been verified and your registration for "${workshop.title}" is confirmed!\n\nWorkshop Details:\n- Workshop Name: ${workshop.title}\n- Date: ${formattedDate}\n- Time: ${workshop.time}${actionBlocksText}\nThe Zoom Meeting Link will automatically be sent to you one day before the workshop.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
+      html: `<p>Hello <strong>${user_details.name}</strong>,</p>
+             <p>Thank you for registering.</p>
+             <p>Your payment has been verified and your registration for <strong>${workshop.title}</strong> is confirmed!</p>
+             <h4>Workshop Details</h4>
+             <ul>
+               <li><strong>Workshop Name:</strong> ${workshop.title}</li>
+               <li><strong>Date:</strong> ${formattedDate}</li>
+               <li><strong>Time:</strong> ${workshop.time}</li>
+             </ul>
+             ${actionBlocksHtml}
+             <p>The Zoom Meeting Link will automatically be sent to you one day before the workshop.</p>
+             <p>Regards,<br/><strong>Ascension by Sonali Bhasin Kumar</strong></p>`
+    };
+
+    try {
+      await sendEmail(emailOptions);
+    } catch (emailErr) {
+      console.error('Workshop payment confirmation email sending failed:', emailErr.message);
+    }
+
     res.json({
       success: true,
       message: 'Successfully registered for the workshop!',
@@ -259,7 +361,7 @@ exports.verifyWorkshopPayment = async (req, res, next) => {
 exports.getAllWorkshopRegistrations = async (req, res, next) => {
   try {
     const registrations = await WorkshopRegistration.find({})
-      .populate('workshop', 'title date time pricing capacity')
+      .populate('workshop', 'title date time pricing capacity zoomLink whatsappGroupLink introVideoUrl')
       .sort({ createdAt: -1 });
 
     res.json({ success: true, count: registrations.length, data: registrations });
@@ -305,11 +407,16 @@ exports.approveWorkshopRegistration = async (req, res, next) => {
       day: 'numeric'
     });
 
+    // Determine WhatsApp & Intro Video links
+    const { whatsappLink, introLink, introTitle } = getEventLinks(registration.workshop);
+    const actionBlocksHtml = renderActionBlocksHtml({ whatsappLink, introLink, introTitle });
+    const actionBlocksText = renderActionBlocksText({ whatsappLink, introLink, introTitle });
+
     // Send confirmation email
     const emailOptions = {
       to: registration.email,
-      subject: 'Your Workshop Registration is Confirmed',
-      text: `Hello ${registration.name},\n\nThank you for registering.\n\nYour registration has been successfully confirmed.\n\nWorkshop Details:\n- Workshop Name: ${registration.workshop.title}\n- Date: ${formattedDate}\n- Time: ${registration.workshop.time}\n\nThe Zoom Meeting Link will automatically be sent to you one day before the workshop.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
+      subject: `Your Workshop Registration is Confirmed: ${registration.workshop.title}`,
+      text: `Hello ${registration.name},\n\nThank you for registering.\n\nYour registration has been successfully confirmed.\n\nWorkshop Details:\n- Workshop Name: ${registration.workshop.title}\n- Date: ${formattedDate}\n- Time: ${registration.workshop.time}${actionBlocksText}\nThe Zoom Meeting Link will automatically be sent to you one day before the workshop.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
       html: `<p>Hello <strong>${registration.name}</strong>,</p>
              <p>Thank you for registering.</p>
              <p>Your registration has been successfully confirmed.</p>
@@ -319,6 +426,7 @@ exports.approveWorkshopRegistration = async (req, res, next) => {
                <li><strong>Date:</strong> ${formattedDate}</li>
                <li><strong>Time:</strong> ${registration.workshop.time}</li>
              </ul>
+             ${actionBlocksHtml}
              <p>The Zoom Meeting Link will automatically be sent to you one day before the workshop.</p>
              <p>Regards,<br/><strong>Ascension by Sonali Bhasin Kumar</strong></p>`
     };
@@ -339,8 +447,8 @@ exports.approveWorkshopRegistration = async (req, res, next) => {
       console.log(`Workshop is in less than 24 hours (${hoursDiff.toFixed(2)}h). Sending Zoom link immediately.`);
       const reminderEmailOptions = {
         to: registration.email,
-        subject: 'Your Workshop Zoom Link - Starts Soon',
-        text: `Hello ${registration.name},\n\nYour registered workshop starts soon.\n\nWorkshop Details:\n- Workshop Name: ${registration.workshop.title}\n- Date: ${formattedDate}\n- Time: ${registration.workshop.time}\n\nZoom Meeting Link:\n${registration.workshop.zoomLink}\n\nPlease join 10 minutes early.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
+        subject: `Your Workshop Zoom Link - Starts Soon: ${registration.workshop.title}`,
+        text: `Hello ${registration.name},\n\nYour registered workshop starts soon.\n\nWorkshop Details:\n- Workshop Name: ${registration.workshop.title}\n- Date: ${formattedDate}\n- Time: ${registration.workshop.time}\n\nZoom Meeting Link:\n${registration.workshop.zoomLink}${actionBlocksText}\nPlease join 10 minutes early.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
         html: `<p>Hello <strong>${registration.name}</strong>,</p>
                <p>Your registered workshop starts soon.</p>
                <h4>Workshop Details:</h4>
@@ -350,6 +458,7 @@ exports.approveWorkshopRegistration = async (req, res, next) => {
                  <li><strong>Time:</strong> ${registration.workshop.time}</li>
                </ul>
                <p><strong>Zoom Meeting Link:</strong> <a href="${registration.workshop.zoomLink}">${registration.workshop.zoomLink}</a></p>
+               ${actionBlocksHtml}
                <p>Please join 10 minutes early.</p>
                <p>Regards,<br/><strong>Ascension by Sonali Bhasin Kumar</strong></p>`
       };

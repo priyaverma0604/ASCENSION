@@ -31,6 +31,18 @@ const workshopSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  whatsappGroupLink: {
+    type: String,
+    default: ''
+  },
+  introVideoUrl: {
+    type: String,
+    default: ''
+  },
+  videoUrl: {
+    type: String,
+    default: ''
+  },
   registeredUsers: [
     {
       user: {

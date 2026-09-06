@@ -1,6 +1,7 @@
 const Webinar = require('../models/Webinar');
 const WebinarRegistration = require('../models/WebinarRegistration');
 const sendEmail = require('../utils/sendEmail');
+const { getEventLinks, renderActionBlocksHtml, renderActionBlocksText } = require('../utils/emailTemplates');
 const { isCloudinaryConfigured } = require('../config/cloudinary');
 
 // Helper to get image path
@@ -217,9 +218,48 @@ exports.registerForWebinar = async (req, res, next) => {
       email: email.toLowerCase(),
       phone,
       paymentScreenshot,
-      transactionId,
+      transactionId: cleanedTxId,
       paymentStatus: 'Pending'
     });
+
+    // Format Date beautifully for registration email
+    const formattedDate = new Date(webinar.date).toLocaleDateString(undefined, {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    // Determine WhatsApp & Intro Video links (with Ancestral defaults)
+    const { whatsappLink, introLink, introTitle } = getEventLinks(webinar);
+    const actionBlocksHtml = renderActionBlocksHtml({ whatsappLink, introLink, introTitle });
+    const actionBlocksText = renderActionBlocksText({ whatsappLink, introLink, introTitle });
+
+    // Send immediate registration acknowledgment email with WhatsApp & Intro video links
+    const regEmailOptions = {
+      to: email.toLowerCase(),
+      subject: `Registration Received: ${webinar.title}`,
+      text: `Hello ${name},\n\nThank you for registering for "${webinar.title}".\n\nYour registration and payment transaction reference ID (${cleanedTxId}) have been received and are currently under verification.\n\nWebinar Details:\n- Webinar Name: ${webinar.title}\n- Date: ${formattedDate}\n- Time: ${webinar.time}\n- Speaker: ${webinar.speakerName}${actionBlocksText}\nOnce approved, your confirmed Zoom Meeting Link will automatically be emailed to you 1 hour before the session starts.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
+      html: `<p>Hello <strong>${name}</strong>,</p>
+             <p>Thank you for registering for <strong>${webinar.title}</strong>.</p>
+             <p>Your registration and payment transaction reference ID (<strong>${cleanedTxId}</strong>) have been received and are currently under verification.</p>
+             <h4>Webinar Details</h4>
+             <ul>
+               <li><strong>Webinar Name:</strong> ${webinar.title}</li>
+               <li><strong>Date:</strong> ${formattedDate}</li>
+               <li><strong>Time:</strong> ${webinar.time}</li>
+               <li><strong>Speaker:</strong> ${webinar.speakerName}</li>
+             </ul>
+             ${actionBlocksHtml}
+             <p>Once approved, your confirmed Zoom Meeting Link will automatically be sent to you 1 hour before the webinar.</p>
+             <p>Regards,<br/><strong>Ascension by Sonali Bhasin Kumar</strong></p>`
+    };
+
+    try {
+      await sendEmail(regEmailOptions);
+    } catch (emailErr) {
+      console.error('Registration submission email sending failed:', emailErr.message);
+    }
 
     res.status(201).json({ success: true, data: registration });
   } catch (error) {
@@ -233,7 +273,7 @@ exports.registerForWebinar = async (req, res, next) => {
 exports.getAllRegistrations = async (req, res, next) => {
   try {
     const registrations = await WebinarRegistration.find({})
-      .populate('webinar', 'title date time speakerName price zoomLink')
+      .populate('webinar', 'title date time speakerName price zoomLink whatsappGroupLink introVideoUrl')
       .sort({ createdAt: -1 });
 
     res.json({ success: true, count: registrations.length, data: registrations });
@@ -263,24 +303,16 @@ exports.approveRegistration = async (req, res, next) => {
       day: 'numeric'
     });
 
-    // Determine WhatsApp Group Link (from webinar or default for Ancestral Healing)
-    const isAncestral = registration.webinar.title && registration.webinar.title.toLowerCase().includes('ancestral');
-    const whatsappLink = registration.webinar.whatsappGroupLink || (isAncestral ? 'https://chat.whatsapp.com/J4nXj2mznEfLCj2YZd1v16' : '');
-
-    const whatsappSectionText = whatsappLink ? `\n\nOfficial Webinar WhatsApp Group (Join for updates & notifications):\n${whatsappLink}\n` : '';
-    const whatsappSectionHtml = whatsappLink ? `
-      <div style="margin: 24px 0; padding: 18px; background-color: #f0fdf4; border: 1.5px solid #86efac; border-radius: 12px; text-align: center;">
-        <p style="color: #166534; margin: 0 0 6px 0; font-size: 15px; font-weight: bold;">📲 Join Our Official Webinar WhatsApp Group</p>
-        <p style="color: #15803d; font-size: 13px; margin: 0 0 14px 0; line-height: 1.4;">Stay updated with live meeting links, session preparation notes, and important announcements directly on WhatsApp.</p>
-        <a href="${whatsappLink}" target="_blank" style="background-color: #25D366; color: #ffffff; padding: 10px 22px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block; font-size: 13px; letter-spacing: 0.5px;">Join WhatsApp Group</a>
-      </div>
-    ` : '';
+    // Determine WhatsApp & Intro Video links (from webinar or Ancestral defaults)
+    const { whatsappLink, introLink, introTitle } = getEventLinks(registration.webinar);
+    const actionBlocksHtml = renderActionBlocksHtml({ whatsappLink, introLink, introTitle });
+    const actionBlocksText = renderActionBlocksText({ whatsappLink, introLink, introTitle });
 
     // Send confirmation email
     const emailOptions = {
       to: registration.email,
       subject: `Your Webinar Registration is Confirmed: ${registration.webinar.title}`,
-      text: `Hello ${registration.name},\n\nThank you for registering.\n\nYour registration has been successfully confirmed.\n\nWebinar Details:\n- Webinar Name: ${registration.webinar.title}\n- Date: ${formattedDate}\n- Time: ${registration.webinar.time}\n- Speaker: ${registration.webinar.speakerName}${whatsappSectionText}\nThe Zoom Meeting Link will automatically be sent to you 1 hour before the webinar.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
+      text: `Hello ${registration.name},\n\nThank you for registering.\n\nYour registration has been successfully confirmed.\n\nWebinar Details:\n- Webinar Name: ${registration.webinar.title}\n- Date: ${formattedDate}\n- Time: ${registration.webinar.time}\n- Speaker: ${registration.webinar.speakerName}${actionBlocksText}\nThe Zoom Meeting Link will automatically be sent to you 1 hour before the webinar.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
       html: `<p>Hello <strong>${registration.name}</strong>,</p>
              <p>Thank you for registering.</p>
              <p>Your registration has been successfully confirmed.</p>
@@ -291,7 +323,7 @@ exports.approveRegistration = async (req, res, next) => {
                <li><strong>Time:</strong> ${registration.webinar.time}</li>
                <li><strong>Speaker:</strong> ${registration.webinar.speakerName}</li>
              </ul>
-             ${whatsappSectionHtml}
+             ${actionBlocksHtml}
              <p>The Zoom Meeting Link will automatically be sent to you 1 hour before the webinar.</p>
              <p>Regards,<br/><strong>Ascension by Sonali Bhasin Kumar</strong></p>`
     };
@@ -316,7 +348,7 @@ exports.approveRegistration = async (req, res, next) => {
       const reminderEmailOptions = {
         to: registration.email,
         subject: `Your Webinar Zoom Link - Starts Soon: ${registration.webinar.title}`,
-        text: `Hello ${registration.name},\n\nYour registered webinar starts soon.\n\nWebinar Details:\n- Webinar Name: ${registration.webinar.title}\n- Date: ${formattedDate}\n- Time: ${registration.webinar.time}\n- Speaker: ${registration.webinar.speakerName}\n\nZoom Meeting Link:\n${registration.webinar.zoomLink}${meetingInfoText}${whatsappSectionText}\nPlease join 10 minutes early.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
+        text: `Hello ${registration.name},\n\nYour registered webinar starts soon.\n\nWebinar Details:\n- Webinar Name: ${registration.webinar.title}\n- Date: ${formattedDate}\n- Time: ${registration.webinar.time}\n- Speaker: ${registration.webinar.speakerName}\n\nZoom Meeting Link:\n${registration.webinar.zoomLink}${meetingInfoText}${actionBlocksText}\nPlease join 10 minutes early.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
         html: `<p>Hello <strong>${registration.name}</strong>,</p>
                <p>Your registered webinar starts soon.</p>
                <h4>Webinar Details:</h4>
@@ -328,7 +360,7 @@ exports.approveRegistration = async (req, res, next) => {
                  ${meetingInfoHtml}
                </ul>
                <p><strong>Zoom Meeting Link:</strong> <a href="${registration.webinar.zoomLink}">${registration.webinar.zoomLink}</a></p>
-               ${whatsappSectionHtml}
+               ${actionBlocksHtml}
                <p>Please join 10 minutes early.</p>
                <p>Regards,<br/><strong>Ascension by Sonali Bhasin Kumar</strong></p>`
       };
