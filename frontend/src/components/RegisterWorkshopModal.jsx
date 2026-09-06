@@ -1,5 +1,8 @@
 import React, { useState, useContext } from 'react';
-import { X, CheckCircle, Compass, AlertTriangle, UploadCloud, CreditCard, MessageCircle, Video, ExternalLink, Copy, Check } from 'lucide-react';
+import { 
+  X, CheckCircle, Compass, AlertTriangle, UploadCloud, CreditCard, MessageCircle, 
+  Video, ExternalLink, Copy, Check, Calendar, Clock, Sparkles, User, CheckCircle2 
+} from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
 
@@ -14,7 +17,7 @@ const getImageUrl = (path) => {
 
 const RegisterWorkshopModal = ({ workshop, onClose }) => {
   const { user } = useContext(AuthContext);
-  const [step, setStep] = useState(1); // 1: Info form, 2: Payment page, 3: Success page
+  const [step, setStep] = useState(1); // 1: Info form & details, 2: Payment page, 3: Success page
   const [name, setName] = useState(user ? user.name : '');
   const [email, setEmail] = useState(user ? user.email : '');
   const [phone, setPhone] = useState('');
@@ -25,6 +28,7 @@ const RegisterWorkshopModal = ({ workshop, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [copiedWhatsapp, setCopiedWhatsapp] = useState(false);
   const [copiedVideo, setCopiedVideo] = useState(false);
+  const [copiedUpi, setCopiedUpi] = useState(false);
 
   const handleInfoSubmit = (e) => {
     e.preventDefault();
@@ -109,106 +113,206 @@ const RegisterWorkshopModal = ({ workshop, onClose }) => {
   const isAncestral = (workshop.title && workshop.title.toLowerCase().includes('ancestral')) || (workshop.name && workshop.name.toLowerCase().includes('ancestral'));
   const whatsappLink = workshop.whatsappGroupLink || (isAncestral ? 'https://chat.whatsapp.com/J4nXj2mznEfLCj2YZd1v16' : '');
   const videoLink = isAncestral ? 'https://youtu.be/jIs3IH-brtg' : (workshop.introVideoUrl || workshop.videoUrl || '');
+  const fullDescription = workshop.description || workshop.shortDescription || (isAncestral ? "Join Sonali Bhasin Kumar for a powerful live introductory Ancestral Healing Webinar. Discover the foundations of healing family karma, clearing intergenerational trauma, and receiving sacred ancestral blessings." : "");
 
   return (
-    <div className="fixed inset-0 z-50 bg-charcoal/40 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="glass max-w-md w-full rounded-2xl shadow-xl overflow-hidden animate-slide-up max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 z-50 bg-charcoal/50 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+      <div className="glass max-w-lg sm:max-w-xl md:max-w-2xl w-full rounded-2xl sm:rounded-3xl shadow-2xl overflow-hidden animate-slide-up max-h-[92vh] flex flex-col border border-cream-dark/60 bg-white/95">
         
         {/* Header */}
-        <div className="flex justify-between items-center p-5 border-b border-cream-dark shrink-0">
-          <div>
-            <h3 className="font-serif text-base font-bold text-charcoal-dark uppercase tracking-wider">
-              Workshop Registration
-            </h3>
-            <p className="text-[10px] text-sage font-medium tracking-wide uppercase mt-0.5 max-w-[280px] truncate">
-              {workshop.title}
-            </p>
+        <div className="flex justify-between items-center p-4 sm:p-5 border-b border-cream-dark/50 bg-[#FCFBF7] shrink-0">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gold/15 border border-gold/30 flex items-center justify-center text-gold-dark shrink-0">
+              <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-gold-dark" />
+            </div>
+            <div>
+              <h3 className="font-serif text-sm sm:text-base font-bold text-charcoal-dark uppercase tracking-wider">
+                {step === 1 ? 'Workshop Details & Registration' : step === 2 ? 'Payment Verification' : 'Registration Confirmation'}
+              </h3>
+              <p className="text-[10px] sm:text-xs text-sage font-semibold tracking-wide truncate max-w-[220px] sm:max-w-md">
+                {workshop.title}
+              </p>
+            </div>
           </div>
-          <button onClick={onClose} className="p-1 text-charcoal hover:text-gold transition-colors focus:outline-none">
+          <button 
+            onClick={onClose} 
+            className="p-1.5 rounded-xl text-charcoal hover:text-gold hover:bg-cream/60 transition-colors focus:outline-none"
+            aria-label="Close modal"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Scrollable Content */}
-        <div className="overflow-y-auto p-6 flex-1">
+        <div className="overflow-y-auto p-4 sm:p-6 flex-1 flex flex-col gap-5">
           
           {step === 1 && (
-            /* Step 1: User Info Form */
-            <form onSubmit={handleInfoSubmit} className="flex flex-col gap-4 font-sans text-xs">
-              <div className="bg-cream p-3.5 rounded-xl border border-cream-dark flex justify-between items-center text-charcoal">
-                <span className="text-charcoal-light">Investment Fees</span>
-                <span className="font-serif font-bold text-sm text-gold-dark">
-                  ₹{workshop.pricing}
-                </span>
-              </div>
-
-              {/* Name */}
-              <div className="flex flex-col gap-1.5 text-left">
-                <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Full Name</label>
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                  placeholder="Enter full name"
-                  className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all"
-                />
-              </div>
-
-              {/* Email */}
-              <div className="flex flex-col gap-1.5 text-left">
-                <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Email Address</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  placeholder="Enter email address"
-                  className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all"
-                />
-              </div>
-
-              {/* Phone */}
-              <div className="flex flex-col gap-1.5 text-left">
-                <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">WhatsApp Phone Number</label>
-                <div className="flex gap-2">
-                  <select
-                    value={countryCode}
-                    onChange={(e) => setCountryCode(e.target.value)}
-                    className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-2 text-charcoal focus:outline-none focus:border-sage transition-all w-20 shrink-0"
-                  >
-                    <option value="+91">+91 (IN)</option>
-                    <option value="+1">+1 (US)</option>
-                    <option value="+44">+44 (UK)</option>
-                    <option value="+61">+61 (AU)</option>
-                    <option value="+971">+971 (AE)</option>
-                    <option value="+65">+65 (SG)</option>
-                  </select>
-                  <input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    required
-                    placeholder="10-digit number"
-                    className="flex-1 bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all"
+            /* Step 1: Full Workshop Details + User Info Form */
+            <div className="flex flex-col gap-5 font-sans">
+              
+              {/* Optional Cover Banner */}
+              {(workshop.coverImage || workshop.image) && (
+                <div className="relative h-44 sm:h-52 rounded-2xl overflow-hidden shadow-sm border border-cream-dark/60 shrink-0 bg-cream">
+                  <img
+                    src={getImageUrl(workshop.coverImage || workshop.image)}
+                    alt={workshop.title}
+                    className="w-full h-full object-cover"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-charcoal-dark/90 via-charcoal-dark/30 to-transparent flex flex-col justify-end p-4 text-white">
+                    <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-gold-light bg-charcoal/70 backdrop-blur-md px-2.5 py-0.5 rounded-full w-fit mb-1.5 border border-white/10">
+                      Live Workshop Gathering
+                    </span>
+                    <h4 className="font-serif text-base sm:text-lg font-bold leading-tight drop-shadow-xs">
+                      {workshop.title}
+                    </h4>
+                  </div>
+                </div>
+              )}
+
+              {/* Quick Info Grid Badges */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                <div className="bg-cream/50 border border-cream-dark/60 p-2.5 sm:p-3 rounded-xl flex flex-col text-left">
+                  <span className="text-[9px] font-bold text-charcoal-light uppercase tracking-wider flex items-center gap-1">
+                    <User className="w-3 h-3 text-gold-dark" />
+                    <span>Instructor</span>
+                  </span>
+                  <span className="text-xs font-semibold text-charcoal-dark mt-0.5 truncate">
+                    {workshop.instructor || workshop.speakerName || 'Sonali Bhasin Kumar'}
+                  </span>
+                </div>
+
+                <div className="bg-cream/50 border border-cream-dark/60 p-2.5 sm:p-3 rounded-xl flex flex-col text-left">
+                  <span className="text-[9px] font-bold text-charcoal-light uppercase tracking-wider flex items-center gap-1">
+                    <Calendar className="w-3 h-3 text-sage" />
+                    <span>Date</span>
+                  </span>
+                  <span className="text-xs font-semibold text-charcoal-dark mt-0.5">
+                    {formattedDate}
+                  </span>
+                </div>
+
+                <div className="bg-cream/50 border border-cream-dark/60 p-2.5 sm:p-3 rounded-xl flex flex-col text-left">
+                  <span className="text-[9px] font-bold text-charcoal-light uppercase tracking-wider flex items-center gap-1">
+                    <Clock className="w-3 h-3 text-gold-dark" />
+                    <span>Timing</span>
+                  </span>
+                  <span className="text-xs font-semibold text-charcoal-dark mt-0.5 truncate">
+                    {workshop.time || 'Live Session'}
+                  </span>
+                </div>
+
+                <div className="bg-cream/50 border border-cream-dark/60 p-2.5 sm:p-3 rounded-xl flex flex-col text-left">
+                  <span className="text-[9px] font-bold text-charcoal-light uppercase tracking-wider flex items-center gap-1">
+                    <Sparkles className="w-3 h-3 text-gold" />
+                    <span>Investment</span>
+                  </span>
+                  <span className="text-xs font-serif font-bold text-gold-dark mt-0.5">
+                    ₹{workshop.pricing || workshop.price}
+                  </span>
                 </div>
               </div>
 
-              {/* Date & Time Info Banner */}
-              <div className="bg-cream-light p-3 rounded-xl border border-cream-dark/50 flex flex-col gap-1 text-[11px] text-charcoal-light text-left mt-1">
-                <span className="font-bold text-charcoal-dark uppercase text-[9px]">Schedule</span>
-                <span>📅 {formattedDate}</span>
-                <span>⏰ {workshop.time}</span>
+              {/* Complete Full Description Section */}
+              <div className="bg-[#FFFDF7] border border-cream-dark/70 rounded-2xl p-4 sm:p-5 flex flex-col gap-3 text-left shadow-xs">
+                <div className="flex items-center gap-2 border-b border-cream-dark/50 pb-2">
+                  <Sparkles className="w-4 h-4 text-gold-dark shrink-0" />
+                  <h4 className="font-serif text-sm sm:text-base font-bold text-charcoal-dark">
+                    About This Workshop
+                  </h4>
+                </div>
+
+                {/* Full Description Text */}
+                <p className="text-xs sm:text-sm text-charcoal leading-relaxed font-sans font-normal">
+                  {fullDescription}
+                </p>
               </div>
 
-              <button
-                type="submit"
-                className="w-full bg-sage hover:bg-sage-dark text-white font-bold py-2.5 rounded-xl transition-all shadow-sm mt-2 uppercase tracking-wider text-[10px]"
-              >
-                Proceed to Payment
-              </button>
-            </form>
+              {/* User Info Form */}
+              <form onSubmit={handleInfoSubmit} className="flex flex-col gap-4 font-sans text-xs pt-2">
+                <div className="flex items-center justify-between border-b border-cream-dark/60 pb-2">
+                  <div className="flex flex-col text-left">
+                    <span className="font-serif font-bold text-sm text-charcoal-dark uppercase tracking-wider">
+                      Reserve Your Spot
+                    </span>
+                    <span className="text-[10px] text-charcoal-light">
+                      Fill out your details to proceed to secure manual UPI payment.
+                    </span>
+                  </div>
+                  <span className="font-serif font-bold text-gold-dark text-sm bg-gold/10 px-3 py-1 rounded-full border border-gold/25 shrink-0">
+                    ₹{workshop.pricing || workshop.price}
+                  </span>
+                </div>
+
+                {/* Name */}
+                <div className="flex flex-col gap-1.5 text-left">
+                  <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Full Name</label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    placeholder="Enter your full name"
+                    className="bg-cream-light border border-cream-dark/60 rounded-xl py-2.5 px-3.5 text-charcoal focus:outline-none focus:border-sage transition-all text-xs"
+                  />
+                </div>
+
+                {/* Email */}
+                <div className="flex flex-col gap-1.5 text-left">
+                  <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Email Address</label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    placeholder="Enter your email address"
+                    className="bg-cream-light border border-cream-dark/60 rounded-xl py-2.5 px-3.5 text-charcoal focus:outline-none focus:border-sage transition-all text-xs"
+                  />
+                </div>
+
+                {/* Phone */}
+                <div className="flex flex-col gap-1.5 text-left">
+                  <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">WhatsApp Phone Number</label>
+                  <div className="flex gap-2">
+                    <select
+                      value={countryCode}
+                      onChange={(e) => setCountryCode(e.target.value)}
+                      className="bg-cream-light border border-cream-dark/60 rounded-xl py-2.5 px-2 text-charcoal focus:outline-none focus:border-sage transition-all w-24 shrink-0 text-xs"
+                    >
+                      <option value="+91">+91 (IN)</option>
+                      <option value="+1">+1 (US)</option>
+                      <option value="+44">+44 (UK)</option>
+                      <option value="+61">+61 (AU)</option>
+                      <option value="+971">+971 (AE)</option>
+                      <option value="+65">+65 (SG)</option>
+                    </select>
+                    <input
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      required
+                      placeholder="10-digit mobile number"
+                      className="flex-1 bg-cream-light border border-cream-dark/60 rounded-xl py-2.5 px-3.5 text-charcoal focus:outline-none focus:border-sage transition-all text-xs"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex gap-3 mt-3 shrink-0">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="w-1/3 bg-cream hover:bg-cream-dark border border-cream-dark/50 text-charcoal font-bold py-3 rounded-xl transition-all text-center uppercase tracking-wider text-[10px]"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="w-2/3 bg-sage hover:bg-sage-dark text-white font-bold py-3 rounded-xl transition-all shadow-sm flex items-center justify-center uppercase tracking-wider text-[10px] gap-1.5"
+                  >
+                    <span>Proceed to Payment (₹{workshop.pricing || workshop.price})</span>
+                  </button>
+                </div>
+              </form>
+            </div>
           )}
 
           {step === 2 && (
@@ -232,11 +336,23 @@ const RegisterWorkshopModal = ({ workshop, onClose }) => {
                   />
                 </div>
                 
-                <div className="flex flex-col gap-1 text-[11px] text-charcoal-dark font-sans leading-relaxed border-t border-cream-dark/45 pt-3 w-full">
-                  <p className="flex justify-between border-b border-cream-dark/30 pb-1.5">
-                    <span className="text-charcoal-light font-medium">Payee UPI ID:</span>
-                    <strong className="select-all text-gold-dark">sonalibhasinkumar@ptaxis</strong>
-                  </p>
+                <div className="flex justify-between items-center bg-cream/70 p-2.5 px-3.5 rounded-xl border border-cream-dark/60 w-full text-xs">
+                  <div className="flex flex-col text-left">
+                    <span className="text-[9px] text-charcoal-light font-bold uppercase tracking-wider">Payee UPI ID</span>
+                    <strong className="select-all text-gold-dark font-mono text-xs mt-0.5">sonalibhasinkumar@ptaxis</strong>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText('sonalibhasinkumar@ptaxis');
+                      setCopiedUpi(true);
+                      setTimeout(() => setCopiedUpi(false), 2000);
+                    }}
+                    className="bg-white hover:bg-cream border border-cream-dark text-charcoal-dark font-medium py-1.5 px-2.5 rounded-lg text-[10px] flex items-center gap-1 transition-all shadow-xs"
+                  >
+                    {copiedUpi ? <Check className="w-3 h-3 text-sage" /> : <Copy className="w-3 h-3 text-charcoal-light" />}
+                    <span>{copiedUpi ? 'Copied' : 'Copy UPI'}</span>
+                  </button>
                 </div>
                 <div className="bg-lavender-light/40 border border-lavender p-3 rounded-xl flex gap-2 text-left text-[10px]">
                   <AlertTriangle className="w-4.5 h-4.5 text-lavender-dark shrink-0 mt-0.5" />

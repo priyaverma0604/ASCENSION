@@ -206,7 +206,9 @@ const Home = ({ scrollToWebinar = false }) => {
         combined = [...combined, ...activeWorkshops];
       }
       if (resWebinars.data.success) {
-        const activeWebinars = resWebinars.data.data.filter(w => new Date(w.date) >= todayStart);
+        const activeWebinars = resWebinars.data.data
+          .filter(w => new Date(w.date) >= todayStart)
+          .map(w => ({ ...w, isWebinar: true }));
         combined = [...combined, ...activeWebinars];
       }
       combined.sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -978,7 +980,10 @@ const Home = ({ scrollToWebinar = false }) => {
               ) : (
                 <>
                   {/* Premium Featured Lion's Gate Portal Webinar Card */}
-                  <div className="group bg-[#FFFDF7]/75 backdrop-blur-md rounded-3xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(212,160,23,0.12)] border border-[#EAE3D2] hover:border-[#D4A017]/40 transition-all duration-500 hover:-translate-y-1.5 flex flex-col text-left h-full">
+                  <div 
+                    onClick={handleLionsGateRegister}
+                    className="group bg-[#FFFDF7]/75 backdrop-blur-md rounded-3xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(212,160,23,0.12)] border border-[#EAE3D2] hover:border-[#D4A017]/40 transition-all duration-500 hover:-translate-y-1.5 flex flex-col text-left h-full cursor-pointer"
+                  >
                     {/* Image Section */}
                     <div className="h-48 overflow-hidden bg-cream relative">
                       <img
@@ -996,7 +1001,7 @@ const Home = ({ scrollToWebinar = false }) => {
 
                     {/* Content Section */}
                     <div className="p-6 flex flex-col flex-grow">
-                      <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark mb-2 leading-snug">
+                      <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark mb-2 leading-snug group-hover:text-gold-dark transition-colors">
                         {lionsGateWebinar ? lionsGateWebinar.title : "Lion's Gate Portal Webinar: 8:8 Gateway of Abundance & Awakening"}
                       </h3>
                       <p className="text-xs 2xl:text-sm text-charcoal-light leading-relaxed font-sans line-clamp-3 mb-6">
@@ -1011,7 +1016,11 @@ const Home = ({ scrollToWebinar = false }) => {
                         </div>
                         
                         <button
-                          onClick={handleLionsGateRegister}
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleLionsGateRegister();
+                          }}
                           className="bg-[#D4A017] hover:bg-[#B38610] text-[#111111] text-[10px] font-bold uppercase tracking-wider py-2.5 px-5 rounded-lg transition-all duration-300 shadow-sm"
                         >
                           REGISTER NOW
@@ -1025,7 +1034,11 @@ const Home = ({ scrollToWebinar = false }) => {
                     .filter((workshop) => !workshop.title || !workshop.title.toLowerCase().includes("lion's gate"))
                     .slice(0, 2)
                     .map((workshop) => (
-                      <div key={workshop._id} className="group bg-white rounded-3xl overflow-hidden shadow-md border border-cream-dark/50 hover:shadow-2xl hover:border-gold-dark/45 hover:-translate-y-1 transition-all duration-300 flex flex-col text-left h-full">
+                      <div 
+                        key={workshop._id} 
+                        onClick={() => setActiveWorkshop(workshop)}
+                        className="group bg-white rounded-3xl overflow-hidden shadow-md border border-cream-dark/50 hover:shadow-2xl hover:border-gold-dark/45 hover:-translate-y-1 transition-all duration-300 flex flex-col text-left h-full cursor-pointer"
+                      >
                         <div className="h-48 overflow-hidden bg-cream relative">
                           <img
                             src={getImageUrl(workshop.coverImage || workshop.image)}
@@ -1038,7 +1051,7 @@ const Home = ({ scrollToWebinar = false }) => {
                           </div>
                         </div>
                         <div className="p-6 flex flex-col flex-grow">
-                          <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark mb-2 leading-snug">{workshop.title}</h3>
+                          <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark mb-2 leading-snug group-hover:text-gold-dark transition-colors">{workshop.title}</h3>
                           <p className="text-xs 2xl:text-sm text-charcoal-light leading-relaxed font-sans line-clamp-3 mb-6">
                             {workshop.description || workshop.shortDescription}
                           </p>
@@ -1049,7 +1062,11 @@ const Home = ({ scrollToWebinar = false }) => {
                               <span className="font-serif font-bold text-gold-dark text-sm 2xl:text-base mt-0.5">₹{workshop.pricing || workshop.price}</span>
                             </div>
                             <button
-                              onClick={() => setActiveWorkshop(workshop)}
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setActiveWorkshop(workshop);
+                              }}
                               className="bg-sage hover:bg-sage-dark text-white text-[10px] font-bold uppercase tracking-wider py-2.5 px-5 rounded-lg transition-all duration-300 shadow-sm"
                             >
                               Register Now
