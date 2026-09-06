@@ -25,7 +25,6 @@ import dogCare2 from '../assets/gallery/dog_care_2.png';
 import whoWeAreBg from '../assets/who_we_are_bg.jpg';
 import whatWeDo from '../assets/what_we_do.jpg';
 import whyChooseAscension from '../assets/why_choose_ascension.jpg';
-import lionsGatePortalImg from '../assets/lions_gate_portal.jpg';
 
 const getImageUrl = (path) => {
   if (!path) return '';
@@ -69,25 +68,15 @@ const Home = ({ scrollToWebinar = false }) => {
     }
   }, [location, scrollToWebinar]);
 
-  // Auto-open webinar modal if register query param is present
+  // Auto-open active webinar modal if register query param is present
   useEffect(() => {
-    if (searchParams.get('register') === 'true' || searchParams.get('webinar') === 'lions-gate') {
-      handleLionsGateRegister();
+    if (searchParams.get('register') === 'true' || searchParams.get('webinar')) {
+      const active = workshops.find(w => w.isWebinar) || workshops[0];
+      if (active) {
+        setActiveWorkshop(active);
+      }
     }
   }, [searchParams, workshops]);
-
-  // Dynamic check for Lion's Gate webinar details
-  const lionsGateWebinar = workshops.find(w => w.title && w.title.toLowerCase().includes("lion's gate"));
-  
-  const getLionsGateDateText = () => {
-    if (lionsGateWebinar && lionsGateWebinar.date) {
-      const d = new Date(lionsGateWebinar.date);
-      const day = d.getDate();
-      const month = d.toLocaleDateString(undefined, { month: 'short' }).toUpperCase();
-      return `${month} ${day}`;
-    }
-    return "AUG 8";
-  };
 
   // Newsletter state
   const [newsletterEmail, setNewsletterEmail] = useState('');
@@ -243,29 +232,6 @@ const Home = ({ scrollToWebinar = false }) => {
   const prevWorkshop = () => {
     if (workshops.length === 0) return;
     setCarouselIndex((prev) => (prev === 0 ? workshops.length - 1 : prev - 1));
-  };
-
-  const handleLionsGateRegister = () => {
-    const found = workshops.find(w => w.title && w.title.toLowerCase().includes("lion's gate"));
-    if (found) {
-      setActiveWorkshop(found);
-    } else {
-      setActiveWorkshop({
-        _id: "mockup-lions-gate-webinar-id",
-        title: "Lion's Gate Portal Webinar: 8:8 Gateway of Abundance & Awakening",
-        price: 2100,
-        speakerName: "Sonali Bhasin Kumar",
-        date: new Date('2026-08-08T18:00:00Z'),
-        time: "6:00 PM - 7:30 PM IST",
-        duration: "90 minutes",
-        upiQrCodeImage: "/uploads/default_upi_qr.jpg",
-        upiId: "sonalibhasinkumar@ptaxis",
-        mobileNumber: "9999999999",
-        zoomLink: "https://zoom.us/mock-link",
-        maxSeats: 100,
-        isWebinar: true
-      });
-    }
   };
 
   // Auto-scroll testimonials
@@ -958,7 +924,7 @@ const Home = ({ scrollToWebinar = false }) => {
       </section>
 
       {/* 8. Upcoming Webinars & Workshops */}
-      {(loading || workshops.length > 0) && (
+      {(loading || workshops.filter(w => !w.title || !w.title.toLowerCase().includes("lion")).length > 0) && (
         <section id="webinars" className="py-20 md:py-24 bg-[#FFFDF7] px-4 sm:px-6 md:px-12 border-b border-cream-dark/30 w-full text-center scroll-mt-24 relative">
           <span id="webinar" className="absolute -top-24"></span>
           <span id="upcoming-events" className="absolute -top-24"></span>
@@ -978,109 +944,87 @@ const Home = ({ scrollToWebinar = false }) => {
                   </div>
                 ))
               ) : (
-                <>
-                  {/* Premium Featured Lion's Gate Portal Webinar Card */}
-                  <div 
-                    onClick={handleLionsGateRegister}
-                    className="group bg-[#FFFDF7]/75 backdrop-blur-md rounded-3xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(212,160,23,0.12)] border border-[#EAE3D2] hover:border-[#D4A017]/40 transition-all duration-500 hover:-translate-y-1.5 flex flex-col text-left h-full cursor-pointer"
-                  >
-                    {/* Image Section */}
-                    <div className="h-48 overflow-hidden bg-cream relative">
-                      <img
-                        src={lionsGatePortalImg}
-                        alt="Lion's Gate Portal Webinar"
-                        className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-[800ms] ease-out"
-                      />
-                      
-                      {/* Floating Date Badge */}
-                      <div className="absolute top-4 left-4 bg-[#FCFBF7]/90 backdrop-blur-md px-3 py-1 rounded-full text-[9px] font-bold tracking-widest uppercase text-sage-dark shadow-sm flex items-center gap-1 font-sans border border-cream-dark/30 select-none">
-                        <Calendar className="w-3 h-3 text-sage" />
-                        <span>{getLionsGateDateText()}</span>
-                      </div>
-                    </div>
+                workshops
+                  .filter((workshop) => !workshop.title || !workshop.title.toLowerCase().includes("lion"))
+                  .slice(0, 3)
+                  .map((workshop) => {
+                    const isAncestral = workshop.title && workshop.title.toLowerCase().includes("ancestral");
+                    const dateObj = workshop.date ? new Date(workshop.date) : new Date();
+                    const dateFormatted = dateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
 
-                    {/* Content Section */}
-                    <div className="p-6 flex flex-col flex-grow">
-                      <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark mb-2 leading-snug group-hover:text-gold-dark transition-colors">
-                        {lionsGateWebinar ? lionsGateWebinar.title : "Lion's Gate Portal Webinar: 8:8 Gateway of Abundance & Awakening"}
-                      </h3>
-                      <p className="text-xs 2xl:text-sm text-charcoal-light leading-relaxed font-sans line-clamp-3 mb-6">
-                        {lionsGateWebinar ? lionsGateWebinar.shortDescription : "Step into the powerful energies of the Lion's Gate Portal 2026. Discover how this cosmic alignment opens the doors to manifestation, spiritual awakening, and divine transformation."}
-                      </p>
-
-                      {/* Footer Section */}
-                      <div className="mt-auto border-t border-cream-dark/40 pt-4 flex justify-between items-center font-sans text-xs">
-                        <div className="flex flex-col text-left">
-                          <span className="text-[10px] text-charcoal-light uppercase tracking-wider font-semibold">INVESTMENT</span>
-                          <span className="font-serif font-bold text-gold-dark text-sm 2xl:text-base mt-0.5">₹{lionsGateWebinar ? lionsGateWebinar.price : 2100}</span>
-                        </div>
-                        
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleLionsGateRegister();
-                          }}
-                          className="bg-[#D4A017] hover:bg-[#B38610] text-[#111111] text-[10px] font-bold uppercase tracking-wider py-2.5 px-5 rounded-lg transition-all duration-300 shadow-sm"
-                        >
-                          REGISTER NOW
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Other Database-fetched Workshops/Webinars */}
-                  {workshops
-                    .filter((workshop) => !workshop.title || !workshop.title.toLowerCase().includes("lion's gate"))
-                    .slice(0, 2)
-                    .map((workshop) => (
+                    return (
                       <div 
                         key={workshop._id} 
                         onClick={() => setActiveWorkshop(workshop)}
-                        className="group bg-white rounded-3xl overflow-hidden shadow-md border border-cream-dark/50 hover:shadow-2xl hover:border-gold-dark/45 hover:-translate-y-1 transition-all duration-300 flex flex-col text-left h-full cursor-pointer"
+                        className={`group bg-white rounded-3xl overflow-hidden shadow-md border transition-all duration-300 flex flex-col text-left h-full cursor-pointer hover:shadow-2xl hover:-translate-y-1 ${
+                          isAncestral 
+                            ? 'border-[#EAE3D2] hover:border-[#D4A017]/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(212,160,23,0.12)] bg-[#FFFDF7]/90' 
+                            : 'border-cream-dark/50 hover:border-gold-dark/45'
+                        }`}
                       >
+                        {/* Image Section */}
                         <div className="h-48 overflow-hidden bg-cream relative">
                           <img
-                            src={getImageUrl(workshop.coverImage || workshop.image)}
+                            src={getImageUrl(workshop.coverImage || workshop.image || "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80")}
                             alt={workshop.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
-                          <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-xs px-3 py-1 rounded-full text-[9px] font-bold tracking-widest uppercase text-sage-dark shadow-sm flex items-center gap-1 font-sans">
+                          
+                          {/* Date Badge */}
+                          <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-xs px-3 py-1 rounded-full text-[9px] font-bold tracking-widest uppercase text-sage-dark shadow-sm flex items-center gap-1 font-sans border border-cream-dark/30 select-none">
                             <Calendar className="w-3.5 h-3.5 text-sage" />
-                            <span>{new Date(workshop.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
+                            <span>{dateFormatted}</span>
                           </div>
+
+                          {workshop.isWebinar && (
+                            <div className="absolute top-4 right-4 bg-gold/90 text-charcoal-dark font-sans px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider shadow-xs">
+                              Live Webinar
+                            </div>
+                          )}
                         </div>
+
+                        {/* Content Section */}
                         <div className="p-6 flex flex-col flex-grow">
-                          <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark mb-2 leading-snug group-hover:text-gold-dark transition-colors">{workshop.title}</h3>
+                          <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark mb-2 leading-snug group-hover:text-gold-dark transition-colors">
+                            {workshop.title}
+                          </h3>
                           <p className="text-xs 2xl:text-sm text-charcoal-light leading-relaxed font-sans line-clamp-3 mb-6">
-                            {workshop.description || workshop.shortDescription}
+                            {workshop.shortDescription || workshop.description}
                           </p>
 
+                          {/* Footer Section */}
                           <div className="mt-auto border-t border-cream-dark/40 pt-4 flex justify-between items-center font-sans text-xs">
                             <div className="flex flex-col text-left">
-                              <span className="text-[10px] text-charcoal-light uppercase tracking-wider">Investment</span>
-                              <span className="font-serif font-bold text-gold-dark text-sm 2xl:text-base mt-0.5">₹{workshop.pricing || workshop.price}</span>
+                              <span className="text-[10px] text-charcoal-light uppercase tracking-wider font-semibold">Investment</span>
+                              <span className="font-serif font-bold text-gold-dark text-sm 2xl:text-base mt-0.5">
+                                ₹{workshop.price !== undefined ? workshop.price : (workshop.pricing || 99)}
+                              </span>
                             </div>
+                            
                             <button
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setActiveWorkshop(workshop);
                               }}
-                              className="bg-sage hover:bg-sage-dark text-white text-[10px] font-bold uppercase tracking-wider py-2.5 px-5 rounded-lg transition-all duration-300 shadow-sm"
+                              className={`text-[10px] font-bold uppercase tracking-wider py-2.5 px-5 rounded-lg transition-all duration-300 shadow-sm ${
+                                isAncestral 
+                                  ? 'bg-[#D4A017] hover:bg-[#B38610] text-[#111111]' 
+                                  : 'bg-sage hover:bg-sage-dark text-white'
+                              }`}
                             >
                               Register Now
                             </button>
                           </div>
                         </div>
                       </div>
-                    ))}
-                </>
+                    );
+                  })
               )}
             </div>
 
             {/* If more than 3, redirect to programs page */}
-            {!loading && workshops.length > 3 && (
+            {!loading && workshops.filter(w => !w.title || !w.title.toLowerCase().includes("lion")).length > 3 && (
               <div className="mt-12">
                 <Link to="/programs" className="text-xs font-bold text-sage-dark uppercase tracking-wider hover:text-gold flex items-center justify-center gap-1">
                   <span>View All Upcoming Gatherings</span>
