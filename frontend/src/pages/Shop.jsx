@@ -273,14 +273,14 @@ Chart Base64 Length: ${fileBase64 ? fileBase64.length : 0}`
   };
 
   return (
-    <div className="min-h-screen py-10 px-4 md:px-8 font-sans">
-      <div className="max-w-7xl mx-auto flex flex-col gap-8">
+    <div className="min-h-screen py-6 sm:py-10 px-3 sm:px-6 md:px-8 font-sans">
+      <div className="max-w-7xl 2xl:max-w-screen-2xl 3xl:max-w-[1600px] mx-auto flex flex-col gap-6 sm:gap-8">
         
         {/* Navigation Tabs */}
-        <div className="flex border-b border-cream-dark/60 gap-4 overflow-x-auto pb-1.5 scrollbar-thin">
+        <div className="flex border-b border-cream-dark/60 gap-3 sm:gap-4 overflow-x-auto pb-2 scrollbar-none whitespace-nowrap">
           <button
             onClick={() => setSearchParams({ tab: 'shop' })}
-            className={`text-xs font-bold uppercase tracking-wider pb-2 border-b-2 transition-all ${
+            className={`text-xs font-bold uppercase tracking-wider pb-2 border-b-2 transition-all shrink-0 ${
               activeTab === 'shop' ? 'border-gold text-gold' : 'border-transparent text-charcoal/60'
             }`}
           >
@@ -288,7 +288,7 @@ Chart Base64 Length: ${fileBase64 ? fileBase64.length : 0}`
           </button>
           <button
             onClick={() => setSearchParams({ tab: 'customise' })}
-            className={`text-xs font-bold uppercase tracking-wider pb-2 border-b-2 transition-all flex items-center gap-1.5 ${
+            className={`text-xs font-bold uppercase tracking-wider pb-2 border-b-2 transition-all flex items-center gap-1.5 shrink-0 ${
               activeTab === 'customise' ? 'border-gold text-gold' : 'border-transparent text-charcoal/60'
             }`}
           >
@@ -297,7 +297,7 @@ Chart Base64 Length: ${fileBase64 ? fileBase64.length : 0}`
           </button>
           <button
             onClick={() => setSearchParams({ tab: 'cart' })}
-            className={`text-xs font-bold uppercase tracking-wider pb-2 border-b-2 transition-all flex items-center gap-1.5 ${
+            className={`text-xs font-bold uppercase tracking-wider pb-2 border-b-2 transition-all flex items-center gap-1.5 shrink-0 ${
               activeTab === 'cart' ? 'border-gold text-gold' : 'border-transparent text-charcoal/60'
             }`}
           >
@@ -306,7 +306,7 @@ Chart Base64 Length: ${fileBase64 ? fileBase64.length : 0}`
           </button>
           <button
             onClick={() => setSearchParams({ tab: 'wishlist' })}
-            className={`text-xs font-bold uppercase tracking-wider pb-2 border-b-2 transition-all flex items-center gap-1.5 ${
+            className={`text-xs font-bold uppercase tracking-wider pb-2 border-b-2 transition-all flex items-center gap-1.5 shrink-0 ${
               activeTab === 'wishlist' ? 'border-gold text-gold' : 'border-transparent text-charcoal/60'
             }`}
           >
@@ -316,7 +316,7 @@ Chart Base64 Length: ${fileBase64 ? fileBase64.length : 0}`
           {user && (
             <button
               onClick={() => setSearchParams({ tab: 'orders' })}
-              className={`text-xs font-bold uppercase tracking-wider pb-2 border-b-2 transition-all ${
+              className={`text-xs font-bold uppercase tracking-wider pb-2 border-b-2 transition-all shrink-0 ${
                 activeTab === 'orders' ? 'border-gold text-gold' : 'border-transparent text-charcoal/60'
               }`}
             >
@@ -327,20 +327,20 @@ Chart Base64 Length: ${fileBase64 ? fileBase64.length : 0}`
 
         {/* Tab 1: Product Shop Listing */}
         {activeTab === 'shop' && (
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8">
             
             {/* Left Sidebar Filters */}
-            <div className="flex flex-col gap-6 text-left">
+            <div className="flex flex-col gap-4 sm:gap-6 text-left">
               <div>
-                <h4 className="font-serif text-sm font-bold uppercase tracking-wider text-charcoal-dark mb-4">
+                <h4 className="font-serif text-xs sm:text-sm font-bold uppercase tracking-wider text-charcoal-dark mb-2 sm:mb-4">
                   Categories
                 </h4>
-                <div className="flex flex-row lg:flex-col gap-2 overflow-x-auto pb-2 lg:pb-0 scrollbar-thin">
+                <div className="flex flex-row lg:flex-col gap-1.5 sm:gap-2 overflow-x-auto pb-2 lg:pb-0 scrollbar-none">
                   {categories.map((cat) => (
                     <button
                       key={cat}
                       onClick={() => handleCategorySelect(cat)}
-                      className={`text-xs text-left px-3 py-2 rounded-xl transition-all whitespace-nowrap ${
+                      className={`text-xs text-left px-3 py-2 rounded-xl transition-all whitespace-nowrap shrink-0 ${
                         category === cat
                           ? 'bg-sage text-white font-bold'
                           : 'bg-cream/50 text-charcoal-light hover:bg-cream-dark'
@@ -357,7 +357,7 @@ Chart Base64 Length: ${fileBase64 ? fileBase64.length : 0}`
             <div className="lg:col-span-3 flex flex-col gap-6">
               
               {/* Search & Sort Panel */}
-              <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center justify-between">
                 <form onSubmit={handleSearchSubmit} className="relative w-full sm:max-w-xs">
                   <input
                     type="text"
@@ -384,29 +384,30 @@ Chart Base64 Length: ${fileBase64 ? fileBase64.length : 0}`
 
               {/* Product Grid */}
               {loading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                  {[1, 2, 3].map(n => (
-                    <div key={n} className="shimmer h-72 rounded-2xl w-full"></div>
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-6">
+                  {[1, 2, 3, 4].map(n => (
+                    <div key={n} className="shimmer h-60 sm:h-72 rounded-2xl w-full"></div>
                   ))}
                 </div>
               ) : products.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 2xl:grid-cols-4 gap-3 sm:gap-6">
                   {products.map((product) => (
-                    <div key={product._id} className="glass rounded-2xl overflow-hidden flex flex-col p-4 shadow-sm hover:shadow-md transition-all duration-300 relative border border-cream-dark/40 group">
+                    <div key={product._id} className="glass rounded-xl sm:rounded-2xl overflow-hidden flex flex-col p-2.5 sm:p-4 shadow-xs sm:shadow-sm hover:shadow-md transition-all duration-300 relative border border-cream-dark/40 group">
                       
                       {/* Wishlist Button */}
                       <button
                         onClick={() => toggleWishlist(product)}
-                        className={`absolute top-6 right-6 z-10 p-1.5 rounded-full border shadow-sm transition-all focus:outline-none ${
+                        className={`absolute top-4 right-4 sm:top-6 sm:right-6 z-10 p-1 sm:p-1.5 rounded-full border shadow-xs transition-all focus:outline-none ${
                           isInWishlist(product._id)
                             ? 'bg-lavender text-charcoal-dark border-lavender-dark'
                             : 'bg-white/80 text-charcoal border-cream-dark'
                         }`}
+                        aria-label="Toggle Wishlist"
                       >
-                        <Heart className="w-3.5 h-3.5 fill-current" />
+                        <Heart className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current" />
                       </button>
 
-                      <Link to={`/product/${product._id}`} className="h-44 bg-cream rounded-xl overflow-hidden relative mb-4 block">
+                      <Link to={`/product/${product._id}`} className="h-32 sm:h-44 bg-cream rounded-lg sm:rounded-xl overflow-hidden relative mb-2 sm:mb-4 block">
                         <img 
                           src={product.images && product.images[0] ? getImageUrl(product.images[0]) : "https://images.unsplash.com/photo-1615627121117-e3278bc8b1db?auto=format&fit=crop&w=400&q=80"} 
                           alt={product.name} 
@@ -415,24 +416,24 @@ Chart Base64 Length: ${fileBase64 ? fileBase64.length : 0}`
                       </Link>
                       
                       <div className="flex flex-col text-left gap-1 flex-1">
-                        <span className="text-[9px] uppercase tracking-widest text-sage font-bold font-sans">
+                        <span className="text-[8px] sm:text-[9px] uppercase tracking-widest text-sage font-bold font-sans">
                           {product.category}
                         </span>
                         <Link to={`/product/${product._id}`}>
-                          <h3 className="font-serif text-sm font-bold text-charcoal-dark leading-snug line-clamp-1 hover:text-gold transition-colors">
+                          <h3 className="font-serif text-xs sm:text-sm font-bold text-charcoal-dark leading-snug line-clamp-1 hover:text-gold transition-colors">
                             {product.name}
                           </h3>
                         </Link>
-                        <p className="text-[11px] text-charcoal-light font-sans line-clamp-2 leading-relaxed flex-1">
+                        <p className="text-[10px] sm:text-[11px] text-charcoal-light font-sans line-clamp-2 leading-relaxed flex-1 hidden xs:line-clamp-2">
                           {product.description}
                         </p>
-                        <div className="flex justify-between items-center border-t border-cream-dark/50 pt-3 mt-3 font-sans text-xs">
-                          <span className="font-serif font-bold text-gold-dark">₹{product.pricing}</span>
+                        <div className="flex justify-between items-center border-t border-cream-dark/50 pt-2 sm:pt-3 mt-2 sm:mt-3 font-sans text-xs">
+                          <span className="font-serif font-bold text-gold-dark text-xs sm:text-sm">₹{product.pricing}</span>
                           <button
                             onClick={() => addToCart(product)}
-                            className="bg-sage hover:bg-sage-dark text-white font-bold py-1.5 px-3 rounded-lg transition-colors text-[10px] uppercase tracking-wider"
+                            className="bg-sage hover:bg-sage-dark text-white font-bold py-1 sm:py-1.5 px-2 sm:px-3 rounded-lg transition-colors text-[9px] sm:text-[10px] uppercase tracking-wider"
                           >
-                            Add to Cart
+                            Add
                           </button>
                         </div>
                       </div>
@@ -651,30 +652,30 @@ Chart Base64 Length: ${fileBase64 ? fileBase64.length : 0}`
                       <p className="text-xs text-charcoal-light mt-3">Scanning active inventory...</p>
                     </div>
                   ) : getRecommendedProducts().length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 gap-3 sm:gap-6">
                       {getRecommendedProducts().map((product) => (
-                        <div key={product._id} className="glass rounded-2xl overflow-hidden border border-cream-dark/45 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col h-full bg-white/70">
+                        <div key={product._id} className="glass rounded-xl sm:rounded-2xl overflow-hidden border border-cream-dark/45 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col h-full bg-white/70">
                           {/* Image container */}
-                          <Link to={`/product/${product._id}`} className="relative h-44 w-full bg-cream overflow-hidden block">
+                          <Link to={`/product/${product._id}`} className="relative h-32 sm:h-44 w-full bg-cream overflow-hidden block">
                             <img 
                               src={product.images && product.images[0] ? getImageUrl(product.images[0]) : ""} 
                               alt={product.name} 
-                              className="w-full h-full object-cover transform hover:scale-[1.02] transition-transform duration-300"
+                              className="w-full h-full object-cover transform hover:scale-[1.02] transition-transform duration-300" 
                             />
-                            <span className="absolute top-3 left-3 bg-white/95 text-gold-dark text-[9px] font-bold uppercase tracking-wider py-1 px-2.5 rounded-full border border-cream-dark/50 shadow-xs">
+                            <span className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-white/95 text-gold-dark text-[8px] sm:text-[9px] font-bold uppercase tracking-wider py-0.5 px-2 sm:py-1 sm:px-2.5 rounded-full border border-cream-dark/50 shadow-xs">
                               {product.category}
                             </span>
                           </Link>
 
                           {/* Info */}
-                          <div className="p-4 flex flex-col flex-grow gap-2.5 text-left">
+                          <div className="p-2.5 sm:p-4 flex flex-col flex-grow gap-1.5 sm:gap-2.5 text-left">
                             <Link to={`/product/${product._id}`} className="font-serif text-xs sm:text-sm font-bold text-charcoal-dark hover:text-gold transition-colors line-clamp-1 block">
                               {product.name}
                             </Link>
-                            <p className="text-[10px] text-charcoal-light leading-normal line-clamp-2 font-sans flex-grow">
+                            <p className="text-[10px] text-charcoal-light leading-normal line-clamp-2 font-sans flex-grow hidden xs:block">
                               {product.description}
                             </p>
-                            <div className="flex items-center justify-between border-t border-cream-dark/35 pt-2.5 mt-auto">
+                            <div className="flex items-center justify-between border-t border-cream-dark/35 pt-2 sm:pt-2.5 mt-auto">
                               <span className="font-serif font-bold text-gold-dark text-xs sm:text-sm">₹{product.pricing}</span>
                               
                               <button
@@ -682,9 +683,9 @@ Chart Base64 Length: ${fileBase64 ? fileBase64.length : 0}`
                                   addToCart(product);
                                   alert(`${product.name} added to cart!`);
                                 }}
-                                className="bg-gold hover:bg-gold-dark text-charcoal-dark font-bold text-[9px] uppercase tracking-wider py-1.5 px-3 rounded-lg shadow-xs transition-all duration-300"
+                                className="bg-gold hover:bg-gold-dark text-charcoal-dark font-bold text-[8px] sm:text-[9px] uppercase tracking-wider py-1 sm:py-1.5 px-2 sm:px-3 rounded-lg shadow-xs transition-all duration-300"
                               >
-                                Add to Cart
+                                Add
                               </button>
                             </div>
                           </div>

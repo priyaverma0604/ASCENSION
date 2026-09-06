@@ -285,8 +285,8 @@ const ProgramDashboard = () => {
     const zoomUrl = program.zoomLink || "https://zoom.us/j/1234567890";
 
     return (
-      <div className="min-h-screen py-12 px-4 md:px-8 font-sans bg-[#FFFDF7] relative z-10">
-        <div className="max-w-6xl mx-auto flex flex-col gap-8">
+      <div className="min-h-screen py-8 sm:py-12 px-3 sm:px-6 md:px-8 font-sans bg-[#FFFDF7] relative z-10">
+        <div className="max-w-6xl 2xl:max-w-7xl 3xl:max-w-screen-2xl mx-auto flex flex-col gap-6 sm:gap-8">
           
           {/* Header Block */}
           <div className="text-left flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-cream-dark/60 pb-6">
@@ -574,8 +574,8 @@ const ProgramDashboard = () => {
   const isCompleted = progress ? progress.completed : false;
 
   return (
-    <div className="min-h-screen py-12 px-4 md:px-8 font-sans bg-[#FFFDF7] relative z-10">
-      <div className="max-w-6xl mx-auto flex flex-col gap-8">
+    <div className="min-h-screen py-8 sm:py-12 px-3 sm:px-6 md:px-8 font-sans bg-[#FFFDF7] relative z-10">
+      <div className="max-w-6xl 2xl:max-w-7xl 3xl:max-w-screen-2xl mx-auto flex flex-col gap-6 sm:gap-8">
         
         {/* Header Block */}
         <div className="text-left flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-cream-dark/60 pb-6">

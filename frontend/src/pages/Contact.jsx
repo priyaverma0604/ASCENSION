@@ -32,16 +32,16 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen py-16 px-6 font-sans">
-      <div className="max-w-5xl mx-auto flex flex-col gap-16">
+    <div className="min-h-screen py-10 sm:py-16 px-4 sm:px-6 md:px-8 font-sans">
+      <div className="max-w-5xl 2xl:max-w-6xl 3xl:max-w-7xl mx-auto flex flex-col gap-10 sm:gap-16">
         
         {/* Title */}
         <div className="text-center flex flex-col gap-3">
           <span className="font-sans text-[10px] sm:text-xs text-sage tracking-[0.25em] font-bold uppercase">Connect With Us</span>
-          <h1 className="font-serif text-3xl md:text-4xl font-bold tracking-wide text-charcoal-dark leading-tight">
+          <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl 2xl:text-5xl font-bold tracking-wide text-charcoal-dark leading-tight">
             Reach Out to Ascension
           </h1>
-          <p className="max-w-xl mx-auto text-xs text-charcoal-light leading-relaxed">
+          <p className="max-w-xl 2xl:max-w-2xl mx-auto text-xs sm:text-sm text-charcoal-light leading-relaxed">
             Whether you want to schedule a distance Theta healing session, inquire about programs, ask about retreats, or volunteer for our Seva campaigns, we are here to guide you.
           </p>
         </div>

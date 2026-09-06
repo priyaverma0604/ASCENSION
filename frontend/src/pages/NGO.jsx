@@ -92,16 +92,16 @@ const NGO = () => {
   ];
 
   return (
-    <div className="min-h-screen py-16 px-6 font-sans">
-      <div className="max-w-5xl mx-auto flex flex-col gap-16">
+    <div className="min-h-screen py-10 sm:py-16 px-4 sm:px-6 md:px-8 font-sans">
+      <div className="max-w-5xl 2xl:max-w-6xl 3xl:max-w-7xl mx-auto flex flex-col gap-10 sm:gap-16">
 
         {/* Title */}
         <div className="text-center flex flex-col gap-3">
           <span className="font-sans text-[10px] sm:text-xs text-sage tracking-[0.25em] font-bold uppercase">Selfless Service</span>
           <h1 className="font-serif text-3xl md:text-4xl font-bold tracking-wide text-charcoal-dark leading-tight flex justify-center">
-            <img src={`${sevaLogo}?v=3`} alt="Ascension Seva" className="h-28 md:h-36 w-auto object-contain" />
+            <img src={`${sevaLogo}?v=3`} alt="Ascension Seva" className="h-24 sm:h-28 md:h-36 w-auto object-contain" />
           </h1>
-          <p className="max-w-xl mx-auto text-xs text-charcoal-light leading-relaxed">
+          <p className="max-w-xl 2xl:max-w-2xl mx-auto text-xs sm:text-sm text-charcoal-light leading-relaxed">
             At Ascension, we believe that true spirituality is reflected in service to humanity. Through Seva, we create ripples of healing and compassion across Delhi's underprivileged communities.
           </p>
         </div>

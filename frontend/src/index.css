@@ -4,6 +4,37 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Fluid Root Scaling for Big Laptops & High-Resolution Displays */
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+@media (min-width: 1440px) {
+  html {
+    font-size: 17px;
+  }
+}
+
+@media (min-width: 1680px) {
+  html {
+    font-size: 18px;
+  }
+}
+
+@media (min-width: 1920px) {
+  html {
+    font-size: 18.5px;
+  }
+}
+
+@media (min-width: 2200px) {
+  html {
+    font-size: 19.5px;
+  }
+}
+
 @layer base {
   body {
     @apply bg-cream-light text-charcoal font-sans antialiased overflow-x-hidden;
@@ -11,11 +42,37 @@
       radial-gradient(at 0% 0%, rgba(201, 162, 39, 0.05) 0px, transparent 50%),
       radial-gradient(at 100% 100%, rgba(79, 107, 82, 0.06) 0px, transparent 50%);
     background-attachment: fixed;
+    touch-action: manipulation;
   }
   
   h1, h2, h3, h4, h5, h6 {
     @apply font-serif text-charcoal-dark tracking-wide;
   }
+
+  /* Prevent iOS Safari auto-zooming on input focus on mobile devices */
+  @media screen and (max-width: 768px) {
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="number"],
+    input[type="password"],
+    input[type="search"],
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
+  }
+}
+
+/* Safe Area Insets for Modern Mobile Phones (e.g., iPhone Home Indicator) */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 0.75rem);
+}
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0.75rem);
+}
+.mb-safe {
+  margin-bottom: env(safe-area-inset-bottom, 0.75rem);
 }
 
 /* Glassmorphism Styles */

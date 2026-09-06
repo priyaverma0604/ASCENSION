@@ -62,16 +62,16 @@ const EnrollProgramModal = ({ program, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-charcoal/40 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="glass max-w-md w-full rounded-2xl shadow-xl overflow-hidden animate-slide-up text-left">
+    <div className="fixed inset-0 z-50 bg-charcoal/40 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+      <div className="glass max-w-md w-full rounded-2xl shadow-xl overflow-hidden animate-slide-up text-left max-h-[90vh] flex flex-col">
         
         {/* Header */}
-        <div className="flex justify-between items-center p-5 border-b border-cream-dark">
+        <div className="flex justify-between items-center p-4 sm:p-5 border-b border-cream-dark shrink-0">
           <div>
             <h3 className="font-serif text-base font-bold text-charcoal-dark uppercase tracking-wider">
               Program Enrollment
             </h3>
-            <p className="text-[10px] text-sage font-medium tracking-wide uppercase mt-0.5">
+            <p className="text-[10px] text-sage font-medium tracking-wide uppercase mt-0.5 max-w-[280px] truncate">
               {program.title}
             </p>
           </div>
@@ -82,12 +82,12 @@ const EnrollProgramModal = ({ program, onClose }) => {
 
         {success ? (
           /* Success Screen */
-          <div className="p-8 flex flex-col items-center justify-center text-center gap-4">
+          <div className="p-6 sm:p-8 flex flex-col items-center justify-center text-center gap-4 overflow-y-auto flex-1">
             <CheckCircle className="w-12 h-12 text-gold animate-pulse" />
             <h4 className="font-serif text-lg font-bold text-charcoal-dark">
               Request Submitted!
             </h4>
-            <p className="text-xs text-charcoal-light leading-relaxed px-4">
+            <p className="text-xs text-charcoal-light leading-relaxed px-2 sm:px-4">
               Thank you, **{user?.name}**! Your manual payment check request (Transaction ID: **{transactionId}**) has been submitted successfully. 
               Our team will verify the payment and activate the program in your dashboard shortly.
             </p>
@@ -100,7 +100,7 @@ const EnrollProgramModal = ({ program, onClose }) => {
           </div>
         ) : (
           /* Checkout Fields Screen */
-          <form onSubmit={handleSubmit} className="p-5 flex flex-col gap-4 text-xs text-charcoal max-h-[80vh] overflow-y-auto">
+          <form onSubmit={handleSubmit} className="p-4 sm:p-5 flex flex-col gap-4 text-xs text-charcoal overflow-y-auto flex-1">
             
             {/* Instruction Block */}
             <div className="bg-cream/60 border border-cream-dark/60 p-3.5 rounded-xl flex gap-3 text-charcoal-light font-sans leading-relaxed">

@@ -226,26 +226,26 @@ const ProductDetails = () => {
   const isOutOfStock = product.stock <= 0;
 
   return (
-    <div className="min-h-screen py-10 px-4 md:px-8 font-sans bg-cream-light">
-      <div className="max-w-7xl mx-auto flex flex-col gap-10">
+    <div className="min-h-screen py-6 sm:py-10 px-3 sm:px-6 md:px-8 font-sans bg-cream-light">
+      <div className="max-w-7xl 2xl:max-w-screen-2xl 3xl:max-w-[1600px] mx-auto flex flex-col gap-6 sm:gap-10">
         
         {/* Breadcrumb Navigation */}
-        <nav className="flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-widest text-charcoal-light border-b border-cream-dark/30 pb-4">
-          <Link to="/" className="hover:text-gold transition-colors">Home</Link>
-          <ChevronRight className="w-3.5 h-3.5" />
-          <Link to="/shop" className="hover:text-gold transition-colors">Shop</Link>
-          <ChevronRight className="w-3.5 h-3.5" />
-          <Link to={`/shop?category=${encodeURIComponent(product.category)}`} className="hover:text-gold transition-colors">{product.category}</Link>
-          <ChevronRight className="w-3.5 h-3.5 text-charcoal/30" />
-          <span className="text-charcoal-dark truncate max-w-[150px]">{product.name}</span>
+        <nav className="flex items-center gap-1.5 text-[10px] uppercase font-bold tracking-widest text-charcoal-light border-b border-cream-dark/30 pb-3 sm:pb-4 overflow-x-auto scrollbar-none whitespace-nowrap">
+          <Link to="/" className="hover:text-gold transition-colors shrink-0">Home</Link>
+          <ChevronRight className="w-3.5 h-3.5 shrink-0" />
+          <Link to="/shop" className="hover:text-gold transition-colors shrink-0">Shop</Link>
+          <ChevronRight className="w-3.5 h-3.5 shrink-0" />
+          <Link to={`/shop?category=${encodeURIComponent(product.category)}`} className="hover:text-gold transition-colors shrink-0">{product.category}</Link>
+          <ChevronRight className="w-3.5 h-3.5 text-charcoal/30 shrink-0" />
+          <span className="text-charcoal-dark truncate max-w-[150px] shrink-0">{product.name}</span>
         </nav>
 
         {/* Product Details Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-10 items-start">
           
           {/* Left Column: Image Gallery */}
-          <div className="flex flex-col gap-4 sticky top-24">
-            <div className="h-[400px] md:h-[500px] bg-cream rounded-3xl overflow-hidden shadow-sm border border-cream-dark/40 relative">
+          <div className="flex flex-col gap-3 sm:gap-4 lg:sticky lg:top-24">
+            <div className="h-[280px] sm:h-[400px] md:h-[500px] 2xl:h-[580px] bg-cream rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm border border-cream-dark/40 relative">
               <img 
                 src={activeImage ? getImageUrl(activeImage) : "https://images.unsplash.com/photo-1615627121117-e3278bc8b1db?auto=format&fit=crop&w=800&q=80"} 
                 alt={product.name} 
@@ -260,7 +260,7 @@ const ProductDetails = () => {
 
             {/* Gallery Thumbnails */}
             {product.images && product.images.length > 1 && (
-              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin">
+              <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-none">
                 {product.images.map((img, idx) => (
                   <button 
                     key={idx}
@@ -614,10 +614,10 @@ const ProductDetails = () => {
             <h2 className="font-serif text-lg md:text-xl font-bold text-charcoal-dark uppercase tracking-wider mb-6">
               Related Products
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
               {relatedProducts.map((p) => (
-                <div key={p._id} className="glass rounded-2xl overflow-hidden flex flex-col p-4 shadow-sm border border-cream-dark/40 hover:shadow-md transition-all duration-300 relative group">
-                  <Link to={`/product/${p._id}`} className="h-40 bg-cream rounded-xl overflow-hidden mb-3 block">
+                <div key={p._id} className="glass rounded-xl sm:rounded-2xl overflow-hidden flex flex-col p-2.5 sm:p-4 shadow-xs sm:shadow-sm border border-cream-dark/40 hover:shadow-md transition-all duration-300 relative group">
+                  <Link to={`/product/${p._id}`} className="h-32 sm:h-40 bg-cream rounded-lg sm:rounded-xl overflow-hidden mb-2 sm:mb-3 block">
                     <img 
                       src={p.images && p.images[0] ? getImageUrl(p.images[0]) : "https://images.unsplash.com/photo-1615627121117-e3278bc8b1db?auto=format&fit=crop&w=400&q=80"} 
                       alt={p.name} 
@@ -625,11 +625,11 @@ const ProductDetails = () => {
                     />
                   </Link>
                   <div className="flex flex-col text-left gap-1 flex-1 font-sans text-xs">
-                    <span className="text-[9px] uppercase tracking-widest text-sage font-bold">{p.category}</span>
+                    <span className="text-[8px] sm:text-[9px] uppercase tracking-widest text-sage font-bold">{p.category}</span>
                     <Link to={`/product/${p._id}`}>
-                      <h4 className="font-serif font-bold text-charcoal-dark truncate hover:text-gold transition-colors">{p.name}</h4>
+                      <h4 className="font-serif font-bold text-xs sm:text-sm text-charcoal-dark truncate hover:text-gold transition-colors">{p.name}</h4>
                     </Link>
-                    <p className="font-bold text-gold-dark mt-1">₹{p.pricing}</p>
+                    <p className="font-bold text-gold-dark text-xs sm:text-sm mt-0.5 sm:mt-1">₹{p.pricing}</p>
                   </div>
                 </div>
               ))}

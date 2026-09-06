@@ -173,25 +173,25 @@ const Donation = () => {
   };
 
   return (
-    <div className="min-h-screen py-16 px-6 font-sans">
-      <div className="max-w-4xl mx-auto flex flex-col gap-12">
+    <div className="min-h-screen py-10 sm:py-16 px-4 sm:px-6 md:px-8 font-sans">
+      <div className="max-w-5xl 2xl:max-w-6xl 3xl:max-w-7xl mx-auto flex flex-col gap-8 sm:gap-12">
 
         {/* Title */}
         <div className="text-center flex flex-col gap-3">
           <span className="font-sans text-[10px] sm:text-xs text-sage tracking-[0.25em] font-bold uppercase">Make an Impact</span>
           <h1 className="flex flex-col items-center gap-1">
-            <span className="font-cormorant text-4xl md:text-5xl font-light uppercase tracking-widest text-charcoal-dark select-none">SUPPORT</span>
+            <span className="font-cormorant text-3xl sm:text-4xl md:text-5xl font-light uppercase tracking-widest text-charcoal-dark select-none">SUPPORT</span>
             <img src={`${sevaLogo}?v=3`} alt="Ascension Seva" className="h-10 md:h-14 w-auto object-contain" />
           </h1>
-          <p className="max-w-xl mx-auto text-xs text-charcoal-light leading-relaxed">
+          <p className="max-w-xl 2xl:max-w-2xl mx-auto text-xs sm:text-sm text-charcoal-light leading-relaxed">
             Every contribution directly funds our local Delhi food distribution campaigns, underprivileged children tutoring drives, women confidence workshops, and stray animal care circles.
           </p>
         </div>
 
         {/* Seva Visual Showcase */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
           <div className="glass rounded-[24px] overflow-hidden border border-cream-dark/50 shadow-sm flex flex-col group transition-all duration-300 hover:shadow-lg">
-            <div className="h-44 overflow-hidden bg-cream">
+            <div className="h-40 sm:h-44 overflow-hidden bg-cream">
               <img
                 src="https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=600&q=80"
                 alt="Delhi Food Distribution Drive"

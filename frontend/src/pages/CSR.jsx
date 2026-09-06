@@ -111,19 +111,19 @@ const CSR = () => {
   ];
 
   return (
-    <div className="min-h-screen py-16 px-6 font-sans relative overflow-hidden">
-      <div className="max-w-5xl mx-auto flex flex-col gap-24 relative z-10">
+    <div className="min-h-screen py-10 sm:py-16 px-4 sm:px-6 md:px-8 font-sans relative overflow-hidden">
+      <div className="max-w-5xl 2xl:max-w-6xl 3xl:max-w-7xl mx-auto flex flex-col gap-14 sm:gap-24 relative z-10">
 
         {/* SECTION 1: HERO */}
-        <section className="relative rounded-[32px] overflow-hidden border border-cream-dark/60 shadow-xl bg-white/40 backdrop-blur-xs min-h-[460px] flex items-center p-8 md:p-14">
+        <section className="relative rounded-[32px] overflow-hidden border border-cream-dark/60 shadow-xl bg-white/40 backdrop-blur-xs min-h-[420px] sm:min-h-[460px] flex items-center p-6 sm:p-8 md:p-14">
           <div className="absolute inset-0 z-0 opacity-15 bg-cover bg-center" style={{ backgroundImage: `url(${waterfallBg})` }} />
           <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/80 to-transparent z-0" />
           
-          <div className="flex flex-col gap-6 text-left relative z-10 max-w-xl">
+          <div className="flex flex-col gap-4 sm:gap-6 text-left relative z-10 max-w-xl 2xl:max-w-2xl">
             <span className="font-cormorant text-sm sm:text-base text-gold-dark font-bold tracking-wider uppercase">
               Corporate Social Responsibility
             </span>
-            <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold tracking-wide text-charcoal-dark leading-tight">
+            <h1 className="font-serif text-2xl sm:text-4xl md:text-5xl font-bold tracking-wide text-charcoal-dark leading-tight">
               Corporate Social Responsibility Partnerships
             </h1>
             <p className="text-xs sm:text-sm text-charcoal-light leading-relaxed font-sans">

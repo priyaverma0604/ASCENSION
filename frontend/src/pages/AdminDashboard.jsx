@@ -407,12 +407,12 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen py-10 px-4 md:px-8 font-sans">
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-8">
+    <div className="min-h-screen py-6 sm:py-10 px-3 sm:px-6 md:px-8 font-sans">
+      <div className="max-w-7xl 2xl:max-w-screen-2xl 3xl:max-w-[1600px] mx-auto flex flex-col md:flex-row gap-6 sm:gap-8">
         
-        {/* Left Side: Side Nav Tabs */}
-        <div className="w-full md:w-64 glass rounded-2xl p-5 border border-cream-dark/50 self-start text-left flex flex-col gap-1.5">
-          <div className="flex items-center gap-2 border-b border-cream-dark/65 pb-3 mb-3">
+        {/* Left Side: Side Nav Tabs (Horizontal scroll bar on mobile, vertical sidebar on desktop) */}
+        <div className="w-full md:w-64 glass rounded-2xl p-3 sm:p-5 border border-cream-dark/50 self-start text-left flex flex-row md:flex-col overflow-x-auto md:overflow-visible scrollbar-none gap-1.5 shrink-0">
+          <div className="hidden md:flex items-center gap-2 border-b border-cream-dark/65 pb-3 mb-3">
             <span className="gold-gradient p-1.5 rounded-lg text-white">
               <Compass className="w-5 h-5" />
             </span>
@@ -422,9 +422,9 @@ const AdminDashboard = () => {
             <button
               key={t.id}
               onClick={() => setActiveTab(t.id)}
-              className={`flex items-center gap-3 py-2.5 px-4 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all focus:outline-none ${
+              className={`flex items-center gap-2 sm:gap-3 py-2 sm:py-2.5 px-3 sm:px-4 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all focus:outline-none shrink-0 whitespace-nowrap ${
                 activeTab === t.id
-                  ? 'bg-sage text-white font-bold shadow-sm'
+                  ? 'bg-sage text-white font-bold shadow-xs sm:shadow-sm'
                   : 'bg-transparent text-charcoal/70 hover:bg-cream-dark/50'
               }`}
             >

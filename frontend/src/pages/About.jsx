@@ -22,36 +22,36 @@ const About = () => {
   ];
 
   return (
-    <div className="min-h-screen py-16 px-6 font-sans">
-      <div className="max-w-4xl mx-auto flex flex-col gap-16">
+    <div className="min-h-screen py-10 sm:py-16 px-4 sm:px-6 md:px-8 font-sans">
+      <div className="max-w-5xl 2xl:max-w-6xl 3xl:max-w-7xl mx-auto flex flex-col gap-10 sm:gap-16">
         
         {/* Title */}
         <div className="text-center flex flex-col gap-3">
           <span className="font-sans text-[10px] sm:text-xs text-sage tracking-[0.25em] font-bold uppercase">About Ascension</span>
-          <h1 className="font-serif text-3xl md:text-4xl font-bold tracking-wide text-charcoal-dark leading-tight">
+          <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl 2xl:text-5xl font-bold tracking-wide text-charcoal-dark leading-tight">
             A Journey of Healing, Light & <br />
             <span className="text-gold-dark italic">Spiritual Awakening</span>
           </h1>
-          <p className="max-w-xl mx-auto text-xs text-charcoal-light leading-relaxed mt-2">
+          <p className="max-w-xl 2xl:max-w-2xl mx-auto text-xs sm:text-sm text-charcoal-light leading-relaxed mt-1 sm:mt-2">
             Providing a sacred, supportive sanctuary where souls can release ancestral blockages and manifest their divine purpose.
           </p>
         </div>
 
         {/* Section 1: Founder Story */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-          <div className="w-full h-80 rounded-2xl overflow-hidden shadow-sm bg-cream">
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-10 items-center">
+          <div className="w-full h-72 sm:h-96 2xl:h-[420px] rounded-2xl overflow-hidden shadow-sm bg-cream">
             <img 
               src={founderImg} 
               alt="Sonali Bhasin Kumar" 
               className="w-full h-full object-cover transform hover:scale-[1.02] transition-transform duration-500"
             />
           </div>
-          <div className="flex flex-col gap-4 text-left">
-            <h3 className="font-serif text-lg font-bold text-charcoal-dark uppercase tracking-wider">Meet the Founder</h3>
-            <p className="text-xs text-charcoal-light leading-relaxed">
+          <div className="flex flex-col gap-3 sm:gap-4 text-left">
+            <h3 className="font-serif text-base sm:text-lg font-bold text-charcoal-dark uppercase tracking-wider">Meet the Founder</h3>
+            <p className="text-xs sm:text-sm text-charcoal-light leading-relaxed">
               Ascension was created to offer a sacred, supportive space where individuals can reconnect, heal, and awaken spiritually. Founded by **Sonali Bhasin Kumar**, Ascension is not just a healing center—it is a community, a sanctuary, and a path to self-discovery.
             </p>
-            <p className="text-xs text-charcoal-light leading-relaxed">
+            <p className="text-xs sm:text-sm text-charcoal-light leading-relaxed">
               Sonali Bhasin Kumar is a spiritual healer, manifestation coach, and energy therapist. Her mission is to empower individuals to release emotional blocks, embrace self-love, and manifest the life they truly desire. Combining intuition, compassion, energy healing, angelic guidance, and manifestation practices, Sonali creates a safe, nurturing space for transformation.
             </p>
           </div>

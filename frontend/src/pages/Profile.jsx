@@ -76,8 +76,8 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen py-16 px-4 md:px-8 font-sans">
-      <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div className="min-h-screen py-10 sm:py-16 px-4 md:px-8 font-sans">
+      <div className="max-w-5xl 2xl:max-w-6xl 3xl:max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
         
         {/* Left Side: Profile Edit Form */}
         <div className="glass p-6 rounded-2xl border border-cream-dark/50 self-start text-left flex flex-col gap-4">

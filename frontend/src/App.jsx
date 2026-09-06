@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import MobileBottomNav from './components/MobileBottomNav';
 import ScrollToTop from './components/ScrollToTop';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
@@ -47,14 +48,16 @@ function App() {
               {/* Luxury Header */}
               <Navbar />
               
-              {/* Content Panel */}
-              <main className="flex-grow">
+              {/* Content Panel with mobile bottom safe padding */}
+              <main className="flex-grow pb-16 lg:pb-0">
                 <Routes>
                   {/* Public routes */}
                   <Route path="/" element={<Home />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/services" element={<Services />} />
                   <Route path="/programs" element={<Programs />} />
+                  <Route path="/webinars" element={<Home scrollToWebinar={true} />} />
+                  <Route path="/webinar" element={<Home scrollToWebinar={true} />} />
                   <Route path="/shop" element={<Shop />} />
                   <Route path="/product/:id" element={<ProductDetails />} />
                   <Route path="/community" element={<Community />} />
@@ -99,10 +102,10 @@ function App() {
                 </Routes>
               </main>
 
-              {/* Floating Heartbeat Donate Button */}
+              {/* Floating Heartbeat Donate Button - adjusted for mobile bottom navigation */}
               <Link 
                 to="/donate" 
-                className="fixed bottom-6 right-6 z-40 bg-sage hover:bg-sage-dark text-white p-4 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-105 group animate-heartbeat"
+                className="fixed bottom-20 right-4 lg:bottom-6 lg:right-6 z-30 bg-sage hover:bg-sage-dark text-white p-3.5 sm:p-4 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-105 group animate-heartbeat border border-gold/30"
                 title="Support Our Seva - Donate Now"
               >
                 <Heart className="w-5 h-5 fill-current transition-colors" />
@@ -113,6 +116,9 @@ function App() {
 
               {/* Luxury Footer */}
               <Footer />
+
+              {/* Mobile Single-Thumb Navigation Bar */}
+              <MobileBottomNav />
             </div>
           </Router>
         </WishlistProvider>
