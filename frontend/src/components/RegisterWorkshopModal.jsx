@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { X, CheckCircle, Compass, AlertTriangle, UploadCloud, CreditCard } from 'lucide-react';
+import { X, CheckCircle, Compass, AlertTriangle, UploadCloud, CreditCard, MessageCircle, Video, ExternalLink, Copy, Check } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
 
@@ -23,6 +23,8 @@ const RegisterWorkshopModal = ({ workshop, onClose }) => {
   const [screenshotPreview, setScreenshotPreview] = useState('');
   const [transactionId, setTransactionId] = useState('');
   const [loading, setLoading] = useState(false);
+  const [copiedWhatsapp, setCopiedWhatsapp] = useState(false);
+  const [copiedVideo, setCopiedVideo] = useState(false);
 
   const handleInfoSubmit = (e) => {
     e.preventDefault();
@@ -38,39 +40,7 @@ const RegisterWorkshopModal = ({ workshop, onClose }) => {
       return;
     }
     
-    // If workshop price is 0 (Free), we submit immediately without showing QR code
-    if (workshop.pricing === 0) {
-      handleFreeSubmit();
-    } else {
-      setStep(2); // Go to Payment Page
-    }
-  };
-
-  const handleFreeSubmit = async () => {
-    setLoading(true);
-    try {
-      const formData = new FormData();
-      formData.append('name', name);
-      formData.append('email', email);
-      formData.append('phone', `${countryCode} ${phone.trim()}`);
-      if (user) {
-        formData.append('userId', user._id);
-      }
-
-      const { data } = await axios.post(`/api/workshops/${workshop._id}/register`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-
-      if (data.success) {
-        setStep(3); // Success page
-      }
-    } catch (err) {
-      alert(err.response?.data?.message || 'Workshop registration failed. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+    setStep(2); // Go to Payment Page
   };
 
   const handleFileChange = (e) => {
@@ -136,6 +106,10 @@ const RegisterWorkshopModal = ({ workshop, onClose }) => {
     year: 'numeric'
   });
 
+  const isAncestral = (workshop.title && workshop.title.toLowerCase().includes('ancestral')) || (workshop.name && workshop.name.toLowerCase().includes('ancestral'));
+  const whatsappLink = workshop.whatsappGroupLink || (isAncestral ? 'https://chat.whatsapp.com/J4nXj2mznEfLCj2YZd1v16' : '');
+  const videoLink = isAncestral ? 'https://youtu.be/jIs3IH-brtg' : (workshop.introVideoUrl || workshop.videoUrl || '');
+
   return (
     <div className="fixed inset-0 z-50 bg-charcoal/40 backdrop-blur-sm flex items-center justify-center p-4">
       <div className="glass max-w-md w-full rounded-2xl shadow-xl overflow-hidden animate-slide-up max-h-[90vh] flex flex-col">
@@ -164,7 +138,7 @@ const RegisterWorkshopModal = ({ workshop, onClose }) => {
               <div className="bg-cream p-3.5 rounded-xl border border-cream-dark flex justify-between items-center text-charcoal">
                 <span className="text-charcoal-light">Investment Fees</span>
                 <span className="font-serif font-bold text-sm text-gold-dark">
-                  {workshop.pricing === 0 ? 'FREE' : `₹${workshop.pricing}`}
+                  ₹{workshop.pricing}
                 </span>
               </div>
 
@@ -177,7 +151,7 @@ const RegisterWorkshopModal = ({ workshop, onClose }) => {
                   onChange={(e) => setName(e.target.value)}
                   required
                   placeholder="Enter full name"
-                  className="w-full bg-cream-light border border-cream-dark/60 rounded-xl py-2.5 px-3.5 text-charcoal focus:outline-none focus:border-sage transition-all"
+                  className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all"
                 />
               </div>
 
@@ -190,18 +164,18 @@ const RegisterWorkshopModal = ({ workshop, onClose }) => {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   placeholder="Enter email address"
-                  className="w-full bg-cream-light border border-cream-dark/60 rounded-xl py-2.5 px-3.5 text-charcoal focus:outline-none focus:border-sage transition-all"
+                  className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all"
                 />
               </div>
 
               {/* Phone */}
               <div className="flex flex-col gap-1.5 text-left">
-                <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Phone Number</label>
+                <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">WhatsApp Phone Number</label>
                 <div className="flex gap-2">
                   <select
                     value={countryCode}
                     onChange={(e) => setCountryCode(e.target.value)}
-                    className="bg-cream-light border border-cream-dark/60 rounded-xl py-2.5 px-2 text-charcoal focus:outline-none focus:border-sage transition-all w-20 shrink-0"
+                    className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-2 text-charcoal focus:outline-none focus:border-sage transition-all w-20 shrink-0"
                   >
                     <option value="+91">+91 (IN)</option>
                     <option value="+1">+1 (US)</option>
@@ -215,58 +189,45 @@ const RegisterWorkshopModal = ({ workshop, onClose }) => {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     required
-                    placeholder="10-digit mobile"
-                    className="flex-1 bg-cream-light border border-cream-dark/60 rounded-xl py-2.5 px-3.5 text-charcoal focus:outline-none focus:border-sage transition-all"
+                    placeholder="10-digit number"
+                    className="flex-1 bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all"
                   />
                 </div>
               </div>
 
-              <div className="flex gap-3 mt-4 shrink-0">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="w-1/3 bg-cream hover:bg-cream-dark border border-cream-dark/50 text-charcoal font-bold py-2.5 rounded-xl transition-all text-center uppercase tracking-wider text-[9px]"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-2/3 bg-sage hover:bg-sage-dark text-white font-bold py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center uppercase tracking-wider text-[9px] gap-2"
-                >
-                  {loading && <Compass className="w-3.5 h-3.5 animate-spin" />}
-                  <span>{loading ? 'Processing...' : workshop.pricing === 0 ? 'Register Now (Free)' : 'Proceed to Payment'}</span>
-                </button>
+              {/* Date & Time Info Banner */}
+              <div className="bg-cream-light p-3 rounded-xl border border-cream-dark/50 flex flex-col gap-1 text-[11px] text-charcoal-light text-left mt-1">
+                <span className="font-bold text-charcoal-dark uppercase text-[9px]">Schedule</span>
+                <span>📅 {formattedDate}</span>
+                <span>⏰ {workshop.time}</span>
               </div>
+
+              <button
+                type="submit"
+                className="w-full bg-sage hover:bg-sage-dark text-white font-bold py-2.5 rounded-xl transition-all shadow-sm mt-2 uppercase tracking-wider text-[10px]"
+              >
+                Proceed to Payment
+              </button>
             </form>
           )}
 
           {step === 2 && (
-            /* Step 2: UPI Manual Payment Form */
-            <form onSubmit={handlePaymentSubmit} className="flex flex-col gap-4 font-sans text-xs text-left">
+            /* Step 2: Payment Page */
+            <form onSubmit={handlePaymentSubmit} className="flex flex-col gap-4 font-sans text-xs">
               
-              {/* Workshop info details summary */}
-              <div className="bg-cream/50 p-4 rounded-xl border border-cream-dark/60 flex flex-col gap-2">
-                <div className="flex justify-between items-center text-charcoal border-b border-cream-dark/50 pb-2">
-                  <span className="font-bold font-serif text-[13px]">{workshop.title}</span>
-                  <span className="font-serif font-bold text-gold-dark text-[13px]">₹{workshop.pricing}</span>
-                </div>
-                <div className="text-[10px] text-charcoal-light flex flex-col gap-0.5">
-                  <p><strong>Date & Time:</strong> {formattedDate} at {workshop.time}</p>
-                </div>
+              {/* Fee summary */}
+              <div className="bg-cream p-3 rounded-xl border border-cream-dark flex justify-between items-center text-charcoal">
+                <span className="text-charcoal-light font-medium">Payable Amount</span>
+                <span className="font-serif font-bold text-base text-gold-dark">₹{workshop.pricing}</span>
               </div>
 
-              {/* UPI Details Display */}
-              <div className="flex flex-col items-center text-center gap-3">
-                <h4 className="font-bold text-charcoal-dark text-[11px] uppercase tracking-wider flex items-center gap-1.5 justify-center">
-                  <CreditCard className="w-4 h-4 text-gold-dark" />
-                  <span>Manual UPI Payment</span>
-                </h4>
-                
-                <div className="w-56 h-56 bg-white border border-cream-dark/80 p-3 rounded-xl overflow-hidden shadow-xs flex items-center justify-center">
-                  <img 
-                    src={getImageUrl('/uploads/default_upi_qr.jpg')} 
-                    alt="UPI QR Code Scan" 
+              {/* QR and Instruction */}
+              <div className="bg-white/60 p-4 rounded-2xl border border-cream-dark flex flex-col items-center gap-3">
+                <span className="text-[10px] font-bold text-charcoal-light uppercase tracking-wider">Scan & Pay via UPI</span>
+                <div className="w-44 h-44 bg-cream rounded-xl border border-cream-dark/80 p-2 overflow-hidden flex items-center justify-center">
+                  <img
+                    src={getImageUrl('/uploads/default_upi_qr.jpg')}
+                    alt="Workshop Payment QR"
                     className="w-full h-full object-contain"
                   />
                 </div>
@@ -277,11 +238,10 @@ const RegisterWorkshopModal = ({ workshop, onClose }) => {
                     <strong className="select-all text-gold-dark">sonalibhasinkumar@ptaxis</strong>
                   </p>
                 </div>
-
                 <div className="bg-lavender-light/40 border border-lavender p-3 rounded-xl flex gap-2 text-left text-[10px]">
                   <AlertTriangle className="w-4.5 h-4.5 text-lavender-dark shrink-0 mt-0.5" />
                   <span className="leading-relaxed text-charcoal-light">
-                    Scan the QR code above using GPay, PhonePe, Paytm, or BHIM. After making the payment, enter the 12-digit transaction ID and upload the receipt screenshot below.
+                    Scan the QR code above. Enter the 12-digit transaction ID and upload the receipt screenshot below.
                   </span>
                 </div>
               </div>
@@ -341,19 +301,92 @@ const RegisterWorkshopModal = ({ workshop, onClose }) => {
 
           {step === 3 && (
             /* Step 3: Success Screen */
-            <div className="p-8 flex flex-col items-center justify-center text-center gap-4">
-              <CheckCircle className="w-12 h-12 text-sage animate-pulse-subtle" />
+            <div className="p-6 flex flex-col items-center justify-center text-center gap-3.5">
+              <CheckCircle className="w-11 h-11 text-sage animate-pulse-subtle" />
               <h4 className="font-serif text-lg font-bold text-charcoal-dark">
                 Registration Submitted!
               </h4>
-              <p className="text-xs text-charcoal-light leading-relaxed px-4">
+              <p className="text-xs text-charcoal-light leading-relaxed px-2 border-b border-cream-dark/50 pb-2.5">
                 Blessings! Your registration request for <strong>{workshop.title}</strong> has been submitted. Our team will verify your transaction ID shortly and confirm your seat via email!
               </p>
+
+              {/* WhatsApp Community Group Banner */}
+              {whatsappLink && (
+                <div className="w-full bg-[#25D366]/10 border border-[#25D366]/30 rounded-2xl p-4 flex flex-col items-center text-center gap-2.5 my-1">
+                  <div className="flex items-center gap-1.5 text-[#128C7E] font-bold text-xs">
+                    <MessageCircle className="w-4 h-4 text-[#25D366] fill-[#25D366]/20" />
+                    <span>Join Workshop WhatsApp Group</span>
+                  </div>
+                  <p className="text-[11px] text-charcoal-light leading-relaxed">
+                    Please join our official WhatsApp group for live meeting links, session preparation updates, and announcements.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-2 w-full mt-1">
+                    <a
+                      href={whatsappLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all shadow-xs active:scale-98"
+                    >
+                      <MessageCircle className="w-3.5 h-3.5 fill-white" />
+                      <span>Join WhatsApp Group</span>
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(whatsappLink);
+                        setCopiedWhatsapp(true);
+                        setTimeout(() => setCopiedWhatsapp(false), 2500);
+                      }}
+                      className="bg-white hover:bg-cream border border-cream-dark/80 text-charcoal-dark font-medium py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1 transition-all"
+                    >
+                      {copiedWhatsapp ? <Check className="w-3.5 h-3.5 text-sage" /> : <Copy className="w-3.5 h-3.5 text-charcoal-light" />}
+                      <span>{copiedWhatsapp ? 'Copied Link' : 'Copy Link'}</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Introduction to Ancestral Healing Video Banner */}
+              {videoLink && (
+                <div className="w-full bg-rose-500/10 border border-rose-500/25 rounded-2xl p-4 flex flex-col items-center text-center gap-2.5 my-1">
+                  <div className="flex items-center gap-1.5 text-rose-700 font-bold text-xs">
+                    <Video className="w-4 h-4 text-rose-600" />
+                    <span>Introduction to Ancestral Healing</span>
+                  </div>
+                  <p className="text-[11px] text-charcoal-light leading-relaxed">
+                    Watch this introductory session to understand generational karma, prepare your energy, and align with your healing path.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-2 w-full mt-1">
+                    <a
+                      href={videoLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all shadow-xs active:scale-98"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>Watch Introduction Video</span>
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(videoLink);
+                        setCopiedVideo(true);
+                        setTimeout(() => setCopiedVideo(false), 2500);
+                      }}
+                      className="bg-white hover:bg-cream border border-cream-dark/80 text-charcoal-dark font-medium py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1 transition-all"
+                    >
+                      {copiedVideo ? <Check className="w-3.5 h-3.5 text-sage" /> : <Copy className="w-3.5 h-3.5 text-charcoal-light" />}
+                      <span>{copiedVideo ? 'Copied Video' : 'Copy Video Link'}</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <button
                 onClick={onClose}
-                className="w-full bg-sage hover:bg-sage-dark text-white text-xs font-bold py-2.5 rounded-xl transition-all duration-300 shadow-sm mt-4"
+                className="w-full bg-sage hover:bg-sage-dark text-white text-xs font-bold py-2.5 rounded-xl transition-all duration-300 shadow-sm mt-3"
               >
-                Close
+                Close Window
               </button>
             </div>
           )}

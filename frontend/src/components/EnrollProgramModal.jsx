@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { X, CheckCircle, Compass, UploadCloud, Smartphone } from 'lucide-react';
+import { X, CheckCircle, Compass, UploadCloud, Smartphone, Video, ExternalLink, MessageCircle, Copy, Check } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
 
@@ -16,9 +16,11 @@ const EnrollProgramModal = ({ program, onClose }) => {
   const { user } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [copiedWhatsapp, setCopiedWhatsapp] = useState(false);
+  const [copiedVideo, setCopiedVideo] = useState(false);
 
   // Form fields
-  const [phone, setPhone] = useState(user ? user.phone || '' : '');
+  const [phone, setPhone] = useState(user?.phone || '');
   const [transactionId, setTransactionId] = useState('');
   const [screenshot, setScreenshot] = useState(null);
   const [screenshotPreview, setScreenshotPreview] = useState('');
@@ -33,19 +35,19 @@ const EnrollProgramModal = ({ program, onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!transactionId || !screenshot) {
-      alert('Please enter your transaction Reference ID and upload the receipt screenshot.');
+    if (!transactionId.trim() || !screenshot) {
+      alert('Please enter your transaction ID and upload payment screenshot');
       return;
     }
 
     setLoading(true);
     try {
       const formData = new FormData();
-      formData.append('phone', phone);
-      formData.append('transactionId', transactionId);
+      formData.append('transactionId', transactionId.trim());
+      formData.append('phone', phone.trim());
       formData.append('paymentScreenshot', screenshot);
 
-      const { data } = await axios.post(`/api/programs/${program._id}/enroll-qr`, formData, {
+      const { data } = await axios.post(`/api/programs/${program._id}/enroll`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -60,6 +62,10 @@ const EnrollProgramModal = ({ program, onClose }) => {
       setLoading(false);
     }
   };
+
+  const isAncestral = (program.title && program.title.toLowerCase().includes('ancestral')) || (program.name && program.name.toLowerCase().includes('ancestral'));
+  const whatsappLink = program.whatsappGroupLink || (isAncestral ? 'https://chat.whatsapp.com/J4nXj2mznEfLCj2YZd1v16' : '');
+  const videoLink = isAncestral ? 'https://youtu.be/jIs3IH-brtg' : (program.introVideoUrl || program.videoUrl || '');
 
   return (
     <div className="fixed inset-0 z-50 bg-charcoal/40 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
@@ -82,18 +88,90 @@ const EnrollProgramModal = ({ program, onClose }) => {
 
         {success ? (
           /* Success Screen */
-          <div className="p-6 sm:p-8 flex flex-col items-center justify-center text-center gap-4 overflow-y-auto flex-1">
-            <CheckCircle className="w-12 h-12 text-gold animate-pulse" />
+          <div className="p-5 sm:p-7 flex flex-col items-center justify-center text-center gap-3 overflow-y-auto flex-1">
+            <CheckCircle className="w-11 h-11 text-gold animate-pulse" />
             <h4 className="font-serif text-lg font-bold text-charcoal-dark">
               Request Submitted!
             </h4>
-            <p className="text-xs text-charcoal-light leading-relaxed px-2 sm:px-4">
-              Thank you, **{user?.name}**! Your manual payment check request (Transaction ID: **{transactionId}**) has been submitted successfully. 
-              Our team will verify the payment and activate the program in your dashboard shortly.
+            <p className="text-xs text-charcoal-light leading-relaxed px-2 border-b border-cream-dark/50 pb-2.5">
+              Thank you, <strong>{user?.name}</strong>! Your manual payment check request (Transaction ID: <strong>{transactionId}</strong>) has been submitted successfully. Our team will verify and activate the program in your dashboard shortly.
             </p>
+
+            {/* WhatsApp Group Banner */}
+            {whatsappLink && (
+              <div className="w-full bg-[#25D366]/10 border border-[#25D366]/30 rounded-2xl p-4 flex flex-col items-center text-center gap-2.5 my-1">
+                <div className="flex items-center gap-1.5 text-[#128C7E] font-bold text-xs">
+                  <MessageCircle className="w-4 h-4 text-[#25D366] fill-[#25D366]/20" />
+                  <span>Join Program WhatsApp Group</span>
+                </div>
+                <p className="text-[11px] text-charcoal-light leading-relaxed">
+                  Please join our official WhatsApp community group for live class links, reminders, and cohort updates.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-2 w-full mt-1">
+                  <a
+                    href={whatsappLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all shadow-xs active:scale-98"
+                  >
+                    <MessageCircle className="w-3.5 h-3.5 fill-white" />
+                    <span>Join WhatsApp Group</span>
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(whatsappLink);
+                      setCopiedWhatsapp(true);
+                      setTimeout(() => setCopiedWhatsapp(false), 2500);
+                    }}
+                    className="bg-white hover:bg-cream border border-cream-dark/80 text-charcoal-dark font-medium py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1 transition-all"
+                  >
+                    {copiedWhatsapp ? <Check className="w-3.5 h-3.5 text-sage" /> : <Copy className="w-3.5 h-3.5 text-charcoal-light" />}
+                    <span>{copiedWhatsapp ? 'Copied Link' : 'Copy Link'}</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Introduction to Ancestral Healing Video Banner */}
+            {videoLink && (
+              <div className="w-full bg-rose-500/10 border border-rose-500/25 rounded-2xl p-4 flex flex-col items-center text-center gap-2.5 my-1">
+                <div className="flex items-center gap-1.5 text-rose-700 font-bold text-xs">
+                  <Video className="w-4 h-4 text-rose-600" />
+                  <span>Introduction to Ancestral Healing</span>
+                </div>
+                <p className="text-[11px] text-charcoal-light leading-relaxed">
+                  Watch this introductory session to understand generational karma, prepare your energy, and align with your healing path.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-2 w-full mt-1">
+                  <a
+                    href={videoLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all shadow-xs active:scale-98"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>Watch Introduction Video</span>
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard.writeText(videoLink);
+                      setCopiedVideo(true);
+                      setTimeout(() => setCopiedVideo(false), 2500);
+                    }}
+                    className="bg-white hover:bg-cream border border-cream-dark/80 text-charcoal-dark font-medium py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1 transition-all"
+                  >
+                    {copiedVideo ? <Check className="w-3.5 h-3.5 text-sage" /> : <Copy className="w-3.5 h-3.5 text-charcoal-light" />}
+                    <span>{copiedVideo ? 'Copied Video' : 'Copy Video Link'}</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
             <button
               onClick={onClose}
-              className="w-full bg-gold hover:bg-gold-dark text-charcoal-dark text-xs font-bold py-2.5 rounded-xl transition-all duration-300 shadow-sm mt-4 uppercase tracking-wider"
+              className="w-full bg-gold hover:bg-gold-dark text-charcoal-dark text-xs font-bold py-2.5 rounded-xl transition-all duration-300 shadow-sm mt-3 uppercase tracking-wider"
             >
               Done
             </button>

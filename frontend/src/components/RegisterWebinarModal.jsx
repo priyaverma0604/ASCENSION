@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { X, CheckCircle, Compass, AlertTriangle, Upload, CreditCard, MessageCircle, Copy, Check } from 'lucide-react';
+import { X, CheckCircle, Compass, AlertTriangle, Upload, CreditCard, MessageCircle, Copy, Check, Video, ExternalLink } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
 
@@ -24,6 +24,7 @@ const RegisterWebinarModal = ({ webinar, onClose }) => {
   const [transactionId, setTransactionId] = useState('');
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [copiedVideo, setCopiedVideo] = useState(false);
 
   const handleInfoSubmit = (e) => {
     e.preventDefault();
@@ -330,7 +331,7 @@ const RegisterWebinarModal = ({ webinar, onClose }) => {
 
               {/* WhatsApp Community Group Banner */}
               {(() => {
-                const isAncestral = webinar.title && webinar.title.toLowerCase().includes('ancestral');
+                const isAncestral = (webinar.title && webinar.title.toLowerCase().includes('ancestral')) || (webinar.name && webinar.name.toLowerCase().includes('ancestral'));
                 const whatsappLink = webinar.whatsappGroupLink || (isAncestral ? 'https://chat.whatsapp.com/J4nXj2mznEfLCj2YZd1v16' : '');
 
                 if (!whatsappLink) return null;
@@ -365,6 +366,49 @@ const RegisterWebinarModal = ({ webinar, onClose }) => {
                       >
                         {copied ? <Check className="w-3.5 h-3.5 text-sage" /> : <Copy className="w-3.5 h-3.5 text-charcoal-light" />}
                         <span>{copied ? 'Copied Link' : 'Copy Link'}</span>
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Introduction to Ancestral Healing Video Banner */}
+              {(() => {
+                const isAncestral = (webinar.title && webinar.title.toLowerCase().includes('ancestral')) || (webinar.name && webinar.name.toLowerCase().includes('ancestral'));
+                const videoLink = isAncestral ? 'https://youtu.be/jIs3IH-brtg' : (webinar.introVideoUrl || webinar.videoUrl || '');
+
+                if (!videoLink) return null;
+
+                return (
+                  <div className="w-full bg-rose-500/10 border border-rose-500/25 rounded-2xl p-4 flex flex-col items-center text-center gap-2.5 my-1">
+                    <div className="flex items-center gap-1.5 text-rose-700 font-bold text-xs">
+                      <Video className="w-4 h-4 text-rose-600" />
+                      <span>Introduction to Ancestral Healing</span>
+                    </div>
+                    <p className="text-[11px] text-charcoal-light leading-relaxed">
+                      Watch this introductory session to understand generational karma, prepare your energy, and align with your healing path.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-2 w-full mt-1">
+                      <a
+                        href={videoLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1.5 transition-all shadow-xs active:scale-98"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        <span>Watch Introduction Video</span>
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText(videoLink);
+                          setCopiedVideo(true);
+                          setTimeout(() => setCopiedVideo(false), 2500);
+                        }}
+                        className="bg-white hover:bg-cream border border-cream-dark/80 text-charcoal-dark font-medium py-2.5 px-3 rounded-xl text-xs flex items-center justify-center gap-1 transition-all"
+                      >
+                        {copiedVideo ? <Check className="w-3.5 h-3.5 text-sage" /> : <Copy className="w-3.5 h-3.5 text-charcoal-light" />}
+                        <span>{copiedVideo ? 'Copied Video' : 'Copy Video Link'}</span>
                       </button>
                     </div>
                   </div>
