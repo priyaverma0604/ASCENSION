@@ -16,6 +16,14 @@ const Login = () => {
   const [searchParams] = useSearchParams();
   const redirect = searchParams.get('redirect') || '/';
 
+  // Support prefilling email from url query params (e.g. from register page)
+  useEffect(() => {
+    const emailParam = searchParams.get('email');
+    if (emailParam) {
+      setEmail(emailParam);
+    }
+  }, [searchParams]);
+
   // Redirect if already logged in
   useEffect(() => {
     if (user) {
@@ -81,7 +89,10 @@ const Login = () => {
           <div className="flex flex-col gap-1.5">
             <div className="flex justify-between items-center">
               <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Password</label>
-              <Link to="/forgot-password" className="text-[10px] font-bold text-sage hover:text-gold transition-colors">
+              <Link 
+                to={email ? `/forgot-password?email=${encodeURIComponent(email)}` : '/forgot-password'} 
+                className="text-[10px] font-bold text-sage hover:text-gold transition-colors"
+              >
                 Forgot Password?
               </Link>
             </div>

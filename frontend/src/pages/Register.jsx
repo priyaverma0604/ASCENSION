@@ -53,8 +53,24 @@ const Register = () => {
         </div>
 
         {error && (
-          <div className="bg-red-500/10 text-red-600 border border-red-500/20 text-xs p-3.5 rounded-xl text-left mb-4">
-            {error}
+          <div className="bg-amber-500/10 text-amber-900 border border-amber-500/30 text-xs p-4 rounded-xl text-left mb-4 shadow-sm">
+            <p className="font-semibold text-red-600 mb-1">{error}</p>
+            {error.toLowerCase().includes('already exist') && (
+              <div className="mt-2.5 pt-2.5 border-t border-amber-300/40 flex flex-wrap gap-2 text-[11px]">
+                <Link
+                  to={`/login?email=${encodeURIComponent(email)}`}
+                  className="bg-sage text-white px-3 py-1.5 rounded-lg font-bold hover:bg-sage-dark transition-colors shadow-xs"
+                >
+                  Log In Now
+                </Link>
+                <Link
+                  to={`/forgot-password?email=${encodeURIComponent(email)}`}
+                  className="bg-cream border border-cream-dark/60 text-charcoal px-3 py-1.5 rounded-lg font-bold hover:text-sage transition-colors shadow-xs"
+                >
+                  Reset Password
+                </Link>
+              </div>
+            )}
           </div>
         )}
 
