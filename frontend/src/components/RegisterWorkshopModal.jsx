@@ -354,7 +354,7 @@ const RegisterWorkshopModal = ({ workshop, onClose }) => {
                     <span>Introduction to Ancestral Healing</span>
                   </div>
                   <p className="text-[11px] text-charcoal-light leading-relaxed">
-                    Watch this introductory session to understand generational karma, prepare your energy, and align with your healing path.
+                    Please watch this video before the webinar.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-2 w-full mt-1">
                     <a
