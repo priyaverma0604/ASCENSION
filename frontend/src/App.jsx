@@ -58,6 +58,10 @@ function App() {
                   <Route path="/programs" element={<Programs />} />
                   <Route path="/webinars" element={<Home scrollToWebinar={true} />} />
                   <Route path="/webinar" element={<Home scrollToWebinar={true} />} />
+                  <Route path="/ancestral-healing-webinar" element={<Home scrollToWebinar={true} autoOpenAncestral={true} />} />
+                  <Route path="/ancestral-webinar" element={<Home scrollToWebinar={true} autoOpenAncestral={true} />} />
+                  <Route path="/webinar/ancestral-healing" element={<Home scrollToWebinar={true} autoOpenAncestral={true} />} />
+                  <Route path="/webinars/ancestral-healing" element={<Home scrollToWebinar={true} autoOpenAncestral={true} />} />
                   <Route path="/shop" element={<Shop />} />
                   <Route path="/product/:id" element={<ProductDetails />} />
                   <Route path="/community" element={<Community />} />

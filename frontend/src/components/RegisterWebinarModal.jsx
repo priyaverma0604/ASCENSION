@@ -30,6 +30,7 @@ const RegisterWebinarModal = ({ webinar, onClose }) => {
   const [copied, setCopied] = useState(false);
   const [copiedVideo, setCopiedVideo] = useState(false);
   const [copiedUpi, setCopiedUpi] = useState(false);
+  const [copiedDirectLink, setCopiedDirectLink] = useState(false);
 
   const handleInfoSubmit = (e) => {
     e.preventDefault();
@@ -133,13 +134,29 @@ const RegisterWebinarModal = ({ webinar, onClose }) => {
               </p>
             </div>
           </div>
-          <button 
-            onClick={onClose} 
-            className="p-1.5 rounded-xl text-charcoal hover:text-gold hover:bg-cream/60 transition-colors focus:outline-none"
-            aria-label="Close modal"
-          >
-            <X className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                const shareUrl = `${window.location.origin}/ancestral-healing-webinar`;
+                navigator.clipboard.writeText(shareUrl);
+                setCopiedDirectLink(true);
+                setTimeout(() => setCopiedDirectLink(false), 2500);
+              }}
+              title="Copy Direct Shareable Link"
+              className="bg-gold/10 hover:bg-gold/20 text-gold-dark border border-gold/30 font-medium py-1.5 px-2.5 rounded-xl text-[10px] sm:text-xs flex items-center gap-1.5 transition-all shadow-xs"
+            >
+              {copiedDirectLink ? <Check className="w-3.5 h-3.5 text-sage" /> : <Copy className="w-3.5 h-3.5 text-gold-dark" />}
+              <span>{copiedDirectLink ? 'Link Copied!' : 'Share Link'}</span>
+            </button>
+            <button 
+              onClick={onClose} 
+              className="p-1.5 rounded-xl text-charcoal hover:text-gold hover:bg-cream/60 transition-colors focus:outline-none"
+              aria-label="Close modal"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Scrollable Content */}

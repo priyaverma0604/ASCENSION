@@ -35,7 +35,7 @@ const getImageUrl = (path) => {
   return `${apiBase}${path}`;
 };
 
-const Home = ({ scrollToWebinar = false }) => {
+const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
 
@@ -48,12 +48,17 @@ const Home = ({ scrollToWebinar = false }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Auto-scroll to webinar section when accessed via /webinars, /webinar, #webinars, or prop
+  // Auto-scroll to webinar section when accessed via /webinars, /webinar, direct ancestral route, #webinars, or prop
   useEffect(() => {
     const shouldScroll =
       scrollToWebinar ||
+      autoOpenAncestral ||
       location.pathname === '/webinars' ||
       location.pathname === '/webinar' ||
+      location.pathname === '/ancestral-healing-webinar' ||
+      location.pathname === '/ancestral-webinar' ||
+      location.pathname === '/webinar/ancestral-healing' ||
+      location.pathname === '/webinars/ancestral-healing' ||
       location.hash === '#webinars' ||
       location.hash === '#webinar' ||
       location.hash === '#upcoming-events';
@@ -66,17 +71,72 @@ const Home = ({ scrollToWebinar = false }) => {
         }
       }, 200);
     }
-  }, [location, scrollToWebinar]);
+  }, [location, scrollToWebinar, autoOpenAncestral]);
 
-  // Auto-open active webinar modal if register query param is present
+  // Auto-open active ancestral webinar modal if accessed via direct route or query param
   useEffect(() => {
-    if (searchParams.get('register') === 'true' || searchParams.get('webinar')) {
-      const active = workshops.find(w => w.isWebinar) || workshops[0];
-      if (active) {
-        setActiveWorkshop(active);
+    const isAncestralRoute =
+      autoOpenAncestral ||
+      location.pathname === '/ancestral-healing-webinar' ||
+      location.pathname === '/ancestral-webinar' ||
+      location.pathname === '/webinar/ancestral-healing' ||
+      location.pathname === '/webinars/ancestral-healing' ||
+      searchParams.get('webinar') === 'ancestral' ||
+      searchParams.get('webinar') === 'ancestral-healing' ||
+      searchParams.get('register') === 'true';
+
+    if (isAncestralRoute) {
+      const found = workshops.find(
+        w => (w.title && w.title.toLowerCase().includes('ancestral')) || (w.name && w.name.toLowerCase().includes('ancestral'))
+      ) || workshops.find(w => w.isWebinar) || workshops[0];
+
+      if (found) {
+        setActiveWorkshop(found);
+      } else if (!loading) {
+        setActiveWorkshop({
+          _id: "ancestral-healing-webinar-id",
+          title: "Ancestral Healing Webinar",
+          shortDescription: "Join Sonali Bhasin Kumar for a powerful live introductory Ancestral Healing Webinar. Discover the foundations of healing family karma, clearing intergenerational trauma, and receiving sacred ancestral blessings.",
+          speakerName: "Sonali Bhasin Kumar",
+          date: new Date('2026-09-23T19:00:00+05:30'),
+          time: "7:00 PM - 8:30 PM IST",
+          duration: "90 minutes",
+          price: 99,
+          coverImage: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80",
+          upiQrCodeImage: "/uploads/default_upi_qr.jpg",
+          upiId: "sonalibhasinkumar@ptaxis",
+          mobileNumber: "9999999999",
+          whatsappGroupLink: "https://chat.whatsapp.com/J4nXj2mznEfLCj2YZd1v16",
+          isWebinar: true
+        });
       }
     }
-  }, [searchParams, workshops]);
+  }, [location, searchParams, workshops, loading, autoOpenAncestral]);
+
+  const handleOpenWorkshop = (workshop) => {
+    setActiveWorkshop(workshop);
+    const isAncestral =
+      (workshop.title && workshop.title.toLowerCase().includes('ancestral')) ||
+      (workshop.name && workshop.name.toLowerCase().includes('ancestral'));
+
+    if (isAncestral) {
+      window.history.pushState(null, '', '/ancestral-healing-webinar');
+    }
+  };
+
+  const handleCloseWorkshop = () => {
+    setActiveWorkshop(null);
+    const isAncestralPath =
+      location.pathname === '/ancestral-healing-webinar' ||
+      location.pathname === '/ancestral-webinar' ||
+      location.pathname === '/webinar/ancestral-healing' ||
+      location.pathname === '/webinars/ancestral-healing' ||
+      window.location.pathname === '/ancestral-healing-webinar';
+
+    if (isAncestralPath) {
+      window.history.pushState(null, '', '/webinars');
+    }
+  };
 
   // Newsletter state
   const [newsletterEmail, setNewsletterEmail] = useState('');
@@ -955,7 +1015,7 @@ const Home = ({ scrollToWebinar = false }) => {
                     return (
                       <div 
                         key={workshop._id} 
-                        onClick={() => setActiveWorkshop(workshop)}
+                        onClick={() => handleOpenWorkshop(workshop)}
                         className={`group bg-white rounded-3xl overflow-hidden shadow-md border transition-all duration-300 flex flex-col text-left h-full cursor-pointer hover:shadow-2xl hover:-translate-y-1 ${
                           isAncestral 
                             ? 'border-[#EAE3D2] hover:border-[#D4A017]/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(212,160,23,0.12)] bg-[#FFFDF7]/90' 
@@ -1005,7 +1065,7 @@ const Home = ({ scrollToWebinar = false }) => {
                               type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                setActiveWorkshop(workshop);
+                                handleOpenWorkshop(workshop);
                               }}
                               className={`text-[10px] font-bold uppercase tracking-wider py-2.5 px-5 rounded-lg transition-all duration-300 shadow-sm ${
                                 isAncestral 
@@ -1254,12 +1314,12 @@ const Home = ({ scrollToWebinar = false }) => {
       {activeWorkshop && activeWorkshop.isWebinar ? (
         <RegisterWebinarModal
           webinar={activeWorkshop}
-          onClose={() => setActiveWorkshop(null)}
+          onClose={handleCloseWorkshop}
         />
       ) : activeWorkshop && (
         <RegisterWorkshopModal
           workshop={activeWorkshop}
-          onClose={() => setActiveWorkshop(null)}
+          onClose={handleCloseWorkshop}
         />
       )}
     </div>
