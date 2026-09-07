@@ -263,9 +263,12 @@ const ProgramDetails = ({ autoProgram }) => {
                 {program.title}
               </h1>
 
-              <p className="text-xs sm:text-sm text-charcoal-light leading-relaxed">
-                {program.description}
-              </p>
+              <div className="flex flex-col gap-2">
+                <span className="text-[10px] text-sage uppercase tracking-widest font-bold">About the Program</span>
+                <p className="text-xs sm:text-sm text-charcoal leading-relaxed whitespace-pre-line font-sans">
+                  {program.description}
+                </p>
+              </div>
             </div>
 
             {/* Pricing & CTA Card */}

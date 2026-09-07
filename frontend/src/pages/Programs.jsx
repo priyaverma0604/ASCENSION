@@ -181,7 +181,7 @@ const Programs = () => {
                         </h3>
                       </Link>
                       
-                      <p className="text-xs sm:text-sm text-charcoal-light leading-relaxed whitespace-pre-line">
+                      <p className="text-xs text-charcoal-light leading-relaxed line-clamp-3">
                         {program.description}
                       </p>
                     </div>
