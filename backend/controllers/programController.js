@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Program = require('../models/Program');
 const User = require('../models/User');
 const ProgramRegistration = require('../models/ProgramRegistration');
@@ -26,7 +27,7 @@ const getImagesPaths = (req) => {
 // @access  Public
 exports.getPrograms = async (req, res, next) => {
   try {
-    const programs = await Program.find({}).populate('enrolledUsers', 'name email');
+    const programs = await Program.find({}).sort({ createdAt: -1 });
     res.json({ success: true, count: programs.length, data: programs });
   } catch (error) {
     next(error);
@@ -38,7 +39,34 @@ exports.getPrograms = async (req, res, next) => {
 // @access  Public
 exports.getProgramById = async (req, res, next) => {
   try {
-    const program = await Program.findById(req.params.id).populate('enrolledUsers', 'name email');
+    const { id } = req.params;
+    let program = null;
+
+    // 1. Try finding by MongoDB ObjectId
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      program = await Program.findById(id).populate('enrolledUsers', 'name email');
+    }
+
+    // 2. If not found by ObjectId or if id is a slug/string
+    if (!program) {
+      const cleanSlug = id.trim().toLowerCase().replace(/-/g, ' ');
+      
+      // Try exact title match (case-insensitive)
+      program = await Program.findOne({
+        title: { $regex: new RegExp(`^${cleanSlug}$`, 'i') }
+      }).populate('enrolledUsers', 'name email');
+
+      // If still not found, try partial match (e.g. 'ancestral healing')
+      if (!program) {
+        const words = cleanSlug.split(' ').filter(Boolean).map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+        if (words.length > 0) {
+          program = await Program.findOne({
+            title: { $regex: new RegExp(words.join('.*'), 'i') }
+          }).populate('enrolledUsers', 'name email');
+        }
+      }
+    }
+
     if (!program) {
       return res.status(404).json({ success: false, message: 'Program not found' });
     }

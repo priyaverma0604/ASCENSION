@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { 
   Compass, Eye, Edit2, Trash2, PlusCircle, CheckCircle, 
   X, RefreshCw, Layers, ShieldCheck, ShoppingBag, 
-  Calendar, MapPin, DollarSign, MessageCircle, FileText, Smile 
+  Calendar, MapPin, DollarSign, MessageCircle, FileText, Smile,
+  Share2, Copy, Check
 } from 'lucide-react';
 import axios from 'axios';
 
@@ -27,6 +28,7 @@ const AdminDashboard = () => {
   const [programProgressList, setProgramProgressList] = useState([]);
   const [loadingProgressList, setLoadingProgressList] = useState(false);
   const [selectedUserProgress, setSelectedUserProgress] = useState(null);
+  const [adminCopiedId, setAdminCopiedId] = useState(null);
 
   // Form State
   const [serviceTitle, setServiceTitle] = useState('');
@@ -546,6 +548,27 @@ const AdminDashboard = () => {
 
                       {/* Column 4: Actions */}
                       <td className="py-3 px-4 text-right flex justify-end gap-1.5 items-center">
+                        {/* Copy Program Link Button */}
+                        {activeTab === 'programs' && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const url = `${window.location.origin}/program/${item._id}`;
+                              navigator.clipboard.writeText(url);
+                              setAdminCopiedId(item._id);
+                              setTimeout(() => setAdminCopiedId(null), 2500);
+                            }}
+                            className="p-1.5 hover:text-gold text-charcoal/60 transition-colors focus:outline-none flex items-center gap-1 text-[10px] font-bold"
+                            title="Copy Direct Program Link"
+                          >
+                            {adminCopiedId === item._id ? (
+                              <span className="text-emerald-600 flex items-center gap-0.5"><Check className="w-3.5 h-3.5" /> Copied</span>
+                            ) : (
+                              <Share2 className="w-4 h-4" />
+                            )}
+                          </button>
+                        )}
+
                         {/* View Registrants/Inquiries Button */}
                         {['workshops', 'retreats', 'programs', 'orders', 'contacts', 'donations'].includes(activeTab) && (
                           <button

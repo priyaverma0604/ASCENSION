@@ -14,6 +14,7 @@ import Home from './pages/Home';
 import About from './pages/About';
 import Services from './pages/Services';
 import Programs from './pages/Programs';
+import ProgramDetails from './pages/ProgramDetails';
 import Shop from './pages/Shop';
 import Community from './pages/Community';
 import NGO from './pages/NGO';
@@ -57,6 +58,11 @@ function App() {
                   <Route path="/about" element={<About />} />
                   <Route path="/services" element={<Services />} />
                   <Route path="/programs" element={<Programs />} />
+                  <Route path="/program/:id" element={<ProgramDetails />} />
+                  <Route path="/programs/:id" element={<ProgramDetails />} />
+                  <Route path="/programs/details/:id" element={<ProgramDetails />} />
+                  <Route path="/ancestral-healing-program" element={<ProgramDetails autoProgram="ancestral-healing" />} />
+                  <Route path="/ancestral-program" element={<ProgramDetails autoProgram="ancestral-healing" />} />
                   <Route path="/webinars" element={<Home scrollToWebinar={true} />} />
                   <Route path="/webinar" element={<Home scrollToWebinar={true} />} />
                   <Route path="/ancestral-healing-webinar" element={<Home scrollToWebinar={true} autoOpenAncestral={true} />} />
