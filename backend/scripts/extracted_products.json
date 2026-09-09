@@ -2,7 +2,7 @@
   {
     "name": "Ascension Cleansing Bath Salt",
     "category": "Bath Salts",
-    "pricing": 499,
+    "pricing": 350,
     "stock": 50,
     "images": [
       "/uploads/cleansing_bath_salt_1.jpeg",
@@ -13,7 +13,7 @@
   {
     "name": "Ascension Abundance Bath Salt",
     "category": "Bath Salts",
-    "pricing": 499,
+    "pricing": 350,
     "stock": 50,
     "images": [
       "/uploads/abundance_bath_salt_1.jpeg",
@@ -24,7 +24,7 @@
   {
     "name": "Ascension Protection Salt",
     "category": "Bath Salts",
-    "pricing": 499,
+    "pricing": 350,
     "stock": 50,
     "images": [
       "/uploads/protection_bath_salt_1.jpeg",
@@ -35,7 +35,7 @@
   {
     "name": "Ascension Health Salt",
     "category": "Bath Salts",
-    "pricing": 499,
+    "pricing": 350,
     "stock": 50,
     "images": [
       "/uploads/health_bath_salt_1.jpeg",
@@ -46,7 +46,7 @@
   {
     "name": "Ascension Love & Peace Salt",
     "category": "Bath Salts",
-    "pricing": 499,
+    "pricing": 350,
     "stock": 50,
     "images": [
       "/uploads/love_peace_bath_salt_1.jpeg",
@@ -57,7 +57,7 @@
   {
     "name": "Ascension Cleansing Camphor",
     "category": "Healing Camphor",
-    "pricing": 399,
+    "pricing": 650,
     "stock": 50,
     "images": [
       "/uploads/cleansing_camphor_1.jpeg",
@@ -68,7 +68,7 @@
   {
     "name": "Ascension Abundance Camphor",
     "category": "Healing Camphor",
-    "pricing": 399,
+    "pricing": 650,
     "stock": 50,
     "images": [
       "/uploads/abundance_camphor_1.jpeg",
@@ -79,7 +79,7 @@
   {
     "name": "Ascension Protection Camphor",
     "category": "Healing Camphor",
-    "pricing": 399,
+    "pricing": 650,
     "stock": 50,
     "images": [
       "/uploads/protection_camphor_1.jpeg",
@@ -90,7 +90,7 @@
   {
     "name": "Ascension Health Camphor",
     "category": "Healing Camphor",
-    "pricing": 399,
+    "pricing": 650,
     "stock": 50,
     "images": [
       "/uploads/health_camphor_1.jpeg",
@@ -101,7 +101,7 @@
   {
     "name": "Ascension Love & Peace Camphor",
     "category": "Healing Camphor",
-    "pricing": 399,
+    "pricing": 650,
     "stock": 50,
     "images": [
       "/uploads/love_peace_camphor_1.jpeg",
@@ -112,7 +112,7 @@
   {
     "name": "Ascension Cleansing Oil",
     "category": "Healing Oils",
-    "pricing": 599,
+    "pricing": 250,
     "stock": 50,
     "images": [
       "/uploads/cleansing_oil_1.jpeg"
@@ -122,7 +122,7 @@
   {
     "name": "Ascension Abundance Oil",
     "category": "Healing Oils",
-    "pricing": 599,
+    "pricing": 250,
     "stock": 50,
     "images": [
       "/uploads/abundance_oil_1.jpeg"
@@ -132,7 +132,7 @@
   {
     "name": "Ascension Protection Oil",
     "category": "Healing Oils",
-    "pricing": 599,
+    "pricing": 250,
     "stock": 50,
     "images": [
       "/uploads/protection_oil_1.jpeg"
@@ -142,7 +142,7 @@
   {
     "name": "Ascension Health Oil",
     "category": "Healing Oils",
-    "pricing": 599,
+    "pricing": 250,
     "stock": 50,
     "images": [
       "/uploads/health_oil_1.jpeg"
@@ -152,7 +152,7 @@
   {
     "name": "Ascension Love & Peace Oil",
     "category": "Healing Oils",
-    "pricing": 599,
+    "pricing": 250,
     "stock": 50,
     "images": [
       "/uploads/love_peace_oil_1.jpeg"
@@ -162,7 +162,7 @@
   {
     "name": "Ascension Abundance Candle",
     "category": "Candles",
-    "pricing": 699,
+    "pricing": 375,
     "stock": 50,
     "images": [
       "/uploads/abundance_candle_1.jpeg",
@@ -173,7 +173,7 @@
   {
     "name": "Ascension Protection Candle",
     "category": "Candles",
-    "pricing": 699,
+    "pricing": 375,
     "stock": 50,
     "images": [
       "/uploads/protection_candle_1.jpeg",
@@ -184,7 +184,7 @@
   {
     "name": "Ascension Cleansing Candle",
     "category": "Candles",
-    "pricing": 699,
+    "pricing": 375,
     "stock": 50,
     "images": [
       "/uploads/cleansing_candle_1.jpeg",
@@ -195,7 +195,7 @@
   {
     "name": "Ascension Health Candle",
     "category": "Candles",
-    "pricing": 699,
+    "pricing": 375,
     "stock": 50,
     "images": [
       "/uploads/health_candle_1.jpeg",
@@ -206,7 +206,7 @@
   {
     "name": "Ascension Love & Peace Candle",
     "category": "Candles",
-    "pricing": 699,
+    "pricing": 375,
     "stock": 50,
     "images": [
       "/uploads/love_peace_candle_1.jpeg",
@@ -217,7 +217,7 @@
   {
     "name": "Ascension Protection Wax Tablet",
     "category": "Wax Tablets",
-    "pricing": 399,
+    "pricing": 250,
     "stock": 50,
     "images": [
       "/uploads/protection_wax_tablet_1.png"
@@ -227,7 +227,7 @@
   {
     "name": "Ascension Health Wax Tablet",
     "category": "Wax Tablets",
-    "pricing": 399,
+    "pricing": 250,
     "stock": 50,
     "images": [
       "/uploads/health_wax_tablet_1.png"
@@ -237,7 +237,7 @@
   {
     "name": "Ascension Cleansing Wax Tablet",
     "category": "Wax Tablets",
-    "pricing": 399,
+    "pricing": 250,
     "stock": 50,
     "images": [
       "/uploads/cleansing_wax_tablet_1.png"
@@ -247,7 +247,7 @@
   {
     "name": "Ascension Love & Peace Wax Tablet",
     "category": "Wax Tablets",
-    "pricing": 399,
+    "pricing": 250,
     "stock": 50,
     "images": [
       "/uploads/love_peace_wax_tablet_1.png"
@@ -257,7 +257,7 @@
   {
     "name": "Ascension Abundance Wax Tablet",
     "category": "Wax Tablets",
-    "pricing": 399,
+    "pricing": 250,
     "stock": 50,
     "images": [
       "/uploads/abundance_wax_tablet_1.png"
@@ -267,7 +267,7 @@
   {
     "name": "Ascension Abundance Boat Candle",
     "category": "Candles",
-    "pricing": 899,
+    "pricing": 475,
     "stock": 50,
     "images": [
       "/uploads/abundance_boat_candle_1.png"
@@ -277,7 +277,7 @@
   {
     "name": "Ascension Cleansing Boat Candle",
     "category": "Candles",
-    "pricing": 899,
+    "pricing": 475,
     "stock": 50,
     "images": [
       "/uploads/cleansing_boat_candle_1.png"
@@ -287,7 +287,7 @@
   {
     "name": "Ascension Protection Boat Candle",
     "category": "Candles",
-    "pricing": 899,
+    "pricing": 475,
     "stock": 50,
     "images": [
       "/uploads/protection_boat_candle_1.png"
@@ -297,7 +297,7 @@
   {
     "name": "Ascension Love & Peace Boat Candle",
     "category": "Candles",
-    "pricing": 899,
+    "pricing": 475,
     "stock": 50,
     "images": [
       "/uploads/love_peace_boat_candle.jpg"
@@ -307,7 +307,7 @@
   {
     "name": "Ascension Health Boat Candle",
     "category": "Candles",
-    "pricing": 899,
+    "pricing": 475,
     "stock": 50,
     "images": [
       "/uploads/health_boat_candle.jpg"

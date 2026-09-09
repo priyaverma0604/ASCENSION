@@ -1431,7 +1431,11 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
                       <h3 className="font-serif text-xs sm:text-sm font-bold text-charcoal-dark mb-2 line-clamp-1 group-hover:text-gold transition-colors">{product.name}</h3>
 
                       <div className="mt-auto pt-2 border-t border-cream-dark/30 flex justify-between items-center font-sans text-xs">
-                        <span className="font-serif font-bold text-gold-dark text-xs sm:text-sm 2xl:text-base">₹{product.price || product.pricing}</span>
+                        <span className="font-serif font-bold text-gold-dark text-xs sm:text-sm 2xl:text-base">
+                          {product.name && product.name.toLowerCase().includes('boat')
+                            ? '₹475 - ₹725'
+                            : `₹${product.pricing || product.price || 375}`}
+                        </span>
                         <Link
                           to={`/product/${product._id}`}
                           className="text-sage hover:text-gold font-bold uppercase tracking-wider flex items-center gap-0.5 text-[9px] sm:text-[10px]"

@@ -151,6 +151,11 @@ const ProductDetails = () => {
     return { tagline, shortDesc, benefits, ingredients, howToUse, whenToUse, ritual, ascensionWay, safety };
   };
 
+  const [selectedSize, setSelectedSize] = useState('Small');
+
+  const isBoatCandle = product?.name && product.name.toLowerCase().includes('boat');
+  const currentPrice = isBoatCandle ? (selectedSize === 'Big' ? 725 : 475) : (product?.pricing || 375);
+
   const handleQuantityChange = (type) => {
     if (type === 'inc') {
       setQuantity(prev => prev + 1);
@@ -161,13 +166,35 @@ const ProductDetails = () => {
 
   const handleAddToCart = () => {
     if (!product) return;
-    addToCart(product, quantity);
-    alert(`${quantity} unit(s) of ${product.name} added to cart.`);
+    const itemToAdd = isBoatCandle ? {
+      ...product,
+      _id: `${product._id}_${selectedSize.toLowerCase()}`,
+      name: `${product.name} (${selectedSize} Size)`,
+      pricing: currentPrice,
+      selectedSize
+    } : {
+      ...product,
+      pricing: currentPrice
+    };
+
+    addToCart(itemToAdd, quantity);
+    alert(`${quantity} unit(s) of ${itemToAdd.name} added to cart.`);
   };
 
   const handleBuyNow = () => {
     if (!product) return;
-    addToCart(product, quantity);
+    const itemToAdd = isBoatCandle ? {
+      ...product,
+      _id: `${product._id}_${selectedSize.toLowerCase()}`,
+      name: `${product.name} (${selectedSize} Size)`,
+      pricing: currentPrice,
+      selectedSize
+    } : {
+      ...product,
+      pricing: currentPrice
+    };
+
+    addToCart(itemToAdd, quantity);
     navigate('/shop?tab=cart');
   };
 
@@ -297,8 +324,8 @@ const ProductDetails = () => {
               </h1>
               
               <div className="flex items-center gap-4 mt-2">
-                <span className="font-serif text-xl font-bold text-gold-dark">
-                  {product.pricing > 0 ? `₹${product.pricing}` : 'Price details coming soon'}
+                <span className="font-serif text-2xl font-bold text-gold-dark">
+                  ₹{currentPrice}
                 </span>
                 
                 <span className={`text-[9px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded border ${
@@ -310,6 +337,44 @@ const ProductDetails = () => {
                 </span>
               </div>
             </div>
+
+            {/* Boat Candle Vessel Size Selector */}
+            {isBoatCandle && !isOutOfStock && (
+              <div className="flex flex-col gap-2 p-3.5 rounded-2xl bg-cream/35 border border-cream-dark/50">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="font-bold uppercase tracking-wider text-charcoal-dark text-[11px]">Select Size</span>
+                  <span className="font-serif text-gold-dark font-medium text-[11px]">
+                    {selectedSize === 'Big' ? 'Big Boat Candle (₹725)' : 'Small Boat Candle (₹475)'}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedSize('Small')}
+                    className={`py-2.5 px-3 rounded-xl border text-xs font-bold transition-all flex flex-col items-center justify-center gap-0.5 ${
+                      selectedSize === 'Small'
+                        ? 'border-gold bg-gold/15 text-gold-dark shadow-xs'
+                        : 'border-cream-dark/60 bg-cream-light text-charcoal hover:border-cream-dark'
+                    }`}
+                  >
+                    <span>Small Size</span>
+                    <span className="font-serif text-gold-dark text-[11px]">₹475</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedSize('Big')}
+                    className={`py-2.5 px-3 rounded-xl border text-xs font-bold transition-all flex flex-col items-center justify-center gap-0.5 ${
+                      selectedSize === 'Big'
+                        ? 'border-gold bg-gold/15 text-gold-dark shadow-xs'
+                        : 'border-cream-dark/60 bg-cream-light text-charcoal hover:border-cream-dark'
+                    }`}
+                  >
+                    <span>Big Size</span>
+                    <span className="font-serif text-gold-dark text-[11px]">₹725</span>
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Order Controls & Actions */}
             {!isOutOfStock && (
@@ -629,7 +694,11 @@ const ProductDetails = () => {
                     <Link to={`/product/${p._id}`}>
                       <h4 className="font-serif font-bold text-xs sm:text-sm text-charcoal-dark truncate hover:text-gold transition-colors">{p.name}</h4>
                     </Link>
-                    <p className="font-bold text-gold-dark text-xs sm:text-sm mt-0.5 sm:mt-1">₹{p.pricing}</p>
+                    <p className="font-bold text-gold-dark text-xs sm:text-sm mt-0.5 sm:mt-1">
+                      {p.name && p.name.toLowerCase().includes('boat')
+                        ? '₹475 - ₹725'
+                        : `₹${p.pricing || 375}`}
+                    </p>
                   </div>
                 </div>
               ))}

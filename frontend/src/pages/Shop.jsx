@@ -527,9 +527,25 @@ Chart Base64 Length: ${fileBase64 ? fileBase64.length : 0}`
                           {product.description}
                         </p>
                         <div className="flex justify-between items-center border-t border-cream-dark/50 pt-2 sm:pt-3 mt-2 sm:mt-3 font-sans text-xs">
-                          <span className="font-serif font-bold text-gold-dark text-xs sm:text-sm">₹{product.pricing}</span>
+                          <span className="font-serif font-bold text-gold-dark text-xs sm:text-sm">
+                            {product.name && product.name.toLowerCase().includes('boat')
+                              ? '₹475 - ₹725'
+                              : `₹${product.pricing || 375}`}
+                          </span>
                           <button
-                            onClick={() => addToCart(product)}
+                            onClick={() => {
+                              if (product.name && product.name.toLowerCase().includes('boat')) {
+                                addToCart({
+                                  ...product,
+                                  _id: `${product._id}_small`,
+                                  name: `${product.name} (Small Size)`,
+                                  pricing: 475,
+                                  selectedSize: 'Small'
+                                });
+                              } else {
+                                addToCart(product);
+                              }
+                            }}
                             className="bg-sage hover:bg-sage-dark text-white font-bold py-1 sm:py-1.5 px-2 sm:px-3 rounded-lg transition-colors text-[9px] sm:text-[10px] uppercase tracking-wider"
                           >
                             Add
@@ -775,11 +791,25 @@ Chart Base64 Length: ${fileBase64 ? fileBase64.length : 0}`
                               {product.description}
                             </p>
                             <div className="flex items-center justify-between border-t border-cream-dark/35 pt-2 sm:pt-2.5 mt-auto">
-                              <span className="font-serif font-bold text-gold-dark text-xs sm:text-sm">₹{product.pricing}</span>
+                              <span className="font-serif font-bold text-gold-dark text-xs sm:text-sm">
+                                {product.name && product.name.toLowerCase().includes('boat')
+                                  ? '₹475 - ₹725'
+                                  : `₹${product.pricing || 375}`}
+                              </span>
                               
                               <button
                                 onClick={() => {
-                                  addToCart(product);
+                                  if (product.name && product.name.toLowerCase().includes('boat')) {
+                                    addToCart({
+                                      ...product,
+                                      _id: `${product._id}_small`,
+                                      name: `${product.name} (Small Size)`,
+                                      pricing: 475,
+                                      selectedSize: 'Small'
+                                    });
+                                  } else {
+                                    addToCart(product);
+                                  }
                                   alert(`${product.name} added to cart!`);
                                 }}
                                 className="bg-gold hover:bg-gold-dark text-charcoal-dark font-bold text-[8px] sm:text-[9px] uppercase tracking-wider py-1 sm:py-1.5 px-2 sm:px-3 rounded-lg shadow-xs transition-all duration-300"
@@ -1159,9 +1189,25 @@ Chart Base64 Length: ${fileBase64 ? fileBase64.length : 0}`
                     <div className="flex flex-col text-left gap-1 flex-1 font-sans text-xs">
                       <span className="text-[9px] uppercase tracking-widest text-sage font-bold">{product.category}</span>
                       <h4 className="font-serif font-bold text-charcoal-dark truncate">{product.name}</h4>
-                      <p className="font-bold text-gold-dark mt-1">₹{product.pricing}</p>
+                      <p className="font-bold text-gold-dark mt-1">
+                        {product.name && product.name.toLowerCase().includes('boat')
+                          ? '₹475 - ₹725'
+                          : `₹${product.pricing || 375}`}
+                      </p>
                       <button
-                        onClick={() => addToCart(product)}
+                        onClick={() => {
+                          if (product.name && product.name.toLowerCase().includes('boat')) {
+                            addToCart({
+                              ...product,
+                              _id: `${product._id}_small`,
+                              name: `${product.name} (Small Size)`,
+                              pricing: 475,
+                              selectedSize: 'Small'
+                            });
+                          } else {
+                            addToCart(product);
+                          }
+                        }}
                         className="bg-sage hover:bg-sage-dark text-white font-bold py-2 rounded-xl transition-colors text-[10px] uppercase tracking-wider mt-3"
                       >
                         Move to Cart
