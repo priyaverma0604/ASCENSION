@@ -267,20 +267,22 @@ const RegisterWebinarModal = ({ webinar, onClose }) => {
             <div className="flex flex-col gap-5 font-sans">
               
               {/* Optional Cover Banner */}
-              {webinar.coverImage && (
+              {(webinar.coverImage || isAncestral) && (
                 <div className="relative h-44 sm:h-52 rounded-2xl overflow-hidden shadow-sm border border-cream-dark/60 shrink-0 bg-cream">
                   <img
-                    src={getImageUrl(webinar.coverImage)}
+                    src={getImageUrl(webinar.coverImage || (isAncestral ? "/uploads/ancestral_healing_webinar_bg.png" : ""))}
                     alt={webinar.title}
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-charcoal-dark/90 via-charcoal-dark/30 to-transparent flex flex-col justify-end p-4 text-white">
-                    <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-gold-light bg-charcoal/70 backdrop-blur-md px-2.5 py-0.5 rounded-full w-fit mb-1.5 border border-white/10">
+                  <div className="absolute inset-0 bg-gradient-to-t from-charcoal-dark/40 via-transparent to-transparent flex flex-col justify-end p-4 text-white">
+                    <span className="text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-gold-light bg-charcoal/80 backdrop-blur-md px-2.5 py-0.5 rounded-full w-fit mb-1 border border-white/10 shadow-sm">
                       Live Interactive Webinar
                     </span>
-                    <h4 className="font-serif text-base sm:text-lg font-bold leading-tight drop-shadow-xs">
-                      {webinar.title}
-                    </h4>
+                    {!isAncestral && (
+                      <h4 className="font-serif text-base sm:text-lg font-bold leading-tight drop-shadow-xs">
+                        {webinar.title}
+                      </h4>
+                    )}
                   </div>
                 </div>
               )}

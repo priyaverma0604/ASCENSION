@@ -16,7 +16,7 @@ dotenv.config();
 const servicesData = [
   {
     title: "Distance Healing using Theta Modality",
-    description: "Theta Healing is a powerful energy healing technique that works at the subconscious level to identify and release limiting beliefs, fears, emotional trauma, and energetic blockages. Many individuals unknowingly carry deep-rooted emotional wounds from childhood, relationships, or past experiences. Theta Healing helps you release limiting beliefs, fears, emotional trauma, and energetic blockages at the subconscious level, transforming your reality and raising your vibration.",
+    description: "Theta Healing is a powerful energy healing technique that works at the subconscious level to identify and release limiting beliefs, fears, emotional trauma, and energetic blockages. *Pricing starts from ₹3555 onwards (additional charges will vary from case to case based on depth of energetic work required).",
     benefits: [
       "Identify and reprogram subconscious blockages",
       "Release deep-rooted fears, anxiety, and trauma",
@@ -24,7 +24,7 @@ const servicesData = [
       "Align mind, body, and soul with abundance and health"
     ],
     duration: 30,
-    pricing: 3500,
+    pricing: 3555,
     image: "/uploads/theta_healing_service.png"
   },
   {
@@ -42,7 +42,7 @@ const servicesData = [
     image: "/uploads/oracle_card_reading_service.png"
   },
   {
-    title: "Personal Counselling Session",
+    title: "Personal Healing & Counselling Session",
     description: "Create a safe, confidential, and nurturing space to discuss emotional pain, anxiety, stress, or career roadblocks. Sonali Bhasin Kumar combines active empathy, transpersonal psychology, and energy understanding to guide you to find actionable paths forward, release tension, and restore personal confidence.",
     benefits: [
       "Receive compassionate, non-judgmental professional counsel",
@@ -51,7 +51,7 @@ const servicesData = [
       "Restore self-love, boundaries, and personal empowerment"
     ],
     duration: 30,
-    pricing: 3000,
+    pricing: 3333,
     image: "/uploads/personal_counselling_service.png"
   },
   {
@@ -64,7 +64,7 @@ const servicesData = [
       "Increase physical vitality and mental clear-sightedness"
     ],
     duration: 30,
-    pricing: 2800,
+    pricing: 2888,
     image: "/uploads/chakra_healing_service.png"
   },
   {
@@ -77,7 +77,7 @@ const servicesData = [
       "Restore cell-level resonance using harmonic bowls"
     ],
     duration: 30,
-    pricing: 2500,
+    pricing: 2999,
     image: "/uploads/sound_healing_service.png"
   }
 ];

@@ -118,7 +118,7 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
           time: "7:00 PM - 8:30 PM IST",
           duration: "90 minutes",
           price: 99,
-          coverImage: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80",
+          coverImage: "/uploads/ancestral_healing_webinar_bg.png",
           upiQrCodeImage: "/uploads/default_upi_qr.jpg",
           upiId: "sonalibhasinkumar@ptaxis",
           mobileNumber: "9999999999",
@@ -309,21 +309,14 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
     }
   };
 
-  const handleOpenRetreat = (retreat) => {
-    if (retreat) {
-      setActiveRetreat(retreat);
-    } else if (retreats.length > 0) {
-      setActiveRetreat(retreats[0]);
-    } else {
-      setActiveRetreat({
-        _id: '6a4963f49e941f93f91f5aae',
-        title: '5-Day Rishikesh Spiritual Reconnection Retreat',
-        description: 'Join Sonali Bhasin Kumar in holy Rishikesh for a 5-day spiritual immersion. Nestled along the banks of the sacred Ganges, this retreat is designed to reset your energy, purge emotional loads, and align your soul with your highest purpose. Experience yoga, Ganga Aarti, deep Theta meditations, fire rituals, and therapeutic sound baths.',
-        images: ['/uploads/retreat_service.png'],
-        pricing: 24999,
-        capacity: 15
-      });
-    }
+  const handleOpenRetreat = () => {
+    setActiveRetreat({
+      _id: 'spiritual-retreats-coming-soon',
+      title: 'Spiritual Retreats',
+      isComingSoon: true,
+      description: 'Transformative multi-day spiritual retreats and sacred immersions in serene, nature-inspired sanctuaries. Curated destinations and dates will be announced soon.',
+      images: ['/uploads/retreat_service.png']
+    });
   };
 
   const handleOpenService = (serviceQuery) => {
@@ -710,7 +703,7 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
                         {/* Image Section */}
                         <div className="h-48 overflow-hidden bg-cream relative">
                           <img
-                            src={getImageUrl(workshop.coverImage || workshop.image || "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80")}
+                            src={getImageUrl(workshop.coverImage || workshop.image || (isAncestral ? "/uploads/ancestral_healing_webinar_bg.png" : "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80"))}
                             alt={workshop.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
@@ -960,7 +953,7 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
             {/* Service 7: Spiritual Retreats */}
             <div 
               onClick={() => handleOpenRetreat()}
-              className="group bg-white rounded-[24px] p-6 shadow-md border border-cream-dark/40 hover:border-gold-dark/45 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 flex flex-col text-left cursor-pointer"
+              className="group bg-white rounded-[24px] p-6 shadow-md border border-cream-dark/40 hover:border-gold-dark/45 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 flex flex-col text-left cursor-pointer relative overflow-hidden"
             >
               <div className="h-52 rounded-2xl overflow-hidden mb-5 relative bg-cream border border-cream-dark/40 shadow-2xs">
                 <img 
@@ -968,19 +961,25 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
                   alt="Spiritual Retreats" 
                   className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500" 
                 />
-                <div className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/90 backdrop-blur-xs flex items-center justify-center text-gold shadow-sm z-20">
-                  <Sun className="w-4 h-4" />
+                <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-md text-gold-dark font-sans text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full shadow-sm z-20 flex items-center gap-1 border border-gold/30">
+                  <Sparkles className="w-3 h-3 text-gold-dark" />
+                  <span>Coming Soon</span>
                 </div>
               </div>
-              <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark mb-2">Spiritual Retreats</h3>
+              <div className="flex items-center gap-2 mb-2">
+                <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark">Spiritual Retreats</h3>
+                <span className="text-[9px] bg-gold/15 text-gold-dark font-bold px-2 py-0.5 rounded-full border border-gold/30 uppercase tracking-wider">
+                  Curating
+                </span>
+              </div>
               <p className="text-xs 2xl:text-sm text-charcoal-light leading-relaxed font-sans mb-6 flex-grow">
-                Immerse yourself in nature-inspired, sacred environments and holy gatherings like Mahakumbh for transformative multi-day healing programs.
+                Immerse yourself in nature-inspired, sacred sanctuaries and holy gatherings for transformative multi-day healing programs. Dates and destinations announcing soon.
               </p>
               <button 
                 onClick={(e) => { e.stopPropagation(); handleOpenRetreat(); }}
-                className="text-xs font-bold text-sage hover:text-gold uppercase tracking-wider flex items-center gap-1 mt-auto font-sans text-left"
+                className="text-xs font-bold text-gold-dark hover:text-sage uppercase tracking-wider flex items-center gap-1 mt-auto font-sans text-left"
               >
-                <span>Learn More</span>
+                <span>Coming Soon — Get Priority Access</span>
                 <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
               </button>
             </div>

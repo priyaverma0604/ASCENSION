@@ -47,7 +47,7 @@ https://us06web.zoom.us/meetings/84687921254/invitations?signature=8YAk3kxoAsqr6
   time: "7:00 PM - 8:30 PM IST",
   duration: "90 minutes",
   price: 99,
-  coverImage: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80",
+  coverImage: "/uploads/ancestral_healing_webinar_bg.png",
   upiQrCodeImage: "/uploads/default_upi_qr.jpg",
   upiId: "sonalibhasinkumar@ptaxis",
   mobileNumber: "9999999999",

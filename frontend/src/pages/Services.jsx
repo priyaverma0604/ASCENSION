@@ -146,6 +146,16 @@ const Services = () => {
                             </span>
                           </div>
                         </>
+                      ) : service.title?.toLowerCase().includes('theta') ? (
+                        <>
+                          <span className="text-[9px] sm:text-[10px] text-sage font-bold uppercase tracking-wider">Starting From</span>
+                          <div className="flex items-baseline gap-1.5">
+                            <span className="font-serif font-bold text-xs sm:text-sm text-gold-dark">₹3,555</span>
+                            <span className="text-[8px] text-charcoal-light bg-sage/10 text-sage px-1.5 py-0.5 rounded-full border border-sage/25 font-bold">
+                              Onwards
+                            </span>
+                          </div>
+                        </>
                       ) : (
                         <>
                           <span className="text-[9px] sm:text-[10px] text-charcoal-light uppercase tracking-wider">Exchange</span>

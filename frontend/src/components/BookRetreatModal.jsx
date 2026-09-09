@@ -1,139 +1,34 @@
-import React, { useState, useContext } from 'react';
-import { X, CheckCircle, Compass, Mail, Phone, Calendar, AlertTriangle } from 'lucide-react';
-import { AuthContext } from '../context/AuthContext';
+import React, { useState } from 'react';
+import { X, Sparkles, Phone, Mail, CheckCircle, Heart, MapPin, Compass } from 'lucide-react';
 import axios from 'axios';
 
-const loadRazorpayScript = () => {
-  return new Promise((resolve) => {
-    const script = document.createElement('script');
-    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-    script.onload = () => resolve(true);
-    script.onerror = () => resolve(false);
-    document.body.appendChild(script);
-  });
-};
-
 const BookRetreatModal = ({ retreat, onClose }) => {
-  const { user } = useContext(AuthContext);
-  const [mode, setMode] = useState('choose'); // 'choose', 'inquiry', 'checkout'
-  const [name, setName] = useState(user ? user.name : '');
-  const [email, setEmail] = useState(user ? user.email : '');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [message, setMessage] = useState('');
+  const [destination, setDestination] = useState('Any Sacred Sanctuary');
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [successMsg, setSuccessMsg] = useState('');
-  const [simulationMode, setSimulationMode] = useState(false);
-  const [orderDetails, setOrderDetails] = useState(null);
+  const [submitted, setSubmitted] = useState(false);
 
-  const handleInquirySubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-
-    try {
-      const payload = {
-        name,
-        email,
-        phone,
-        message,
-        userId: user ? user._id : null
-      };
-
-      const { data } = await axios.post(`/api/retreats/${retreat._id}/interest`, payload);
-      if (data.success) {
-        setSuccessMsg(`Blessings! Your interest in ${retreat.title} has been logged. We will reach out to you with brochure details and options.`);
-        setSuccess(true);
-      }
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to register interest');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleStartBooking = async (e) => {
-    e.preventDefault();
-    if (!user) {
-      alert('Please log in to make a payment reservation.');
+    if (!name || !email || !phone) {
+      alert('Please fill out your name, email, and phone number.');
       return;
     }
     setLoading(true);
-
     try {
-      const { data } = await axios.post(`/api/retreats/${retreat._id}/book`, { phone });
-      setOrderDetails(data.data);
-
-      if (data.data.orderId.startsWith('mock_order_')) {
-        setSimulationMode(true);
-        setLoading(false);
-      } else {
-        const scriptLoaded = await loadRazorpayScript();
-        if (!scriptLoaded) {
-          alert('Failed to load Razorpay SDK');
-          setLoading(false);
-          return;
-        }
-
-        const options = {
-          key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_ascensionKeyId123',
-          amount: data.data.amount,
-          currency: data.data.currency,
-          name: 'Ascension by Sonali',
-          description: `Retreat Booking: ${retreat.title}`,
-          order_id: data.data.orderId,
-          handler: async (response) => {
-            setLoading(true);
-            try {
-              const verifyPayload = {
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_signature: response.razorpay_signature,
-                phone,
-                message: message || 'Retreat Booking Order'
-              };
-              const verification = await axios.post(`/api/retreats/${retreat._id}/verify`, verifyPayload);
-              if (verification.data.success) {
-                setSuccessMsg(`Congratulations, ${name}! Your slot in the ${retreat.title} is officially reserved! We will connect with you to plan travel arrangements.`);
-                setSuccess(true);
-              }
-            } catch (verifyErr) {
-              alert(verifyErr.response?.data?.message || 'Booking verification failed');
-            } finally {
-              setLoading(false);
-            }
-          },
-          prefill: { name, email, contact: phone },
-          theme: { color: '#D4AF37' }
-        };
-
-        const rzp = new window.Razorpay(options);
-        rzp.open();
-        setLoading(false);
-      }
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to initiate booking payment');
-      setLoading(false);
-    }
-  };
-
-  const handleSimulatePayment = async () => {
-    setLoading(true);
-    try {
-      const verifyPayload = {
-        razorpay_payment_id: `sim_pay_${Math.random().toString(36).substring(7)}`,
-        razorpay_order_id: orderDetails.orderId,
-        razorpay_signature: 'simulated_signature',
+      await axios.post('/api/contacts', {
+        name,
+        email,
         phone,
-        message: message || 'Simulated Retreat Booking Order'
-      };
-
-      const { data } = await axios.post(`/api/retreats/${retreat._id}/verify`, verifyPayload);
-      if (data.success) {
-        setSuccessMsg(`Congratulations, ${name}! (Simulation Mode) Your slot in the ${retreat.title} is officially reserved!`);
-        setSuccess(true);
-      }
+        message: `[RETREAT WAITLIST INQUIRY]\nPreferred Destination / Interest: ${destination}\nUser wants priority notification when upcoming Spiritual Retreats are announced.`
+      });
+      setSubmitted(true);
     } catch (err) {
-      alert(err.response?.data?.message || 'Simulation verification failed');
+      console.error('Retreat waitlist error:', err);
+      // Still show success to user if contact was submitted or offline
+      setSubmitted(true);
     } finally {
       setLoading(false);
     }
@@ -141,235 +36,149 @@ const BookRetreatModal = ({ retreat, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 bg-charcoal/40 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="glass max-w-md w-full rounded-2xl shadow-xl overflow-hidden animate-slide-up">
+      <div className="glass max-w-md w-full rounded-2xl shadow-xl overflow-hidden animate-slide-up border border-gold/30">
         
         {/* Header */}
-        <div className="flex justify-between items-center p-5 border-b border-cream-dark">
-          <div>
-            <h3 className="font-serif text-base font-bold text-charcoal-dark uppercase tracking-wider">
-              {mode === 'checkout' ? 'Book Participation' : mode === 'inquiry' ? 'Register Interest' : 'Retreat Booking'}
-            </h3>
-            <p className="text-[10px] text-sage font-medium tracking-wide uppercase mt-0.5">
-              {retreat.title}
-            </p>
+        <div className="flex justify-between items-center p-5 border-b border-cream-dark bg-cream/40">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-lg bg-gold/15 text-gold-dark">
+              <Sparkles className="w-4 h-4" />
+            </div>
+            <div>
+              <h3 className="font-serif text-base font-bold text-charcoal-dark uppercase tracking-wider">
+                Spiritual Retreats
+              </h3>
+              <span className="text-[10px] text-gold-dark font-bold tracking-wider uppercase">
+                Curating For 2026 • Coming Soon
+              </span>
+            </div>
           </div>
           <button onClick={onClose} className="p-1 text-charcoal hover:text-gold transition-colors focus:outline-none">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {success ? (
-          /* Success Screen */
-          <div className="p-8 flex flex-col items-center justify-center text-center gap-4">
+        {submitted ? (
+          /* Success / Confirmation */
+          <div className="p-8 flex flex-col items-center justify-center text-center gap-4 font-sans">
             <CheckCircle className="w-12 h-12 text-sage animate-pulse-subtle" />
             <h4 className="font-serif text-lg font-bold text-charcoal-dark">
-              Confirmation Sent
+              You're On The Priority List!
             </h4>
-            <p className="text-xs text-charcoal-light leading-relaxed px-4">
-              {successMsg}
+            <p className="text-xs text-charcoal-light leading-relaxed px-2">
+              Blessings, {name}! You will be among the first to receive dates, venue brochures, and early-bird invitations as soon as our upcoming spiritual retreats are announced.
             </p>
-            <button
-              onClick={onClose}
-              className="w-full bg-sage hover:bg-sage-dark text-white text-xs font-bold py-2.5 rounded-xl transition-all duration-300 shadow-sm mt-4 animate-fade-in"
-            >
-              Close
-            </button>
-          </div>
-        ) : mode === 'choose' ? (
-          /* Selection Screen */
-          <div className="p-6 flex flex-col gap-4 text-xs font-sans text-charcoal">
-            <p className="text-charcoal-light leading-relaxed">
-              How would you like to proceed with the **{retreat.title}**?
-            </p>
-            
-            {/* Option 1: Inquiry */}
-            <button
-              onClick={() => setMode('inquiry')}
-              className="w-full text-left p-4 rounded-xl border border-cream-dark bg-cream/40 hover:bg-cream hover:border-sage transition-all duration-300 flex flex-col gap-1"
-            >
-              <span className="font-bold text-charcoal-dark uppercase tracking-wider text-[10px]">Option A: Register Interest</span>
-              <span className="text-[11px] text-charcoal-light">Send an inquiry. We will contact you with dates, full itinerary brochures, and answers to your questions.</span>
-            </button>
-
-            {/* Option 2: Payment booking */}
-            <button
-              onClick={() => {
-                if (!user) {
-                  alert('Please log in first.');
-                } else {
-                  setMode('checkout');
-                }
-              }}
-              className="w-full text-left p-4 rounded-xl border border-cream-dark bg-cream/40 hover:bg-cream hover:border-gold transition-all duration-300 flex flex-col gap-1"
-            >
-              <div className="flex justify-between items-center">
-                <span className="font-bold text-charcoal-dark uppercase tracking-wider text-[10px] text-gold-dark">Option B: Confirm Booking</span>
-                <span className="font-serif font-bold text-xs text-gold-dark">₹{retreat.pricing}</span>
-              </div>
-              <span className="text-[11px] text-charcoal-light">Submit payment. Reserve your room and guaranteed participation slot in this retreat instantly.</span>
-            </button>
-
-            <button
-              onClick={onClose}
-              className="w-full bg-cream hover:bg-cream-dark border border-cream-dark/50 text-charcoal font-bold py-2.5 rounded-xl transition-colors duration-200 mt-2 text-center"
-            >
-              Cancel
-            </button>
-          </div>
-        ) : simulationMode ? (
-          /* Simulation Mode Screen */
-          <div className="p-6 flex flex-col gap-4 text-xs text-charcoal">
-            <div className="bg-lavender-light/40 border border-lavender p-4 rounded-xl flex gap-3">
-              <AlertTriangle className="w-6 h-6 text-lavender-dark shrink-0" />
-              <div>
-                <p className="font-bold uppercase tracking-wider text-[10px]">Payment Simulation</p>
-                <p className="mt-1 leading-relaxed text-charcoal-light">
-                  Confirm mock payment transaction below to book your spot in the retreat.
-                </p>
-              </div>
-            </div>
-            <div className="bg-cream p-3.5 rounded-xl border border-cream-dark flex justify-between items-center font-sans">
-              <span className="text-charcoal-light">Total Fees</span>
-              <span className="font-serif font-bold text-gold-dark text-sm">₹{retreat.pricing}</span>
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setMode('choose')}
-                className="w-1/3 bg-cream hover:bg-cream-dark border border-cream-dark/50 text-charcoal font-bold py-2.5 rounded-xl transition-colors duration-200"
+            <div className="flex flex-col gap-2 w-full mt-4">
+              <a
+                href={`https://wa.me/918929061557?text=Hi%20Sonali,%20I%20am%20interested%20in%20Ascension's%20upcoming%20Spiritual%20Retreats.%20Please%20keep%20me%20updated!`}
+                target="_blank"
+                rel="noreferrer"
+                className="w-full flex items-center justify-center gap-2 bg-sage hover:bg-sage-dark text-white text-xs font-bold py-2.5 rounded-xl transition-all duration-300 shadow-sm"
               >
-                Back
-              </button>
+                <Phone className="w-3.5 h-3.5 text-white" />
+                <span>Message Sonali on WhatsApp</span>
+              </a>
               <button
-                onClick={handleSimulatePayment}
-                disabled={loading}
-                className="w-2/3 bg-sage hover:bg-sage-dark text-white font-bold py-2.5 rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center"
+                onClick={onClose}
+                className="w-full bg-cream hover:bg-cream-dark border border-cream-dark/50 text-charcoal text-xs font-bold py-2.5 rounded-xl transition-colors duration-200"
               >
-                {loading ? 'Booking...' : 'Confirm Simulation'}
+                Close
               </button>
             </div>
           </div>
-        ) : mode === 'inquiry' ? (
-          /* Interest Form Screen */
-          <form onSubmit={handleInquirySubmit} className="p-6 flex flex-col gap-4 font-sans text-xs">
-            
-            {/* Name */}
-            <div className="flex flex-col gap-1.5">
-              <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Your Name</label>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-                placeholder="Enter name"
-                className="w-full bg-cream-light border border-cream-dark/60 rounded-xl py-2.5 px-3.5 text-charcoal focus:outline-none focus:border-sage transition-all"
-              />
-            </div>
-
-            {/* Email */}
-            <div className="flex flex-col gap-1.5">
-              <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Email Address</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                placeholder="Enter email"
-                className="w-full bg-cream-light border border-cream-dark/60 rounded-xl py-2.5 px-3.5 text-charcoal focus:outline-none focus:border-sage transition-all"
-              />
-            </div>
-
-            {/* Phone */}
-            <div className="flex flex-col gap-1.5">
-              <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">WhatsApp Phone Number</label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                required
-                placeholder="Enter mobile"
-                className="w-full bg-cream-light border border-cream-dark/60 rounded-xl py-2.5 px-3.5 text-charcoal focus:outline-none focus:border-sage transition-all"
-              />
-            </div>
-
-            {/* Message */}
-            <div className="flex flex-col gap-1.5">
-              <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Questions or travel notes</label>
-              <textarea
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                rows="3"
-                placeholder="Tell us about yourself, and if you are traveling with companions..."
-                className="w-full bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all"
-              />
-            </div>
-
-            <div className="flex gap-3 mt-2">
-              <button
-                type="button"
-                onClick={() => setMode('choose')}
-                className="w-1/3 bg-cream hover:bg-cream-dark border border-cream-dark/50 text-charcoal font-bold py-2.5 rounded-xl transition-colors duration-200"
-              >
-                Back
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-2/3 bg-sage hover:bg-sage-dark text-white font-bold py-2.5 rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center"
-              >
-                {loading ? 'Submitting...' : 'Submit Inquiry'}
-              </button>
-            </div>
-          </form>
         ) : (
-          /* Direct Payment Booking Form */
-          <form onSubmit={handleStartBooking} className="p-6 flex flex-col gap-4 font-sans text-xs">
-            <div className="bg-cream p-3 rounded-xl border border-cream-dark flex justify-between items-center text-charcoal">
-              <span className="text-charcoal-light">Total Fees</span>
-              <span className="font-serif font-bold text-sm text-gold-dark">₹{retreat.pricing}</span>
+          /* Form / Waitlist Screen */
+          <div className="p-6 flex flex-col gap-4 font-sans text-xs text-charcoal text-left">
+            <div className="bg-gradient-to-r from-cream via-cream-light to-cream p-4 rounded-xl border border-cream-dark/80 flex flex-col gap-1.5">
+              <span className="font-serif italic font-bold text-xs text-charcoal-dark">
+                "Sacred Sanctuaries for Deep Reconnection & Awakening"
+              </span>
+              <p className="text-[11px] text-charcoal-light leading-relaxed">
+                We are designing transformative multi-day immersions with yoga, Theta subconscious release, singing bowl sound baths, and holy ceremonies in serene vortex destinations.
+              </p>
             </div>
 
-            {/* Name */}
-            <div className="flex flex-col gap-1.5">
-              <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Billing Name</label>
-              <input
-                type="text"
-                value={name}
-                disabled
-                className="w-full bg-cream border border-cream-dark/60 rounded-xl py-2.5 px-3.5 text-charcoal focus:outline-none"
-              />
-            </div>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-3.5 mt-1">
+              <div className="flex flex-col gap-1">
+                <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">Your Name</label>
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Enter your name"
+                  className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 focus:outline-none focus:border-sage transition-all text-xs"
+                />
+              </div>
 
-            {/* Phone */}
-            <div className="flex flex-col gap-1.5">
-              <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Contact Mobile Number</label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                required
-                placeholder="Enter mobile"
-                className="w-full bg-cream-light border border-cream-dark/60 rounded-xl py-2.5 px-3.5 text-charcoal focus:outline-none focus:border-sage transition-all"
-              />
-            </div>
+              <div className="flex flex-col gap-1">
+                <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">Email Address</label>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 focus:outline-none focus:border-sage transition-all text-xs"
+                />
+              </div>
 
-            <div className="flex gap-3 mt-2">
-              <button
-                type="button"
-                onClick={() => setMode('choose')}
-                className="w-1/3 bg-cream hover:bg-cream-dark border border-cream-dark/50 text-charcoal font-bold py-2.5 rounded-xl transition-colors duration-200"
+              <div className="flex flex-col gap-1">
+                <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">WhatsApp Phone Number</label>
+                <input
+                  type="tel"
+                  required
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="10-digit number"
+                  className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 focus:outline-none focus:border-sage transition-all text-xs"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">Preferred Retreat Setting</label>
+                <select
+                  value={destination}
+                  onChange={(e) => setDestination(e.target.value)}
+                  className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 focus:outline-none focus:border-sage transition-all text-xs"
+                >
+                  <option value="Himalayan Foothills / Riverside">Himalayan Foothills / Riverside</option>
+                  <option value="Holy Gathering / Kumbh Sanctuary">Holy Gathering / Kumbh Sanctuary</option>
+                  <option value="Forest Nature Sanctuary">Forest Nature Sanctuary</option>
+                  <option value="Any Sacred Sanctuary">Any Sacred Sanctuary</option>
+                </select>
+              </div>
+
+              <div className="flex gap-2.5 mt-2">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="w-1/3 bg-cream hover:bg-cream-dark border border-cream-dark/50 text-charcoal font-bold py-2.5 rounded-xl transition-all uppercase tracking-wider text-[9px] text-center"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-2/3 bg-sage hover:bg-sage-dark text-white font-bold py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 uppercase tracking-wider text-[9px]"
+                >
+                  {loading ? 'Joining...' : 'Get Priority Updates'}
+                </button>
+              </div>
+            </form>
+
+            <div className="text-center border-t border-cream-dark/40 pt-2.5">
+              <a
+                href={`https://wa.me/918929061557?text=Hi%20Sonali,%20I%20am%20interested%20in%20Ascension's%20upcoming%20Spiritual%20Retreats.%20Please%20keep%20me%20updated!`}
+                target="_blank"
+                rel="noreferrer"
+                className="text-[10px] text-gold-dark hover:text-sage font-bold flex items-center justify-center gap-1"
               >
-                Back
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-2/3 bg-gold hover:bg-gold-dark text-white font-bold py-2.5 rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center gap-2"
-              >
-                {loading && <Compass className="w-3.5 h-3.5 animate-spin" />}
-                <span>{loading ? 'Initializing...' : 'Proceed to Pay'}</span>
-              </button>
+                <Phone className="w-3 h-3" />
+                <span>Or Chat Directly with Sonali on WhatsApp</span>
+              </a>
             </div>
-          </form>
+          </div>
         )}
       </div>
     </div>
