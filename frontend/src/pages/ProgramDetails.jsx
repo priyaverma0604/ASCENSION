@@ -25,7 +25,6 @@ const ProgramDetails = ({ autoProgram }) => {
   const { user } = useContext(AuthContext);
 
   const [program, setProgram] = useState(null);
-  const [otherPrograms, setOtherPrograms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedProgram, setSelectedProgram] = useState(null);
@@ -44,7 +43,6 @@ const ProgramDetails = ({ autoProgram }) => {
       const { data } = await axios.get(`/api/programs/${id}`);
       if (data.success && data.data) {
         setProgram(data.data);
-        fetchOtherPrograms(data.data._id);
       } else {
         setError('Program not found.');
       }
@@ -53,17 +51,6 @@ const ProgramDetails = ({ autoProgram }) => {
       setError(err.response?.data?.message || 'Unable to load program details.');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchOtherPrograms = async (currentId) => {
-    try {
-      const { data } = await axios.get('/api/programs');
-      if (data.success) {
-        setOtherPrograms(data.data.filter(p => p._id !== currentId).slice(0, 3));
-      }
-    } catch (err) {
-      console.error('Error fetching other programs:', err);
     }
   };
 
@@ -426,64 +413,6 @@ const ProgramDetails = ({ autoProgram }) => {
             </Link>
           </div>
         </div>
-
-        {/* Other Transformative Programs */}
-        {otherPrograms.length > 0 && (
-          <div className="flex flex-col gap-6 text-left mt-6">
-            <div className="flex justify-between items-baseline border-b border-cream-dark/60 pb-3">
-              <div>
-                <span className="text-[10px] text-sage font-bold uppercase tracking-widest">More Offerings</span>
-                <h3 className="font-serif text-lg sm:text-xl font-bold text-charcoal-dark">
-                  Other Transformative Programs
-                </h3>
-              </div>
-              <Link to="/programs" className="text-xs font-bold text-gold-dark hover:text-gold flex items-center gap-1">
-                <span>View All</span>
-                <ChevronRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {otherPrograms.map((prog) => (
-                <div
-                  key={prog._id}
-                  onClick={() => navigate(`/program/${prog._id}`)}
-                  className="glass rounded-2xl overflow-hidden border border-cream-dark/60 hover:border-gold/60 hover:shadow-md transition-all cursor-pointer flex flex-col group"
-                >
-                  <div className="h-40 bg-cream relative overflow-hidden">
-                    <img 
-                      src={prog.images && prog.images[0] ? getImageUrl(prog.images[0]) : "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=600&q=80"} 
-                      alt={prog.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
-                  <div className="p-4 flex flex-col justify-between flex-1 gap-3">
-                    <div>
-                      <span className="text-[10px] text-sage font-bold uppercase tracking-wider block mb-1">
-                        {prog.duration || 'Structured Program'}
-                      </span>
-                      <h4 className="font-serif text-sm font-bold text-charcoal-dark group-hover:text-gold transition-colors line-clamp-1">
-                        {prog.title}
-                      </h4>
-                      <p className="text-[11px] text-charcoal-light line-clamp-2 mt-1">
-                        {prog.description}
-                      </p>
-                    </div>
-                    <div className="flex justify-between items-center pt-2 border-t border-cream-dark/40 text-xs font-bold">
-                      <span className="text-gold-dark">
-                        ₹{new Intl.NumberFormat('en-IN').format(prog.sellingPrice || prog.pricing)}
-                      </span>
-                      <span className="text-sage flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
-                        <span>Details</span>
-                        <ChevronRight className="w-3 h-3" />
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
       </div>
 
