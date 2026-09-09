@@ -7,6 +7,7 @@ const {
   updateWorkshop,
   deleteWorkshop,
   registerForWorkshop,
+  createWorkshopOrder,
   verifyWorkshopPayment,
   getAllWorkshopRegistrations,
   approveWorkshopRegistration,
@@ -38,6 +39,7 @@ router.route('/:id')
   .delete(protect, admin, deleteWorkshop);
 
 router.post('/:id/register', upload.single('paymentScreenshot'), registerForWorkshop);
+router.post('/:id/razorpay-order', createWorkshopOrder);
 router.post('/:id/verify', verifyWorkshopPayment);
 
 module.exports = router;

@@ -4,7 +4,9 @@ const {
   submitContact,
   getQueries,
   updateQueryStatus,
-  getBookedSlots
+  getBookedSlots,
+  createServiceOrder,
+  verifyServicePayment
 } = require('../controllers/contactController');
 const { protect, admin } = require('../middleware/auth');
 const upload = require('../middleware/upload');
@@ -14,6 +16,9 @@ router.route('/')
   .post(upload.single('paymentScreenshot'), submitContact);
 
 router.get('/booked-slots', getBookedSlots);
+
+router.post('/razorpay-order', createServiceOrder);
+router.post('/verify-booking', verifyServicePayment);
 
 router.route('/:id/status')
   .put(protect, admin, updateQueryStatus);

@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { Copy, Heart, CheckCircle, Smartphone, HelpCircle, ArrowRight, DollarSign, Compass } from 'lucide-react';
 import axios from 'axios';
 import sevaLogo from '../assets/seva_logo.png';
+import foodDistributionImg from '../assets/gallery/mahabhoj_4.png';
+import shikshaEducationImg from '../assets/gallery/shiksha_kendra_1.png';
+import womenDignityImg from '../assets/gallery/women_hygiene_2.jpg';
 
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
@@ -193,7 +196,7 @@ const Donation = () => {
           <div className="glass rounded-[24px] overflow-hidden border border-cream-dark/50 shadow-sm flex flex-col group transition-all duration-300 hover:shadow-lg">
             <div className="h-40 sm:h-44 overflow-hidden bg-cream">
               <img
-                src="https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&w=600&q=80"
+                src={foodDistributionImg}
                 alt="Delhi Food Distribution Drive"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
@@ -202,7 +205,7 @@ const Donation = () => {
               <div>
                 <h3 className="font-serif text-xs font-bold text-charcoal-dark uppercase tracking-wider">Food Distribution Seva</h3>
                 <p className="text-[11px] text-charcoal-light leading-relaxed mt-2">
-                  Distributing warm, hygienic, and nutritious meals daily to neglected street elders and underprivileged children in Delhi slum areas.
+                  Distributing warm, hygienic, and nutritious meals daily to neglected street elders and underprivileged children in Delhi community areas.
                 </p>
               </div>
             </div>
@@ -211,16 +214,16 @@ const Donation = () => {
           <div className="glass rounded-[24px] overflow-hidden border border-cream-dark/50 shadow-sm flex flex-col group transition-all duration-300 hover:shadow-lg">
             <div className="h-44 overflow-hidden bg-cream">
               <img
-                src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=600&q=80"
-                alt="Children Education and Welfare"
+                src={shikshaEducationImg}
+                alt="Shiksha Kendra Seva"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
             </div>
             <div className="p-5 text-left flex-1 bg-white/40 flex flex-col justify-between">
               <div>
-                <h3 className="font-serif text-xs font-bold text-charcoal-dark uppercase tracking-wider">Shiksha Education</h3>
+                <h3 className="font-serif text-xs font-bold text-charcoal-dark uppercase tracking-wider">Shiksha Kendra Seva</h3>
                 <p className="text-[11px] text-charcoal-light leading-relaxed mt-2">
-                  Providing tutoring support, stationary supplies, creative arts, and mindfulness camps for underprivileged children to inspire healing.
+                  Providing tutoring support, stationary supplies, creative arts, and foundational learning circles for underprivileged children.
                 </p>
               </div>
             </div>
@@ -229,16 +232,16 @@ const Donation = () => {
           <div className="glass rounded-[24px] overflow-hidden border border-cream-dark/50 shadow-sm flex flex-col group transition-all duration-300 hover:shadow-lg">
             <div className="h-44 overflow-hidden bg-cream">
               <img
-                src="https://images.unsplash.com/photo-1509099836639-18ba1795216d?auto=format&fit=crop&w=600&q=80"
-                alt="Elderly Welfare Support"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                src={womenDignityImg}
+                alt="Women Dignity & Hygiene Drive"
+                className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
               />
             </div>
             <div className="p-5 text-left flex-1 bg-white/40 flex flex-col justify-between">
               <div>
-                <h3 className="font-serif text-xs font-bold text-charcoal-dark uppercase tracking-wider">Elderly Care & Support</h3>
+                <h3 className="font-serif text-xs font-bold text-charcoal-dark uppercase tracking-wider">Women Dignity & Hygiene</h3>
                 <p className="text-[11px] text-charcoal-light leading-relaxed mt-2">
-                  Supporting local elders with health aids, hygiene kits, clothing, and blankets, ensuring they are cared for with dignity and warmth.
+                  Distributing free sanitary kits and dignity care packs directly to women in need, breaking taboos and fostering empowerment.
                 </p>
               </div>
             </div>

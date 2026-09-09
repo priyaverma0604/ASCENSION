@@ -68,11 +68,7 @@ const ProgramDetails = ({ autoProgram }) => {
   };
 
   const handleEnrollClick = () => {
-    if (!user) {
-      navigate('/login');
-    } else {
-      setSelectedProgram(program);
-    }
+    setSelectedProgram(program);
   };
 
   const getShareUrl = () => {

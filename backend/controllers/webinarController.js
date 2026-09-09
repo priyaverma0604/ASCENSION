@@ -3,6 +3,8 @@ const WebinarRegistration = require('../models/WebinarRegistration');
 const sendEmail = require('../utils/sendEmail');
 const { getEventLinks, renderActionBlocksHtml, renderActionBlocksText } = require('../utils/emailTemplates');
 const { isCloudinaryConfigured } = require('../config/cloudinary');
+const { razorpayInstance, isRazorpayConfigured } = require('../config/razorpay');
+const crypto = require('crypto');
 
 // Helper to get image path
 const getSingleImagePath = (req, fieldName) => {
@@ -428,6 +430,143 @@ exports.deleteRegistration = async (req, res, next) => {
 
     await WebinarRegistration.findByIdAndDelete(req.params.id);
     res.json({ success: true, message: 'Registration deleted successfully.' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Initiate Razorpay order for Webinar Registration
+// @route   POST /api/webinars/:id/razorpay-order
+// @access  Public
+exports.createWebinarOrder = async (req, res, next) => {
+  try {
+    const webinar = await Webinar.findById(req.params.id);
+    if (!webinar) {
+      return res.status(404).json({ success: false, message: 'Webinar not found' });
+    }
+
+    const { name, email, phone } = req.body;
+    const amount = Number(webinar.price) || 0;
+
+    let orderResponseId = `mock_order_${crypto.randomBytes(6).toString('hex')}`;
+    if (isRazorpayConfigured && razorpayInstance) {
+      const options = {
+        amount: Math.round(amount * 100), // paise
+        currency: 'INR',
+        receipt: `rcpt_wb_${crypto.randomBytes(4).toString('hex')}`
+      };
+      const order = await razorpayInstance.orders.create(options);
+      orderResponseId = order.id;
+    }
+
+    res.json({
+      success: true,
+      data: {
+        orderId: orderResponseId,
+        amount: Math.round(amount * 100),
+        currency: 'INR',
+        webinarTitle: webinar.title
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Verify Razorpay payment and register for Webinar
+// @route   POST /api/webinars/:id/verify-payment
+// @access  Public
+exports.verifyWebinarPayment = async (req, res, next) => {
+  try {
+    const webinar = await Webinar.findById(req.params.id);
+    if (!webinar) {
+      return res.status(404).json({ success: false, message: 'Webinar not found' });
+    }
+
+    const {
+      razorpay_payment_id,
+      razorpay_order_id,
+      razorpay_signature,
+      registrationDetails
+    } = req.body;
+
+    if (!registrationDetails || !registrationDetails.name || !registrationDetails.email || !registrationDetails.phone) {
+      return res.status(400).json({ success: false, message: 'Registration details missing' });
+    }
+
+    if (isRazorpayConfigured) {
+      if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
+        return res.status(400).json({ success: false, message: 'Payment verification fields missing' });
+      }
+
+      const body = razorpay_order_id + '|' + razorpay_payment_id;
+      const expectedSignature = crypto
+        .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+        .update(body.toString())
+        .digest('hex');
+
+      if (expectedSignature !== razorpay_signature) {
+        return res.status(400).json({ success: false, message: 'Payment signature verification failed' });
+      }
+    }
+
+    const { name, email, phone, userId } = registrationDetails;
+    const payId = razorpay_payment_id || `MOCK_PAY_${crypto.randomBytes(6).toString('hex')}`;
+
+    const registration = await WebinarRegistration.create({
+      webinar: webinar._id,
+      user: userId || null,
+      name,
+      email: email.toLowerCase(),
+      phone,
+      paymentScreenshot: 'razorpay_online',
+      transactionId: payId,
+      paymentStatus: 'Paid'
+    });
+
+    // Format Date for email
+    const formattedDate = new Date(webinar.date).toLocaleDateString(undefined, {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
+    const { whatsappLink, introLink, introTitle } = getEventLinks(webinar);
+    const actionBlocksHtml = renderActionBlocksHtml({ whatsappLink, introLink, introTitle });
+    const actionBlocksText = renderActionBlocksText({ whatsappLink, introLink, introTitle });
+
+    // Send confirmation email
+    const emailOptions = {
+      to: email.toLowerCase(),
+      subject: `Confirmed: Your Webinar Registration for ${webinar.title}`,
+      text: `Hello ${name},\n\nThank you! Your payment has been received and your seat for "${webinar.title}" is confirmed!\n\nWebinar Details:\n- Date: ${formattedDate}\n- Time: ${webinar.time}\n- Speaker: ${webinar.speakerName}${actionBlocksText}\nThe Zoom Meeting Link will automatically be sent to you 1 hour before the webinar.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
+      html: `<p>Hello <strong>${name}</strong>,</p>
+             <p>Thank you! Your payment has been received and your seat for <strong>${webinar.title}</strong> is confirmed!</p>
+             <h4>Webinar Details</h4>
+             <ul>
+               <li><strong>Webinar Name:</strong> ${webinar.title}</li>
+               <li><strong>Date:</strong> ${formattedDate}</li>
+               <li><strong>Time:</strong> ${webinar.time}</li>
+               <li><strong>Speaker:</strong> ${webinar.speakerName}</li>
+               <li><strong>Payment ID:</strong> ${payId}</li>
+             </ul>
+             ${actionBlocksHtml}
+             <p>The Zoom Meeting Link will automatically be sent to you 1 hour before the webinar.</p>
+             <p>Regards,<br/><strong>Ascension by Sonali Bhasin Kumar</strong></p>`
+    };
+
+    try {
+      await sendEmail(emailOptions);
+    } catch (emailErr) {
+      console.error('Confirmation email error:', emailErr.message);
+    }
+
+    res.status(201).json({
+      success: true,
+      message: 'Webinar registration and online payment confirmed!',
+      data: registration
+    });
   } catch (error) {
     next(error);
   }

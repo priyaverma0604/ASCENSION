@@ -183,3 +183,113 @@ exports.getBookedSlots = async (req, res, next) => {
   }
 };
 
+// @desc    Initiate Razorpay order for Service Booking
+// @route   POST /api/contacts/razorpay-order
+// @access  Public
+exports.createServiceOrder = async (req, res, next) => {
+  try {
+    const crypto = require('crypto');
+    const { razorpayInstance, isRazorpayConfigured } = require('../config/razorpay');
+    const { amount, serviceTitle, name, email, phone, slot } = req.body;
+    
+    if (!amount || amount <= 0) {
+      return res.status(400).json({ success: false, message: 'Invalid service amount' });
+    }
+
+    let orderResponseId = `mock_order_${crypto.randomBytes(6).toString('hex')}`;
+    if (isRazorpayConfigured && razorpayInstance) {
+      const options = {
+        amount: Math.round(amount * 100), // paise
+        currency: 'INR',
+        receipt: `rcpt_srv_${crypto.randomBytes(4).toString('hex')}`
+      };
+      const order = await razorpayInstance.orders.create(options);
+      orderResponseId = order.id;
+    }
+
+    res.json({
+      success: true,
+      data: {
+        orderId: orderResponseId,
+        amount: Math.round(amount * 100),
+        currency: 'INR'
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Verify Razorpay payment for Service Booking
+// @route   POST /api/contacts/verify-booking
+// @access  Public
+exports.verifyServicePayment = async (req, res, next) => {
+  try {
+    const crypto = require('crypto');
+    const { isRazorpayConfigured } = require('../config/razorpay');
+    const { 
+      razorpay_payment_id, 
+      razorpay_order_id, 
+      razorpay_signature,
+      bookingDetails 
+    } = req.body;
+
+    if (!bookingDetails) {
+      return res.status(400).json({ success: false, message: 'Booking details missing' });
+    }
+
+    if (isRazorpayConfigured) {
+      if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
+        return res.status(400).json({ success: false, message: 'Payment signature missing' });
+      }
+      const body = razorpay_order_id + '|' + razorpay_payment_id;
+      const expectedSignature = crypto
+        .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+        .update(body.toString())
+        .digest('hex');
+
+      if (expectedSignature !== razorpay_signature) {
+        return res.status(400).json({ success: false, message: 'Payment verification failed' });
+      }
+    }
+
+    const { name, email, phone, serviceTitle, slot, message, amount } = bookingDetails;
+    const formattedMessage = `[SERVICE BOOKING REQUEST: ${serviceTitle}]\nPreferred Date: ${slot}\nPayment ID: ${razorpay_payment_id}\nNotes: ${message || ''}`;
+
+    const contact = await Contact.create({
+      name,
+      email: email.toLowerCase(),
+      phone: phone || '',
+      message: formattedMessage,
+      transactionId: razorpay_payment_id,
+      status: 'Approved'
+    });
+
+    // Send confirmation emails
+    const adminEmail = process.env.ADMIN_EMAIL || 'ascension.sonalibhasin@gmail.com';
+    try {
+      await sendEmail({
+        to: adminEmail,
+        subject: `Paid Service Booking: ${serviceTitle} (${name})`,
+        text: `A new session has been paid online via Razorpay!\n\nService: ${serviceTitle}\nClient: ${name}\nEmail: ${email}\nPhone: ${phone}\nSlot: ${slot}\nPayment ID: ${razorpay_payment_id}\nAmount: ₹${amount}`
+      });
+
+      await sendEmail({
+        to: email.toLowerCase(),
+        subject: `Confirmed: ${serviceTitle} Session with Ascension`,
+        text: `Dear ${name},\n\nThank you! Your payment of ₹${amount} for "${serviceTitle}" has been received and confirmed.\n\nSlot: ${slot}\nPayment ID: ${razorpay_payment_id}\n\nOur team will reach out to you shortly before your session.\n\nWarm regards,\nAscension by Sonali Bhasin Kumar`
+      });
+    } catch (e) {
+      console.error('Email error:', e.message);
+    }
+
+    res.json({
+      success: true,
+      message: 'Service session booked and confirmed successfully!',
+      data: contact
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+

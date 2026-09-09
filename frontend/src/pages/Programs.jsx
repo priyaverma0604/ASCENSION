@@ -42,11 +42,7 @@ const Programs = () => {
   };
 
   const handleEnrollClick = (program) => {
-    if (!user) {
-      navigate('/login');
-    } else {
-      setSelectedProgram(program);
-    }
+    setSelectedProgram(program);
   };
 
   useEffect(() => {

@@ -528,3 +528,41 @@ exports.deleteWorkshopRegistration = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Initiate Razorpay order for Workshop Registration
+// @route   POST /api/workshops/:id/razorpay-order
+// @access  Public
+exports.createWorkshopOrder = async (req, res, next) => {
+  try {
+    const workshop = await Workshop.findById(req.params.id);
+    if (!workshop) {
+      return res.status(404).json({ success: false, message: 'Workshop not found' });
+    }
+
+    const { name, email, phone } = req.body;
+    const amount = Number(workshop.pricing) || 0;
+
+    let orderResponseId = `mock_order_${crypto.randomBytes(6).toString('hex')}`;
+    if (isRazorpayConfigured && razorpayInstance) {
+      const options = {
+        amount: Math.round(amount * 100), // paise
+        currency: 'INR',
+        receipt: `rcpt_ws_${crypto.randomBytes(4).toString('hex')}`
+      };
+      const order = await razorpayInstance.orders.create(options);
+      orderResponseId = order.id;
+    }
+
+    res.json({
+      success: true,
+      data: {
+        orderId: orderResponseId,
+        amount: Math.round(amount * 100),
+        currency: 'INR',
+        workshopTitle: workshop.title
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};

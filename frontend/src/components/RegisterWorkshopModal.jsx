@@ -1,10 +1,25 @@
 import React, { useState, useContext } from 'react';
 import { 
   X, CheckCircle, Compass, AlertTriangle, UploadCloud, CreditCard, MessageCircle, 
-  Video, ExternalLink, Copy, Check, Calendar, Clock, Sparkles, User, CheckCircle2 
+  Video, ExternalLink, Copy, Check, Calendar, Clock, Sparkles, User, CheckCircle2,
+  ShieldCheck, Zap
 } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
+
+const loadRazorpayScript = () => {
+  return new Promise((resolve) => {
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+};
 
 const getImageUrl = (path) => {
   if (!path) return '';
@@ -18,6 +33,7 @@ const getImageUrl = (path) => {
 const RegisterWorkshopModal = ({ workshop, onClose }) => {
   const { user } = useContext(AuthContext);
   const [step, setStep] = useState(1); // 1: Info form & details, 2: Payment page, 3: Success page
+  const [paymentMethod, setPaymentMethod] = useState('razorpay'); // 'razorpay' or 'upi_qr'
   const [name, setName] = useState(user ? user.name : '');
   const [email, setEmail] = useState(user ? user.email : '');
   const [phone, setPhone] = useState('');
@@ -26,6 +42,7 @@ const RegisterWorkshopModal = ({ workshop, onClose }) => {
   const [screenshotPreview, setScreenshotPreview] = useState('');
   const [transactionId, setTransactionId] = useState('');
   const [loading, setLoading] = useState(false);
+  const [confirmedPaymentId, setConfirmedPaymentId] = useState('');
   const [copiedWhatsapp, setCopiedWhatsapp] = useState(false);
   const [copiedVideo, setCopiedVideo] = useState(false);
   const [copiedUpi, setCopiedUpi] = useState(false);
@@ -52,6 +69,89 @@ const RegisterWorkshopModal = ({ workshop, onClose }) => {
     if (file) {
       setScreenshot(file);
       setScreenshotPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleRazorpayPayment = async () => {
+    setLoading(true);
+    try {
+      const isLoaded = await loadRazorpayScript();
+      if (!isLoaded) {
+        alert('Razorpay payment gateway failed to load. Please check your internet connection.');
+        setLoading(false);
+        return;
+      }
+
+      const fullPhone = `${countryCode} ${phone.trim()}`;
+      const { data } = await axios.post(`/api/workshops/${workshop._id}/razorpay-order`, {
+        name,
+        email,
+        phone: fullPhone
+      });
+
+      if (!data.success) {
+        alert(data.message || 'Could not initiate workshop payment order');
+        setLoading(false);
+        return;
+      }
+
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_live_TZqxQy6crShQ65',
+        amount: data.data.amount,
+        currency: data.data.currency,
+        name: 'Ascension by Sonali Bhasin Kumar',
+        description: `Workshop: ${workshop.title}`,
+        image: '/logo.png',
+        order_id: data.data.orderId,
+        prefill: {
+          name,
+          email,
+          contact: fullPhone
+        },
+        theme: {
+          color: '#8A9A86'
+        },
+        handler: async function (response) {
+          setLoading(true);
+          try {
+            const verifyRes = await axios.post(`/api/workshops/${workshop._id}/verify`, {
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+              user_details: {
+                name,
+                email,
+                phone: fullPhone,
+                userId: user?._id || null
+              }
+            });
+
+            if (verifyRes.data.success) {
+              setConfirmedPaymentId(response.razorpay_payment_id);
+              setStep(3); // Go to success confirmation
+            }
+          } catch (err) {
+            alert(err.response?.data?.message || 'Workshop payment verification failed');
+          } finally {
+            setLoading(false);
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            setLoading(false);
+          }
+        }
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', function (response) {
+        alert(`Payment failed: ${response.error.description}`);
+        setLoading(false);
+      });
+      rzp.open();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to initialize payment');
+      setLoading(false);
     }
   };
 
@@ -94,6 +194,7 @@ const RegisterWorkshopModal = ({ workshop, onClose }) => {
       });
 
       if (data.success) {
+        setConfirmedPaymentId(cleanedTxId);
         setStep(3); // Success Screen
       }
     } catch (err) {
@@ -316,103 +417,178 @@ const RegisterWorkshopModal = ({ workshop, onClose }) => {
           )}
 
           {step === 2 && (
-            /* Step 2: Payment Page */
-            <form onSubmit={handlePaymentSubmit} className="flex flex-col gap-4 font-sans text-xs">
+            /* Step 2: Payment Options Form */
+            <div className="flex flex-col gap-4 font-sans text-xs text-left">
               
-              {/* Fee summary */}
-              <div className="bg-cream p-3 rounded-xl border border-cream-dark flex justify-between items-center text-charcoal">
-                <span className="text-charcoal-light font-medium">Payable Amount</span>
-                <span className="font-serif font-bold text-base text-gold-dark">₹{workshop.pricing}</span>
-              </div>
-
-              {/* QR and Instruction */}
-              <div className="bg-white/60 p-4 rounded-2xl border border-cream-dark flex flex-col items-center gap-3">
-                <span className="text-[10px] font-bold text-charcoal-light uppercase tracking-wider">Scan & Pay via UPI</span>
-                <div className="w-44 h-44 bg-cream rounded-xl border border-cream-dark/80 p-2 overflow-hidden flex items-center justify-center">
-                  <img
-                    src={getImageUrl('/uploads/default_upi_qr.jpg')}
-                    alt="Workshop Payment QR"
-                    className="w-full h-full object-contain"
-                  />
+              {/* Workshop summary */}
+              <div className="bg-cream/50 p-4 rounded-xl border border-cream-dark/60 flex flex-col gap-2">
+                <div className="flex justify-between items-center text-charcoal border-b border-cream-dark/50 pb-2">
+                  <span className="font-bold font-serif text-[13px]">{workshop.title}</span>
+                  <span className="font-serif font-bold text-gold-dark text-[13px]">₹{workshop.pricing || workshop.price}</span>
                 </div>
-                
-                <div className="flex justify-between items-center bg-cream/70 p-2.5 px-3.5 rounded-xl border border-cream-dark/60 w-full text-xs">
-                  <div className="flex flex-col text-left">
-                    <span className="text-[9px] text-charcoal-light font-bold uppercase tracking-wider">Payee UPI ID</span>
-                    <strong className="select-all text-gold-dark font-mono text-xs mt-0.5">sonalibhasinkumar@ptaxis</strong>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      navigator.clipboard.writeText('sonalibhasinkumar@ptaxis');
-                      setCopiedUpi(true);
-                      setTimeout(() => setCopiedUpi(false), 2000);
-                    }}
-                    className="bg-white hover:bg-cream border border-cream-dark text-charcoal-dark font-medium py-1.5 px-2.5 rounded-lg text-[10px] flex items-center gap-1 transition-all shadow-xs"
-                  >
-                    {copiedUpi ? <Check className="w-3 h-3 text-sage" /> : <Copy className="w-3 h-3 text-charcoal-light" />}
-                    <span>{copiedUpi ? 'Copied' : 'Copy UPI'}</span>
-                  </button>
-                </div>
-                <div className="bg-lavender-light/40 border border-lavender p-3 rounded-xl flex gap-2 text-left text-[10px]">
-                  <AlertTriangle className="w-4.5 h-4.5 text-lavender-dark shrink-0 mt-0.5" />
-                  <span className="leading-relaxed text-charcoal-light">
-                    Scan the QR code above. Enter the 12-digit transaction ID and upload the receipt screenshot below.
-                  </span>
+                <div className="text-[10px] text-charcoal-light flex flex-col gap-0.5">
+                  <p><strong>Instructor:</strong> {workshop.instructor || workshop.speakerName || 'Sonali Bhasin Kumar'}</p>
+                  <p><strong>Date & Time:</strong> {formattedDate} at {workshop.time || 'Live Session'}</p>
                 </div>
               </div>
 
-              <div className="flex flex-col gap-1.5 text-left">
-                <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">UPI Transaction ID</label>
-                <input
-                  type="text"
-                  required
-                  value={transactionId}
-                  onChange={(e) => setTransactionId(e.target.value)}
-                  placeholder="Enter 12-digit UPI reference number"
-                  className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none focus:border-gold transition-colors text-xs"
-                />
-              </div>
-
-              <div className="flex flex-col gap-1.5 text-left">
-                <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">Upload Receipt Screenshot</label>
-                <div className="border border-dashed border-cream-dark/80 rounded-xl p-3 bg-cream-light/30 flex flex-col items-center gap-1 text-center cursor-pointer hover:bg-cream-light/60 transition-colors relative">
-                  <input
-                    type="file"
-                    required
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                  />
-                  <UploadCloud className="w-5 h-5 text-gold-dark" />
-                  <span className="text-[10px] text-charcoal-light font-medium">
-                    {screenshot ? `Selected: ${screenshot.name}` : "Choose receipt screenshot"}
-                  </span>
-                </div>
-                {screenshotPreview && (
-                  <div className="mt-2 border rounded-xl overflow-hidden h-28 bg-white flex items-center justify-center p-1">
-                    <img src={screenshotPreview} alt="Receipt preview" className="h-full object-contain" />
-                  </div>
-                )}
-              </div>
-
-              <div className="flex gap-3 mt-2 shrink-0">
+              {/* Payment Method Selector */}
+              <div className="flex rounded-xl p-1 bg-cream border border-cream-dark/60 gap-1">
                 <button
                   type="button"
-                  onClick={() => setStep(1)}
-                  className="w-1/3 bg-cream hover:bg-cream-dark border border-cream-dark/50 text-charcoal font-bold py-2.5 rounded-xl transition-all uppercase tracking-wider text-[9px] text-center"
+                  onClick={() => setPaymentMethod('razorpay')}
+                  className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                    paymentMethod === 'razorpay'
+                      ? 'bg-sage text-white shadow-xs'
+                      : 'text-charcoal hover:bg-cream-light'
+                  }`}
                 >
-                  Back
+                  <Zap className="w-3.5 h-3.5" />
+                  <span>Instant Razorpay</span>
                 </button>
                 <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-2/3 bg-sage hover:bg-sage-dark text-white font-bold py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center uppercase tracking-wider text-[9px]"
+                  type="button"
+                  onClick={() => setPaymentMethod('upi_qr')}
+                  className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                    paymentMethod === 'upi_qr'
+                      ? 'bg-sage text-white shadow-xs'
+                      : 'text-charcoal hover:bg-cream-light'
+                  }`}
                 >
-                  {loading ? 'Submitting...' : 'Submit Payment Details'}
+                  <CreditCard className="w-3.5 h-3.5" />
+                  <span>Manual UPI QR</span>
                 </button>
               </div>
-            </form>
+
+              {paymentMethod === 'razorpay' ? (
+                /* Online Razorpay Flow */
+                <div className="flex flex-col gap-4">
+                  <div className="bg-cream-light/60 border border-cream-dark/60 p-4 rounded-xl flex flex-col gap-2.5 text-charcoal">
+                    <div className="flex items-center gap-2 text-sage font-bold text-xs">
+                      <ShieldCheck className="w-4 h-4 text-sage" />
+                      <span>Razorpay Instant Registration Gateway</span>
+                    </div>
+                    <p className="text-[11px] text-charcoal-light leading-relaxed">
+                      Pay instantly with UPI (Google Pay, PhonePe, Paytm), Cards, Netbanking, or Wallets. Your registration is confirmed immediately!
+                    </p>
+                    <div className="flex justify-between items-center border-t border-cream-dark/40 pt-2 text-xs font-semibold">
+                      <span>Payable Amount:</span>
+                      <span className="font-serif font-bold text-gold-dark text-sm">₹{workshop.pricing || workshop.price}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 mt-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setStep(1)}
+                      className="w-1/3 bg-cream hover:bg-cream-dark border border-cream-dark/50 text-charcoal font-bold py-2.5 rounded-xl transition-all text-center"
+                    >
+                      Back
+                    </button>
+                    <button
+                      type="button"
+                      disabled={loading}
+                      onClick={handleRazorpayPayment}
+                      className="w-2/3 bg-gold hover:bg-gold-dark text-charcoal-dark font-bold py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 border border-gold-dark/20 text-xs"
+                    >
+                      {loading ? <Compass className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
+                      <span>{loading ? 'Opening Gateway...' : `Pay ₹${workshop.pricing || workshop.price} Online`}</span>
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                /* UPI Manual Payment Form */
+                <form onSubmit={handlePaymentSubmit} className="flex flex-col gap-4 font-sans text-xs">
+                  {/* QR and Instruction */}
+                  <div className="bg-white/60 p-4 rounded-2xl border border-cream-dark flex flex-col items-center gap-3">
+                    <span className="text-[10px] font-bold text-charcoal-light uppercase tracking-wider">Scan & Pay via UPI</span>
+                    <div className="w-44 h-44 bg-cream rounded-xl border border-cream-dark/80 p-2 overflow-hidden flex items-center justify-center">
+                      <img
+                        src={getImageUrl('/uploads/default_upi_qr.jpg')}
+                        alt="Workshop Payment QR"
+                        className="w-full h-full object-contain"
+                      />
+                    </div>
+                    
+                    <div className="flex justify-between items-center bg-cream/70 p-2.5 px-3.5 rounded-xl border border-cream-dark/60 w-full text-xs">
+                      <div className="flex flex-col text-left">
+                        <span className="text-[9px] text-charcoal-light font-bold uppercase tracking-wider">Payee UPI ID</span>
+                        <strong className="select-all text-gold-dark font-mono text-xs mt-0.5">sonalibhasinkumar@ptaxis</strong>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          navigator.clipboard.writeText('sonalibhasinkumar@ptaxis');
+                          setCopiedUpi(true);
+                          setTimeout(() => setCopiedUpi(false), 2000);
+                        }}
+                        className="bg-white hover:bg-cream border border-cream-dark text-charcoal-dark font-medium py-1.5 px-2.5 rounded-lg text-[10px] flex items-center gap-1 transition-all shadow-xs"
+                      >
+                        {copiedUpi ? <Check className="w-3 h-3 text-sage" /> : <Copy className="w-3 h-3 text-charcoal-light" />}
+                        <span>{copiedUpi ? 'Copied' : 'Copy UPI'}</span>
+                      </button>
+                    </div>
+                    <div className="bg-lavender-light/40 border border-lavender p-3 rounded-xl flex gap-2 text-left text-[10px]">
+                      <AlertTriangle className="w-4.5 h-4.5 text-lavender-dark shrink-0 mt-0.5" />
+                      <span className="leading-relaxed text-charcoal-light">
+                        Scan the QR code above. Enter the 12-digit transaction ID and upload the receipt screenshot below.
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-1.5 text-left">
+                    <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">UPI Transaction ID</label>
+                    <input
+                      type="text"
+                      required
+                      value={transactionId}
+                      onChange={(e) => setTransactionId(e.target.value)}
+                      placeholder="Enter 12-digit UPI reference number"
+                      className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none focus:border-gold transition-colors text-xs"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1.5 text-left">
+                    <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">Upload Receipt Screenshot</label>
+                    <div className="border border-dashed border-cream-dark/80 rounded-xl p-3 bg-cream-light/30 flex flex-col items-center gap-1 text-center cursor-pointer hover:bg-cream-light/60 transition-colors relative">
+                      <input
+                        type="file"
+                        required
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                      />
+                      <UploadCloud className="w-5 h-5 text-gold-dark" />
+                      <span className="text-[10px] text-charcoal-light font-medium">
+                        {screenshot ? `Selected: ${screenshot.name}` : "Choose receipt screenshot"}
+                      </span>
+                    </div>
+                    {screenshotPreview && (
+                      <div className="mt-2 border rounded-xl overflow-hidden h-28 bg-white flex items-center justify-center p-1">
+                        <img src={screenshotPreview} alt="Receipt preview" className="h-full object-contain" />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex gap-3 mt-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => setStep(1)}
+                      className="w-1/3 bg-cream hover:bg-cream-dark border border-cream-dark/50 text-charcoal font-bold py-2.5 rounded-xl transition-all uppercase tracking-wider text-[9px] text-center"
+                    >
+                      Back
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="w-2/3 bg-sage hover:bg-sage-dark text-white font-bold py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center uppercase tracking-wider text-[9px]"
+                    >
+                      {loading ? 'Submitting...' : 'Submit Payment Details'}
+                    </button>
+                  </div>
+                </form>
+              )}
+            </div>
           )}
 
           {step === 3 && (
@@ -420,10 +596,18 @@ const RegisterWorkshopModal = ({ workshop, onClose }) => {
             <div className="p-6 flex flex-col items-center justify-center text-center gap-3.5">
               <CheckCircle className="w-11 h-11 text-sage animate-pulse-subtle" />
               <h4 className="font-serif text-lg font-bold text-charcoal-dark">
-                Registration Submitted!
+                {confirmedPaymentId ? 'Registration Confirmed!' : 'Registration Submitted!'}
               </h4>
               <p className="text-xs text-charcoal-light leading-relaxed px-2 border-b border-cream-dark/50 pb-2.5">
-                Blessings! Your registration request for <strong>{workshop.title}</strong> has been submitted. Our team will verify your transaction ID shortly and confirm your seat via email!
+                {confirmedPaymentId ? (
+                  <span>
+                    Thank you! Your payment for <strong>{workshop.title}</strong> has been successfully verified via Razorpay (Ref: <code className="font-mono text-[11px] text-gold-dark bg-cream px-1.5 py-0.5 rounded">{confirmedPaymentId}</code>). A confirmation email has been sent!
+                  </span>
+                ) : (
+                  <span>
+                    Blessings! Your registration request for <strong>{workshop.title}</strong> has been submitted. Our team will verify your transaction ID shortly and confirm your seat via email!
+                  </span>
+                )}
               </p>
 
               {/* WhatsApp Community Group Banner */}

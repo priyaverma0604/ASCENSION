@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { Search, ShoppingBag, Heart, Trash2, Plus, Minus, CreditCard, Compass, ChevronRight, User, CheckCircle, AlertTriangle, UploadCloud, Smartphone } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Trash2, Plus, Minus, CreditCard, Compass, ChevronRight, User, CheckCircle, AlertTriangle, UploadCloud, Smartphone, ShieldCheck, Zap } from 'lucide-react';
 import axios from 'axios';
 import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
@@ -8,6 +8,10 @@ import { AuthContext } from '../context/AuthContext';
 
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
     const script = document.createElement('script');
     script.src = 'https://checkout.razorpay.com/v1/checkout.js';
     script.onload = () => resolve(true);
@@ -45,12 +49,13 @@ const Shop = () => {
 
   // Checkout state
   const [checkoutActive, setCheckoutActive] = useState(false);
+  const [checkoutPaymentMethod, setCheckoutPaymentMethod] = useState('razorpay'); // 'razorpay' or 'upi_qr'
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
   const [stateName, setStateName] = useState('');
   const [postalCode, setPostalCode] = useState('');
   const [country, setCountry] = useState('India');
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState(user?.phone || '');
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [checkoutSuccess, setCheckoutSuccess] = useState(false);
   const [simulationMode, setSimulationMode] = useState(false);
@@ -226,6 +231,100 @@ Chart Base64 Length: ${fileBase64 ? fileBase64.length : 0}`
   const handleCategorySelect = (cat) => {
     setCategory(cat);
     setSearchParams({ category: cat, tab: 'shop' });
+  };
+
+  const handleRazorpayCheckout = async () => {
+    if (!user) {
+      alert('Please register/login to complete purchase checkout.');
+      navigate('/login');
+      return;
+    }
+    if (!address.trim() || !city.trim() || !stateName.trim() || !postalCode.trim() || !phone.trim()) {
+      alert('Please fill out all shipping address fields and phone number.');
+      return;
+    }
+
+    setCheckoutLoading(true);
+    try {
+      const isLoaded = await loadRazorpayScript();
+      if (!isLoaded) {
+        alert('Razorpay payment gateway failed to load. Please check your internet connection.');
+        setCheckoutLoading(false);
+        return;
+      }
+
+      const shippingPayload = {
+        address: address.trim(),
+        city: city.trim(),
+        state: stateName.trim(),
+        postalCode: postalCode.trim(),
+        country: country.trim(),
+        phone: phone.trim()
+      };
+
+      const { data } = await axios.post('/api/orders', {
+        items: cart.map(item => ({ product: item.product._id, quantity: item.quantity })),
+        shippingAddress: shippingPayload
+      });
+
+      if (!data.success) {
+        alert(data.message || 'Failed to create order');
+        setCheckoutLoading(false);
+        return;
+      }
+
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_live_TZqxQy6crShQ65',
+        amount: data.data.amount,
+        currency: data.data.currency,
+        name: 'Ascension by Sonali Bhasin Kumar',
+        description: `Order Payment (${cart.length} items)`,
+        image: '/logo.png',
+        order_id: data.data.orderId,
+        prefill: {
+          name: user.name,
+          email: user.email,
+          contact: phone.trim()
+        },
+        theme: {
+          color: '#8A9A86'
+        },
+        handler: async function (response) {
+          setCheckoutLoading(true);
+          try {
+            const verifyRes = await axios.post('/api/orders/verify', {
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature
+            });
+
+            if (verifyRes.data.success) {
+              clearCart();
+              setCheckoutSuccess(true);
+            }
+          } catch (err) {
+            alert(err.response?.data?.message || 'Payment verification failed');
+          } finally {
+            setCheckoutLoading(false);
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            setCheckoutLoading(false);
+          }
+        }
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', function (response) {
+        alert(`Payment failed: ${response.error.description}`);
+        setCheckoutLoading(false);
+      });
+      rzp.open();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to initialize Razorpay checkout');
+      setCheckoutLoading(false);
+    }
   };
 
   const handleCheckoutSubmit = async (e) => {
@@ -826,159 +925,211 @@ Chart Base64 Length: ${fileBase64 ? fileBase64.length : 0}`
 
                 {/* Checkout Fields (Active Mode) */}
                 {checkoutActive && (
-                  <form onSubmit={handleCheckoutSubmit} className="glass p-5 rounded-2xl border border-cream-dark/50 flex flex-col gap-3 font-sans text-xs text-charcoal animate-slide-up">
+                  <div className="glass p-5 rounded-2xl border border-cream-dark/50 flex flex-col gap-3 font-sans text-xs text-charcoal animate-slide-up">
                     <h4 className="font-serif text-sm font-bold uppercase tracking-wider text-charcoal-dark border-b border-cream-dark pb-2 mb-2">
                       Shipping Details
                     </h4>
 
-                      /* Shipping Address & UPI Payment Form */
-                      <div className="flex flex-col gap-3 text-left">
+                    {/* Shipping Address Fields */}
+                    <div className="flex flex-col gap-3 text-left">
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-bold text-charcoal-light uppercase">Street Address</label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="Door No, Street name"
+                          value={address}
+                          onChange={(e) => setAddress(e.target.value)}
+                          className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
                         <div className="flex flex-col gap-1">
-                          <label className="text-[10px] font-bold text-charcoal-light uppercase">Street Address</label>
+                          <label className="text-[10px] font-bold text-charcoal-light uppercase">City</label>
                           <input
                             type="text"
                             required
-                            placeholder="Door No, Street name"
-                            value={address}
-                            onChange={(e) => setAddress(e.target.value)}
+                            placeholder="New Delhi"
+                            value={city}
+                            onChange={(e) => setCity(e.target.value)}
                             className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all"
                           />
                         </div>
-                        <div className="grid grid-cols-2 gap-3">
-                          <div className="flex flex-col gap-1">
-                            <label className="text-[10px] font-bold text-charcoal-light uppercase">City</label>
-                            <input
-                              type="text"
-                              required
-                              placeholder="New Delhi"
-                              value={city}
-                              onChange={(e) => setCity(e.target.value)}
-                              className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all"
-                            />
-                          </div>
-                          <div className="flex flex-col gap-1">
-                            <label className="text-[10px] font-bold text-charcoal-light uppercase">State</label>
-                            <input
-                              type="text"
-                              required
-                              placeholder="Delhi"
-                              value={stateName}
-                              onChange={(e) => setStateName(e.target.value)}
-                              className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all"
-                            />
-                          </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-3">
-                          <div className="flex flex-col gap-1">
-                            <label className="text-[10px] font-bold text-charcoal-light uppercase">Postal Code</label>
-                            <input
-                              type="text"
-                              required
-                              placeholder="110016"
-                              value={postalCode}
-                              onChange={(e) => setPostalCode(e.target.value)}
-                              className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all"
-                            />
-                          </div>
-                          <div className="flex flex-col gap-1">
-                            <label className="text-[10px] font-bold text-charcoal-light uppercase">Country</label>
-                            <input
-                              type="text"
-                              required
-                              placeholder="India"
-                              value={country}
-                              onChange={(e) => setCountry(e.target.value)}
-                              className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none"
-                            />
-                          </div>
-                        </div>
                         <div className="flex flex-col gap-1">
-                          <label className="text-[10px] font-bold text-charcoal-light uppercase">Phone Number</label>
-                          <input
-                            type="tel"
-                            required
-                            placeholder="10-digit phone"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all"
-                          />
-                        </div>
-
-                        {/* UPI QR Details */}
-                        <div className="bg-cream/60 border border-cream-dark/60 p-3 rounded-xl flex gap-3 text-charcoal-light font-sans leading-relaxed text-left mt-2">
-                          <Smartphone className="w-4 h-4 text-gold-dark shrink-0 mt-0.5" />
-                          <div>
-                            <p className="font-bold uppercase tracking-wider text-[8px] text-charcoal-dark">Scan & Pay via UPI</p>
-                            <p className="text-[9px] mt-0.5">
-                              Scan the QR below or pay using UPI ID: <strong className="text-charcoal-dark">sonalibhasinkumar@ptaxis</strong>. 
-                              Upload the receipt screenshot and transaction ID to submit order.
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* QR Image */}
-                        <div className="flex justify-center py-2 bg-white/40 rounded-xl border border-cream-dark/40 max-w-[150px] mx-auto">
-                          <img 
-                            src={getImageUrl('/uploads/default_upi_qr.jpg')} 
-                            alt="Payment QR Code" 
-                            className="w-32 h-32 object-contain"
-                          />
-                        </div>
-
-                        {/* Transaction ID */}
-                        <div className="flex flex-col gap-1">
-                          <label className="text-[10px] font-bold text-charcoal-light uppercase">Transaction Reference ID</label>
+                          <label className="text-[10px] font-bold text-charcoal-light uppercase">State</label>
                           <input
                             type="text"
                             required
-                            placeholder="Enter 12-digit transaction ID"
-                            value={transactionId}
-                            onChange={(e) => setTransactionId(e.target.value)}
+                            placeholder="Delhi"
+                            value={stateName}
+                            onChange={(e) => setStateName(e.target.value)}
                             className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all"
                           />
                         </div>
-
-                        {/* Screenshot upload */}
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
                         <div className="flex flex-col gap-1">
-                          <label className="text-[10px] font-bold text-charcoal-light uppercase">Upload Payment Screenshot</label>
-                          <div className="flex items-center gap-3">
-                            <label className="flex-1 flex flex-col items-center justify-center border border-dashed border-cream-dark/60 rounded-xl py-2 px-3 bg-cream-light hover:bg-cream cursor-pointer transition-colors duration-200">
-                              <UploadCloud className="w-4 h-4 text-gold-dark mb-1" />
-                              <span className="text-[9px] text-charcoal-light">
-                                {screenshot ? screenshot.name : 'Choose receipt image'}
-                              </span>
-                              <input 
-                                type="file"
-                                required
-                                accept="image/*"
-                                onChange={(e) => {
-                                  const file = e.target.files[0];
-                                  if (file) {
-                                    setScreenshot(file);
-                                    setScreenshotPreview(URL.createObjectURL(file));
-                                  }
-                                }}
-                                className="hidden"
-                              />
-                            </label>
-                            {screenshotPreview && (
-                              <div className="w-10 h-10 rounded-lg overflow-hidden border border-cream-dark shrink-0">
-                                <img src={screenshotPreview} alt="Receipt preview" className="w-full h-full object-cover" />
-                              </div>
-                            )}
-                          </div>
+                          <label className="text-[10px] font-bold text-charcoal-light uppercase">Postal Code</label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="110016"
+                            value={postalCode}
+                            onChange={(e) => setPostalCode(e.target.value)}
+                            className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all"
+                          />
                         </div>
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[10px] font-bold text-charcoal-light uppercase">Country</label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="India"
+                            value={country}
+                            onChange={(e) => setCountry(e.target.value)}
+                            className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[10px] font-bold text-charcoal-light uppercase">Phone Number</label>
+                        <input
+                          type="tel"
+                          required
+                          placeholder="10-digit phone"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all"
+                        />
+                      </div>
 
+                      {/* Payment Method Selector */}
+                      <div className="flex rounded-xl p-1 bg-cream border border-cream-dark/60 gap-1 mt-2">
                         <button
-                          type="submit"
-                          disabled={checkoutLoading}
-                          className="w-full bg-gold hover:bg-gold-dark text-charcoal-dark border border-gold-dark/20 font-bold py-3 rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center gap-2 mt-2 uppercase tracking-wider text-[10px]"
+                          type="button"
+                          onClick={() => setCheckoutPaymentMethod('razorpay')}
+                          className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                            checkoutPaymentMethod === 'razorpay'
+                              ? 'bg-sage text-white shadow-xs'
+                              : 'text-charcoal hover:bg-cream-light'
+                          }`}
                         >
-                          {checkoutLoading && <Compass className="w-4 h-4 animate-spin text-charcoal-dark" />}
-                          <span>{checkoutLoading ? 'Submitting...' : 'Submit Order Receipt'}</span>
+                          <Zap className="w-3.5 h-3.5" />
+                          <span>Instant Razorpay</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setCheckoutPaymentMethod('upi_qr')}
+                          className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                            checkoutPaymentMethod === 'upi_qr'
+                              ? 'bg-sage text-white shadow-xs'
+                              : 'text-charcoal hover:bg-cream-light'
+                          }`}
+                        >
+                          <CreditCard className="w-3.5 h-3.5" />
+                          <span>Manual UPI QR</span>
                         </button>
                       </div>
-                  </form>
+
+                      {checkoutPaymentMethod === 'razorpay' ? (
+                        /* Online Razorpay Flow */
+                        <div className="flex flex-col gap-3 mt-1">
+                          <div className="bg-cream-light/60 border border-cream-dark/60 p-3.5 rounded-xl flex flex-col gap-2">
+                            <div className="flex items-center gap-2 text-sage font-bold text-xs">
+                              <ShieldCheck className="w-4 h-4 text-sage" />
+                              <span>Razorpay Secure Online Payment</span>
+                            </div>
+                            <p className="text-[11px] text-charcoal-light leading-relaxed">
+                              Pay instantly via UPI (GPay, PhonePe, Paytm), Cards, Netbanking, or Wallets. Your order will be placed and confirmed immediately!
+                            </p>
+                          </div>
+
+                          <button
+                            type="button"
+                            disabled={checkoutLoading}
+                            onClick={handleRazorpayCheckout}
+                            className="w-full bg-gold hover:bg-gold-dark text-charcoal-dark border border-gold-dark/20 font-bold py-3 rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center gap-2 mt-1 uppercase tracking-wider text-[10px]"
+                          >
+                            {checkoutLoading ? <Compass className="w-4 h-4 animate-spin text-charcoal-dark" /> : <Zap className="w-4 h-4" />}
+                            <span>{checkoutLoading ? 'Opening Gateway...' : `Pay ₹${getCartTotal()} Online`}</span>
+                          </button>
+                        </div>
+                      ) : (
+                        /* Manual UPI QR Flow */
+                        <form onSubmit={handleCheckoutSubmit} className="flex flex-col gap-3">
+                          <div className="bg-cream/60 border border-cream-dark/60 p-3 rounded-xl flex gap-3 text-charcoal-light font-sans leading-relaxed text-left mt-1">
+                            <Smartphone className="w-4 h-4 text-gold-dark shrink-0 mt-0.5" />
+                            <div>
+                              <p className="font-bold uppercase tracking-wider text-[8px] text-charcoal-dark">Scan & Pay via UPI</p>
+                              <p className="text-[9px] mt-0.5">
+                                Scan the QR below or pay using UPI ID: <strong className="text-charcoal-dark">sonalibhasinkumar@ptaxis</strong>. 
+                                Upload the receipt screenshot and transaction ID to submit order.
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex justify-center py-2 bg-white/40 rounded-xl border border-cream-dark/40 max-w-[150px] mx-auto">
+                            <img 
+                              src={getImageUrl('/uploads/default_upi_qr.jpg')} 
+                              alt="Payment QR Code" 
+                              className="w-32 h-32 object-contain"
+                            />
+                          </div>
+
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-bold text-charcoal-light uppercase">Transaction Reference ID</label>
+                            <input
+                              type="text"
+                              required
+                              placeholder="Enter 12-digit transaction ID"
+                              value={transactionId}
+                              onChange={(e) => setTransactionId(e.target.value)}
+                              className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all"
+                            />
+                          </div>
+
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[10px] font-bold text-charcoal-light uppercase">Upload Payment Screenshot</label>
+                            <div className="flex items-center gap-3">
+                              <label className="flex-1 flex flex-col items-center justify-center border border-dashed border-cream-dark/60 rounded-xl py-2 px-3 bg-cream-light hover:bg-cream cursor-pointer transition-colors duration-200">
+                                <UploadCloud className="w-4 h-4 text-gold-dark mb-1" />
+                                <span className="text-[9px] text-charcoal-light">
+                                  {screenshot ? screenshot.name : 'Choose receipt image'}
+                                </span>
+                                <input 
+                                  type="file"
+                                  required
+                                  accept="image/*"
+                                  onChange={(e) => {
+                                    const file = e.target.files[0];
+                                    if (file) {
+                                      setScreenshot(file);
+                                      setScreenshotPreview(URL.createObjectURL(file));
+                                    }
+                                  }}
+                                  className="hidden"
+                                />
+                              </label>
+                              {screenshotPreview && (
+                                <div className="w-10 h-10 rounded-lg overflow-hidden border border-cream-dark shrink-0">
+                                  <img src={screenshotPreview} alt="Receipt preview" className="w-full h-full object-cover" />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          <button
+                            type="submit"
+                            disabled={checkoutLoading}
+                            className="w-full bg-gold hover:bg-gold-dark text-charcoal-dark border border-gold-dark/20 font-bold py-3 rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center gap-2 mt-2 uppercase tracking-wider text-[10px]"
+                          >
+                            {checkoutLoading && <Compass className="w-4 h-4 animate-spin text-charcoal-dark" />}
+                            <span>{checkoutLoading ? 'Submitting...' : 'Submit Order Receipt'}</span>
+                          </button>
+                        </form>
+                      )}
+                    </div>
+                  </div>
                 )}
 
               </div>

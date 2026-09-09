@@ -197,7 +197,7 @@ exports.deleteProgram = async (req, res, next) => {
 
 // @desc    Create program enrollment Razorpay order
 // @route   POST /api/programs/:id/enroll-order
-// @access  Private
+// @access  Public (Optional auth)
 exports.createEnrollmentOrder = async (req, res, next) => {
   try {
     const program = await Program.findById(req.params.id);
@@ -205,39 +205,37 @@ exports.createEnrollmentOrder = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Program not found' });
     }
 
+    const userId = req.user ? req.user._id : null;
+
     // Check if user is already enrolled
-    if (program.enrolledUsers.includes(req.user._id)) {
+    if (userId && program.enrolledUsers.includes(userId)) {
       return res.status(400).json({ success: false, message: 'You are already enrolled in this program' });
     }
 
     // Check capacity
-    if (program.enrolledUsers.length >= program.enrollmentCapacity) {
+    if (program.enrollmentCapacity && program.enrolledUsers.length >= program.enrollmentCapacity) {
       return res.status(400).json({ success: false, message: 'Program capacity has been reached' });
     }
 
-    const amount = program.pricing; // In INR
+    const amount = Number(program.sellingPrice || program.pricing) || 0; // In INR
 
     // If pricing is 0, we can enroll directly
-    if (amount === 0) {
-      program.enrolledUsers.push(req.user._id);
+    if (amount === 0 && userId) {
+      program.enrolledUsers.push(userId);
       await program.save();
       return res.json({ success: true, free: true, message: 'Successfully enrolled in free program' });
     }
 
-    let orderResponse = {
-      orderId: `mock_order_${crypto.randomBytes(6).toString('hex')}`,
-      amount: amount * 100, // in paise
-      currency: 'INR'
-    };
+    let orderResponseId = `mock_order_${crypto.randomBytes(6).toString('hex')}`;
 
-    if (false && isRazorpayConfigured) { // Disabled for programs per user request
+    if (isRazorpayConfigured && razorpayInstance) {
       const options = {
-        amount: amount * 100, // paise
+        amount: Math.round(amount * 100), // paise
         currency: 'INR',
-        receipt: `receipt_program_${program._id.toString().substring(0, 10)}`
+        receipt: `rcpt_prog_${crypto.randomBytes(4).toString('hex')}`
       };
       const order = await razorpayInstance.orders.create(options);
-      orderResponse.orderId = order.id;
+      orderResponseId = order.id;
     } else {
       console.log(`Razorpay simulated order created for Program: ${program.title}, amount: Rs. ${amount}`);
     }
@@ -245,13 +243,14 @@ exports.createEnrollmentOrder = async (req, res, next) => {
     res.json({
       success: true,
       data: {
-        orderId: orderResponse.orderId,
-        amount: orderResponse.amount,
-        currency: orderResponse.currency,
+        orderId: orderResponseId,
+        amount: Math.round(amount * 100),
+        currency: 'INR',
         programId: program._id,
+        programTitle: program.title,
         user: {
-          name: req.user.name,
-          email: req.user.email
+          name: req.user ? req.user.name : (req.body.name || ''),
+          email: req.user ? req.user.email : (req.body.email || '')
         }
       }
     });
@@ -262,7 +261,7 @@ exports.createEnrollmentOrder = async (req, res, next) => {
 
 // @desc    Verify program enrollment payment & enroll
 // @route   POST /api/programs/:id/enroll-verify
-// @access  Private
+// @access  Public (Optional auth)
 exports.verifyEnrollmentPayment = async (req, res, next) => {
   try {
     const program = await Program.findById(req.params.id);
@@ -270,9 +269,19 @@ exports.verifyEnrollmentPayment = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Program not found' });
     }
 
-    const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
+    const { 
+      razorpay_payment_id, 
+      razorpay_order_id, 
+      razorpay_signature,
+      userDetails 
+    } = req.body;
 
-    if (false && isRazorpayConfigured) { // Disabled for programs per user request
+    const userEmail = (req.user ? req.user.email : userDetails?.email) || '';
+    const userName = (req.user ? req.user.name : userDetails?.name) || 'Devotee';
+    const userPhone = (req.user ? req.user.phone : userDetails?.phone) || '';
+    const userId = req.user ? req.user._id : (userDetails?.userId || null);
+
+    if (isRazorpayConfigured) {
       if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
         return res.status(400).json({ success: false, message: 'Please provide all payment verification fields' });
       }
@@ -294,9 +303,40 @@ exports.verifyEnrollmentPayment = async (req, res, next) => {
     }
 
     // Enroll user if not already enrolled
-    if (!program.enrolledUsers.includes(req.user._id)) {
-      program.enrolledUsers.push(req.user._id);
+    if (userId && !program.enrolledUsers.includes(userId)) {
+      program.enrolledUsers.push(userId);
       await program.save();
+    }
+
+    // Create a ProgramRegistration record as Paid
+    await ProgramRegistration.create({
+      program: program._id,
+      user: userId,
+      name: userName,
+      email: userEmail.toLowerCase(),
+      phone: userPhone,
+      transactionId: razorpay_payment_id || `MOCK_PAY_${crypto.randomBytes(4).toString('hex')}`,
+      paymentScreenshot: 'razorpay_online',
+      paymentStatus: 'Paid'
+    });
+
+    // Send confirmation email
+    if (userEmail) {
+      const emailOptions = {
+        to: userEmail.toLowerCase(),
+        subject: `Your Program Enrollment is Confirmed: ${program.title}`,
+        text: `Hello ${userName},\n\nThank you for enrolling.\n\nYour payment has been received and your enrollment for "${program.title}" is confirmed!\n\nYou can access your program content and zoom links directly inside your dashboard profile.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
+        html: `<p>Hello <strong>${userName}</strong>,</p>
+               <p>Thank you for enrolling.</p>
+               <p>Your payment has been received and your enrollment for <strong>${program.title}</strong> is confirmed!</p>
+               <p>You can access your program content and zoom links directly inside your dashboard profile.</p>
+               <p>Regards,<br/><strong>Ascension by Sonali Bhasin Kumar</strong></p>`
+      };
+      try {
+        await sendEmail(emailOptions);
+      } catch (emailErr) {
+        console.error('Program confirmation email error:', emailErr.message);
+      }
     }
 
     res.json({

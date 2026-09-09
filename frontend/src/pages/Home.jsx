@@ -9,6 +9,8 @@ import {
 import axios from 'axios';
 import RegisterWorkshopModal from '../components/RegisterWorkshopModal';
 import RegisterWebinarModal from '../components/RegisterWebinarModal';
+import BookRetreatModal from '../components/BookRetreatModal';
+import BookSessionModal from '../components/BookSessionModal';
 import waterfallBg from '../assets/waterfall_bg.jpg';
 import founderImg from '../assets/founder.jpg';
 import foodSeva from '../assets/food_seva.png';
@@ -22,16 +24,27 @@ import cowFeeding2 from '../assets/gallery/cow_feeding_2.png';
 import dogCare1 from '../assets/gallery/dog_care_1.png';
 import educationSeva from '../assets/gallery/education_seva.png';
 import dogCare2 from '../assets/gallery/dog_care_2.png';
+import meditationCircle from '../assets/gallery/meditation_circle_candlelight.png';
+import kunzumSpeaker from '../assets/gallery/kunzum_event_speaker.jpg';
+import healingBooth from '../assets/gallery/healing_booth_reading.jpg';
+import kunzumCommunity from '../assets/gallery/kunzum_community_group.jpg';
 import whoWeAreBg from '../assets/who_we_are_bg.jpg';
 import whatWeDo from '../assets/what_we_do.jpg';
 import whyChooseAscension from '../assets/why_choose_ascension.jpg';
+import personalizedHealingImg from '../assets/why_choose/personalized_healing.jpg';
+import safeConfidentialImg from '../assets/why_choose/safe_and_confidential.jpg';
+import experiencedGuidanceImg from '../assets/why_choose/experienced_guidance.jpg';
+import holisticWellnessImg from '../assets/why_choose/holistic_wellness.jpg';
+import natureInspiredImg from '../assets/why_choose/nature_inspired_healing.jpg';
+import trustedByThousandsImg from '../assets/why_choose/trusted_by_thousands.jpg';
+import smallLearnersSeva from '../assets/small_learners_seva.jpg';
 
 const getImageUrl = (path) => {
   if (!path) return '';
   if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
     return path;
   }
-  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5001';
   return `${apiBase}${path}`;
 };
 
@@ -43,9 +56,12 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
   const [activeWorkshop, setActiveWorkshop] = useState(null);
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [services, setServices] = useState([]);
+  const [selectedService, setSelectedService] = useState(null);
   const [testimonials, setTestimonials] = useState([]);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [products, setProducts] = useState([]);
+  const [retreats, setRetreats] = useState([]);
+  const [activeRetreat, setActiveRetreat] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // Auto-scroll to webinar section when accessed via /webinars, /webinar, direct ancestral route, #webinars, or prop
@@ -151,6 +167,10 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
   const [galleryVisibleItems, setGalleryVisibleItems] = useState(3);
 
   const galleryImages = [
+    kunzumCommunity,
+    healingBooth,
+    meditationCircle,
+    kunzumSpeaker,
     foodDistribution,
     sanitaryDistribution1,
     cowFeeding1,
@@ -277,10 +297,145 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
       if (resProducts.data.success) {
         setProducts(resProducts.data.data.slice(0, 4)); // Show 4 featured products
       }
+
+      const resRetreats = await axios.get('/api/retreats');
+      if (resRetreats.data.success) {
+        setRetreats(resRetreats.data.data);
+      }
     } catch (err) {
       console.error('Error fetching home data:', err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleOpenRetreat = (retreat) => {
+    if (retreat) {
+      setActiveRetreat(retreat);
+    } else if (retreats.length > 0) {
+      setActiveRetreat(retreats[0]);
+    } else {
+      setActiveRetreat({
+        _id: '6a4963f49e941f93f91f5aae',
+        title: '5-Day Rishikesh Spiritual Reconnection Retreat',
+        description: 'Join Sonali Bhasin Kumar in holy Rishikesh for a 5-day spiritual immersion. Nestled along the banks of the sacred Ganges, this retreat is designed to reset your energy, purge emotional loads, and align your soul with your highest purpose. Experience yoga, Ganga Aarti, deep Theta meditations, fire rituals, and therapeutic sound baths.',
+        images: ['/uploads/retreat_service.png'],
+        pricing: 24999,
+        capacity: 15
+      });
+    }
+  };
+
+  const handleOpenService = (serviceQuery) => {
+    if (typeof serviceQuery === 'object' && serviceQuery !== null) {
+      setSelectedService(serviceQuery);
+      return;
+    }
+    const query = (serviceQuery || '').toLowerCase();
+    const matched = services.find(s => 
+      (s.title && s.title.toLowerCase().includes(query)) ||
+      (query.includes('theta') && s.title?.toLowerCase().includes('theta')) ||
+      (query.includes('sound') && s.title?.toLowerCase().includes('sound')) ||
+      (query.includes('chakra') && s.title?.toLowerCase().includes('chakra')) ||
+      (query.includes('oracle') && s.title?.toLowerCase().includes('oracle')) ||
+      (query.includes('counsell') && s.title?.toLowerCase().includes('counsell')) ||
+      (query.includes('meditat') && s.title?.toLowerCase().includes('meditat'))
+    );
+
+    if (matched) {
+      setSelectedService(matched);
+    } else {
+      if (query.includes('theta')) {
+        setSelectedService({
+          _id: 'theta-healing-service',
+          title: 'Distance Healing using Theta Modality',
+          description: 'Theta Healing is a powerful energy healing technique that works at the subconscious level to identify and release limiting beliefs, fears, emotional trauma, and energetic blockages. Many individuals unknowingly carry deep-rooted emotional wounds from childhood, relationships, or past experiences. Theta Healing helps you release limiting beliefs, fears, emotional trauma, and energetic blockages at the subconscious level, transforming your reality and raising your vibration.',
+          benefits: [
+            'Identify and reprogram subconscious blockages',
+            'Release deep-rooted fears, anxiety, and trauma',
+            'Heal childhood wounds and relationship baggages',
+            'Align mind, body, and soul with abundance and health'
+          ],
+          duration: 60,
+          pricing: 3500,
+          image: '/uploads/theta_healing_service.png'
+        });
+      } else if (query.includes('sound')) {
+        setSelectedService({
+          _id: 'sound-healing-service',
+          title: 'Sound Healing',
+          description: 'Sound Healing is a therapeutic modality that uses frequencies, vibrations, and instruments like Tibetan singing bowls to restore energetic balance and emotional harmony. Frequencies bypass logical blocks to touch the cellular level, restoring balance and deep relaxation to your nervous system.',
+          benefits: [
+            'Induce profound meditative states and deep relaxation',
+            'Relieve physical tension and alleviate chronic insomnia',
+            'Calm active mental chatter and reset cortisol levels',
+            'Restore cell-level resonance using harmonic bowls'
+          ],
+          duration: 60,
+          pricing: 2500,
+          image: '/uploads/sound_healing_service.png'
+        });
+      } else if (query.includes('chakra')) {
+        setSelectedService({
+          _id: 'chakra-healing-service',
+          title: 'Chakra Healing',
+          description: 'Align and balance the seven major energy centers in your body. Purge stagnant, heavy, and negative energies from your auric field and restore the natural flow of prana/vitality. This session leaves you feeling completely grounded, centered, and physically re-energized.',
+          benefits: [
+            'Purify and rebalance the seven major chakra centers',
+            'Harmonize emotional swings and remove energetic lethargy',
+            'Strengthen your aura against negative ambient energies',
+            'Increase physical vitality and mental clear-sightedness'
+          ],
+          duration: 60,
+          pricing: 2800,
+          image: '/uploads/chakra_healing_service.png'
+        });
+      } else if (query.includes('meditat')) {
+        setSelectedService({
+          _id: 'meditation-breathwork-service',
+          title: 'Meditation & Breathwork Immersion',
+          description: 'Cultivate mindfulness, quieten the inner chatter, and build a lasting connection to your spiritual wisdom. Guided breathing and stillness practices restore neurological equilibrium, lower stress, and awaken your intuitive capacity.',
+          benefits: [
+            'Cultivate profound inner stillness and mindfulness',
+            'Master conscious Pranayama to reset cortisol levels',
+            'Strengthen daily focus and emotional equilibrium',
+            'Awaken intuitive connection and spiritual peace'
+          ],
+          duration: 45,
+          pricing: 1800,
+          image: '/uploads/meditation_service.png'
+        });
+      } else if (query.includes('oracle')) {
+        setSelectedService({
+          _id: 'oracle-card-reading-service',
+          title: 'Oracle Card Reading Session',
+          description: 'Sometimes the soul seeks direction and insight. Our Oracle Card Reading sessions provide intuitive guidance for career, relationships, financial decisions, and personal growth. Every reading is conducted with intuition, compassion, and positive energy.',
+          benefits: [
+            'Gain direct clarity on relationship and career roadblocks',
+            'Receive supportive guidance from divine spiritual energies',
+            'Re-align with your higher self and path forward',
+            'Heal indecisiveness and find peace in current actions'
+          ],
+          duration: 45,
+          pricing: 2100,
+          image: '/uploads/oracle_card_reading_service.png'
+        });
+      } else if (query.includes('counsell')) {
+        setSelectedService({
+          _id: 'personal-counselling-service',
+          title: 'Personal Counselling Session',
+          description: 'Create a safe, confidential, and nurturing space to discuss emotional pain, anxiety, stress, or career roadblocks. Sonali Bhasin Kumar combines active empathy, transpersonal psychology, and energy understanding to guide you to find actionable paths forward.',
+          benefits: [
+            'Receive compassionate, non-judgmental professional counsel',
+            'Explore stress and anxiety triggers in a supportive space',
+            'Generate actionable frameworks for resolving life conflicts',
+            'Restore self-love, boundaries, and personal empowerment'
+          ],
+          duration: 60,
+          pricing: 3000,
+          image: '/uploads/personal_counselling_service.png'
+        });
+      }
     }
   };
 
@@ -513,7 +668,394 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
         </div>
       </section>
 
-      {/* 3. Meet the Founder */}
+      {/* 3. Upcoming Webinars & Workshops */}
+      {(loading || workshops.filter(w => !w.title || !w.title.toLowerCase().includes("lion")).length > 0) && (
+        <section id="webinars" className="py-20 md:py-24 bg-[#FFFDF7] px-4 sm:px-6 md:px-12 border-b border-cream-dark/30 w-full text-center scroll-mt-24 relative">
+          <span id="webinar" className="absolute -top-24"></span>
+          <span id="upcoming-events" className="absolute -top-24"></span>
+          <div className="max-w-6xl 2xl:max-w-7xl 3xl:max-w-screen-2xl mx-auto">
+            <span className="font-sans text-xs 2xl:text-sm text-gold-dark tracking-[0.25em] font-bold uppercase">Sacred Gatherings</span>
+            <h2 className="font-serif text-3xl 2xl:text-4xl font-bold text-charcoal-dark mt-2 mb-10 sm:mb-12">Upcoming Webinars & Workshops</h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              {loading ? (
+                [1, 2, 3].map((n) => (
+                  <div key={n} className="bg-white rounded-3xl overflow-hidden shadow-md border border-cream-dark/50 p-6 flex flex-col gap-4 animate-pulse h-[400px]">
+                    <div className="h-48 bg-cream rounded-2xl w-full"></div>
+                    <div className="h-6 bg-cream rounded-full w-3/4 mt-2"></div>
+                    <div className="h-4 bg-cream rounded-full w-full"></div>
+                    <div className="h-4 bg-cream rounded-full w-1/2"></div>
+                    <div className="mt-auto h-10 bg-cream rounded-xl w-full"></div>
+                  </div>
+                ))
+              ) : (
+                workshops
+                  .filter((workshop) => !workshop.title || !workshop.title.toLowerCase().includes("lion"))
+                  .slice(0, 3)
+                  .map((workshop) => {
+                    const isAncestral = workshop.title && workshop.title.toLowerCase().includes("ancestral");
+                    const dateObj = workshop.date ? new Date(workshop.date) : new Date();
+                    const dateFormatted = dateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+
+                    return (
+                      <div 
+                        key={workshop._id} 
+                        onClick={() => handleOpenWorkshop(workshop)}
+                        className={`group bg-white rounded-3xl overflow-hidden shadow-md border transition-all duration-300 flex flex-col text-left h-full cursor-pointer hover:shadow-2xl hover:-translate-y-1 ${
+                          isAncestral 
+                            ? 'border-[#EAE3D2] hover:border-[#D4A017]/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(212,160,23,0.12)] bg-[#FFFDF7]/90' 
+                            : 'border-cream-dark/50 hover:border-gold-dark/45'
+                        }`}
+                      >
+                        {/* Image Section */}
+                        <div className="h-48 overflow-hidden bg-cream relative">
+                          <img
+                            src={getImageUrl(workshop.coverImage || workshop.image || "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80")}
+                            alt={workshop.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                          
+                          {/* Date Badge */}
+                          <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-xs px-3 py-1 rounded-full text-[9px] font-bold tracking-widest uppercase text-sage-dark shadow-sm flex items-center gap-1 font-sans border border-cream-dark/30 select-none">
+                            <Calendar className="w-3.5 h-3.5 text-sage" />
+                            <span>{dateFormatted}</span>
+                          </div>
+
+                          {workshop.isWebinar && (
+                            <div className="absolute top-4 right-4 bg-gold/90 text-charcoal-dark font-sans px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider shadow-xs">
+                              Live Webinar
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Content Section */}
+                        <div className="p-6 flex flex-col flex-grow">
+                          <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark mb-2 leading-snug group-hover:text-gold-dark transition-colors">
+                            {workshop.title}
+                          </h3>
+                          <p className="text-xs 2xl:text-sm text-charcoal-light leading-relaxed font-sans line-clamp-3 mb-6">
+                            {workshop.shortDescription || workshop.description}
+                          </p>
+
+                          {/* Footer Section */}
+                          <div className="mt-auto border-t border-cream-dark/40 pt-4 flex justify-between items-center font-sans text-xs">
+                            <div className="flex flex-col text-left">
+                              <span className="text-[10px] text-charcoal-light uppercase tracking-wider font-semibold">Investment</span>
+                              <span className="font-serif font-bold text-gold-dark text-sm 2xl:text-base mt-0.5">
+                                ₹{workshop.price !== undefined ? workshop.price : (workshop.pricing || 99)}
+                              </span>
+                            </div>
+                            
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOpenWorkshop(workshop);
+                              }}
+                              className={`text-[10px] font-bold uppercase tracking-wider py-2.5 px-5 rounded-lg transition-all duration-300 shadow-sm ${
+                                isAncestral 
+                                  ? 'bg-[#D4A017] hover:bg-[#B38610] text-[#111111]' 
+                                  : 'bg-sage hover:bg-sage-dark text-white'
+                              }`}
+                            >
+                              Register Now
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+              )}
+            </div>
+
+            {/* If more than 3, redirect to programs page */}
+            {!loading && workshops.filter(w => !w.title || !w.title.toLowerCase().includes("lion")).length > 3 && (
+              <div className="mt-12">
+                <Link to="/webinars" className="text-xs font-bold text-sage-dark uppercase tracking-wider hover:text-gold flex items-center justify-center gap-1">
+                  <span>View All Upcoming Gatherings</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* 4. Healing Services */}
+      <section className="py-20 md:py-24 bg-[#FFFDF7] px-4 sm:px-6 md:px-12 border-b border-cream-dark/30 w-full text-center">
+        <div className="max-w-6xl 2xl:max-w-7xl 3xl:max-w-screen-2xl mx-auto">
+          <span className="font-sans text-xs 2xl:text-sm text-gold-dark tracking-[0.25em] font-bold uppercase">Premium Modalities</span>
+          <h2 className="font-serif text-3xl md:text-4xl 2xl:text-5xl font-bold text-charcoal-dark mt-2 mb-12 sm:mb-16">Healing Services</h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+
+            {/* Service 1: Theta Healing */}
+            <div 
+              onClick={() => handleOpenService('theta')}
+              className="group bg-white rounded-[24px] p-6 shadow-md border border-cream-dark/40 hover:border-gold-dark/45 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 flex flex-col text-left cursor-pointer"
+            >
+              <div className="h-52 rounded-2xl overflow-hidden mb-5 relative bg-cream border border-cream-dark/40 shadow-2xs">
+                <img 
+                  src={getImageUrl('/uploads/theta_healing_service.png')} 
+                  alt="Theta Healing" 
+                  className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500" 
+                />
+                <div className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/90 backdrop-blur-xs flex items-center justify-center text-gold shadow-sm z-20">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+              </div>
+              <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark mb-2">Theta Healing</h3>
+              <p className="text-xs 2xl:text-sm text-charcoal-light leading-relaxed font-sans mb-6 flex-grow">
+                Release deep subconscious blocks, negative patterns, and emotional trauma to align with your highest potential.
+              </p>
+              <button 
+                onClick={(e) => { e.stopPropagation(); handleOpenService('theta'); }}
+                className="text-xs font-bold text-sage hover:text-gold uppercase tracking-wider flex items-center gap-1 mt-auto font-sans text-left"
+              >
+                <span>Learn More</span>
+                <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
+              </button>
+            </div>
+
+            {/* Service 2: Sound Healing */}
+            <div 
+              onClick={() => handleOpenService('sound')}
+              className="group bg-white rounded-[24px] p-6 shadow-md border border-cream-dark/40 hover:border-gold-dark/45 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 flex flex-col text-left cursor-pointer"
+            >
+              <div className="h-52 rounded-2xl overflow-hidden mb-5 relative bg-cream border border-cream-dark/40 shadow-2xs">
+                <img 
+                  src={getImageUrl('/uploads/sound_healing_service.png')} 
+                  alt="Sound Healing" 
+                  className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500" 
+                />
+                <div className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/90 backdrop-blur-xs flex items-center justify-center text-gold shadow-sm z-20">
+                  <Compass className="w-4 h-4" />
+                </div>
+              </div>
+              <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark mb-2">Sound Healing</h3>
+              <p className="text-xs 2xl:text-sm text-charcoal-light leading-relaxed font-sans mb-6 flex-grow">
+                Rebalance your energetic fields, reduce stress, and achieve deep relaxation through sacred sound baths.
+              </p>
+              <button 
+                onClick={(e) => { e.stopPropagation(); handleOpenService('sound'); }}
+                className="text-xs font-bold text-sage hover:text-gold uppercase tracking-wider flex items-center gap-1 mt-auto font-sans text-left"
+              >
+                <span>Learn More</span>
+                <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
+              </button>
+            </div>
+
+            {/* Service 3: Chakra Healing */}
+            <div 
+              onClick={() => handleOpenService('chakra')}
+              className="group bg-white rounded-[24px] p-6 shadow-md border border-cream-dark/40 hover:border-gold-dark/45 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 flex flex-col text-left cursor-pointer"
+            >
+              <div className="h-52 rounded-2xl overflow-hidden mb-5 relative bg-cream border border-cream-dark/40 shadow-2xs">
+                <img 
+                  src={getImageUrl('/uploads/chakra_healing_service.png')} 
+                  alt="Chakra Healing" 
+                  className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500" 
+                />
+                <div className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/90 backdrop-blur-xs flex items-center justify-center text-gold shadow-sm z-20">
+                  <ShieldCheck className="w-4 h-4" />
+                </div>
+              </div>
+              <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark mb-2">Chakra Healing</h3>
+              <p className="text-xs 2xl:text-sm text-charcoal-light leading-relaxed font-sans mb-6 flex-grow">
+                Harmonize your primary energy centers (chakras) using crystals, energy transfer, and focused intentions.
+              </p>
+              <button 
+                onClick={(e) => { e.stopPropagation(); handleOpenService('chakra'); }}
+                className="text-xs font-bold text-sage hover:text-gold uppercase tracking-wider flex items-center gap-1 mt-auto font-sans text-left"
+              >
+                <span>Learn More</span>
+                <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
+              </button>
+            </div>
+
+            {/* Service 4: Meditation */}
+            <div 
+              onClick={() => handleOpenService('meditat')}
+              className="group bg-white rounded-[24px] p-6 shadow-md border border-cream-dark/40 hover:border-gold-dark/45 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 flex flex-col text-left cursor-pointer"
+            >
+              <div className="h-52 rounded-2xl overflow-hidden mb-5 relative bg-cream border border-cream-dark/40 shadow-2xs">
+                <img 
+                  src={getImageUrl('/uploads/meditation_service.png')} 
+                  alt="Meditation" 
+                  className="w-full h-full object-cover object-[center_20%] group-hover:scale-105 transition-transform duration-500" 
+                />
+                <div className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/90 backdrop-blur-xs flex items-center justify-center text-gold shadow-sm z-20">
+                  <Leaf className="w-4 h-4" />
+                </div>
+              </div>
+              <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark mb-2">Meditation</h3>
+              <p className="text-xs 2xl:text-sm text-charcoal-light leading-relaxed font-sans mb-6 flex-grow">
+                Cultivate mindfulness, quieten the inner mind, and build a lasting connection to your spiritual wisdom.
+              </p>
+              <button 
+                onClick={(e) => { e.stopPropagation(); handleOpenService('meditat'); }}
+                className="text-xs font-bold text-sage hover:text-gold uppercase tracking-wider flex items-center gap-1 mt-auto font-sans text-left"
+              >
+                <span>Learn More</span>
+                <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
+              </button>
+            </div>
+
+            {/* Service 5: Oracle Guidance */}
+            <div 
+              onClick={() => handleOpenService('oracle')}
+              className="group bg-white rounded-[24px] p-6 shadow-md border border-cream-dark/40 hover:border-gold-dark/45 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 flex flex-col text-left cursor-pointer"
+            >
+              <div className="h-52 rounded-2xl overflow-hidden mb-5 relative bg-cream border border-cream-dark/40 shadow-2xs">
+                <img 
+                  src={getImageUrl('/uploads/oracle_card_reading_service.png')} 
+                  alt="Oracle Guidance" 
+                  className="w-full h-full object-cover object-[center_35%] group-hover:scale-105 transition-transform duration-500" 
+                />
+                <div className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/90 backdrop-blur-xs flex items-center justify-center text-gold shadow-sm z-20">
+                  <Moon className="w-4 h-4" />
+                </div>
+              </div>
+              <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark mb-2">Oracle Guidance</h3>
+              <p className="text-xs 2xl:text-sm text-charcoal-light leading-relaxed font-sans mb-6 flex-grow">
+                Receive intuitive divine messages, clarity for your path, and answers to your soul's deepest questions.
+              </p>
+              <button 
+                onClick={(e) => { e.stopPropagation(); handleOpenService('oracle'); }}
+                className="text-xs font-bold text-sage hover:text-gold uppercase tracking-wider flex items-center gap-1 mt-auto font-sans text-left"
+              >
+                <span>Learn More</span>
+                <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
+              </button>
+            </div>
+
+            {/* Service 6: Personal Counselling */}
+            <div 
+              onClick={() => handleOpenService('counsell')}
+              className="group bg-white rounded-[24px] p-6 shadow-md border border-cream-dark/40 hover:border-gold-dark/45 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 flex flex-col text-left cursor-pointer"
+            >
+              <div className="h-52 rounded-2xl overflow-hidden mb-5 relative bg-cream border border-cream-dark/40 shadow-2xs">
+                <img 
+                  src={getImageUrl('/uploads/personal_counselling_service.png')} 
+                  alt="Personal Counselling" 
+                  className="w-full h-full object-cover object-[center_22%] group-hover:scale-105 transition-transform duration-500" 
+                />
+                <div className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/90 backdrop-blur-xs flex items-center justify-center text-gold shadow-sm z-20">
+                  <Heart className="w-4 h-4" />
+                </div>
+              </div>
+              <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark mb-2">Personal Counselling</h3>
+              <p className="text-xs 2xl:text-sm text-charcoal-light leading-relaxed font-sans mb-6 flex-grow">
+                Confidential one-on-one sessions to navigate life transitions, release anxiety, and restore emotional equilibrium.
+              </p>
+              <button 
+                onClick={(e) => { e.stopPropagation(); handleOpenService('counsell'); }}
+                className="text-xs font-bold text-sage hover:text-gold uppercase tracking-wider flex items-center gap-1 mt-auto font-sans text-left"
+              >
+                <span>Learn More</span>
+                <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
+              </button>
+            </div>
+
+            {/* Service 7: Spiritual Retreats */}
+            <div 
+              onClick={() => handleOpenRetreat()}
+              className="group bg-white rounded-[24px] p-6 shadow-md border border-cream-dark/40 hover:border-gold-dark/45 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 flex flex-col text-left cursor-pointer"
+            >
+              <div className="h-52 rounded-2xl overflow-hidden mb-5 relative bg-cream border border-cream-dark/40 shadow-2xs">
+                <img 
+                  src={getImageUrl('/uploads/retreat_service.png')} 
+                  alt="Spiritual Retreats" 
+                  className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500" 
+                />
+                <div className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/90 backdrop-blur-xs flex items-center justify-center text-gold shadow-sm z-20">
+                  <Sun className="w-4 h-4" />
+                </div>
+              </div>
+              <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark mb-2">Spiritual Retreats</h3>
+              <p className="text-xs 2xl:text-sm text-charcoal-light leading-relaxed font-sans mb-6 flex-grow">
+                Immerse yourself in nature-inspired, sacred environments and holy gatherings like Mahakumbh for transformative multi-day healing programs.
+              </p>
+              <button 
+                onClick={(e) => { e.stopPropagation(); handleOpenRetreat(); }}
+                className="text-xs font-bold text-sage hover:text-gold uppercase tracking-wider flex items-center gap-1 mt-auto font-sans text-left"
+              >
+                <span>Learn More</span>
+                <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Why Choose Ascension */}
+      <section id="why-choose" className="py-20 md:py-24 bg-cream/20 px-4 sm:px-6 md:px-12 border-b border-cream-dark/30 w-full text-center scroll-mt-20">
+        <div className="max-w-6xl 2xl:max-w-7xl 3xl:max-w-screen-2xl mx-auto">
+          <span className="font-sans text-xs 2xl:text-sm text-gold-dark tracking-[0.25em] font-bold uppercase">Sacred Safety & Experienced Care</span>
+          <h2 className="font-serif text-3xl md:text-4xl 2xl:text-5xl font-bold text-charcoal-dark mt-2 mb-12 sm:mb-16">Why Choose Ascension</h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+
+            {/* Feature 1: Personalized Healing */}
+            <div className="group rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-cream-dark/40 hover:border-gold-dark/45 transition-all duration-300 bg-white">
+              <img 
+                src={personalizedHealingImg} 
+                alt="Personalized Healing" 
+                className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" 
+              />
+            </div>
+
+            {/* Feature 2: Safe & Confidential */}
+            <div className="group rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-cream-dark/40 hover:border-gold-dark/45 transition-all duration-300 bg-white">
+              <img 
+                src={safeConfidentialImg} 
+                alt="Safe & Confidential" 
+                className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" 
+              />
+            </div>
+
+            {/* Feature 3: Experienced Guidance */}
+            <div className="group rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-cream-dark/40 hover:border-gold-dark/45 transition-all duration-300 bg-white">
+              <img 
+                src={experiencedGuidanceImg} 
+                alt="Experienced Guidance" 
+                className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" 
+              />
+            </div>
+
+            {/* Feature 4: Nature Inspired Healing */}
+            <div className="group rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-cream-dark/40 hover:border-gold-dark/45 transition-all duration-300 bg-white">
+              <img 
+                src={natureInspiredImg} 
+                alt="Nature Inspired Healing" 
+                className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" 
+              />
+            </div>
+
+            {/* Feature 5: Holistic Wellness */}
+            <div className="group rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-cream-dark/40 hover:border-gold-dark/45 transition-all duration-300 bg-white">
+              <img 
+                src={holisticWellnessImg} 
+                alt="Holistic Wellness" 
+                className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" 
+              />
+            </div>
+
+            {/* Feature 6: Trusted by Thousands */}
+            <div className="group rounded-2xl overflow-hidden shadow-sm hover:shadow-xl border border-cream-dark/40 hover:border-gold-dark/45 transition-all duration-300 bg-white">
+              <img 
+                src={trustedByThousandsImg} 
+                alt="Trusted by Thousands" 
+                className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500" 
+              />
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Meet the Founder */}
       <section className="py-20 md:py-24 bg-cream/20 px-4 sm:px-6 md:px-12 border-b border-cream-dark/30 w-full">
         <div className="max-w-6xl 2xl:max-w-7xl 3xl:max-w-screen-2xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
 
@@ -564,204 +1106,6 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
             </Link>
           </div>
 
-        </div>
-      </section>
-
-      {/* 4. Healing Services */}
-      <section className="py-20 md:py-24 bg-[#FFFDF7] px-4 sm:px-6 md:px-12 border-b border-cream-dark/30 w-full text-center">
-        <div className="max-w-6xl 2xl:max-w-7xl 3xl:max-w-screen-2xl mx-auto">
-          <span className="font-sans text-xs 2xl:text-sm text-gold-dark tracking-[0.25em] font-bold uppercase">Premium Modalities</span>
-          <h2 className="font-serif text-3xl md:text-4xl 2xl:text-5xl font-bold text-charcoal-dark mt-2 mb-12 sm:mb-16">Healing Services</h2>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-
-            {/* Service 1: Theta Healing */}
-            <div className="group bg-white rounded-[24px] p-6 shadow-md border border-cream-dark/40 hover:border-gold-dark/45 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 flex flex-col text-left">
-              <div className="h-44 rounded-xl overflow-hidden mb-5 relative">
-                <img src="https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&w=600&q=80" alt="Theta Healing" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                <div className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/90 backdrop-blur-xs flex items-center justify-center text-gold shadow-sm">
-                  <Sparkles className="w-4 h-4" />
-                </div>
-              </div>
-              <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark mb-2">Theta Healing</h3>
-              <p className="text-xs 2xl:text-sm text-charcoal-light leading-relaxed font-sans mb-6 flex-grow">
-                Release deep subconscious blocks, negative patterns, and emotional trauma to align with your highest potential.
-              </p>
-              <Link to="/services" className="text-xs font-bold text-sage hover:text-gold uppercase tracking-wider flex items-center gap-1 mt-auto font-sans">
-                <span>Learn More</span>
-                <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </div>
-
-            {/* Service 2: Sound Healing */}
-            <div className="group bg-white rounded-[24px] p-6 shadow-md border border-cream-dark/40 hover:border-gold-dark/45 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 flex flex-col text-left">
-              <div className="h-44 rounded-xl overflow-hidden mb-5 relative">
-                <img src={getImageUrl('/uploads/sound_healing_service.png')} alt="Sound Healing" className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500" />
-                <div className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/90 backdrop-blur-xs flex items-center justify-center text-gold shadow-sm">
-                  <Compass className="w-4 h-4" />
-                </div>
-              </div>
-              <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark mb-2">Sound Healing</h3>
-              <p className="text-xs 2xl:text-sm text-charcoal-light leading-relaxed font-sans mb-6 flex-grow">
-                Rebalance your energetic fields, reduce stress, and achieve deep relaxation through sacred sound baths.
-              </p>
-              <Link to="/services" className="text-xs font-bold text-sage hover:text-gold uppercase tracking-wider flex items-center gap-1 mt-auto font-sans">
-                <span>Learn More</span>
-                <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </div>
-
-            {/* Service 3: Chakra Healing */}
-            <div className="group bg-white rounded-[24px] p-6 shadow-md border border-cream-dark/40 hover:border-gold-dark/45 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 flex flex-col text-left">
-              <div className="h-44 rounded-xl overflow-hidden mb-5 relative">
-                <img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=600&q=80" alt="Chakra Healing" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                <div className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/90 backdrop-blur-xs flex items-center justify-center text-gold shadow-sm">
-                  <ShieldCheck className="w-4 h-4" />
-                </div>
-              </div>
-              <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark mb-2">Chakra Healing</h3>
-              <p className="text-xs 2xl:text-sm text-charcoal-light leading-relaxed font-sans mb-6 flex-grow">
-                Harmonize your primary energy centers (chakras) using crystals, energy transfer, and focused intentions.
-              </p>
-              <Link to="/services" className="text-xs font-bold text-sage hover:text-gold uppercase tracking-wider flex items-center gap-1 mt-auto font-sans">
-                <span>Learn More</span>
-                <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </div>
-
-            {/* Service 4: Meditation */}
-            <div className="group bg-white rounded-[24px] p-6 shadow-md border border-cream-dark/40 hover:border-gold-dark/45 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 flex flex-col text-left">
-              <div className="h-44 rounded-xl overflow-hidden mb-5 relative">
-                <img src="https://images.unsplash.com/photo-1508672019048-805c876b67e2?auto=format&fit=crop&w=600&q=80" alt="Meditation" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                <div className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/90 backdrop-blur-xs flex items-center justify-center text-gold shadow-sm">
-                  <Leaf className="w-4 h-4" />
-                </div>
-              </div>
-              <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark mb-2">Meditation</h3>
-              <p className="text-xs 2xl:text-sm text-charcoal-light leading-relaxed font-sans mb-6 flex-grow">
-                Cultivate mindfulness, quieten the inner mind, and build a lasting connection to your spiritual wisdom.
-              </p>
-              <Link to="/services" className="text-xs font-bold text-sage hover:text-gold uppercase tracking-wider flex items-center gap-1 mt-auto font-sans">
-                <span>Learn More</span>
-                <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </div>
-
-            {/* Service 5: Oracle Guidance */}
-            <div className="group bg-white rounded-[24px] p-6 shadow-md border border-cream-dark/40 hover:border-gold-dark/45 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 flex flex-col text-left">
-              <div className="h-44 rounded-xl overflow-hidden mb-5 relative">
-                <img src="https://images.unsplash.com/photo-1515003197210-e0cd71810b5f?auto=format&fit=crop&w=600&q=80" alt="Oracle Guidance" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                <div className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/90 backdrop-blur-xs flex items-center justify-center text-gold shadow-sm">
-                  <Moon className="w-4 h-4" />
-                </div>
-              </div>
-              <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark mb-2">Oracle Guidance</h3>
-              <p className="text-xs 2xl:text-sm text-charcoal-light leading-relaxed font-sans mb-6 flex-grow">
-                Receive intuitive divine messages, clarity for your path, and answers to your soul's deepest questions.
-              </p>
-              <Link to="/services" className="text-xs font-bold text-sage hover:text-gold uppercase tracking-wider flex items-center gap-1 mt-auto font-sans">
-                <span>Learn More</span>
-                <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </div>
-
-            {/* Service 6: Retreats */}
-            <div className="group bg-white rounded-[24px] p-6 shadow-md border border-cream-dark/40 hover:border-gold-dark/45 hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 flex flex-col text-left">
-              <div className="h-44 rounded-xl overflow-hidden mb-5 relative">
-                <img src="https://images.unsplash.com/photo-1545205597-3d9d02c29597?auto=format&fit=crop&w=600&q=80" alt="Retreats" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                <div className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white/90 backdrop-blur-xs flex items-center justify-center text-gold shadow-sm">
-                  <Sun className="w-4 h-4" />
-                </div>
-              </div>
-              <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark mb-2">Retreats</h3>
-              <p className="text-xs 2xl:text-sm text-charcoal-light leading-relaxed font-sans mb-6 flex-grow">
-                Immerse yourself in nature-inspired, sacred environments for transformative multi-day healing programs.
-              </p>
-              <Link to="/services" className="text-xs font-bold text-sage hover:text-gold uppercase tracking-wider flex items-center gap-1 mt-auto font-sans">
-                <span>Learn More</span>
-                <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
-              </Link>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* 5. Why Choose Ascension */}
-      <section id="why-choose" className="py-20 md:py-24 bg-cream/20 px-4 sm:px-6 md:px-12 border-b border-cream-dark/30 w-full text-center scroll-mt-20">
-        <div className="max-w-6xl 2xl:max-w-7xl 3xl:max-w-screen-2xl mx-auto">
-          <span className="font-sans text-xs 2xl:text-sm text-gold-dark tracking-[0.25em] font-bold uppercase">Sacred Safety & Experienced Care</span>
-          <h2 className="font-serif text-3xl md:text-4xl 2xl:text-5xl font-bold text-charcoal-dark mt-2 mb-12 sm:mb-16">Why Choose Ascension</h2>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-
-            {/* Feature 1 */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-cream-dark/30 hover:border-gold-dark/45 transition-all duration-300 text-left flex flex-col gap-3">
-              <div className="w-10 h-10 rounded-full bg-gold/10 text-gold flex items-center justify-center">
-                <Sparkles className="w-5 h-5" />
-              </div>
-              <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark">Personalized Healing</h3>
-              <p className="text-xs 2xl:text-sm text-charcoal-light leading-relaxed font-sans">
-                Customized energy sessions tailored specifically to your unique physical, mental, and emotional needs.
-              </p>
-            </div>
-
-            {/* Feature 2 */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-cream-dark/30 hover:border-gold-dark/45 transition-all duration-300 text-left flex flex-col gap-3">
-              <div className="w-10 h-10 rounded-full bg-gold/10 text-gold flex items-center justify-center">
-                <Lock className="w-5 h-5" />
-              </div>
-              <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark">Safe & Confidential</h3>
-              <p className="text-xs 2xl:text-sm text-charcoal-light leading-relaxed font-sans">
-                A completely secure, non-judgmental sanctuary where your vulnerability is treated with the highest sacred respect.
-              </p>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-cream-dark/30 hover:border-gold-dark/45 transition-all duration-300 text-left flex flex-col gap-3">
-              <div className="w-10 h-10 rounded-full bg-gold/10 text-gold flex items-center justify-center">
-                <Award className="w-5 h-5" />
-              </div>
-              <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark">Experienced Guidance</h3>
-              <p className="text-xs 2xl:text-sm text-charcoal-light leading-relaxed font-sans">
-                Led by Sonali Bhasin Kumar, offering years of proven certification in Theta healing, sound therapy, and manifestation.
-              </p>
-            </div>
-
-            {/* Feature 4 */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-cream-dark/30 hover:border-gold-dark/45 transition-all duration-300 text-left flex flex-col gap-3">
-              <div className="w-10 h-10 rounded-full bg-gold/10 text-gold flex items-center justify-center">
-                <Leaf className="w-5 h-5" />
-              </div>
-              <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark">Nature Inspired Healing</h3>
-              <p className="text-xs 2xl:text-sm text-charcoal-light leading-relaxed font-sans">
-                Harnessing natural frequencies, crystals, sound baths, and nature retreats to ground and align your spirit.
-              </p>
-            </div>
-
-            {/* Feature 5 */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-cream-dark/30 hover:border-gold-dark/45 transition-all duration-300 text-left flex flex-col gap-3">
-              <div className="w-10 h-10 rounded-full bg-gold/10 text-gold flex items-center justify-center">
-                <Compass className="w-5 h-5" />
-              </div>
-              <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark">Holistic Wellness</h3>
-              <p className="text-xs 2xl:text-sm text-charcoal-light leading-relaxed font-sans">
-                Bridging the mind, body, and soul connection to ensure true recovery, clarity, and life purpose.
-              </p>
-            </div>
-
-            {/* Feature 6 */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-cream-dark/30 hover:border-gold-dark/45 transition-all duration-300 text-left flex flex-col gap-3">
-              <div className="w-10 h-10 rounded-full bg-gold/10 text-gold flex items-center justify-center">
-                <Users className="w-5 h-5" />
-              </div>
-              <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark">Trusted by Thousands</h3>
-              <p className="text-xs 2xl:text-sm text-charcoal-light leading-relaxed font-sans">
-                A vibrant community of souls who have successfully broke free from past blocks and transformed their lives.
-              </p>
-            </div>
-
-          </div>
         </div>
       </section>
 
@@ -956,8 +1300,8 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
             {/* Image Wrapper */}
             <div className="relative w-full h-[360px] sm:h-[420px] md:h-[480px] rounded-[32px] overflow-hidden shadow-2xl border border-cream-dark/50 bg-cream group">
               <img
-                src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80"
-                alt="Ascension Seva NGO"
+                src={smallLearnersSeva}
+                alt="Ascension Seva NGO - Small Learners Big Tomorrows"
                 className="w-full h-full object-cover transform hover:scale-[1.03] transition-transform duration-[1.2s] ease-out"
               />
               
@@ -983,120 +1327,7 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
         </div>
       </section>
 
-      {/* 8. Upcoming Webinars & Workshops */}
-      {(loading || workshops.filter(w => !w.title || !w.title.toLowerCase().includes("lion")).length > 0) && (
-        <section id="webinars" className="py-20 md:py-24 bg-[#FFFDF7] px-4 sm:px-6 md:px-12 border-b border-cream-dark/30 w-full text-center scroll-mt-24 relative">
-          <span id="webinar" className="absolute -top-24"></span>
-          <span id="upcoming-events" className="absolute -top-24"></span>
-          <div className="max-w-6xl 2xl:max-w-7xl 3xl:max-w-screen-2xl mx-auto">
-            <span className="font-sans text-xs 2xl:text-sm text-gold-dark tracking-[0.25em] font-bold uppercase">Sacred Gatherings</span>
-            <h2 className="font-serif text-3xl 2xl:text-4xl font-bold text-charcoal-dark mt-2 mb-10 sm:mb-12">Upcoming Webinars & Workshops</h2>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-              {loading ? (
-                [1, 2, 3].map((n) => (
-                  <div key={n} className="bg-white rounded-3xl overflow-hidden shadow-md border border-cream-dark/50 p-6 flex flex-col gap-4 animate-pulse h-[400px]">
-                    <div className="h-48 bg-cream rounded-2xl w-full"></div>
-                    <div className="h-6 bg-cream rounded-full w-3/4 mt-2"></div>
-                    <div className="h-4 bg-cream rounded-full w-full"></div>
-                    <div className="h-4 bg-cream rounded-full w-1/2"></div>
-                    <div className="mt-auto h-10 bg-cream rounded-xl w-full"></div>
-                  </div>
-                ))
-              ) : (
-                workshops
-                  .filter((workshop) => !workshop.title || !workshop.title.toLowerCase().includes("lion"))
-                  .slice(0, 3)
-                  .map((workshop) => {
-                    const isAncestral = workshop.title && workshop.title.toLowerCase().includes("ancestral");
-                    const dateObj = workshop.date ? new Date(workshop.date) : new Date();
-                    const dateFormatted = dateObj.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
-
-                    return (
-                      <div 
-                        key={workshop._id} 
-                        onClick={() => handleOpenWorkshop(workshop)}
-                        className={`group bg-white rounded-3xl overflow-hidden shadow-md border transition-all duration-300 flex flex-col text-left h-full cursor-pointer hover:shadow-2xl hover:-translate-y-1 ${
-                          isAncestral 
-                            ? 'border-[#EAE3D2] hover:border-[#D4A017]/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(212,160,23,0.12)] bg-[#FFFDF7]/90' 
-                            : 'border-cream-dark/50 hover:border-gold-dark/45'
-                        }`}
-                      >
-                        {/* Image Section */}
-                        <div className="h-48 overflow-hidden bg-cream relative">
-                          <img
-                            src={getImageUrl(workshop.coverImage || workshop.image || "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80")}
-                            alt={workshop.title}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          />
-                          
-                          {/* Date Badge */}
-                          <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-xs px-3 py-1 rounded-full text-[9px] font-bold tracking-widest uppercase text-sage-dark shadow-sm flex items-center gap-1 font-sans border border-cream-dark/30 select-none">
-                            <Calendar className="w-3.5 h-3.5 text-sage" />
-                            <span>{dateFormatted}</span>
-                          </div>
-
-                          {workshop.isWebinar && (
-                            <div className="absolute top-4 right-4 bg-gold/90 text-charcoal-dark font-sans px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider shadow-xs">
-                              Live Webinar
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Content Section */}
-                        <div className="p-6 flex flex-col flex-grow">
-                          <h3 className="font-serif text-base 2xl:text-lg font-bold text-charcoal-dark mb-2 leading-snug group-hover:text-gold-dark transition-colors">
-                            {workshop.title}
-                          </h3>
-                          <p className="text-xs 2xl:text-sm text-charcoal-light leading-relaxed font-sans line-clamp-3 mb-6">
-                            {workshop.shortDescription || workshop.description}
-                          </p>
-
-                          {/* Footer Section */}
-                          <div className="mt-auto border-t border-cream-dark/40 pt-4 flex justify-between items-center font-sans text-xs">
-                            <div className="flex flex-col text-left">
-                              <span className="text-[10px] text-charcoal-light uppercase tracking-wider font-semibold">Investment</span>
-                              <span className="font-serif font-bold text-gold-dark text-sm 2xl:text-base mt-0.5">
-                                ₹{workshop.price !== undefined ? workshop.price : (workshop.pricing || 99)}
-                              </span>
-                            </div>
-                            
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleOpenWorkshop(workshop);
-                              }}
-                              className={`text-[10px] font-bold uppercase tracking-wider py-2.5 px-5 rounded-lg transition-all duration-300 shadow-sm ${
-                                isAncestral 
-                                  ? 'bg-[#D4A017] hover:bg-[#B38610] text-[#111111]' 
-                                  : 'bg-sage hover:bg-sage-dark text-white'
-                              }`}
-                            >
-                              Register Now
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })
-              )}
-            </div>
-
-            {/* If more than 3, redirect to programs page */}
-            {!loading && workshops.filter(w => !w.title || !w.title.toLowerCase().includes("lion")).length > 3 && (
-              <div className="mt-12">
-                <Link to="/programs" className="text-xs font-bold text-sage-dark uppercase tracking-wider hover:text-gold flex items-center justify-center gap-1">
-                  <span>View All Upcoming Gatherings</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-            )}
-          </div>
-        </section>
-      )}
-
-      {/* 9. Featured Shop (Optimized 2-column on mobile phones!) */}
+      {/* 8. Featured Shop (Optimized 2-column on mobile phones!) */}
       {(loading || products.length > 0) && (
         <section className="py-20 md:py-24 bg-cream/20 px-3 sm:px-6 md:px-12 border-b border-cream-dark/30 w-full text-center">
           <div className="max-w-6xl 2xl:max-w-7xl 3xl:max-w-screen-2xl mx-auto">
@@ -1320,6 +1551,22 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
         <RegisterWorkshopModal
           workshop={activeWorkshop}
           onClose={handleCloseWorkshop}
+        />
+      )}
+
+      {/* Retreat Registration / Inquiry Modal */}
+      {activeRetreat && (
+        <BookRetreatModal
+          retreat={activeRetreat}
+          onClose={() => setActiveRetreat(null)}
+        />
+      )}
+
+      {/* Service Booking & Details Modal */}
+      {selectedService && (
+        <BookSessionModal
+          service={selectedService}
+          onClose={() => setSelectedService(null)}
         />
       )}
     </div>

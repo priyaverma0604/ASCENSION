@@ -7,6 +7,8 @@ const {
   updateWebinar,
   deleteWebinar,
   registerForWebinar,
+  createWebinarOrder,
+  verifyWebinarPayment,
   getAllRegistrations,
   approveRegistration,
   rejectRegistration,
@@ -73,5 +75,8 @@ router.route('/:id')
 
 router.route('/:id/register')
   .post(upload.single('paymentScreenshot'), registerForWebinar);
+
+router.post('/:id/razorpay-order', createWebinarOrder);
+router.post('/:id/verify-payment', verifyWebinarPayment);
 
 module.exports = router;

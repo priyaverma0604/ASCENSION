@@ -30,7 +30,7 @@ const {
   deleteAssignment,
   getAssignmentByDayNum
 } = require('../controllers/assignmentController');
-const { protect, admin } = require('../middleware/auth');
+const { protect, optionalProtect, admin } = require('../middleware/auth');
 const upload = require('../middleware/upload');
 
 // Admin Registrations management (Must be defined before /:id routes)
@@ -43,13 +43,12 @@ router.route('/')
 
 router.route('/:id')
   .get(getProgramById)
-  .put(protect, admin, upload.array('images', 5), updatedProgram => updateProgram(updatedProgram, ...arguments)) // Wait, standard syntax:
   .put(protect, admin, upload.array('images', 5), updateProgram)
   .delete(protect, admin, deleteProgram);
 
-router.post('/:id/enroll-order', protect, createEnrollmentOrder);
-router.post('/:id/enroll-verify', protect, verifyEnrollmentPayment);
-router.post('/:id/enroll-qr', protect, upload.single('paymentScreenshot'), enrollProgramQR);
+router.post('/:id/enroll-order', optionalProtect, createEnrollmentOrder);
+router.post('/:id/enroll-verify', optionalProtect, verifyEnrollmentPayment);
+router.post('/:id/enroll-qr', optionalProtect, upload.single('paymentScreenshot'), enrollProgramQR);
 
 // Program daily progress tracking routes
 router.get('/:id/progress', protect, getProgramProgress);

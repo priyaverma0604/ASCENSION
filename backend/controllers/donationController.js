@@ -1,5 +1,5 @@
 const Donation = require('../models/Donation');
-const { razorpayInstance, isRazorpayConfigured } = require('../config/razorpay');
+const { razorpaySevaInstance, isRazorpaySevaConfigured } = require('../config/razorpay');
 const crypto = require('crypto');
 
 // @desc    Initiate donation - create Razorpay order
@@ -15,16 +15,16 @@ exports.createDonationOrder = async (req, res, next) => {
 
     let orderResponseId = `mock_order_${crypto.randomBytes(6).toString('hex')}`;
 
-    if (isRazorpayConfigured) {
+    if (isRazorpaySevaConfigured && razorpaySevaInstance) {
       const options = {
         amount: Math.round(amount * 100), // paise
         currency: 'INR',
         receipt: `receipt_donation_${crypto.randomBytes(4).toString('hex')}`
       };
-      const order = await razorpayInstance.orders.create(options);
+      const order = await razorpaySevaInstance.orders.create(options);
       orderResponseId = order.id;
     } else {
-      console.log(`Razorpay simulated donation order created, amount: Rs. ${amount}`);
+      console.log(`Razorpay Seva simulated donation order created, amount: Rs. ${amount}`);
     }
 
     res.json({
@@ -62,14 +62,14 @@ exports.verifyDonationPayment = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Please provide donation details' });
     }
 
-    if (isRazorpayConfigured) {
+    if (isRazorpaySevaConfigured) {
       if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
         return res.status(400).json({ success: false, message: 'Missing payment details' });
       }
 
       const body = razorpay_order_id + '|' + razorpay_payment_id;
       const expectedSignature = crypto
-        .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+        .createHmac('sha256', process.env.RAZORPAY_SEVA_KEY_SECRET)
         .update(body.toString())
         .digest('hex');
 
@@ -79,7 +79,7 @@ exports.verifyDonationPayment = async (req, res, next) => {
         return res.status(400).json({ success: false, message: 'Payment verification failed: invalid signature' });
       }
     } else {
-      console.log('Donation payment signature verified (Simulation Mode)');
+      console.log('Donation payment signature verified (Simulation / Pending Seva Keys Mode)');
     }
 
     // Save completed donation to DB

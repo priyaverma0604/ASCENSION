@@ -23,9 +23,9 @@ const servicesData = [
       "Heal childhood wounds and relationship baggages",
       "Align mind, body, and soul with abundance and health"
     ],
-    duration: 60,
+    duration: 30,
     pricing: 3500,
-    image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?auto=format&fit=crop&w=800&q=80"
+    image: "/uploads/theta_healing_service.png"
   },
   {
     title: "Oracle Card Reading Session",
@@ -36,9 +36,9 @@ const servicesData = [
       "Re-align with your higher self and path forward",
       "Heal indecisiveness and find peace in current actions"
     ],
-    duration: 45,
+    duration: 30,
     pricing: 2100,
-    image: "https://images.unsplash.com/photo-1572945281781-863a3014a51e?auto=format&fit=crop&w=800&q=80"
+    image: "/uploads/oracle_card_reading_service.png"
   },
   {
     title: "Personal Counselling Session",
@@ -49,9 +49,9 @@ const servicesData = [
       "Generate actionable frameworks for resolving life conflicts",
       "Restore self-love, boundaries, and personal empowerment"
     ],
-    duration: 60,
+    duration: 30,
     pricing: 3000,
-    image: "https://images.unsplash.com/photo-1573497620053-ea5300f94f21?auto=format&fit=crop&w=800&q=80"
+    image: "/uploads/personal_counselling_service.png"
   },
   {
     title: "Chakra Healing",
@@ -62,9 +62,9 @@ const servicesData = [
       "Strengthen your aura against negative ambient energies",
       "Increase physical vitality and mental clear-sightedness"
     ],
-    duration: 60,
+    duration: 30,
     pricing: 2800,
-    image: "https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80"
+    image: "/uploads/chakra_healing_service.png"
   },
   {
     title: "Sound Healing",
@@ -75,7 +75,7 @@ const servicesData = [
       "Calm active mental chatter and reset cortisol levels",
       "Restore cell-level resonance using harmonic bowls"
     ],
-    duration: 60,
+    duration: 30,
     pricing: 2500,
     image: "/uploads/sound_healing_service.png"
   }
@@ -110,7 +110,7 @@ const retreatsData = [
     description: "Join Sonali Bhasin Kumar in holy Rishikesh for a 5-day spiritual immersion. Nestled along the banks of the sacred Ganges, this retreat is designed to reset your energy, purge emotional loads, and align your soul with your highest purpose. Experience yoga, Ganga Aarti, deep Theta meditations, fire rituals, and therapeutic sound baths.",
     pricing: 24999,
     capacity: 15,
-    images: ["https://images.unsplash.com/photo-1545205597-3d9d02c29597?auto=format&fit=crop&w=800&q=80"],
+    images: ["/uploads/retreat_service.png"],
     itinerary: [
       { day: 1, title: "Sacred Welcome & Intention Setting", description: "Arrive at our riverside resort. Join the opening circle, get personal energy assessments, and set intentions around our introductory circle." },
       { day: 2, title: "Subconscious Clearing & Holy Dip", description: "Sunrise mindfulness meditation, intensive group Theta Healing to clear ancestral blocks, and a holy dip in the clean Ganges waters." },
@@ -183,7 +183,7 @@ const programsData = [
     originalPrice: 2100,
     sellingPrice: 2100,
     enrollmentCapacity: 50,
-    images: ["https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&w=800&q=80"],
+    images: ["/uploads/meditation_service.png"],
     youtubeUrl: "https://www.youtube.com/embed/MERkgMlwkJs"
   },
   {
@@ -322,7 +322,7 @@ const seedDatabase = async () => {
       content: "We are thrilled to open our virtual doors to you. Here, we will post spiritual insights, volunteer opportunities for Ascension Seva NGO, and upcoming retreats. Feel free to join our WhatsApp Community and stay aligned with our higher frequencies.",
       type: "announcement",
       date: new Date(),
-      image: "https://images.unsplash.com/photo-1518241353330-0f7941c2d9b5?auto=format&fit=crop&w=800&q=80"
+      image: "/uploads/ascension_seva_banner.png"
     });
     console.log(`Seed: Created default community post.`);
 
