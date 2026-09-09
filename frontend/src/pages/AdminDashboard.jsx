@@ -986,6 +986,8 @@ const AdminDashboard = () => {
                             <option value="Healing Camphor">Healing Camphor</option>
                             <option value="Healing Oils">Healing Oils</option>
                             <option value="Candles">Candles</option>
+                            <option value="Wax Tablets">Wax Tablets</option>
+                            <option value="Sage Leaves">Sage Leaves</option>
                             <option value="Crystals">Crystals</option>
                             <option value="Lamps">Lamps</option>
                             <option value="Crystal Trees">Crystal Trees</option>

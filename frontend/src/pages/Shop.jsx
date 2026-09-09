@@ -65,7 +65,7 @@ const Shop = () => {
   const [screenshotPreview, setScreenshotPreview] = useState('');
 
   const categories = [
-    'All', 'Bath Salts', 'Healing Camphor', 'Healing Oils', 'Candles'
+    'All', 'Bath Salts', 'Healing Camphor', 'Healing Oils', 'Candles', 'Wax Tablets', 'Sage Leaves'
   ];
 
   useEffect(() => {
