@@ -4,7 +4,7 @@ import {
   Compass, Calendar, ArrowRight, MessageCircle, ChevronLeft, ChevronRight, Check,
   ShieldCheck, UserCheck, Heart, Lock, Sparkles, Award, Users, Shield, Star, Leaf,
   TrendingUp, ShoppingBag, Eye, HeartHandshake, MapPin, Mail, Phone, CalendarRange,
-  Moon, Sun
+  Moon, Sun, Zap, Flame, X
 } from 'lucide-react';
 import axios from 'axios';
 import RegisterWorkshopModal from '../components/RegisterWorkshopModal';
@@ -63,6 +63,7 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
   const [retreats, setRetreats] = useState([]);
   const [activeRetreat, setActiveRetreat] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [dismissFloatingAlert, setDismissFloatingAlert] = useState(false);
 
   // Auto-scroll to webinar section when accessed via /webinars, /webinar, direct ancestral route, #webinars, or prop
   useEffect(() => {
@@ -478,6 +479,46 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
 
         <div className="flex flex-col items-center gap-3 sm:gap-4 relative z-10 w-full max-w-4xl 2xl:max-w-5xl 3xl:max-w-6xl mx-auto animate-fade-in lg:-translate-y-8 2xl:-translate-y-12">
 
+          {/* Flashy Live Webinar Announcement Flash Banner */}
+          <div 
+            onClick={() => {
+              const ancestral = workshops.find(w => (w.title && w.title.toLowerCase().includes('ancestral')) || (w.name && w.name.toLowerCase().includes('ancestral'))) || workshops.find(w => w.isWebinar);
+              if (ancestral) handleOpenWorkshop(ancestral);
+              else handleOpenWorkshop({
+                _id: "ancestral-healing-webinar-id",
+                title: "Ancestral Healing Webinar",
+                shortDescription: "Join Sonali Bhasin Kumar for a powerful live introductory Ancestral Healing Webinar. Discover the foundations of healing family karma, clearing intergenerational trauma, and receiving sacred ancestral blessings.",
+                speakerName: "Sonali Bhasin Kumar",
+                date: new Date('2026-09-23T19:00:00+05:30'),
+                time: "7:00 PM - 8:30 PM IST",
+                duration: "90 minutes",
+                price: 99,
+                coverImage: "/uploads/ancestral_healing_webinar_bg.png",
+                upiQrCodeImage: "/uploads/default_upi_qr.jpg",
+                upiId: "sonalibhasinkumar@ptaxis",
+                mobileNumber: "9999999999",
+                whatsappGroupLink: "https://chat.whatsapp.com/J4nXj2mznEfLCj2YZd1v16",
+                isWebinar: true
+              });
+            }}
+            className="group cursor-pointer inline-flex items-center gap-2 sm:gap-2.5 px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full bg-white/95 hover:bg-white border-2 border-[#D4A017] shadow-[0_4px_25px_rgba(212,160,23,0.35)] hover:shadow-[0_8px_35px_rgba(212,160,23,0.5)] transition-all duration-300 transform hover:scale-[1.03] mb-1 select-none animate-pulse"
+          >
+            <span className="relative flex h-2.5 w-2.5 shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-90"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-600"></span>
+            </span>
+            <span className="bg-red-600 text-white text-[9px] sm:text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs flex items-center gap-1">
+              <Zap className="w-3 h-3 text-yellow-300 fill-yellow-300" />
+              <span>REGISTRATIONS LIVE</span>
+            </span>
+            <span className="text-[11px] sm:text-xs font-bold text-charcoal-dark tracking-wide font-sans truncate max-w-[170px] sm:max-w-none">
+              Ancestral Healing Live Webinar
+            </span>
+            <span className="text-[11px] sm:text-xs font-serif font-bold text-gold-dark flex items-center gap-1 group-hover:text-gold-darker">
+              <span className="hidden sm:inline">•</span> ₹99 Pass <span className="group-hover:translate-x-1 transition-transform">→</span>
+            </span>
+          </div>
+
           <span className="font-cormorant text-xs sm:text-base 2xl:text-lg text-black font-bold tracking-wider uppercase">
             Reclaim your peace. Reconnect with your light.
           </span>
@@ -667,8 +708,14 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
           <span id="webinar" className="absolute -top-24"></span>
           <span id="upcoming-events" className="absolute -top-24"></span>
           <div className="max-w-6xl 2xl:max-w-7xl 3xl:max-w-screen-2xl mx-auto">
-            <span className="font-sans text-xs 2xl:text-sm text-gold-dark tracking-[0.25em] font-bold uppercase">Sacred Gatherings</span>
-            <h2 className="font-serif text-3xl 2xl:text-4xl font-bold text-charcoal-dark mt-2 mb-10 sm:mb-12">Upcoming Webinars & Workshops</h2>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-red-600/10 border border-red-500/25 text-red-600 font-sans text-[10px] font-extrabold uppercase tracking-widest mb-3 animate-pulse">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-90"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
+              </span>
+              <span>LIVE GATHERINGS & WEBINARS</span>
+            </div>
+            <h2 className="font-serif text-3xl 2xl:text-4xl font-bold text-charcoal-dark mt-1 mb-10 sm:mb-12">Upcoming Webinars & Workshops</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
               {loading ? (
@@ -694,10 +741,10 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
                       <div 
                         key={workshop._id} 
                         onClick={() => handleOpenWorkshop(workshop)}
-                        className={`group bg-white rounded-3xl overflow-hidden shadow-md border transition-all duration-300 flex flex-col text-left h-full cursor-pointer hover:shadow-2xl hover:-translate-y-1 ${
+                        className={`group bg-white rounded-3xl overflow-hidden transition-all duration-300 flex flex-col text-left h-full cursor-pointer hover:-translate-y-1 ${
                           isAncestral 
-                            ? 'border-[#EAE3D2] hover:border-[#D4A017]/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(212,160,23,0.12)] bg-[#FFFDF7]/90' 
-                            : 'border-cream-dark/50 hover:border-gold-dark/45'
+                            ? 'border-2 border-[#D4A017] ring-2 ring-[#D4A017]/40 shadow-[0_12px_45px_rgba(212,160,23,0.3)] hover:shadow-[0_24px_65px_rgba(212,160,23,0.45)] bg-[#FFFDF7]' 
+                            : 'border border-cream-dark/50 hover:border-gold-dark/45 shadow-md hover:shadow-2xl'
                         }`}
                       >
                         {/* Image Section */}
@@ -709,17 +756,34 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
                           />
                           
                           {/* Date Badge */}
-                          <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-xs px-3 py-1 rounded-full text-[9px] font-bold tracking-widest uppercase text-sage-dark shadow-sm flex items-center gap-1 font-sans border border-cream-dark/30 select-none">
+                          <div className="absolute top-4 left-4 bg-white/95 backdrop-blur-xs px-3 py-1 rounded-full text-[9px] font-bold tracking-widest uppercase text-sage-dark shadow-sm flex items-center gap-1 font-sans border border-cream-dark/30 select-none z-10">
                             <Calendar className="w-3.5 h-3.5 text-sage" />
                             <span>{dateFormatted}</span>
                           </div>
 
                           {workshop.isWebinar && (
-                            <div className="absolute top-4 right-4 bg-gold/90 text-charcoal-dark font-sans px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider shadow-xs">
-                              Live Webinar
+                            <div className="absolute top-3.5 right-3.5 bg-red-600 text-white font-sans px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg shadow-red-600/50 flex items-center gap-1.5 animate-pulse border border-white/40 z-10">
+                              <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-90"></span>
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                              </span>
+                              <span>REGISTRATIONS LIVE</span>
                             </div>
                           )}
                         </div>
+
+                        {/* Urgency Ribbon for Live Webinar */}
+                        {isAncestral && (
+                          <div className="bg-gradient-to-r from-amber-600 via-red-500 to-amber-600 text-white text-[10px] font-bold px-4 py-1.5 flex items-center justify-between shadow-xs">
+                            <span className="flex items-center gap-1.5 font-sans">
+                              <Zap className="w-3.5 h-3.5 text-yellow-200 fill-yellow-200 animate-bounce" />
+                              <span>Live Zoom Session • Limited Seats</span>
+                            </span>
+                            <span className="bg-black/30 text-yellow-300 text-[9px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider">
+                              🔥 85% Booked
+                            </span>
+                          </div>
+                        )}
 
                         {/* Content Section */}
                         <div className="p-6 flex flex-col flex-grow">
@@ -745,13 +809,20 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
                                 e.stopPropagation();
                                 handleOpenWorkshop(workshop);
                               }}
-                              className={`text-[10px] font-bold uppercase tracking-wider py-2.5 px-5 rounded-lg transition-all duration-300 shadow-sm ${
+                              className={`text-[10px] font-black uppercase tracking-wider py-2.5 px-5 rounded-xl transition-all duration-300 shadow-md flex items-center gap-1.5 ${
                                 isAncestral 
-                                  ? 'bg-[#D4A017] hover:bg-[#B38610] text-[#111111]' 
+                                  ? 'bg-gradient-to-r from-[#D4A017] via-[#F3C048] to-[#D4A017] hover:from-[#B38610] hover:to-[#B38610] text-[#111111] ring-2 ring-[#D4A017]/60 shadow-gold/40 animate-pulse hover:scale-105' 
                                   : 'bg-sage hover:bg-sage-dark text-white'
                               }`}
                             >
-                              Register Now
+                              {isAncestral ? (
+                                <>
+                                  <Zap className="w-3.5 h-3.5 text-charcoal-dark fill-charcoal-dark" />
+                                  <span>⚡ REGISTER NOW (LIVE)</span>
+                                </>
+                              ) : (
+                                <span>Register Now</span>
+                              )}
                             </button>
                           </div>
                         </div>
@@ -1567,6 +1638,63 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
           service={selectedService}
           onClose={() => setSelectedService(null)}
         />
+      )}
+
+      {/* Floating Live Webinar Quick-Access Flash Pill */}
+      {!dismissFloatingAlert && (
+        <div className="fixed bottom-20 left-3 sm:left-6 lg:bottom-6 z-40 animate-slide-up flex items-center">
+          <div
+            onClick={() => {
+              const ancestral = workshops.find(w => (w.title && w.title.toLowerCase().includes('ancestral')) || (w.name && w.name.toLowerCase().includes('ancestral'))) || workshops.find(w => w.isWebinar);
+              if (ancestral) handleOpenWorkshop(ancestral);
+              else handleOpenWorkshop({
+                _id: "ancestral-healing-webinar-id",
+                title: "Ancestral Healing Webinar",
+                shortDescription: "Join Sonali Bhasin Kumar for a powerful live introductory Ancestral Healing Webinar. Discover the foundations of healing family karma, clearing intergenerational trauma, and receiving sacred ancestral blessings.",
+                speakerName: "Sonali Bhasin Kumar",
+                date: new Date('2026-09-23T19:00:00+05:30'),
+                time: "7:00 PM - 8:30 PM IST",
+                duration: "90 minutes",
+                price: 99,
+                coverImage: "/uploads/ancestral_healing_webinar_bg.png",
+                upiQrCodeImage: "/uploads/default_upi_qr.jpg",
+                upiId: "sonalibhasinkumar@ptaxis",
+                mobileNumber: "9999999999",
+                whatsappGroupLink: "https://chat.whatsapp.com/J4nXj2mznEfLCj2YZd1v16",
+                isWebinar: true
+              });
+            }}
+            className="group cursor-pointer bg-white/95 hover:bg-white backdrop-blur-md rounded-2xl shadow-[0_10px_35px_rgba(212,160,23,0.35)] border-2 border-[#D4A017] p-2.5 sm:px-4 sm:py-2.5 flex items-center gap-2.5 sm:gap-3 transition-all duration-300 transform hover:scale-105"
+          >
+            <div className="relative flex h-3 w-3 shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-90"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-red-600"></span>
+            </div>
+            <div className="flex flex-col text-left">
+              <div className="flex items-center gap-1.5">
+                <span className="bg-red-600 text-white text-[8px] sm:text-[9px] font-black px-1.5 py-0.2 rounded font-sans uppercase tracking-wider animate-pulse shadow-xs">
+                  ⚡ LIVE
+                </span>
+                <span className="text-[11px] sm:text-xs font-bold text-charcoal-dark font-sans leading-tight">
+                  Ancestral Healing Webinar
+                </span>
+              </div>
+              <span className="text-[10px] text-sage-dark font-semibold font-sans mt-0.5">
+                ₹99 Early Pass • Tap to Register →
+              </span>
+            </div>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setDismissFloatingAlert(true);
+              }}
+              className="p-1 rounded-full text-charcoal-light hover:text-charcoal hover:bg-cream/80 ml-1 focus:outline-none"
+              aria-label="Dismiss alert"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

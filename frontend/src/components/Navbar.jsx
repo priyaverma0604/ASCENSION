@@ -87,10 +87,17 @@ const Navbar = () => {
             <NavLink
               to="/webinars"
               className={({ isActive }) =>
-                `text-xs 2xl:text-sm font-semibold uppercase tracking-wider transition-colors duration-300 hover:text-gold ${isActive || location.pathname === '/webinars' || location.pathname === '/webinar' ? 'text-gold font-bold' : 'text-charcoal/80'}`
+                `text-xs 2xl:text-sm font-semibold uppercase tracking-wider transition-colors duration-300 hover:text-gold flex items-center gap-1.5 ${isActive || location.pathname === '/webinars' || location.pathname === '/webinar' || location.pathname === '/ancestral-healing-webinar' ? 'text-gold font-bold' : 'text-charcoal/80'}`
               }
             >
-              Webinars
+              <span>Webinars</span>
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-90"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
+              </span>
+              <span className="bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-tight animate-pulse shadow-xs">
+                LIVE
+              </span>
             </NavLink>
 
             {/* Seva Dropdown Parent */}
@@ -345,9 +352,18 @@ const Navbar = () => {
                 <Link
                   to="/webinars"
                   onClick={() => setIsOpen(false)}
-                  className={`text-xs font-bold uppercase tracking-wider py-2.5 px-2 rounded-xl hover:bg-cream-dark/30 hover:text-gold transition-colors ${location.pathname === '/webinars' || location.pathname === '/webinar' ? 'text-gold bg-gold/10' : 'text-charcoal'}`}
+                  className={`text-xs font-bold uppercase tracking-wider py-2.5 px-2 rounded-xl hover:bg-cream-dark/30 hover:text-gold transition-colors flex items-center justify-between ${location.pathname === '/webinars' || location.pathname === '/webinar' || location.pathname === '/ancestral-healing-webinar' ? 'text-gold bg-gold/10' : 'text-charcoal'}`}
                 >
-                  Live Webinars
+                  <span className="flex items-center gap-2">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-90"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
+                    </span>
+                    <span>Live Webinars</span>
+                  </span>
+                  <span className="bg-red-600 text-white text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse shadow-xs">
+                    REGISTRATIONS LIVE
+                  </span>
                 </Link>
 
                 {/* Mobile Seva Accordion */}
