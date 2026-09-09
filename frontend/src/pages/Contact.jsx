@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { Mail, Phone, MapPin, CheckCircle, MessageSquare, Compass } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
+import reachOutBanner from '../assets/reach_out_banner.jpg';
 
 const Contact = () => {
   const { user } = useContext(AuthContext);
@@ -51,12 +52,12 @@ const Contact = () => {
           {/* Left: Contact Info & Details */}
           <div className="flex flex-col gap-6 text-left">
             
-            {/* Serene Sanctuary Space Image */}
-            <div className="w-full h-52 rounded-[24px] overflow-hidden bg-cream border border-cream-dark/50 shadow-sm group">
+            {/* Reach Out Artwork Banner */}
+            <div className="w-full rounded-[24px] overflow-hidden bg-cream border border-gold/30 shadow-md group">
               <img 
-                src="https://images.unsplash.com/photo-1545205597-3d9d02c29597?auto=format&fit=crop&w=800&q=80" 
-                alt="Ascension Healing Sanctuary Hauz Khas" 
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                src={reachOutBanner} 
+                alt="Reach Out - Ascension by Sonali Bhasin Kumar" 
+                className="w-full h-auto object-cover group-hover:scale-[1.02] transition-transform duration-700" 
               />
             </div>
 

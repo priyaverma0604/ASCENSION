@@ -22,6 +22,8 @@ import shikshaKendra3 from '../assets/gallery/shiksha_kendra_3.jpg';
 import shikshaKendra4 from '../assets/gallery/shiksha_kendra_4.jpg';
 import shikshaKendra5 from '../assets/gallery/shiksha_kendra_5.jpg';
 import shikshaKendra6 from '../assets/gallery/shiksha_kendra_6.jpg';
+import healthCommunity1 from '../assets/gallery/health_community_1.png';
+import healthCommunity2 from '../assets/gallery/health_community_2.png';
 import shikshaHeroBanner from '../assets/gallery/shiksha_hero_banner.jpg';
 
 const NGO = () => {
@@ -132,13 +134,26 @@ const NGO = () => {
     },
     {
       img: shikshaKendra5,
-      title: "Strategic Mind Games & Chess Coaching",
-      caption: "Cultivating focus, problem-solving, analytical reasoning, and strategic thinking through guided chess matches."
+      title: "Strategic Minds",
+      caption: "Cultivating focus, problem-solving, analytical reasoning, and strategic thinking through guided interactive learning."
     },
     {
       img: shikshaKendra6,
       title: "Self-Paced Study & Literacy Support",
       caption: "Dedicated syllabus reading practice, textbooks, and personalized academic guidance for young learners."
+    }
+  ];
+
+  const healthCommunityGallery = [
+    {
+      img: healthCommunity1,
+      title: "Community Nutrition & Patient Care",
+      caption: "Distributing protein supplements, nutritional care formulas, and medical kits to patients and elder care centers."
+    },
+    {
+      img: healthCommunity2,
+      title: "Medical Outreach & Care Packages",
+      caption: "Providing essential healthcare supplies, adult care kits, and wellness packages directly to vulnerable families."
     }
   ];
 
@@ -409,6 +424,48 @@ const NGO = () => {
               ))}
             </div>
           </div>
+
+          {/* 5. Health & Community Wellness Dedicated Spotlight */}
+          <div className="glass p-6 sm:p-8 rounded-3xl border border-rose-400/40 flex flex-col gap-6 text-left bg-gradient-to-br from-white/90 via-rose-50/25 to-white/90 shadow-sm">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div>
+                <span className="text-[10px] uppercase font-bold tracking-widest text-rose-700">Healthcare Seva • Community Care</span>
+                <h3 className="font-serif text-xl sm:text-2xl font-bold text-charcoal-dark mt-0.5">Health & Community Wellness Campaign</h3>
+              </div>
+              <p className="text-xs text-charcoal-light max-w-md leading-relaxed">
+                Supporting underserved communities, patients, and families in need through healthcare outreach, nutritional care supplements, medical supplies, and wellness aid.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              {healthCommunityGallery.map((item, idx) => (
+                <div
+                  key={idx}
+                  onClick={() => setSelectedPhoto(item)}
+                  className="bg-white rounded-2xl overflow-hidden border border-cream-dark/50 shadow-xs hover:shadow-lg transition-all duration-300 cursor-pointer flex flex-col group"
+                >
+                  <div className="h-56 sm:h-64 overflow-hidden relative bg-cream">
+                    <img
+                      src={item.img}
+                      alt={item.title}
+                      className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute top-2.5 right-2.5 bg-charcoal-dark/75 text-white text-[9px] px-2.5 py-0.5 rounded-full backdrop-blur-xs font-sans font-medium">
+                      Drive Photo {idx + 1}/2
+                    </div>
+                  </div>
+                  <div className="p-4 flex flex-col gap-1.5 flex-1">
+                    <h5 className="font-serif font-bold text-sm text-charcoal-dark group-hover:text-gold-dark transition-colors">
+                      {item.title}
+                    </h5>
+                    <p className="text-[11px] text-charcoal-light leading-relaxed">
+                      {item.caption}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* More Ongoing Seva Initiatives */}
@@ -609,12 +666,14 @@ const NGO = () => {
               </div>
               <div className="p-5 flex flex-col gap-1.5 text-left bg-white">
                 <span className="text-[10px] uppercase tracking-widest text-gold-dark font-bold">
-                  {selectedPhoto.title.includes("Chess") || selectedPhoto.title.includes("Learning") || selectedPhoto.title.includes("Literacy") || selectedPhoto.title.includes("Mentorship") || selectedPhoto.title.includes("Classroom") || selectedPhoto.title.includes("Study")
+                  {selectedPhoto.title.includes("Strategic") || selectedPhoto.title.includes("Learning") || selectedPhoto.title.includes("Literacy") || selectedPhoto.title.includes("Mentorship") || selectedPhoto.title.includes("Classroom") || selectedPhoto.title.includes("Study")
                     ? "Shiksha Kendra • Education & Mentorship Seva"
                     : selectedPhoto.title.includes("Prasad") || selectedPhoto.title.includes("Mahabhoj") || selectedPhoto.title.includes("Kitchen")
                     ? "Mahabhoj • Annadan & Festival Seva"
                     : selectedPhoto.title.includes("Hygiene") || selectedPhoto.title.includes("Napkin") || selectedPhoto.title.includes("Dignity")
                     ? "Women's Dignity & Hygiene Seva"
+                    : selectedPhoto.title.includes("Nutrition") || selectedPhoto.title.includes("Medical") || selectedPhoto.title.includes("Patient") || selectedPhoto.title.includes("Healthcare")
+                    ? "Health & Community Wellness Seva"
                     : "Animal Welfare & Compassion Seva"}
                 </span>
                 <h4 className="font-serif font-bold text-base text-charcoal-dark">{selectedPhoto.title}</h4>

@@ -24,6 +24,8 @@ import shikshaKendra3 from '../assets/gallery/shiksha_kendra_3.jpg';
 import shikshaKendra4 from '../assets/gallery/shiksha_kendra_4.jpg';
 import shikshaKendra5 from '../assets/gallery/shiksha_kendra_5.jpg';
 import shikshaKendra6 from '../assets/gallery/shiksha_kendra_6.jpg';
+import healthCommunity1 from '../assets/gallery/health_community_1.png';
+import healthCommunity2 from '../assets/gallery/health_community_2.png';
 
 const CSR = () => {
   const [name, setName] = useState('');
@@ -56,12 +58,17 @@ const CSR = () => {
     { src: mahabhoj4, title: "Live Annadan Kitchen Counter", caption: "Volunteer team managing live meal distribution serving 5,000+ people." }
   ];
 
+  const healthCommunityPhotos = [
+    { src: healthCommunity1, title: "Community Nutrition & Patient Care", caption: "Distributing protein supplements, nutritional care formulas, and medical kits." },
+    { src: healthCommunity2, title: "Medical Outreach & Essential Supplies", caption: "Direct distribution of essential healthcare supplies, adult care kits, and medicines." }
+  ];
+
   const shikshaKendraPhotos = [
     { src: shikshaKendra1, title: "Children's Creative Learning Circle", caption: "Early childhood education, drawing, and foundational literacy." },
     { src: shikshaKendra2, title: "Women's Literacy & Adult Education", caption: "Empowering mothers and rural women with functional literacy." },
     { src: shikshaKendra3, title: "Student Classroom Mentorship", caption: "Textbooks, mentorship, and quiet study spaces for underprivileged students." },
     { src: shikshaKendra4, title: "Digital Classroom & Value Mentorship", caption: "Interactive smart classroom learning and moral guidance." },
-    { src: shikshaKendra5, title: "Chess & Cognitive Mind Development", caption: "Strategic thinking, focus, and problem-solving through chess coaching." },
+    { src: shikshaKendra5, title: "Strategic Minds", caption: "Strategic thinking, focus, analytical reasoning, and cognitive mind development." },
     { src: shikshaKendra6, title: "Self-Paced Reading & Academic Literacy", caption: "Curriculum textbooks and dedicated reading study support." }
   ];
 
@@ -251,7 +258,8 @@ const CSR = () => {
               const isWomenHygiene = ini.title.includes("Women's Dignity");
               const isMahabhoj = ini.title.includes("Mahabhoj");
               const isShikshaKendra = ini.title.includes("Shiksha Kendra");
-              const isExpanded = isAnimalWelfare || isWomenHygiene || isMahabhoj || isShikshaKendra;
+              const isHealthCommunity = ini.title.includes("Health & Community");
+              const isExpanded = isAnimalWelfare || isWomenHygiene || isMahabhoj || isShikshaKendra || isHealthCommunity;
 
               return (
                 <div 
@@ -285,6 +293,11 @@ const CSR = () => {
                             4 Verified Drive Photos
                           </span>
                         )}
+                        {isHealthCommunity && (
+                          <span className="text-[10px] bg-gold/15 text-gold-dark font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                            2 Verified Drive Photos
+                          </span>
+                        )}
                       </div>
                       <p className="text-xs text-charcoal-light leading-relaxed">{ini.desc}</p>
                     </div>
@@ -294,7 +307,7 @@ const CSR = () => {
                   {isShikshaKendra && (
                     <div className="mt-1 pt-3 border-t border-cream-dark/50 flex flex-col gap-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] uppercase font-bold text-gold-dark tracking-wider">Child Education, Chess & Mentorship Drive Photos</span>
+                        <span className="text-[10px] uppercase font-bold text-gold-dark tracking-wider">Child Education, Strategic Minds & Mentorship Drive Photos</span>
                         <span className="text-[10px] text-charcoal-light">Click any photo to view full size</span>
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5">
@@ -395,6 +408,34 @@ const CSR = () => {
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-charcoal-dark/80 via-transparent to-transparent opacity-0 group-hover/item:opacity-100 transition-opacity flex items-end p-2">
                               <span className="text-white text-[9px] font-medium leading-tight">{photo.title}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Health & Community Wellness 2 Photos Strip */}
+                  {isHealthCommunity && (
+                    <div className="mt-1 pt-3 border-t border-cream-dark/50 flex flex-col gap-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] uppercase font-bold text-gold-dark tracking-wider">Health & Community Wellness Drive Photos</span>
+                        <span className="text-[10px] text-charcoal-light">Click any photo to view full size</span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {healthCommunityPhotos.map((photo, pIdx) => (
+                          <div
+                            key={pIdx}
+                            onClick={() => setSelectedAnimalPhoto(photo)}
+                            className="group/item relative h-36 sm:h-44 rounded-xl overflow-hidden cursor-pointer border border-cream-dark/70 shadow-2xs hover:shadow-md transition-all duration-300"
+                          >
+                            <img
+                              src={photo.src}
+                              alt={photo.title}
+                              className="w-full h-full object-cover object-top group-hover/item:scale-110 transition-transform duration-500"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-charcoal-dark/80 via-transparent to-transparent opacity-0 group-hover/item:opacity-100 transition-opacity flex items-end p-2.5">
+                              <span className="text-white text-[10px] font-medium leading-tight">{photo.title}</span>
                             </div>
                           </div>
                         ))}
@@ -619,12 +660,14 @@ const CSR = () => {
               </div>
               <div className="p-5 flex flex-col gap-1.5 text-left bg-white">
                 <span className="text-[10px] uppercase tracking-widest text-gold-dark font-bold">
-                  {selectedAnimalPhoto.title.includes("Chess") || selectedAnimalPhoto.title.includes("Learning") || selectedAnimalPhoto.title.includes("Literacy") || selectedAnimalPhoto.title.includes("Mentorship") || selectedAnimalPhoto.title.includes("Classroom") || selectedAnimalPhoto.title.includes("Study") || selectedAnimalPhoto.title.includes("Reading")
+                  {selectedAnimalPhoto.title.includes("Strategic") || selectedAnimalPhoto.title.includes("Learning") || selectedAnimalPhoto.title.includes("Literacy") || selectedAnimalPhoto.title.includes("Mentorship") || selectedAnimalPhoto.title.includes("Classroom") || selectedAnimalPhoto.title.includes("Study") || selectedAnimalPhoto.title.includes("Reading")
                     ? "CSR Shiksha Kendra • Child Education & Mentorship"
                     : selectedAnimalPhoto.title.includes("Prasad") || selectedAnimalPhoto.title.includes("Mahabhoj") || selectedAnimalPhoto.title.includes("Kitchen") || selectedAnimalPhoto.title.includes("Feast")
                     ? "CSR Mahabhoj • Annadan & Hunger Relief"
                     : selectedAnimalPhoto.title.includes("Hygiene") || selectedAnimalPhoto.title.includes("Napkin") || selectedAnimalPhoto.title.includes("Dignity")
                     ? "CSR Women's Dignity & Hygiene Initiative"
+                    : selectedAnimalPhoto.title.includes("Nutrition") || selectedAnimalPhoto.title.includes("Medical") || selectedAnimalPhoto.title.includes("Patient") || selectedAnimalPhoto.title.includes("Healthcare")
+                    ? "CSR Health & Community Wellness Initiative"
                     : "CSR Animal Welfare & Compassion Initiative"}
                 </span>
                 <h4 className="font-serif font-bold text-base text-charcoal-dark">{selectedAnimalPhoto.title}</h4>

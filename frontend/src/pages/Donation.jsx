@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Copy, Heart, CheckCircle, Smartphone, HelpCircle, ArrowRight, DollarSign, Compass } from 'lucide-react';
+import { Heart, CheckCircle, ShieldCheck, Sparkles, Compass, Lock, Gift, Users, CreditCard } from 'lucide-react';
 import axios from 'axios';
 import sevaLogo from '../assets/seva_logo.png';
 import foodDistributionImg from '../assets/gallery/mahabhoj_4.png';
 import shikshaEducationImg from '../assets/gallery/shiksha_kendra_1.png';
 import womenDignityImg from '../assets/gallery/women_hygiene_2.jpg';
+import shikshaHeroBanner from '../assets/gallery/shiksha_hero_banner.jpg';
 
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
@@ -17,28 +18,18 @@ const loadRazorpayScript = () => {
 };
 
 const Donation = () => {
-  const [activeMode, setActiveMode] = useState('razorpay'); // 'razorpay', 'upi_qr'
-  const [copied, setCopied] = useState(false);
-
   // Form Fields
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [amount, setAmount] = useState('');
+  const [amount, setAmount] = useState('1100');
   const [message, setMessage] = useState('');
-  const [transactionId, setTransactionId] = useState(''); // for manual UPI reference
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
 
-  const upiId = 'ascensionseva@gmail.com';
-
-  const handleCopyUpi = () => {
-    navigator.clipboard.writeText(upiId);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
-  };
+  const presetAmounts = [500, 1100, 2100, 5100, 11000];
 
   const handleRazorpayDonation = async (e) => {
     e.preventDefault();
@@ -71,7 +62,7 @@ const Donation = () => {
 
         const verify = await axios.post('/api/donations/verify', verifyPayload);
         if (verify.data.success) {
-          setSuccessMsg('Blessings! Your simulated donation transaction was completed successfully. Thank you for supporting Ascension Seva!');
+          setSuccessMsg('Blessings! Your donation was completed successfully. Thank you for supporting Ascension Seva!');
           setSuccess(true);
         }
         setLoading(false);
@@ -108,7 +99,7 @@ const Donation = () => {
               };
               const verification = await axios.post('/api/donations/verify', verifyPayload);
               if (verification.data.success) {
-                setSuccessMsg('Blessings! Your donation transaction has been completed successfully. We appreciate your generosity!');
+                setSuccessMsg('Blessings! Your donation transaction has been completed successfully. We deeply appreciate your generosity!');
                 setSuccess(true);
               }
             } catch (err) {
@@ -131,55 +122,20 @@ const Donation = () => {
     }
   };
 
-  const handleManualUpiSubmit = async (e) => {
-    e.preventDefault();
-    if (!amount || amount <= 0) {
-      alert('Please specify a valid donation amount');
-      return;
-    }
-    if (!transactionId) {
-      alert('Please provide the UPI Transaction Reference ID');
-      return;
-    }
-    setLoading(true);
-
-    try {
-      const payload = {
-        name: name || 'Anonymous',
-        email,
-        phone,
-        amount,
-        transactionId,
-        message
-      };
-
-      const { data } = await axios.post('/api/donations/log-upi', payload);
-      if (data.success) {
-        setSuccessMsg('Blessings! Your UPI donation log has been received. Our admin will verify the funds transfer and update the status in our dashboard records. Thank you!');
-        setSuccess(true);
-      }
-    } catch (err) {
-      alert(err.response?.data?.message || 'Failed to log UPI transaction');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const clearForm = () => {
     setName('');
     setEmail('');
     setPhone('');
-    setAmount('');
+    setAmount('1100');
     setMessage('');
-    setTransactionId('');
     setSuccess(false);
   };
 
   return (
     <div className="min-h-screen py-10 sm:py-16 px-4 sm:px-6 md:px-8 font-sans">
-      <div className="max-w-5xl 2xl:max-w-6xl 3xl:max-w-7xl mx-auto flex flex-col gap-8 sm:gap-12">
+      <div className="max-w-5xl 2xl:max-w-6xl 3xl:max-w-7xl mx-auto flex flex-col gap-10 sm:gap-14">
 
-        {/* Title */}
+        {/* Header Section */}
         <div className="text-center flex flex-col gap-3">
           <span className="font-sans text-[10px] sm:text-xs text-sage tracking-[0.25em] font-bold uppercase">Make an Impact</span>
           <h1 className="flex flex-col items-center gap-1">
@@ -187,13 +143,13 @@ const Donation = () => {
             <img src={`${sevaLogo}?v=3`} alt="Ascension Seva" className="h-10 md:h-14 w-auto object-contain" />
           </h1>
           <p className="max-w-xl 2xl:max-w-2xl mx-auto text-xs sm:text-sm text-charcoal-light leading-relaxed">
-            Every contribution directly funds our local Delhi food distribution campaigns, underprivileged children tutoring drives, women confidence workshops, and stray animal care circles.
+            Every contribution directly funds our local Delhi food distribution campaigns, underprivileged children tutoring drives, women confidence workshops, and health outreach circles.
           </p>
         </div>
 
-        {/* Seva Visual Showcase */}
+        {/* Seva Visual Showcase Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-          <div className="glass rounded-[24px] overflow-hidden border border-cream-dark/50 shadow-sm flex flex-col group transition-all duration-300 hover:shadow-lg">
+          <div className="glass rounded-[24px] overflow-hidden border border-cream-dark/50 shadow-xs flex flex-col group transition-all duration-300 hover:shadow-lg">
             <div className="h-40 sm:h-44 overflow-hidden bg-cream">
               <img
                 src={foodDistributionImg}
@@ -211,7 +167,7 @@ const Donation = () => {
             </div>
           </div>
 
-          <div className="glass rounded-[24px] overflow-hidden border border-cream-dark/50 shadow-sm flex flex-col group transition-all duration-300 hover:shadow-lg">
+          <div className="glass rounded-[24px] overflow-hidden border border-cream-dark/50 shadow-xs flex flex-col group transition-all duration-300 hover:shadow-lg">
             <div className="h-44 overflow-hidden bg-cream">
               <img
                 src={shikshaEducationImg}
@@ -223,13 +179,13 @@ const Donation = () => {
               <div>
                 <h3 className="font-serif text-xs font-bold text-charcoal-dark uppercase tracking-wider">Shiksha Kendra Seva</h3>
                 <p className="text-[11px] text-charcoal-light leading-relaxed mt-2">
-                  Providing tutoring support, stationary supplies, creative arts, and foundational learning circles for underprivileged children.
+                  Providing tutoring support, stationery supplies, creative arts, and foundational learning circles for underprivileged children.
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="glass rounded-[24px] overflow-hidden border border-cream-dark/50 shadow-sm flex flex-col group transition-all duration-300 hover:shadow-lg">
+          <div className="glass rounded-[24px] overflow-hidden border border-cream-dark/50 shadow-xs flex flex-col group transition-all duration-300 hover:shadow-lg">
             <div className="h-44 overflow-hidden bg-cream">
               <img
                 src={womenDignityImg}
@@ -248,255 +204,193 @@ const Donation = () => {
           </div>
         </div>
 
+        {/* Donation Form with NGO Photo Backdrop */}
         {success ? (
           /* Thank You Screen */
-          <div className="glass max-w-lg mx-auto w-full p-8 rounded-2xl shadow-sm text-center flex flex-col items-center justify-center gap-4 border border-sage/40 animate-fade-in">
-            <Heart className="w-14 h-14 text-red-500 fill-current animate-pulse-subtle" />
-            <h2 className="font-serif text-xl font-bold text-charcoal-dark">
+          <div className="relative rounded-[32px] overflow-hidden p-8 sm:p-14 border border-gold/40 shadow-xl max-w-2xl mx-auto w-full text-center flex flex-col items-center justify-center gap-5 bg-white/95 backdrop-blur-md animate-fade-in">
+            <div className="w-16 h-16 rounded-full bg-sage/15 flex items-center justify-center">
+              <Heart className="w-8 h-8 text-sage fill-current animate-pulse" />
+            </div>
+            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-charcoal-dark">
               Thank You for Your Generosity!
             </h2>
-            <p className="text-xs text-charcoal-light leading-relaxed px-4">
+            <p className="text-xs sm:text-sm text-charcoal-light leading-relaxed max-w-md">
               {successMsg}
             </p>
-            <button
-              onClick={clearForm}
-              className="bg-sage hover:bg-sage-dark text-white font-bold py-2.5 px-8 rounded-xl text-xs uppercase tracking-wider mt-4"
-            >
-              Done
-            </button>
+            <div className="border-t border-cream-dark/60 pt-4 w-full flex justify-center">
+              <button
+                onClick={clearForm}
+                className="bg-gold hover:bg-gold-dark text-charcoal-dark font-bold py-3 px-10 rounded-xl text-xs uppercase tracking-wider shadow-sm transition-all duration-300"
+              >
+                Make Another Donation
+              </button>
+            </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+          <div className="relative rounded-[32px] overflow-hidden border border-gold/35 shadow-xl bg-charcoal-dark text-left">
+            {/* Authentic NGO Photo Background with Warm Atmosphere */}
+            <div 
+              className="absolute inset-0 z-0 bg-cover bg-center opacity-25 scale-105"
+              style={{ backgroundImage: `url(${shikshaHeroBanner})` }}
+            />
+            {/* Ambient gradients for high readability and premium feel */}
+            <div className="absolute inset-0 z-0 bg-gradient-to-r from-charcoal-dark/95 via-charcoal-dark/85 to-charcoal-dark/95" />
+            <div className="absolute inset-0 z-0 bg-radial from-transparent via-charcoal-dark/40 to-charcoal-dark/90" />
 
-            {/* Left: Donation Mode Options */}
-            <div className="flex flex-col gap-6 text-left">
-              <div className="glass p-5 rounded-2xl border border-cream-dark/50 flex flex-col gap-4">
-                <h3 className="font-serif text-base font-bold text-charcoal-dark uppercase tracking-wider border-b border-cream-dark pb-2">
-                  Select Donation Method
-                </h3>
+            <div className="relative z-10 p-6 sm:p-10 md:p-14 grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-center">
+              
+              {/* Left Column: Mission & Impact Promise */}
+              <div className="lg:col-span-5 flex flex-col gap-5 text-white">
+                <span className="font-sans text-[10px] sm:text-xs text-gold-light tracking-[0.25em] font-bold uppercase bg-white/10 w-fit px-3 py-1 rounded-full backdrop-blur-xs border border-white/15">
+                  ✨ 100% Direct Impact Seva
+                </span>
 
-                {/* Method selector */}
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => setActiveMode('razorpay')}
-                    className={`py-3 px-4 rounded-xl border text-xs font-bold uppercase tracking-wider transition-all focus:outline-none ${activeMode === 'razorpay'
-                        ? 'bg-sage text-white border-sage shadow-sm'
-                        : 'bg-cream/40 border-cream-dark/60 text-charcoal hover:bg-cream'
-                      }`}
-                  >
-                    Online Cards / UPI
-                  </button>
-                  <button
-                    onClick={() => setActiveMode('upi_qr')}
-                    className={`py-3 px-4 rounded-xl border text-xs font-bold uppercase tracking-wider transition-all focus:outline-none ${activeMode === 'upi_qr'
-                        ? 'bg-sage text-white border-sage shadow-sm'
-                        : 'bg-cream/40 border-cream-dark/60 text-charcoal hover:bg-cream'
-                      }`}
-                  >
-                    UPI QR Code
-                  </button>
+                <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight">
+                  Transform Lives with Your Contribution
+                </h2>
+
+                <p className="text-xs sm:text-sm text-cream-light leading-relaxed font-sans opacity-90">
+                  Every rupee goes straight towards daily nutritious food seva, children's education kits, women's menstrual health essentials, and patient wellness support across Delhi.
+                </p>
+
+                {/* Trust Points */}
+                <div className="flex flex-col gap-3 pt-2 text-xs text-cream-light font-sans">
+                  <div className="flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/10 backdrop-blur-xs">
+                    <ShieldCheck className="w-5 h-5 text-gold-light shrink-0" />
+                    <span>Instant Payment Confirmation & Verification</span>
+                  </div>
+                  <div className="flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/10 backdrop-blur-xs">
+                    <CreditCard className="w-5 h-5 text-gold-light shrink-0" />
+                    <span>Supports GPay, PhonePe, Paytm, BHIM, Cards & NetBanking</span>
+                  </div>
+                  <div className="flex items-center gap-3 bg-white/5 p-3 rounded-xl border border-white/10 backdrop-blur-xs">
+                    <Lock className="w-5 h-5 text-gold-light shrink-0" />
+                    <span>Encrypted & 100% Safe Payments via Razorpay</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Clean Donation Form */}
+              <div className="lg:col-span-7 bg-white/95 backdrop-blur-md rounded-2xl sm:rounded-3xl p-6 sm:p-8 border border-white/80 shadow-2xl">
+                <div className="flex items-center justify-between border-b border-cream-dark/60 pb-3 mb-5">
+                  <div>
+                    <h3 className="font-serif text-lg sm:text-xl font-bold text-charcoal-dark">
+                      Contribute to Seva
+                    </h3>
+                    <p className="text-[11px] text-charcoal-light font-medium">Select or enter your desired donation amount</p>
+                  </div>
+                  <Heart className="w-6 h-6 text-gold-dark" />
                 </div>
 
-                {activeMode === 'upi_qr' && (
-                  /* UPI QR code contents */
-                  <div className="flex flex-col items-center gap-4 mt-2 bg-cream p-4 rounded-xl border border-cream-dark/60">
-                    <p className="text-[10px] text-center text-charcoal-light font-sans max-w-[180px] leading-relaxed">
-                      Scan QR code below using GPay, PhonePe, Paytm, or any BHIM UPI App.
-                    </p>
-
-                    {/* Simulated High Quality QR code */}
-                    <div className="w-40 h-40 bg-white border border-cream-dark p-2 rounded-xl flex items-center justify-center relative">
-                      <div className="w-full h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-charcoal-dark/5 via-charcoal-dark/30 to-charcoal-dark/70 rounded flex flex-col items-center justify-center gap-1">
-                        <Smartphone className="w-8 h-8 text-charcoal" />
-                        <span className="font-bold text-[10px] tracking-wide text-charcoal">UPI QR CODE</span>
-                      </div>
-                    </div>
-
-                    <div className="w-full flex flex-col gap-1 font-sans text-xs">
-                      <span className="text-[9px] uppercase text-charcoal-light text-center">UPI Address</span>
-                      <div className="flex justify-between items-center bg-cream-light border border-cream-dark/80 rounded-xl py-2 px-3">
-                        <span className="font-mono font-bold select-all text-charcoal-dark truncate">{upiId}</span>
+                <form onSubmit={handleRazorpayDonation} className="flex flex-col gap-4 font-sans text-xs text-charcoal text-left">
+                  
+                  {/* Quick Amount Pills */}
+                  <div className="flex flex-col gap-2">
+                    <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Select Amount (INR)</label>
+                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                      {presetAmounts.map((preset) => (
                         <button
+                          key={preset}
                           type="button"
-                          onClick={handleCopyUpi}
-                          className="p-1 hover:text-gold transition-colors focus:outline-none"
+                          onClick={() => setAmount(preset.toString())}
+                          className={`py-2 px-2 text-center rounded-xl border font-bold text-xs transition-all duration-200 ${
+                            amount === preset.toString()
+                              ? 'bg-gold text-charcoal-dark border-gold shadow-xs'
+                              : 'bg-cream-light border-cream-dark/70 text-charcoal hover:border-gold/60'
+                          }`}
                         >
-                          <Copy className="w-4 h-4" />
+                          ₹{preset.toLocaleString('en-IN')}
                         </button>
-                      </div>
-                      {copied && (
-                        <span className="text-[10px] text-sage font-bold text-center mt-1 animate-pulse">
-                          UPI ID Copied to clipboard!
-                        </span>
-                      )}
+                      ))}
                     </div>
                   </div>
-                )}
-              </div>
-            </div>
 
-            {/* Right: Donation Forms details */}
-            <div className="glass p-6 rounded-2xl border border-cream-dark/50">
-
-              <h3 className="font-serif text-base font-bold text-charcoal-dark uppercase tracking-wider text-left border-b border-cream-dark pb-2 mb-4">
-                Donation Details
-              </h3>
-
-              {activeMode === 'razorpay' ? (
-                /* Razorpay Donation Form */
-                <form onSubmit={handleRazorpayDonation} className="flex flex-col gap-4 font-sans text-xs text-left text-charcoal">
+                  {/* Custom Amount Input */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Donation Amount (INR)</label>
-                    <input
-                      type="number"
-                      required
-                      min="50"
-                      placeholder="₹ Enter amount (min ₹50)"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                      className="w-full bg-cream-light border border-cream-dark/60 rounded-xl py-2.5 px-3.5 focus:outline-none focus:border-sage transition-all"
-                    />
+                    <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Or Enter Custom Amount (₹)</label>
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 font-bold text-charcoal-light">₹</span>
+                      <input
+                        type="number"
+                        required
+                        min="50"
+                        placeholder="Enter amount (min ₹50)"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        className="w-full bg-cream-light/60 border border-cream-dark rounded-xl py-2.5 pl-8 pr-3.5 focus:outline-none focus:border-gold transition-colors font-medium text-charcoal-dark"
+                      />
+                    </div>
                   </div>
 
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Donor Name (Optional)</label>
-                    <input
-                      type="text"
-                      placeholder="Enter name (or blank for Anonymous)"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="w-full bg-cream-light border border-cream-dark/60 rounded-xl py-2.5 px-3.5 focus:outline-none focus:border-sage transition-all"
-                    />
+                  {/* Donor Name & Email */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Donor Name (Optional)</label>
+                      <input
+                        type="text"
+                        placeholder="Your name (or leave blank)"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="w-full bg-cream-light/60 border border-cream-dark rounded-xl py-2.5 px-3.5 focus:outline-none focus:border-gold transition-colors"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Email Address (Optional)</label>
+                      <input
+                        type="email"
+                        placeholder="For digital payment receipt"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full bg-cream-light/60 border border-cream-dark rounded-xl py-2.5 px-3.5 focus:outline-none focus:border-gold transition-colors"
+                      />
+                    </div>
                   </div>
 
+                  {/* Phone & Message */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Email Address (Optional)</label>
-                    <input
-                      type="email"
-                      placeholder="Enter email for receipts"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-cream-light border border-cream-dark/60 rounded-xl py-2.5 px-3.5 focus:outline-none focus:border-sage transition-all"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Phone Number (Optional)</label>
+                    <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">WhatsApp Phone Number (Optional)</label>
                     <input
                       type="tel"
-                      placeholder="Enter phone"
+                      placeholder="10-digit mobile number"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="w-full bg-cream-light border border-cream-dark/60 rounded-xl py-2.5 px-3.5 focus:outline-none focus:border-sage transition-all"
+                      className="w-full bg-cream-light/60 border border-cream-dark rounded-xl py-2.5 px-3.5 focus:outline-none focus:border-gold transition-colors"
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Blessing message</label>
+                    <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Blessing / Dedication Note (Optional)</label>
                     <textarea
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
-                      rows="3"
-                      placeholder="Add a prayer, blessing message, or dedication note..."
-                      className="w-full bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 focus:outline-none focus:border-sage transition-all"
+                      rows="2"
+                      placeholder="Add a prayer, dedication, or heartfelt blessing message..."
+                      className="w-full bg-cream-light/60 border border-cream-dark rounded-xl py-2 px-3 focus:outline-none focus:border-gold transition-colors resize-none"
                     />
                   </div>
 
+                  {/* Submit Button */}
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-sage hover:bg-sage-dark text-white font-bold py-3 rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center gap-1.5 uppercase tracking-wider mt-2"
+                    className="w-full bg-gold hover:bg-gold-dark text-charcoal-dark font-bold py-3.5 rounded-xl transition-all duration-300 shadow-md flex items-center justify-center gap-2 uppercase tracking-wider mt-2 disabled:opacity-50"
                   >
                     {loading && <Compass className="w-4 h-4 animate-spin" />}
-                    <span>{loading ? 'Processing...' : 'Donate via Online Cards/UPI'}</span>
-                  </button>
-                </form>
-              ) : (
-                /* Manual UPI Logging Form */
-                <form onSubmit={handleManualUpiSubmit} className="flex flex-col gap-4 font-sans text-xs text-left text-charcoal">
-
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Transferred Amount (INR)</label>
-                    <input
-                      type="number"
-                      required
-                      min="1"
-                      placeholder="₹ Enter amount transferred"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                      className="w-full bg-cream-light border border-cream-dark/60 rounded-xl py-2.5 px-3.5 focus:outline-none focus:border-sage transition-all"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">UPI Transaction ID / Reference No.</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="12-digit UPI reference number"
-                      value={transactionId}
-                      onChange={(e) => setTransactionId(e.target.value)}
-                      className="w-full bg-cream-light border border-cream-dark/60 rounded-xl py-2.5 px-3.5 focus:outline-none focus:border-sage transition-all"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Your Name</label>
-                    <input
-                      type="text"
-                      placeholder="Enter donor name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="w-full bg-cream-light border border-cream-dark/60 rounded-xl py-2.5 px-3.5 focus:outline-none focus:border-sage transition-all"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Email Address</label>
-                    <input
-                      type="email"
-                      placeholder="Enter email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-cream-light border border-cream-dark/60 rounded-xl py-2.5 px-3.5 focus:outline-none focus:border-sage transition-all"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">WhatsApp Phone</label>
-                    <input
-                      type="tel"
-                      placeholder="Enter phone"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      className="w-full bg-cream-light border border-cream-dark/60 rounded-xl py-2.5 px-3.5 focus:outline-none focus:border-sage transition-all"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1.5">
-                    <label className="font-bold text-charcoal-light uppercase tracking-wider text-[10px]">Blessing message</label>
-                    <textarea
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                      rows="3"
-                      placeholder="Add a prayer, blessing message, or dedication note..."
-                      className="w-full bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 focus:outline-none focus:border-sage transition-all"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full bg-sage hover:bg-sage-dark text-white font-bold py-3 rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center uppercase tracking-wider mt-2"
-                  >
-                    {loading ? 'Logging Transaction...' : 'Verify & Log Donation'}
+                    <span>
+                      {loading 
+                        ? 'Processing Donation...' 
+                        : `Proceed to Donate ${amount ? `₹${Number(amount).toLocaleString('en-IN')}` : ''}`}
+                    </span>
                   </button>
 
+                  <p className="text-[10px] text-center text-charcoal-light mt-1">
+                    Accepts UPI (GPay, PhonePe, Paytm, BHIM), Credit/Debit Cards & NetBanking
+                  </p>
                 </form>
-              )}
+              </div>
 
             </div>
-
           </div>
         )}
 
