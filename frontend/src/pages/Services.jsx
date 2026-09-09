@@ -136,13 +136,27 @@ const Services = () => {
                   {/* Pricing and Button */}
                   <div className="mt-auto pt-4 sm:pt-6 border-t border-cream-dark/50 flex justify-between items-center font-sans">
                     <div className="flex flex-col text-left">
-                      <span className="text-[9px] sm:text-[10px] text-charcoal-light uppercase tracking-wider">Exchange</span>
-                      <span className="font-serif font-bold text-xs sm:text-sm text-gold-dark">₹{service.pricing}</span>
+                      {service.title?.toLowerCase().includes('oracle') || service.title?.toLowerCase().includes('card') ? (
+                        <>
+                          <span className="text-[9px] sm:text-[10px] text-sage font-bold uppercase tracking-wider">Starting From</span>
+                          <div className="flex items-baseline gap-1.5">
+                            <span className="font-serif font-bold text-xs sm:text-sm text-gold-dark">₹999</span>
+                            <span className="text-[9px] text-charcoal-light bg-gold/10 px-1.5 py-0.5 rounded-full border border-gold/25 font-semibold">
+                              3–21 Decks
+                            </span>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-[9px] sm:text-[10px] text-charcoal-light uppercase tracking-wider">Exchange</span>
+                          <span className="font-serif font-bold text-xs sm:text-sm text-gold-dark">₹{service.pricing}</span>
+                        </>
+                      )}
                     </div>
                     
                     <button
                       onClick={() => setSelectedService(service)}
-                      className="bg-sage hover:bg-sage-dark text-white font-bold uppercase tracking-wider py-2 sm:py-2.5 px-4 sm:px-6 rounded-xl transition-all duration-300 text-[11px] sm:text-xs shadow-xs flex items-center gap-1.5 group"
+                      className="bg-sage hover:bg-sage-dark text-white font-bold uppercase tracking-wider py-2 sm:py-2.5 px-4 sm:px-6 rounded-xl transition-all duration-300 text-[11px] sm:text-xs shadow-xs flex items-center gap-1.5 group cursor-pointer"
                     >
                       <span>Book Session</span>
                       <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />

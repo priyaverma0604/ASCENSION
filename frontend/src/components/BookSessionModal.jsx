@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { X, CheckCircle, Calendar, MessageSquare, Phone, AlertTriangle, UploadCloud, CreditCard, Compass, ShieldCheck, Zap } from 'lucide-react';
+import { X, CheckCircle, Calendar, MessageSquare, Phone, AlertTriangle, UploadCloud, CreditCard, Compass, ShieldCheck, Zap, Sparkles } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
 
@@ -25,6 +25,16 @@ const getImageUrl = (path) => {
   const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000';
   return `${apiBase}${path}`;
 };
+
+const ORACLE_DECK_TIERS = [
+  { decks: 3, label: '3 Decks', price: 999, desc: 'Introductory Clarity & Quick Focus' },
+  { decks: 6, label: '6 Decks', price: 1599, desc: 'Dual-Dimension Insights (Love & Career)' },
+  { decks: 9, label: '9 Decks', price: 1899, desc: 'Deeper Energy Alignment & Path Finding' },
+  { decks: 12, label: '12 Decks', price: 2199, desc: 'Comprehensive Multi-Aspect Soul Reading' },
+  { decks: 15, label: '15 Decks', price: 2499, desc: 'Advanced Karmic & Chakra Resonance' },
+  { decks: 18, label: '18 Decks', price: 2799, desc: 'Profound Life Transformation & Destiny Map' },
+  { decks: 21, label: '21 Decks', price: 2999, desc: 'Master Oracle Odyssey (Ultimate Clarity & Insights)', featured: true }
+];
 
 const TIME_SLOTS = [
   '12:00 PM - 12:30 PM',
@@ -55,9 +65,11 @@ const getAvailableDates = () => {
 
 const BookSessionModal = ({ service, onClose }) => {
   const { user } = useContext(AuthContext);
+  const isOracle = service.title?.toLowerCase().includes('oracle') || service.title?.toLowerCase().includes('card');
   const availableDates = getAvailableDates();
   const [step, setStep] = useState(1); // 1: Info form, 2: Payment page, 3: Success page
   const [paymentMethod, setPaymentMethod] = useState('razorpay'); // 'razorpay' or 'upi_qr'
+  const [selectedDeckTier, setSelectedDeckTier] = useState(ORACLE_DECK_TIERS[0]);
   const [name, setName] = useState(user ? user.name : '');
   const [email, setEmail] = useState(user ? user.email : '');
   const [phone, setPhone] = useState('');
@@ -72,6 +84,11 @@ const BookSessionModal = ({ service, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [confirmedPaymentId, setConfirmedPaymentId] = useState('');
   const [bookedSlots, setBookedSlots] = useState([]);
+
+  const effectivePrice = isOracle ? selectedDeckTier.price : (service.pricing || 0);
+  const bookingServiceTitle = isOracle 
+    ? `${service.title} (${selectedDeckTier.label})` 
+    : service.title;
 
   useEffect(() => {
     const fetchBookedSlots = async () => {
@@ -124,8 +141,8 @@ const BookSessionModal = ({ service, onClose }) => {
 
       const fullPhone = `${countryCode} ${phone.trim()}`;
       const { data } = await axios.post('/api/contacts/razorpay-order', {
-        amount: service.pricing,
-        serviceTitle: service.title,
+        amount: effectivePrice,
+        serviceTitle: bookingServiceTitle,
         name,
         email,
         phone: fullPhone,
@@ -143,7 +160,7 @@ const BookSessionModal = ({ service, onClose }) => {
         amount: data.data.amount,
         currency: data.data.currency,
         name: 'Ascension by Sonali Bhasin Kumar',
-        description: `Booking: ${service.title}`,
+        description: `Booking: ${bookingServiceTitle}`,
         image: '/logo.png',
         order_id: data.data.orderId,
         prefill: {
@@ -165,10 +182,10 @@ const BookSessionModal = ({ service, onClose }) => {
                 name,
                 email,
                 phone: fullPhone,
-                serviceTitle: service.title,
+                serviceTitle: bookingServiceTitle,
                 slot: selectedSlot,
                 message,
-                amount: service.pricing
+                amount: effectivePrice
               }
             });
 
@@ -230,7 +247,7 @@ const BookSessionModal = ({ service, onClose }) => {
       formData.append('transactionId', cleanedTxId);
       formData.append('paymentScreenshot', screenshot);
       
-      const formattedMessage = `[SERVICE BOOKING REQUEST: ${service.title}]\nPreferred Date: ${selectedSlot}\nMessage: ${message}`;
+      const formattedMessage = `[SERVICE BOOKING REQUEST: ${bookingServiceTitle}]\nPreferred Date: ${selectedSlot}\nExchange: ₹${effectivePrice}\nMessage: ${message}`;
       formData.append('message', formattedMessage);
 
       const { data } = await axios.post('/api/contacts', formData, {
@@ -276,13 +293,98 @@ const BookSessionModal = ({ service, onClose }) => {
             /* Step 1: Info Form */
             <form onSubmit={handleInfoSubmit} className="flex flex-col gap-4 font-sans text-xs">
               
-              {/* Price Banner */}
-              <div className="bg-cream p-3.5 rounded-xl border border-cream-dark flex justify-between items-center text-charcoal">
-                <span className="text-charcoal-light">Investment</span>
-                <span className="font-serif font-bold text-sm text-gold-dark">
-                  ₹{service.pricing} <span className="text-[10px] font-sans font-normal text-charcoal-light">/ {service.duration} mins</span>
-                </span>
-              </div>
+              {/* Oracle Special Hero Banner & Deck Selector */}
+              {isOracle ? (
+                <div className="flex flex-col gap-3">
+                  {/* Spiritual Inspiration Tagline */}
+                  <div className="bg-gradient-to-r from-cream via-cream-light to-cream p-3.5 rounded-2xl border border-gold/40 text-center shadow-xs flex flex-col gap-1 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-gold/5 rounded-full blur-xl pointer-events-none" />
+                    <span className="font-serif italic text-xs sm:text-sm text-charcoal-dark font-bold">
+                      "Not a COINCIDENCE... Your Soul Brought You Here"
+                    </span>
+                    <span className="text-[10px] text-sage font-bold tracking-wider uppercase">
+                      Unlock Messages Meant Only For You ✨
+                    </span>
+                    <p className="text-[9px] text-charcoal-light leading-snug mt-0.5">
+                      1:1 Private Reading • Using 21+ Powerful Sacred Decks • Love, Career & Spiritual Clarity
+                    </p>
+                  </div>
+
+                  {/* Choose Decks Section */}
+                  <div className="flex flex-col gap-2 text-left">
+                    <div className="flex justify-between items-center">
+                      <label className="font-bold text-charcoal-dark uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-gold-dark" />
+                        <span>Choose Decks & Energy Depth</span>
+                      </label>
+                      <span className="text-[9px] text-gold-dark font-bold bg-gold/15 px-2 py-0.5 rounded-full border border-gold/30">
+                        {selectedDeckTier.decks} Decks (₹{selectedDeckTier.price})
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                      {ORACLE_DECK_TIERS.map((tier) => {
+                        const isSelected = selectedDeckTier.decks === tier.decks;
+                        return (
+                          <button
+                            key={tier.decks}
+                            type="button"
+                            onClick={() => setSelectedDeckTier(tier)}
+                            className={`p-2.5 rounded-xl border text-left transition-all duration-200 flex flex-col justify-between gap-1 relative focus:outline-none cursor-pointer ${
+                              isSelected
+                                ? 'bg-white border-gold shadow-md ring-2 ring-gold/40 scale-[1.02]'
+                                : 'bg-cream-light/60 border-cream-dark/60 hover:border-gold/50 hover:bg-cream-light'
+                            }`}
+                          >
+                            {tier.featured && (
+                              <span className="absolute -top-2 right-1.5 bg-gold-dark text-white text-[7px] font-bold uppercase tracking-wider px-1.5 py-0.2 rounded-full shadow-2xs">
+                                Master Tier
+                              </span>
+                            )}
+                            <div className="flex justify-between items-center w-full">
+                              <span className="font-serif font-bold text-xs text-charcoal-dark">
+                                {tier.label}
+                              </span>
+                              {isSelected ? (
+                                <span className="w-3.5 h-3.5 rounded-full bg-gold text-charcoal-dark flex items-center justify-center text-[9px] font-bold">
+                                  ✓
+                                </span>
+                              ) : null}
+                            </div>
+                            <span className="font-serif font-bold text-sm text-gold-dark">
+                              ₹{tier.price}
+                            </span>
+                            <span className="text-[8px] text-charcoal-light leading-tight line-clamp-2">
+                              {tier.desc}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Selected Investment Banner */}
+                  <div className="bg-sage/10 p-3 rounded-xl border border-sage/30 flex justify-between items-center text-charcoal">
+                    <div className="flex flex-col text-left">
+                      <span className="text-[9px] uppercase tracking-wider text-sage font-bold">Selected Reading Tier</span>
+                      <span className="font-sans font-semibold text-xs text-charcoal-dark">
+                        {selectedDeckTier.label} — {selectedDeckTier.desc}
+                      </span>
+                    </div>
+                    <span className="font-serif font-bold text-sm text-gold-dark whitespace-nowrap">
+                      ₹{effectivePrice} <span className="text-[9px] font-sans font-normal text-charcoal-light">/ 30 mins</span>
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                /* Standard Price Banner */
+                <div className="bg-cream p-3.5 rounded-xl border border-cream-dark flex justify-between items-center text-charcoal">
+                  <span className="text-charcoal-light font-medium">Session Investment</span>
+                  <span className="font-serif font-bold text-sm text-gold-dark">
+                    ₹{service.pricing} <span className="text-[10px] font-sans font-normal text-charcoal-light">/ {service.duration} mins</span>
+                  </span>
+                </div>
+              )}
 
               {/* Name */}
               <div className="flex flex-col gap-1.5 text-left">
@@ -430,7 +532,7 @@ const BookSessionModal = ({ service, onClose }) => {
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   rows="3"
-                  placeholder="Let Sonali know if you have specific blockages or areas of concern..."
+                  placeholder="Let Sonali know if you have specific blockages, life questions, or areas of concern..."
                   className="w-full bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all"
                 />
               </div>
@@ -461,11 +563,12 @@ const BookSessionModal = ({ service, onClose }) => {
               {/* Service details summary */}
               <div className="bg-cream/50 p-4 rounded-xl border border-cream-dark/60 flex flex-col gap-2">
                 <div className="flex justify-between items-center text-charcoal border-b border-cream-dark/50 pb-2">
-                  <span className="font-bold font-serif text-[13px]">{service.title}</span>
-                  <span className="font-serif font-bold text-gold-dark text-[13px]">₹{service.pricing}</span>
+                  <span className="font-bold font-serif text-[13px]">{bookingServiceTitle}</span>
+                  <span className="font-serif font-bold text-gold-dark text-[13px]">₹{effectivePrice}</span>
                 </div>
                 <div className="text-[10px] text-charcoal-light flex flex-col gap-0.5 font-sans">
-                  <p><strong>Duration:</strong> {service.duration} mins</p>
+                  {isOracle && <p><strong>Deck Tier:</strong> {selectedDeckTier.label} ({selectedDeckTier.desc})</p>}
+                  <p><strong>Duration:</strong> {service.duration || 30} mins</p>
                   <p><strong>Selected Slot:</strong> {selectedSlot}</p>
                 </div>
               </div>
@@ -511,7 +614,7 @@ const BookSessionModal = ({ service, onClose }) => {
                     </p>
                     <div className="flex justify-between items-center border-t border-cream-dark/40 pt-2 text-xs font-semibold">
                       <span>Payable Total:</span>
-                      <span className="font-serif font-bold text-gold-dark text-sm">₹{service.pricing}</span>
+                      <span className="font-serif font-bold text-gold-dark text-sm">₹{effectivePrice}</span>
                     </div>
                   </div>
 
@@ -530,7 +633,7 @@ const BookSessionModal = ({ service, onClose }) => {
                       className="w-2/3 bg-gold hover:bg-gold-dark text-charcoal-dark font-bold py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 uppercase tracking-wider text-[9px] border border-gold-dark/20"
                     >
                       {loading ? <Compass className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
-                      <span>{loading ? 'Opening Razorpay...' : `Pay ₹${service.pricing} Online`}</span>
+                      <span>{loading ? 'Opening Razorpay...' : `Pay ₹${effectivePrice} Online`}</span>
                     </button>
                   </div>
                 </div>
@@ -551,12 +654,16 @@ const BookSessionModal = ({ service, onClose }) => {
                         <span className="text-charcoal-light font-medium">Payee UPI ID:</span>
                         <strong className="select-all text-gold-dark">sonalibhasinkumar@ptaxis</strong>
                       </p>
+                      <p className="flex justify-between pt-0.5">
+                        <span className="text-charcoal-light font-medium">Amount to Pay:</span>
+                        <strong className="text-charcoal-dark font-serif text-xs">₹{effectivePrice}</strong>
+                      </p>
                     </div>
 
                     <div className="bg-lavender-light/40 border border-lavender p-3 rounded-xl flex gap-2 text-left text-[10px]">
                       <AlertTriangle className="w-4.5 h-4.5 text-lavender-dark shrink-0 mt-0.5" />
                       <span className="leading-relaxed text-charcoal-light font-sans">
-                        Scan the QR code above using any UPI app. After payment, enter the 12-digit transaction ID and upload the receipt screenshot below.
+                        Scan the QR code above using any UPI app. After transferring ₹{effectivePrice}, enter the 12-digit transaction ID and upload the receipt screenshot below.
                       </span>
                     </div>
                   </div>
@@ -624,11 +731,11 @@ const BookSessionModal = ({ service, onClose }) => {
                 {confirmedPaymentId.startsWith('pay_') ? 'Session Confirmed!' : 'Booking Submitted!'}
               </h4>
               <p className="text-xs text-charcoal-light leading-relaxed px-4 font-sans">
-                Blessings, {name}! Your session booking for <strong>{service.title}</strong> has been {confirmedPaymentId.startsWith('pay_') ? 'paid online and confirmed' : 'submitted for verification'}. Slot: <strong>{selectedSlot}</strong>. Confirmation email sent to <strong>{email}</strong>!
+                Blessings, {name}! Your session booking for <strong>{bookingServiceTitle}</strong> (Exchange: ₹{effectivePrice}) has been {confirmedPaymentId.startsWith('pay_') ? 'paid online and confirmed' : 'submitted for verification'}. Slot: <strong>{selectedSlot}</strong>. Confirmation email sent to <strong>{email}</strong>!
               </p>
               <div className="flex flex-col gap-2 w-full mt-4 font-sans">
                 <a
-                  href={`https://wa.me/918929061557?text=Hi%20Sonali,%20I%20have%20booked%20a%20session%20for%20${encodeURIComponent(service.title)}.%20Payment%20Reference:%20${confirmedPaymentId || transactionId}.%20Looking%20forward%20to%20our%20session!`}
+                  href={`https://wa.me/918929061557?text=Hi%20Sonali,%20I%20have%20booked%20a%20session%20for%20${encodeURIComponent(bookingServiceTitle)}%20(Exchange:%20₹${effectivePrice}).%20Payment%20Reference:%20${confirmedPaymentId || transactionId}.%20Looking%20forward%20to%20our%20session!`}
                   target="_blank"
                   rel="noreferrer"
                   className="w-full flex items-center justify-center gap-2 bg-sage hover:bg-sage-dark text-white text-xs font-bold py-2.5 rounded-xl transition-all duration-300 shadow-sm"

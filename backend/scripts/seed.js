@@ -28,16 +28,17 @@ const servicesData = [
     image: "/uploads/theta_healing_service.png"
   },
   {
-    title: "Oracle Card Reading Session",
-    description: "Sometimes the soul seeks direction and insight. Our Oracle Card Reading sessions provide intuitive guidance for career, relationships, financial decisions, and personal growth. Every reading is conducted with intuition, compassion, and positive energy, helping you make informed choices and align with your higher purpose. Get clarity, advice, and spiritual insight into your current situations.",
+    title: "1:1 Oracle Card Reading Session",
+    description: "Not a COINCIDENCE... Your Soul Brought You Here. Unlock sacred messages meant only for you through personal, intuitive, and transformational 1:1 Oracle Card Readings with Sonali Bhasin Kumar. Using 21+ powerful decks (including The Sacred Creator, The Spirited Animal, Moonology, Wisdom of the Oracle, Sacred Destiny & more), we channel multiple energies for deep clarity, healing, and spiritual guidance across love, career, finances, relationships, and life transitions.",
     benefits: [
-      "Gain direct clarity on relationship and career roadblocks",
-      "Receive supportive guidance from divine spiritual energies",
-      "Re-align with your higher self and path forward",
-      "Heal indecisiveness and find peace in current actions"
+      "1:1 Personal, Intuitive & Transformational Session with Sonali",
+      "21+ Powerful Sacred Decks channeling multiple energies & deep insights",
+      "Profound Clarity, Healing & Guidance for Love, Career & Life Path",
+      "One-on-One Private Consultation focused completely on your soul growth",
+      "Choose custom deck tiers from 3 Decks (₹999) to full 21+ Master Decks (₹2,999)"
     ],
     duration: 30,
-    pricing: 2100,
+    pricing: 999,
     image: "/uploads/oracle_card_reading_service.png"
   },
   {
