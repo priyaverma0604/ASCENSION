@@ -63,7 +63,6 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
   const [retreats, setRetreats] = useState([]);
   const [activeRetreat, setActiveRetreat] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [dismissFloatingAlert, setDismissFloatingAlert] = useState(false);
 
   // Auto-scroll to webinar section when accessed via /webinars, /webinar, direct ancestral route, #webinars, or prop
   useEffect(() => {
@@ -1638,63 +1637,6 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
           service={selectedService}
           onClose={() => setSelectedService(null)}
         />
-      )}
-
-      {/* Floating Live Webinar Quick-Access Flash Pill */}
-      {!dismissFloatingAlert && (
-        <div className="fixed bottom-20 left-3 sm:left-6 lg:bottom-6 z-40 animate-slide-up flex items-center">
-          <div
-            onClick={() => {
-              const ancestral = workshops.find(w => (w.title && w.title.toLowerCase().includes('ancestral')) || (w.name && w.name.toLowerCase().includes('ancestral'))) || workshops.find(w => w.isWebinar);
-              if (ancestral) handleOpenWorkshop(ancestral);
-              else handleOpenWorkshop({
-                _id: "ancestral-healing-webinar-id",
-                title: "Ancestral Healing Webinar",
-                shortDescription: "Join Sonali Bhasin Kumar for a powerful live introductory Ancestral Healing Webinar. Discover the foundations of healing family karma, clearing intergenerational trauma, and receiving sacred ancestral blessings.",
-                speakerName: "Sonali Bhasin Kumar",
-                date: new Date('2026-09-23T19:00:00+05:30'),
-                time: "7:00 PM - 8:30 PM IST",
-                duration: "90 minutes",
-                price: 99,
-                coverImage: "/uploads/ancestral_healing_webinar_bg.png",
-                upiQrCodeImage: "/uploads/default_upi_qr.jpg",
-                upiId: "sonalibhasinkumar@ptaxis",
-                mobileNumber: "9999999999",
-                whatsappGroupLink: "https://chat.whatsapp.com/J4nXj2mznEfLCj2YZd1v16",
-                isWebinar: true
-              });
-            }}
-            className="group cursor-pointer bg-white/95 hover:bg-white backdrop-blur-md rounded-2xl shadow-[0_10px_35px_rgba(212,160,23,0.35)] border-2 border-[#D4A017] p-2.5 sm:px-4 sm:py-2.5 flex items-center gap-2.5 sm:gap-3 transition-all duration-300 transform hover:scale-105"
-          >
-            <div className="relative flex h-3 w-3 shrink-0">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-90"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-red-600"></span>
-            </div>
-            <div className="flex flex-col text-left">
-              <div className="flex items-center gap-1.5">
-                <span className="bg-red-600 text-white text-[8px] sm:text-[9px] font-black px-1.5 py-0.2 rounded font-sans uppercase tracking-wider animate-pulse shadow-xs">
-                  ⚡ LIVE
-                </span>
-                <span className="text-[11px] sm:text-xs font-bold text-charcoal-dark font-sans leading-tight">
-                  Ancestral Healing Webinar
-                </span>
-              </div>
-              <span className="text-[10px] text-sage-dark font-semibold font-sans mt-0.5">
-                ₹99 Early Pass • Tap to Register →
-              </span>
-            </div>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setDismissFloatingAlert(true);
-              }}
-              className="p-1 rounded-full text-charcoal-light hover:text-charcoal hover:bg-cream/80 ml-1 focus:outline-none"
-              aria-label="Dismiss alert"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
       )}
     </div>
   );

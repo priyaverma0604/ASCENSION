@@ -85,7 +85,7 @@ const Donation = () => {
         }
 
         const options = {
-          key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_ascensionKeyId123',
+          key: import.meta.env.VITE_RAZORPAY_SEVA_KEY_ID || 'rzp_live_TZyjJGoSABoWsa',
           amount: data.data.amount,
           currency: data.data.currency,
           name: 'Ascension Seva NGO',
