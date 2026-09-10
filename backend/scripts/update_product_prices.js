@@ -22,6 +22,12 @@ async function updateAllProductPrices() {
       if (name.includes('boat')) {
         // Boat Candles: Small size 475 (Big size 725 in size variant)
         newPrice = 475;
+      } else if (name.includes('cone')) {
+        // Camphor Cones: 350
+        newPrice = 350;
+      } else if (name.includes('pouch')) {
+        // Camphor Pouches: 550
+        newPrice = 550;
       } else if (cat.includes('candle') || name.includes('candle')) {
         // Normal Candles: 375
         newPrice = 375;
@@ -55,6 +61,10 @@ async function updateAllProductPrices() {
 
         if (name.includes('boat')) {
           newPrice = 475;
+        } else if (name.includes('cone')) {
+          newPrice = 350;
+        } else if (name.includes('pouch')) {
+          newPrice = 550;
         } else if (cat.includes('candle') || name.includes('candle')) {
           newPrice = 375;
         } else if (cat.includes('wax tablet') || name.includes('wax tablet')) {
