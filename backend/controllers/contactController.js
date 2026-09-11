@@ -115,13 +115,27 @@ exports.updateQueryStatus = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Query not found' });
     }
 
-    const { status } = req.body;
+    const { status, recommendedCrystal, crystalBenefits, adminReplyMessage } = req.body;
     if (!status || !['unread', 'read', 'resolved'].includes(status)) {
       return res.status(400).json({ success: false, message: 'Please provide valid status: unread, read, or resolved' });
     }
 
     const oldStatus = query.status;
     query.status = status;
+
+    if (recommendedCrystal !== undefined) {
+      query.recommendedCrystal = recommendedCrystal;
+    }
+    if (crystalBenefits !== undefined) {
+      query.crystalBenefits = crystalBenefits;
+    }
+    if (adminReplyMessage !== undefined) {
+      query.adminReplyMessage = adminReplyMessage;
+    }
+    if (status === 'resolved') {
+      query.resolvedAt = new Date();
+    }
+
     await query.save();
 
     // Check if status is updated to 'resolved' and this is a Service Booking Request
@@ -149,6 +163,108 @@ exports.updateQueryStatus = async (req, res, next) => {
       console.log(`From (Ascension): +91 89290 61557`);
       console.log(`Message: Dear ${query.name}, your payment for the service booking has been verified and approved successfully! We will coordinate with you shortly to schedule your final slot. Blessings!`);
       console.log('--------------------------------------------------');
+    }
+
+    // Check if this is a Horoscope / Aura Customization Request or if a Crystal was recommended
+    const isHoroscopeRequest = query.message && (
+      query.message.includes('[HOROSCOPE') || 
+      query.message.includes('HOROSCOPE') || 
+      query.message.includes('AURA PHOTO')
+    );
+
+    if (status === 'resolved' && (recommendedCrystal || (isHoroscopeRequest && (recommendedCrystal || adminReplyMessage)))) {
+      const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+      const shopUrl = `${clientUrl}/shop?tab=shop`;
+
+      const userSubject = `Your Personalised Crystal Recommendation from Ascension ✨`;
+
+      const emailHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #fcfbf9; color: #2c2a29; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #ede8df; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+    .header { background: linear-gradient(135deg, #1c2826 0%, #2c3e3a 100%); color: #ffffff; padding: 32px 24px; text-align: center; }
+    .header h1 { margin: 0; font-size: 24px; font-weight: 700; color: #d4af37; letter-spacing: 1px; }
+    .header p { margin: 6px 0 0 0; font-size: 12px; color: #e0d8c3; text-transform: uppercase; letter-spacing: 2px; }
+    .content { padding: 32px 28px; line-height: 1.6; }
+    .greeting { font-size: 16px; font-weight: 600; color: #2c2a29; margin-bottom: 12px; }
+    .intro { font-size: 14px; color: #55524f; margin-bottom: 24px; }
+    .crystal-card { background: #faf7f2; border: 1.5px solid #d4af37; border-radius: 12px; padding: 22px; margin: 20px 0; }
+    .crystal-label { font-size: 11px; text-transform: uppercase; font-weight: 700; color: #a3821a; letter-spacing: 1.5px; margin-bottom: 4px; }
+    .crystal-title { font-size: 20px; font-weight: 700; color: #1c2826; margin: 0 0 12px 0; }
+    .crystal-section { margin-top: 12px; }
+    .section-title { font-size: 12px; font-weight: 700; color: #333; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+    .section-desc { font-size: 13.5px; color: #4a4846; line-height: 1.5; margin: 0; }
+    .cta-btn { display: inline-block; background: #d4af37; color: #1c2826 !important; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; padding: 14px 28px; border-radius: 8px; text-decoration: none; margin: 24px 0 10px 0; text-align: center; }
+    .footer { background: #f7f4ee; padding: 20px; text-align: center; font-size: 11px; color: #8c8883; border-top: 1px solid #ede8df; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>ASCENSION</h1>
+      <p>Personalised Horoscope & Aura Crystal Reading</p>
+    </div>
+    <div class="content">
+      <div class="greeting">Dear ${query.name},</div>
+      <div class="intro">
+        Thank you for submitting your horoscope and facial aura energy details. Sonali Bhasin and our intuitive energy coaches have reviewed your celestial coordinates and facial vibration to curate your personalized gemstone recommendation:
+      </div>
+
+      <div class="crystal-card">
+        <div class="crystal-label">Your Tailored Energy Stone</div>
+        <div class="crystal-title">💎 ${query.recommendedCrystal || 'Custom Energetic Crystal'}</div>
+        
+        ${query.crystalBenefits ? `
+        <div class="crystal-section">
+          <div class="section-title">✨ Spiritual & Healing Benefits:</div>
+          <p class="section-desc">${query.crystalBenefits}</p>
+        </div>` : ''}
+
+        ${query.adminReplyMessage ? `
+        <div class="crystal-section" style="margin-top: 16px; border-top: 1px dashed #dcd3c3; padding-top: 12px;">
+          <div class="section-title">🔮 Special Guidance from Sonali Bhasin:</div>
+          <p class="section-desc" style="font-style: italic;">"${query.adminReplyMessage}"</p>
+        </div>` : ''}
+      </div>
+
+      <p style="font-size: 13px; color: #55524f;">
+        Each crystal bracelet at Ascension is cleared, blessed, and energized specifically to resonate with your personal frequency.
+      </p>
+
+      <div style="text-align: center;">
+        <a href="${shopUrl}" class="cta-btn">Explore Ascension Crystal Shop &rarr;</a>
+      </div>
+
+      <p style="font-size: 12px; color: #7a7672; margin-top: 20px;">
+        Need help ordering or customizing your bracelet size? Feel free to reply to this email or reach us on WhatsApp at <strong>+91 89290 61557</strong>.
+      </p>
+    </div>
+    <div class="footer">
+      <p style="margin: 0 0 4px 0;"><strong>Ascension by Sonali Bhasin Kumar</strong></p>
+      <p style="margin: 0;">Healing • Mindfulness • Astrological Harmonization</p>
+    </div>
+  </div>
+</body>
+</html>
+      `;
+
+      const userText = `Dear ${query.name},\n\nThank you for submitting your horoscope and facial aura energy details. Sonali Bhasin and our intuitive energy coaches have curated your personalized crystal recommendation:\n\nRecommended Crystal: ${query.recommendedCrystal || 'Custom Energetic Crystal'}\n${query.crystalBenefits ? `Benefits: ${query.crystalBenefits}\n` : ''}${query.adminReplyMessage ? `Guidance from Sonali: ${query.adminReplyMessage}\n` : ''}\n\nExplore our shop at ${shopUrl} to find or order your energized crystal.\n\nBlessings & Light,\nAscension by Sonali Bhasin Kumar`;
+
+      try {
+        await sendEmail({
+          to: query.email,
+          subject: userSubject,
+          text: userText,
+          html: emailHtml
+        });
+        console.log(`Crystal recommendation email sent to ${query.email}`);
+      } catch (mailError) {
+        console.error('Failed to send crystal recommendation email:', mailError.message);
+      }
     }
 
     res.json({ success: true, message: `Query status updated to ${status}`, data: query });

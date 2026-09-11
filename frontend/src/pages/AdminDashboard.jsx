@@ -3,7 +3,7 @@ import {
   Compass, Eye, Edit2, Trash2, PlusCircle, CheckCircle, 
   X, RefreshCw, Layers, ShieldCheck, ShoppingBag, 
   Calendar, MapPin, DollarSign, MessageCircle, FileText, Smile,
-  Share2, Copy, Check
+  Share2, Copy, Check, Sparkles
 } from 'lucide-react';
 import axios from 'axios';
 
@@ -84,6 +84,12 @@ const AdminDashboard = () => {
   const [webinarCover, setWebinarCover] = useState(null);
   const [webinarQr, setWebinarQr] = useState(null);
 
+  // Horoscope Crystal Recommendation state
+  const [recommendedCrystal, setRecommendedCrystal] = useState('');
+  const [crystalBenefits, setCrystalBenefits] = useState('');
+  const [adminReplyMessage, setAdminReplyMessage] = useState('');
+  const [sendingRecommendation, setSendingRecommendation] = useState(false);
+
   const tabs = [
     { id: 'services', label: 'Services', icon: <Layers className="w-4 h-4" /> },
     { id: 'programs', label: 'Programs', icon: <ShieldCheck className="w-4 h-4" /> },
@@ -156,6 +162,12 @@ const AdminDashboard = () => {
     setModalMode('view');
     setSelectedItem(item);
     setShowModal(true);
+
+    if (activeTab === 'contacts') {
+      setRecommendedCrystal(item.recommendedCrystal || '');
+      setCrystalBenefits(item.crystalBenefits || '');
+      setAdminReplyMessage(item.adminReplyMessage || '');
+    }
     
     if (activeTab === 'programs') {
       setLoadingProgressList(true);
@@ -399,6 +411,29 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleSendCrystalRecommendation = async (id) => {
+    if (!recommendedCrystal || !recommendedCrystal.trim()) {
+      alert('Please enter a recommended crystal / stone name.');
+      return;
+    }
+    setSendingRecommendation(true);
+    try {
+      const { data } = await axios.put(`/api/contacts/${id}/status`, {
+        status: 'resolved',
+        recommendedCrystal: recommendedCrystal.trim(),
+        crystalBenefits: crystalBenefits.trim(),
+        adminReplyMessage: adminReplyMessage.trim()
+      });
+      alert('Personalized crystal recommendation emailed to user and query resolved successfully!');
+      setShowModal(false);
+      fetchTabData();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to send crystal recommendation');
+    } finally {
+      setSendingRecommendation(false);
+    }
+  };
+
   const handleUpdateStatus = async (id, field, value) => {
     try {
       await axios.put(`/api/${activeTab}/${id}/${field}`, { [field]: value });
@@ -499,7 +534,31 @@ const AdminDashboard = () => {
                         {activeTab === 'retreats' && <span className="text-sage font-medium">Interested: {item.interestedUsers?.length} logged</span>}
                         {activeTab === 'programs' && <span className="text-sage font-medium">Enrolled: {item.enrolledUsers?.length} / {item.enrollmentCapacity}</span>}
                         {activeTab === 'community' && <span className="bg-lavender text-charcoal-dark py-0.5 px-2 rounded-md font-semibold uppercase">{item.type}</span>}
-                        {activeTab === 'contacts' && <span className="text-charcoal-light font-medium">{item.email}</span>}
+                        {activeTab === 'contacts' && (
+                          <div className="flex flex-col gap-1">
+                            <span className="text-charcoal-light font-medium">{item.email}</span>
+                            {item.message && (item.message.includes('[HOROSCOPE') || item.message.includes('HOROSCOPE') || item.message.includes('AURA PHOTO')) && (
+                              <span className="inline-flex items-center gap-1 text-[9px] font-bold text-gold-dark bg-gold/15 px-2 py-0.5 rounded-full border border-gold/30 w-fit">
+                                <Sparkles className="w-3 h-3" /> Horoscope & Aura Request
+                              </span>
+                            )}
+                            {item.recommendedCrystal && (
+                              <span className="text-[9px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 w-fit">
+                                💎 {item.recommendedCrystal}
+                              </span>
+                            )}
+                            {item.paymentScreenshot && (
+                              <a 
+                                href={getImageUrl(item.paymentScreenshot)} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-sage hover:underline font-bold text-[10px] uppercase flex items-center gap-0.5"
+                              >
+                                View Selfie / Photo ↗
+                              </a>
+                            )}
+                          </div>
+                        )}
                         {activeTab === 'donations' && <span className="font-mono text-charcoal-light">{item.transactionId}</span>}
                         {activeTab === 'orders' && <span className="text-charcoal-light font-medium">Status: {item.status}</span>}
                         {activeTab === 'testimonials' && <span className="text-gold">{'★'.repeat(item.rating)}</span>}
@@ -600,12 +659,21 @@ const AdminDashboard = () => {
                           </button>
                         )}
                         {activeTab === 'contacts' && item.status === 'unread' && (
-                          <button
-                            onClick={() => handleUpdateStatus(item._id, 'status', 'resolved')}
-                            className="p-1 text-sage hover:text-sage-dark focus:outline-none font-bold text-[10px] uppercase border border-sage/40 rounded px-1.5"
-                          >
-                            Resolve
-                          </button>
+                          item.message && (item.message.includes('[HOROSCOPE') || item.message.includes('HOROSCOPE') || item.message.includes('AURA PHOTO')) ? (
+                            <button
+                              onClick={() => handleOpenView(item)}
+                              className="p-1 text-gold-dark hover:text-charcoal-dark bg-gold/15 hover:bg-gold/30 focus:outline-none font-bold text-[10px] uppercase border border-gold/40 rounded px-2 flex items-center gap-1 cursor-pointer"
+                            >
+                              <Sparkles className="w-3 h-3" /> Recommend
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => handleUpdateStatus(item._id, 'status', 'resolved')}
+                              className="p-1 text-sage hover:text-sage-dark focus:outline-none font-bold text-[10px] uppercase border border-sage/40 rounded px-1.5 cursor-pointer"
+                            >
+                              Resolve
+                            </button>
+                          )
                         )}
 
                         {/* Webinar Approval/Rejection Buttons */}
@@ -909,26 +977,181 @@ const AdminDashboard = () => {
 
                   {/* Contact detail query viewer */}
                   {activeTab === 'contacts' && (
-                    <div className="flex flex-col gap-3">
-                      <h4 className="font-bold text-charcoal-dark border-b pb-1">Message Query Details</h4>
-                      <div className="bg-cream p-4 rounded-xl border flex flex-col gap-1 leading-relaxed text-[11.5px]">
-                        <p><strong>Sender:</strong> {selectedItem.name}</p>
-                        <p><strong>Contact Email:</strong> {selectedItem.email}</p>
-                        <p><strong>Phone:</strong> {selectedItem.phone || 'N/A'}</p>
-                        <p className="mt-2 border-t pt-2 font-sans italic text-charcoal">"{selectedItem.message}"</p>
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between border-b pb-2">
+                        <h4 className="font-bold text-charcoal-dark font-serif text-sm">
+                          {selectedItem.message?.includes('[HOROSCOPE') || selectedItem.message?.includes('HOROSCOPE') || selectedItem.message?.includes('AURA PHOTO')
+                            ? '✨ Horoscope & Facial Aura Request Details'
+                            : 'Message Query Details'}
+                        </h4>
+                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                          selectedItem.status === 'resolved' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                        }`}>
+                          Status: {selectedItem.status}
+                        </span>
                       </div>
 
-                      {selectedItem.status === 'unread' && (
-                        <button
-                          onClick={() => {
-                            handleUpdateStatus(selectedItem._id, 'status', 'resolved');
-                            setShowModal(false);
-                          }}
-                          className="bg-sage hover:bg-sage-dark text-white font-bold py-2.5 rounded-xl text-center mt-2"
-                        >
-                          Mark Resolved
-                        </button>
+                      <div className="bg-cream p-4 rounded-xl border flex flex-col gap-2 leading-relaxed text-[11.5px]">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          <p><strong>Sender:</strong> {selectedItem.name}</p>
+                          <p><strong>Contact Email:</strong> <a href={`mailto:${selectedItem.email}`} className="text-sage hover:underline font-medium">{selectedItem.email}</a></p>
+                          <p><strong>Phone:</strong> {selectedItem.phone || 'N/A'}</p>
+                          <p><strong>Received:</strong> {new Date(selectedItem.createdAt).toLocaleString()}</p>
+                        </div>
+
+                        {selectedItem.paymentScreenshot && (
+                          <div className="mt-2 pt-2 border-t flex flex-col gap-1.5">
+                            <span className="font-bold text-charcoal-dark uppercase tracking-wider text-[10px]">
+                              Uploaded Photo / Live Selfie:
+                            </span>
+                            <div className="flex items-center gap-3">
+                              <a 
+                                href={getImageUrl(selectedItem.paymentScreenshot)} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="block rounded-lg overflow-hidden border border-gold/40 shadow-sm hover:opacity-90 transition-opacity"
+                              >
+                                <img 
+                                  src={getImageUrl(selectedItem.paymentScreenshot)} 
+                                  alt="Customer Aura Snapshot" 
+                                  className="w-20 h-20 object-cover" 
+                                />
+                              </a>
+                              <a 
+                                href={getImageUrl(selectedItem.paymentScreenshot)} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-[11px] text-sage font-bold hover:underline"
+                              >
+                                View Full Size Image ↗
+                              </a>
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="mt-2 border-t pt-2">
+                          <span className="font-bold text-charcoal-dark uppercase tracking-wider text-[10px] block mb-1">
+                            Request Content:
+                          </span>
+                          <p className="font-sans whitespace-pre-wrap bg-white/70 p-3 rounded-lg border border-cream-dark/50 text-charcoal text-[11px] leading-relaxed">
+                            {selectedItem.message}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Display previously sent crystal recommendation if resolved */}
+                      {selectedItem.recommendedCrystal && (
+                        <div className="bg-gold/10 border border-gold/30 rounded-xl p-4 flex flex-col gap-2">
+                          <div className="flex items-center gap-1.5 text-gold-dark font-bold text-xs uppercase tracking-wider">
+                            <Sparkles className="w-4 h-4" />
+                            <span>Recommendation Dispatched to User</span>
+                          </div>
+                          <div className="text-[11.5px] flex flex-col gap-1 text-charcoal">
+                            <p><strong>Recommended Crystal:</strong> <span className="font-bold text-charcoal-dark">{selectedItem.recommendedCrystal}</span></p>
+                            {selectedItem.crystalBenefits && (
+                              <p><strong>Spiritual Benefits:</strong> {selectedItem.crystalBenefits}</p>
+                            )}
+                            {selectedItem.adminReplyMessage && (
+                              <p><strong>Guidance / Note:</strong> <em>"{selectedItem.adminReplyMessage}"</em></p>
+                            )}
+                            {selectedItem.resolvedAt && (
+                              <p className="text-[10px] text-charcoal-light mt-1">Dispatched on: {new Date(selectedItem.resolvedAt).toLocaleString()}</p>
+                            )}
+                          </div>
+                        </div>
                       )}
+
+                      {/* Interactive Form for Sending/Updating Crystal Recommendation */}
+                      <div className="border border-gold/30 bg-white/90 rounded-2xl p-4 sm:p-5 flex flex-col gap-3 shadow-sm">
+                        <div className="flex flex-col gap-0.5 border-b border-cream-dark/50 pb-2">
+                          <span className="text-[10px] uppercase font-bold tracking-wider text-gold-dark flex items-center gap-1">
+                            <Sparkles className="w-3.5 h-3.5" />
+                            Personalized Crystal Reply & Resolution
+                          </span>
+                          <h5 className="font-serif font-bold text-xs text-charcoal-dark">
+                            Type Crystal Recommendation for {selectedItem.name}
+                          </h5>
+                          <p className="text-[10px] text-charcoal-light">
+                            Submitting this will automatically email the customer at <strong>{selectedItem.email}</strong> with your personalized crystal recommendation and mark this query as resolved.
+                          </p>
+                        </div>
+
+                        <div className="flex flex-col gap-2.5 text-[11px]">
+                          <div className="flex flex-col gap-1">
+                            <label className="font-bold text-charcoal-dark text-[10px] uppercase tracking-wider">
+                              Recommended Crystal / Stone Name *
+                            </label>
+                            <input
+                              type="text"
+                              required
+                              placeholder="e.g. 7 Chakra Pyrite & Tiger Eye Abundance Bracelet"
+                              value={recommendedCrystal}
+                              onChange={(e) => setRecommendedCrystal(e.target.value)}
+                              className="bg-cream-light/60 border border-cream-dark rounded-xl py-2 px-3 focus:outline-none focus:border-gold text-xs"
+                            />
+                          </div>
+
+                          <div className="flex flex-col gap-1">
+                            <label className="font-bold text-charcoal-dark text-[10px] uppercase tracking-wider">
+                              Spiritual & Healing Benefits (Optional)
+                            </label>
+                            <textarea
+                              rows="2"
+                              placeholder="e.g. Harmonizes solar plexus energy, attracts financial abundance, and grounds emotional vibrations."
+                              value={crystalBenefits}
+                              onChange={(e) => setCrystalBenefits(e.target.value)}
+                              className="bg-cream-light/60 border border-cream-dark rounded-xl py-2 px-3 focus:outline-none focus:border-gold text-xs"
+                            />
+                          </div>
+
+                          <div className="flex flex-col gap-1">
+                            <label className="font-bold text-charcoal-dark text-[10px] uppercase tracking-wider">
+                              Personal Guidance / Note from Sonali (Optional)
+                            </label>
+                            <textarea
+                              rows="2"
+                              placeholder="e.g. Wear this on your right wrist after energizing under the morning sunlight..."
+                              value={adminReplyMessage}
+                              onChange={(e) => setAdminReplyMessage(e.target.value)}
+                              className="bg-cream-light/60 border border-cream-dark rounded-xl py-2 px-3 focus:outline-none focus:border-gold text-xs"
+                            />
+                          </div>
+
+                          <div className="flex flex-col sm:flex-row gap-2 pt-1">
+                            <button
+                              type="button"
+                              disabled={sendingRecommendation}
+                              onClick={() => handleSendCrystalRecommendation(selectedItem._id)}
+                              className="flex-1 bg-gold hover:bg-gold-dark text-charcoal-dark font-bold py-2.5 px-4 rounded-xl text-xs uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors shadow-sm disabled:opacity-50 cursor-pointer"
+                            >
+                              {sendingRecommendation ? (
+                                <>
+                                  <div className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-charcoal-dark border-t-transparent" />
+                                  <span>Sending Email & Resolving...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Sparkles className="w-3.5 h-3.5" />
+                                  <span>{selectedItem.status === 'resolved' ? 'Update & Resend Crystal Email' : 'Email Crystal Recommendation & Resolve'}</span>
+                                </>
+                              )}
+                            </button>
+
+                            {selectedItem.status === 'unread' && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  handleUpdateStatus(selectedItem._id, 'status', 'resolved');
+                                  setShowModal(false);
+                                }}
+                                className="bg-cream hover:bg-cream-dark text-charcoal-light font-bold py-2.5 px-4 rounded-xl text-[10px] uppercase tracking-wider transition-colors cursor-pointer"
+                              >
+                                Mark Resolved Without Email
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>

@@ -30,6 +30,21 @@ const contactSchema = new mongoose.Schema({
     type: String,
     enum: ['unread', 'read', 'resolved'],
     default: 'unread'
+  },
+  recommendedCrystal: {
+    type: String,
+    trim: true
+  },
+  crystalBenefits: {
+    type: String,
+    trim: true
+  },
+  adminReplyMessage: {
+    type: String,
+    trim: true
+  },
+  resolvedAt: {
+    type: Date
   }
 }, {
   timestamps: true
