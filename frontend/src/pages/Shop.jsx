@@ -85,9 +85,9 @@ const Shop = () => {
       dates: "Mar 21 - Apr 19", 
       element: "Fire", 
       planet: "Mars", 
-      crystals: ["Tiger Eye", "Obsidian", "Citrine", "Pyrite", "Carnelian", "Protection", "Abundance"],
+      crystals: ["Tiger Eye", "Obsidian", "Citrine", "Pyrite", "Carnelian", "Protection", "Abundance", "Manifestation"],
       primaryIntention: "Protection & Abundance",
-      primaryBracelet: "Ascension Protection & Grounding Crystal Bracelet",
+      primaryBracelet: "Ascension Protection Crystal Bracelet",
       desc: "As a dynamic and bold Fire sign ruled by Mars, your fierce drive is magnified by protective Tiger Eye & grounding Obsidian, while Citrine & Pyrite channel boundless abundance and leadership without burnout."
     },
     { 
@@ -95,27 +95,27 @@ const Shop = () => {
       dates: "Apr 20 - May 20", 
       element: "Earth", 
       planet: "Venus", 
-      crystals: ["Rose Quartz", "Selenite", "Clear Quartz", "Aventurine", "Love", "Cleansing", "Health"],
+      crystals: ["Rose Quartz", "Clear Quartz", "Aventurine", "Pyrite", "Love", "Cleansing", "Health", "Abundance"],
       primaryIntention: "Love & Inner Peace",
       primaryBracelet: "Ascension Love & Peace Crystal Bracelet",
-      desc: "Governed by Venus, you thrive in beauty, emotional peace, and stability. Rose Quartz deepens heart-centered harmony and love, while Selenite & Clear Quartz cleanse and elevate your grounded earth energy."
+      desc: "Governed by Venus, you thrive in beauty, emotional peace, and stability. Rose Quartz deepens heart-centered harmony and love, while Clear Quartz & Pyrite cleanse and attract grounded prosperity."
     },
     { 
       name: "Gemini", 
       dates: "May 21 - Jun 20", 
       element: "Air", 
       planet: "Mercury", 
-      crystals: ["Citrine", "Pyrite", "Tiger Eye", "Aventurine", "Clear Quartz", "Abundance", "Health"],
-      primaryIntention: "Abundance & Health",
-      primaryBracelet: "Ascension Abundance & Wealth Crystal Bracelet",
-      desc: "Expressive and intellectually sharp, your mental clarity and communication thrive with abundance-magnet Citrine & Pyrite, while Green Aventurine brings calming balance to your active nervous system."
+      crystals: ["Citrine", "Pyrite", "Tiger Eye", "Aventurine", "Clear Quartz", "Amethyst", "Abundance", "Health", "Manifestation"],
+      primaryIntention: "Abundance & Manifestation",
+      primaryBracelet: "Ascension Abundance Crystal Bracelet",
+      desc: "Expressive and intellectually sharp, your mental clarity and communication thrive with abundance-magnet Citrine & Pyrite, while Amethyst and Green Aventurine bring calming balance to your active nervous system."
     },
     { 
       name: "Cancer", 
       dates: "Jun 21 - Jul 22", 
       element: "Water", 
       planet: "Moon", 
-      crystals: ["Rose Quartz", "Obsidian", "Moonstone", "Clear Quartz", "Selenite", "Love", "Protection"],
+      crystals: ["Rose Quartz", "Obsidian", "Moonstone", "Clear Quartz", "Amethyst", "Love", "Protection", "Manifestation"],
       primaryIntention: "Love & Protection",
       primaryBracelet: "Ascension Love & Peace Crystal Bracelet",
       desc: "Deeply empathetic and intuitive, you benefit from soothing Rose Quartz for heart healing and protective Black Obsidian/Tiger Eye to shield your sensitive empathic aura from outside energies."
@@ -126,18 +126,18 @@ const Shop = () => {
       element: "Fire", 
       planet: "Sun", 
       crystals: ["Tiger Eye", "Citrine", "Pyrite", "Clear Quartz", "Abundance", "Protection"],
-      primaryIntention: "Abundance & Wealth",
-      primaryBracelet: "Ascension Abundance & Wealth Crystal Bracelet",
-      desc: "Radiant, generous, and sun-governed, your natural magnetic charisma aligns perfectly with golden Citrine & Pyrite for prosperity, while Tiger Eye anchors your regal courage and focus."
+      primaryIntention: "Abundance & Tiger Eye Power",
+      primaryBracelet: "Ascension Tiger Eye Crystal Bracelet",
+      desc: "Radiant, generous, and sun-governed, your natural magnetic charisma aligns with pure Tiger Eye for fearless leadership, paired with Citrine & Pyrite for regal prosperity and solar fire."
     },
     { 
       name: "Virgo", 
       dates: "Aug 23 - Sep 22", 
       element: "Earth", 
       planet: "Mercury", 
-      crystals: ["Aventurine", "Citrine", "Clear Quartz", "Pyrite", "Health", "Abundance"],
+      crystals: ["Aventurine", "Citrine", "Clear Quartz", "Pyrite", "Amethyst", "Health", "Abundance", "Manifestation"],
       primaryIntention: "Health & Vitality",
-      primaryBracelet: "Ascension Health & Vitality Crystal Bracelet",
+      primaryBracelet: "Ascension Health Crystal Bracelet",
       desc: "Practical, analytical, and wellness-focused, you thrive with Green Aventurine and Clear Quartz for cellular vitality, mental calm, and physical stress relief, alongside Citrine for smooth success."
     },
     { 
@@ -145,60 +145,60 @@ const Shop = () => {
       dates: "Sep 23 - Oct 22", 
       element: "Air", 
       planet: "Venus", 
-      crystals: ["Rose Quartz", "Selenite", "Clear Quartz", "Citrine", "Love", "Cleansing"],
-      primaryIntention: "Love & Peace",
+      crystals: ["Rose Quartz", "Clear Quartz", "Amethyst", "Citrine", "Love", "Cleansing", "Manifestation"],
+      primaryIntention: "Love & Harmony",
       primaryBracelet: "Ascension Love & Peace Crystal Bracelet",
-      desc: "Seeking divine harmony, peace, and soulful relationships, you resonate with soft Rose Quartz for unconditional love and pure Selenite to clear mental dilemmas and restore pristine equilibrium."
+      desc: "Seeking divine harmony, peace, and soulful relationships, you resonate with soft Rose Quartz for unconditional love and Clear Quartz to clear mental dilemmas and restore pristine equilibrium."
     },
     { 
       name: "Scorpio", 
       dates: "Oct 23 - Nov 21", 
       element: "Water", 
       planet: "Pluto", 
-      crystals: ["Obsidian", "Tiger Eye", "Selenite", "Clear Quartz", "Protection", "Cleansing"],
+      crystals: ["Obsidian", "Tiger Eye", "Clear Quartz", "Pyrite", "Protection", "Cleansing"],
       primaryIntention: "Protection & Grounding",
-      primaryBracelet: "Ascension Protection & Grounding Crystal Bracelet",
-      desc: "Intense, magnetic, and transformative, you benefit from deep protective Black Obsidian and Tiger Eye to transmute heavy emotions, alongside Selenite to purify and elevate your psychic intuition."
+      primaryBracelet: "Ascension Protection Crystal Bracelet",
+      desc: "Intense, magnetic, and transformative, you benefit from deep protective Black Obsidian and Tiger Eye to transmute heavy emotions, alongside Clear Quartz to purify and elevate your psychic intuition."
     },
     { 
       name: "Sagittarius", 
       dates: "Nov 22 - Dec 21", 
       element: "Fire", 
       planet: "Jupiter", 
-      crystals: ["Citrine", "Pyrite", "Tiger Eye", "Clear Quartz", "Abundance", "Protection"],
-      primaryIntention: "Abundance & Good Fortune",
-      primaryBracelet: "Ascension Abundance & Wealth Crystal Bracelet",
-      desc: "Adventurous, philosophical, and vision-driven, your lucky expansive Jupiter energy matches with Citrine & Pyrite for commercial abundance and Tiger Eye for safe travel and grounded wisdom."
+      crystals: ["Amethyst", "Citrine", "Pyrite", "Tiger Eye", "Clear Quartz", "Manifestation", "Abundance", "Protection"],
+      primaryIntention: "Manifestation & Expansion",
+      primaryBracelet: "Ascension Manifestation Crystal Bracelet",
+      desc: "Adventurous, philosophical, and vision-driven, your lucky expansive Jupiter energy matches with Amethyst for visionary manifestation and Pyrite & Citrine for commercial abundance and good fortune."
     },
     { 
       name: "Capricorn", 
       dates: "Dec 22 - Jan 19", 
       element: "Earth", 
       planet: "Saturn", 
-      crystals: ["Tiger Eye", "Obsidian", "Pyrite", "Citrine", "Protection", "Abundance"],
-      primaryIntention: "Protection & Abundance",
-      primaryBracelet: "Ascension Protection & Grounding Crystal Bracelet",
-      desc: "Ambitious, structured, and persevering, your long-term empire-building goals are empowered by protective Tiger Eye & Obsidian for resilience, paired with Pyrite for unyielding financial growth."
+      crystals: ["Tiger Eye", "Obsidian", "Pyrite", "Citrine", "Clear Quartz", "Protection", "Abundance"],
+      primaryIntention: "Pyrite Wealth & Protection",
+      primaryBracelet: "Ascension Pyrite Crystal Bracelet",
+      desc: "Ambitious, structured, and persevering, your long-term empire-building goals are empowered by metallic Pyrite for unyielding financial magnetism, paired with Tiger Eye & Obsidian for resilience."
     },
     { 
       name: "Aquarius", 
       dates: "Jan 20 - Feb 18", 
       element: "Air", 
       planet: "Uranus", 
-      crystals: ["Selenite", "Clear Quartz", "Rose Quartz", "Cleansing", "Love"],
-      primaryIntention: "Cleansing & Higher Vibes",
-      primaryBracelet: "Ascension Cleansing & Higher Vibes Crystal Bracelet",
-      desc: "Visionary, innovative, and high-frequency, your cosmic ideas connect seamlessly with luminous Selenite and Clear Quartz to channel higher intuition and clear static energy from your auric field."
+      crystals: ["Amethyst", "Clear Quartz", "Rose Quartz", "Manifestation", "Cleansing", "Love"],
+      primaryIntention: "Manifestation & Higher Vibes",
+      primaryBracelet: "Ascension Manifestation Crystal Bracelet",
+      desc: "Visionary, innovative, and high-frequency, your cosmic ideas connect seamlessly with Amethyst and Clear Quartz to channel higher intuition and clear static energy from your auric field."
     },
     { 
       name: "Pisces", 
       dates: "Feb 19 - Mar 20", 
       element: "Water", 
       planet: "Neptune", 
-      crystals: ["Rose Quartz", "Moonstone", "Selenite", "Aventurine", "Clear Quartz", "Love", "Cleansing", "Health"],
+      crystals: ["Amethyst", "Rose Quartz", "Aventurine", "Clear Quartz", "Manifestation", "Cleansing", "Love", "Health"],
       primaryIntention: "Cleansing & Inner Peace",
-      primaryBracelet: "Ascension Cleansing & Higher Vibes Crystal Bracelet",
-      desc: "Dreamy, mystical, and deeply compassionate, your sensitive spiritual nature is nurtured by angelic Selenite and Rose Quartz, shielding you from psychic overload while enveloping you in universal love."
+      primaryBracelet: "Ascension Cleansing Crystal Bracelet",
+      desc: "Dreamy, mystical, and deeply compassionate, your sensitive spiritual nature is nurtured by purifying Clear Quartz and Amethyst, shielding you from psychic overload while enveloping you in universal love."
     }
   ];
 
@@ -828,16 +828,19 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
               {/* 5 Sacred Intentions Quick-Filter Showcase Bar */}
               <div className="pt-2 border-t border-cream-dark/40 flex flex-col gap-2">
                 <span className="text-[10px] uppercase font-bold tracking-wider text-charcoal-light">
-                  Filter by Sacred Intention:
+                  Filter by Sacred Intention & Crystal:
                 </span>
                 <div className="flex flex-wrap gap-2">
                   {[
-                    { id: 'All', label: 'All Sacred Crystals', icon: '🌟' },
-                    { id: 'Health', label: 'Health & Vitality', icon: '🌿' },
-                    { id: 'Protection', label: 'Protection & Grounding', icon: '🛡️' },
-                    { id: 'Love', label: 'Love & Inner Peace', icon: '💖' },
-                    { id: 'Abundance', label: 'Abundance & Wealth', icon: '💰' },
-                    { id: 'Cleansing', label: 'Cleansing & Higher Vibes', icon: '✨' }
+                    { id: 'All', label: 'All Crystals', icon: '🌟' },
+                    { id: 'Manifestation', label: 'Manifestation (Amethyst)', icon: '🔮' },
+                    { id: 'Abundance', label: 'Abundance (Citrine+Pyrite)', icon: '💰' },
+                    { id: 'Health', label: 'Health (Green Aventurine)', icon: '🌿' },
+                    { id: 'Love', label: 'Love & Peace (Rose Quartz)', icon: '💖' },
+                    { id: 'Protection', label: 'Protection (Tiger Eye+Obsidian)', icon: '🛡️' },
+                    { id: 'Cleansing', label: 'Cleansing (Clear Quartz)', icon: '✨' },
+                    { id: 'Pyrite', label: 'Pyrite Wealth Magnet', icon: '🪙' },
+                    { id: 'Tiger Eye', label: 'Tiger Eye Power', icon: '🐯' }
                   ].map((filter) => (
                     <button
                       key={filter.id}
@@ -909,35 +912,38 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                   </div>
 
                   {/* Primary Signature Bracelet Alignment Banner */}
-                  {selectedZodiac.primaryBracelet && (
-                    <div className="p-4 rounded-2xl bg-gradient-to-r from-gold/15 via-cream/40 to-gold/10 border border-gold/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <div className="flex flex-col gap-1">
-                        <span className="text-[9px] font-bold uppercase tracking-wider text-gold-dark flex items-center gap-1">
-                          ✨ Primary Astrological Crystal Alignment
-                        </span>
-                        <h4 className="font-serif text-sm font-bold text-charcoal-dark">
-                          {selectedZodiac.primaryBracelet}
-                        </h4>
-                        <span className="text-[10px] text-charcoal-light font-sans">
-                          Harmonizes with <strong>{selectedZodiac.primaryIntention}</strong> frequencies
-                        </span>
+                  {selectedZodiac.primaryBracelet && (() => {
+                    const matchingProd = allProductsForCustomise.find(p => p.name?.toLowerCase() === selectedZodiac.primaryBracelet?.toLowerCase() || p.name?.toLowerCase().includes(selectedZodiac.primaryBracelet?.toLowerCase()));
+                    const braceletPrice = matchingProd?.pricing || 999;
+                    return (
+                      <div className="p-4 rounded-2xl bg-gradient-to-r from-gold/15 via-cream/40 to-gold/10 border border-gold/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[9px] font-bold uppercase tracking-wider text-gold-dark flex items-center gap-1">
+                            ✨ Primary Astrological Crystal Alignment
+                          </span>
+                          <h4 className="font-serif text-sm font-bold text-charcoal-dark">
+                            {selectedZodiac.primaryBracelet}
+                          </h4>
+                          <span className="text-[10px] text-charcoal-light font-sans">
+                            Harmonizes with <strong>{selectedZodiac.primaryIntention}</strong> frequencies
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => {
+                            if (matchingProd) {
+                              addToCart(matchingProd);
+                              alert(`${matchingProd.name} (₹${matchingProd.pricing}) added to your cart!`);
+                            } else {
+                              alert(`${selectedZodiac.primaryBracelet} is in stock below!`);
+                            }
+                          }}
+                          className="bg-gold hover:bg-gold-dark text-charcoal-dark font-bold text-[10px] uppercase tracking-wider py-2 px-4 rounded-xl shadow-xs transition-colors shrink-0"
+                        >
+                          Quick Add to Cart (₹{braceletPrice})
+                        </button>
                       </div>
-                      <button
-                        onClick={() => {
-                          const matchingProd = allProductsForCustomise.find(p => p.name?.toLowerCase().includes(selectedZodiac.primaryBracelet?.toLowerCase()) || (selectedZodiac.primaryIntention && p.name?.toLowerCase().includes(selectedZodiac.primaryIntention.toLowerCase())));
-                          if (matchingProd) {
-                            addToCart(matchingProd);
-                            alert(`${matchingProd.name} added to your cart!`);
-                          } else {
-                            alert(`${selectedZodiac.primaryBracelet} is in stock below!`);
-                          }
-                        }}
-                        className="bg-gold hover:bg-gold-dark text-charcoal-dark font-bold text-[10px] uppercase tracking-wider py-2 px-4 rounded-xl shadow-xs transition-colors shrink-0"
-                      >
-                        Quick Add to Cart (₹999)
-                      </button>
-                    </div>
-                  )}
+                    );
+                  })()}
 
                   <div className="flex flex-col gap-2">
                     <h5 className="font-serif text-xs uppercase tracking-wider text-charcoal-dark font-bold">Energy Balancing Guidance:</h5>
@@ -997,11 +1003,14 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                         </label>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                           {[
+                            { name: 'Manifestation (Amethyst)', icon: '🔮' },
+                            { name: 'Abundance (Citrine+Pyrite)', icon: '💰' },
                             { name: 'Health & Vitality', icon: '🌿' },
                             { name: 'Protection & Grounding', icon: '🛡️' },
                             { name: 'Love & Inner Peace', icon: '💖' },
-                            { name: 'Abundance & Wealth', icon: '💰' },
-                            { name: 'Cleansing & Higher Vibes', icon: '✨' },
+                            { name: 'Cleansing & Clarity', icon: '✨' },
+                            { name: 'Courage & Focus (Tiger Eye)', icon: '🐯' },
+                            { name: 'Wealth Magnet (Pyrite)', icon: '🪙' },
                             { name: 'General Harmony', icon: '☯️' }
                           ].map((item) => (
                             <button
