@@ -283,7 +283,7 @@ When to Use:
   },
   {
     name: "Ascension Sacred White Sage Leaves Smudge Bundles",
-    category: "Camphor & Incense",
+    category: "Sage Leaves",
     pricing: 999,
     stock: 50,
     images: ["/uploads/sage_leaves_bundle.png"],
