@@ -252,7 +252,7 @@ Cleanse with sacred smoke (sage/camphor) or dry Himalayan salt. Keep away from e
   {
     name: "Ascension Pocha Salt",
     category: "Bath Salts",
-    pricing: 350,
+    pricing: 299,
     stock: 50,
     images: ["/uploads/pocha_salt.png"],
     description: `Tagline: Clean Spaces • Brighter Days • Good Energy Only
