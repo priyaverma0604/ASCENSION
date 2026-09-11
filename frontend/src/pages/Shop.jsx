@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { Search, ShoppingBag, Heart, Trash2, Plus, Minus, CreditCard, Compass, ChevronRight, User, CheckCircle, AlertTriangle, UploadCloud, Smartphone, ShieldCheck, Zap } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Trash2, Plus, Minus, CreditCard, Compass, ChevronRight, User, CheckCircle, AlertTriangle, UploadCloud, Smartphone, ShieldCheck, Zap, Camera, RefreshCw, X, Sparkles, Image as ImageIcon, Check } from 'lucide-react';
 import axios from 'axios';
 import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
@@ -131,56 +131,171 @@ const Shop = () => {
     });
   };
 
-  // Horoscope Upload Form State
+  // Horoscope Photo & Selfie Customizer State
   const [birthDate, setBirthDate] = useState('');
   const [birthTime, setBirthTime] = useState('');
   const [birthPlace, setBirthPlace] = useState('');
   const [custName, setCustName] = useState(user ? user.name : '');
   const [custContact, setCustContact] = useState('');
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [fileBase64, setFileBase64] = useState('');
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState('');
   const [uploadSubmitting, setUploadSubmitting] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFileBase64(reader.result);
-      };
-      reader.readAsDataURL(file);
+  // Live Camera state
+  const [isCameraActive, setIsCameraActive] = useState(false);
+  const [cameraFacing, setCameraFacing] = useState('user'); // 'user' or 'environment'
+  const [cameraError, setCameraError] = useState('');
+  const [isCapturing, setIsCapturing] = useState(false);
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const streamRef = useRef(null);
+
+  const startCamera = async (facing = cameraFacing) => {
+    setCameraError('');
+    setIsCameraActive(true);
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: facing,
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        },
+        audio: false
+      });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+    } catch (err) {
+      console.error('Camera access error:', err);
+      setCameraError('Unable to access camera. Please allow camera permissions or upload a photo from your device.');
     }
   };
 
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
+    }
+    setIsCameraActive(false);
+    setCameraError('');
+  };
+
+  const switchCameraFacing = async () => {
+    const nextFacing = cameraFacing === 'user' ? 'environment' : 'user';
+    setCameraFacing(nextFacing);
+    await startCamera(nextFacing);
+  };
+
+  const captureLiveSelfie = () => {
+    if (!videoRef.current || !canvasRef.current) return;
+    setIsCapturing(true);
+    try {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      const width = video.videoWidth || 640;
+      const height = video.videoHeight || 480;
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+
+      // Mirror horizontally when front-facing for natural selfie orientation
+      if (cameraFacing === 'user') {
+        ctx.translate(width, 0);
+        ctx.scale(-1, 1);
+      }
+      ctx.drawImage(video, 0, 0, width, height);
+
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const file = new File([blob], `live_selfie_${Date.now()}.jpg`, { type: 'image/jpeg' });
+          setSelectedPhoto(file);
+          setPhotoPreview(URL.createObjectURL(blob));
+          stopCamera();
+        }
+        setIsCapturing(false);
+      }, 'image/jpeg', 0.92);
+    } catch (err) {
+      console.error('Error capturing selfie:', err);
+      setIsCapturing(false);
+    }
+  };
+
+  const handlePhotoFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        alert('Please select an image file (JPEG, PNG, WEBP).');
+        return;
+      }
+      setSelectedPhoto(file);
+      setPhotoPreview(URL.createObjectURL(file));
+      stopCamera();
+    }
+  };
+
+  const clearPhoto = () => {
+    setSelectedPhoto(null);
+    setPhotoPreview('');
+    stopCamera();
+  };
+
+  // Clean up camera stream on tab change or unmount
+  useEffect(() => {
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((t) => t.stop());
+      }
+    };
+  }, [activeTab]);
+
   const handleUploadSubmit = async (e) => {
     e.preventDefault();
+    if (!selectedPhoto && !photoPreview) {
+      alert('Please take a live selfie or upload your photo for the facial energy and horoscope reading.');
+      return;
+    }
+
     setUploadSubmitting(true);
     try {
-      const payload = {
-        name: custName,
-        email: user ? user.email : 'horoscope@custom.com',
-        phone: custContact,
-        message: `[HOROSCOPE BRACELET CUSTOMIZATION REQUEST]
+      const formData = new FormData();
+      formData.append('name', custName);
+      formData.append('email', user ? user.email : 'horoscope@custom.com');
+      formData.append('phone', custContact);
+      formData.append('message', `[HOROSCOPE & AURA PHOTO CUSTOMIZATION REQUEST]
 Name: ${custName}
 WhatsApp/Contact: ${custContact}
-Birth Date: ${birthDate}
-Birth Time: ${birthTime}
-Birth Place: ${birthPlace}
-Attached Chart File: ${selectedFile ? selectedFile.name : 'None'}
-Chart Base64 Length: ${fileBase64 ? fileBase64.length : 0}`
-      };
-      
-      const { data } = await axios.post('/api/contacts', payload);
+Selected Zodiac: ${selectedZodiac?.name || 'Not specified'}
+Birth Date: ${birthDate || 'Not specified'}
+Birth Time: ${birthTime || 'Not specified'}
+Birth Place: ${birthPlace || 'Not specified'}
+Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
+
+      if (selectedPhoto) {
+        formData.append('paymentScreenshot', selectedPhoto);
+      }
+
+      const { data } = await axios.post('/api/contacts', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
       if (data.success) {
         setUploadSuccess(true);
         setBirthDate('');
         setBirthTime('');
         setBirthPlace('');
         setCustContact('');
-        setSelectedFile(null);
-        setFileBase64('');
+        setSelectedPhoto(null);
+        setPhotoPreview('');
+        stopCamera();
       }
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to submit customization request. Please try again.');
@@ -636,39 +751,209 @@ Chart Base64 Length: ${fileBase64 ? fileBase64.length : 0}`
                   </div>
                 </div>
 
-                {/* Upload Horoscope Form */}
-                <div className="glass p-6 md:p-8 rounded-[24px] border border-cream-dark/65 flex flex-col gap-6 shadow-sm bg-white/70">
+                {/* Upload Photo / Live Selfie Customizer Form */}
+                <div className="glass p-6 md:p-8 rounded-[24px] border border-cream-dark/65 flex flex-col gap-6 shadow-sm bg-white/70 relative">
                   <div className="flex flex-col gap-1 border-b border-cream-dark/50 pb-3 text-left">
-                    <span className="text-[10px] text-gold-dark uppercase tracking-wider font-bold">Personalised Astrological Alignment</span>
-                    <h3 className="font-serif text-lg font-bold text-charcoal-dark">Upload Birth Chart for Custom Recommendation</h3>
+                    <div className="flex items-center gap-1.5 text-[10px] text-gold-dark uppercase tracking-wider font-bold">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Facial Aura & Energy Alignment</span>
+                    </div>
+                    <h3 className="font-serif text-lg font-bold text-charcoal-dark">Upload Your Photo or Take a Live Selfie</h3>
                     <p className="text-[10px] text-charcoal-light leading-relaxed font-sans mt-1">
-                      Don't want to choose by zodiac alone? Upload your birth chart (Kundli / Natal chart image) or provide your birth details below. Our manifestation and energy coaches will review your placements to recommend the exact custom bracelets you need.
+                      Instead of traditional birth charts, our energy masters analyze your natural facial aura, chakra vibrations, and cosmic resonance. Take a live selfie or upload your portrait to receive your custom-tailored gemstone & horoscope bracelet recommendation.
                     </p>
                   </div>
 
                   {uploadSuccess ? (
-                    <div className="flex flex-col items-center justify-center text-center gap-3 py-6 bg-cream/20 rounded-2xl border border-gold/15 animate-fade-in">
-                      <CheckCircle className="w-10 h-10 text-gold animate-bounce" />
-                      <h5 className="font-serif text-sm font-bold text-charcoal-dark">Chart Received Successfully!</h5>
-                      <p className="text-[10px] text-charcoal-light leading-relaxed max-w-sm">
-                        Thank you! Our energy healers will analyze your chart configuration. We will reach out to you on WhatsApp or Email within 24 hours with your custom crystal recommendation report.
+                    <div className="flex flex-col items-center justify-center text-center gap-3 py-8 bg-cream/20 rounded-2xl border border-gold/20 animate-fade-in">
+                      <div className="w-14 h-14 rounded-full bg-gold/20 flex items-center justify-center border border-gold/40 mb-1">
+                        <CheckCircle className="w-8 h-8 text-gold-dark" />
+                      </div>
+                      <h5 className="font-serif text-base font-bold text-charcoal-dark">Photo & Details Received Successfully!</h5>
+                      <p className="text-xs text-charcoal-light leading-relaxed max-w-md font-sans">
+                        Thank you! Our energy healers and manifestation coaches will analyze your facial vibration and energetic frequency. We will reach out to you on WhatsApp or Email within 24 hours with your personalized custom crystal bracelet recommendation.
                       </p>
                       <button
                         onClick={() => setUploadSuccess(false)}
-                        className="bg-gold hover:bg-gold-dark text-charcoal-dark font-bold text-[9px] uppercase tracking-wider py-2 px-6 rounded-lg mt-2 transition-colors"
+                        className="bg-gold hover:bg-gold-dark text-charcoal-dark font-bold text-[10px] uppercase tracking-wider py-2.5 px-6 rounded-xl mt-3 transition-colors shadow-sm"
                       >
-                        Upload Another Chart
+                        Submit Another Photo Request
                       </button>
                     </div>
                   ) : (
-                    <form onSubmit={handleUploadSubmit} className="flex flex-col gap-4 font-sans text-xs text-charcoal text-left">
+                    <form onSubmit={handleUploadSubmit} className="flex flex-col gap-5 font-sans text-xs text-charcoal text-left">
+                      
+                      {/* Photo Capture / Upload Section */}
+                      <div className="flex flex-col gap-2">
+                        <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px] flex items-center justify-between">
+                          <span>Your Photo / Live Selfie *</span>
+                          {selectedPhoto && <span className="text-emerald-600 font-bold flex items-center gap-1"><Check className="w-3 h-3" /> Ready for Aura Analysis</span>}
+                        </label>
+
+                        {/* If Photo already captured/selected */}
+                        {photoPreview ? (
+                          <div className="p-4 rounded-2xl bg-cream-light/40 border border-gold/40 flex flex-col sm:flex-row items-center gap-4 animate-fade-in">
+                            <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden border-2 border-gold shadow-md shrink-0 bg-charcoal-dark">
+                              <img src={photoPreview} alt="Selfie Preview" className="w-full h-full object-cover" />
+                              <div className="absolute top-1 right-1 bg-gold text-charcoal-dark p-1 rounded-full shadow">
+                                <Sparkles className="w-3 h-3" />
+                              </div>
+                            </div>
+                            <div className="flex flex-col gap-2 flex-1 text-center sm:text-left">
+                              <div>
+                                <span className="text-xs font-bold text-charcoal-dark block">Photo Attached</span>
+                                <span className="text-[10px] text-charcoal-light block">
+                                  {selectedPhoto ? selectedPhoto.name : 'Live Camera Snapshot'} 
+                                  {selectedPhoto?.size ? ` • ${(selectedPhoto.size / 1024).toFixed(1)} KB` : ''}
+                                </span>
+                              </div>
+                              <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    clearPhoto();
+                                    startCamera();
+                                  }}
+                                  className="px-3 py-1.5 rounded-lg border border-gold/50 bg-gold/10 hover:bg-gold/20 text-gold-dark font-bold text-[9px] uppercase tracking-wider flex items-center gap-1 transition-colors"
+                                >
+                                  <Camera className="w-3 h-3" /> Retake Selfie
+                                </button>
+                                <label className="px-3 py-1.5 rounded-lg border border-cream-dark bg-white hover:bg-cream-light text-charcoal font-bold text-[9px] uppercase tracking-wider flex items-center gap-1 cursor-pointer transition-colors">
+                                  <UploadCloud className="w-3 h-3" /> Change Photo
+                                  <input type="file" accept="image/*" onChange={handlePhotoFileChange} className="hidden" />
+                                </label>
+                                <button
+                                  type="button"
+                                  onClick={clearPhoto}
+                                  className="px-2.5 py-1.5 rounded-lg border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-[9px] uppercase tracking-wider flex items-center gap-1 transition-colors"
+                                >
+                                  <X className="w-3 h-3" /> Remove
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ) : isCameraActive ? (
+                          /* Live Camera Viewfinder */
+                          <div className="rounded-2xl border-2 border-gold/50 bg-charcoal-dark/95 p-3 flex flex-col items-center gap-3 text-white relative overflow-hidden animate-fade-in">
+                            <div className="relative w-full max-w-md aspect-video sm:aspect-[4/3] rounded-xl overflow-hidden bg-black flex items-center justify-center">
+                              <video
+                                ref={videoRef}
+                                autoPlay
+                                playsInline
+                                muted
+                                className={`w-full h-full object-cover ${cameraFacing === 'user' ? '-scale-x-100' : ''}`}
+                              />
+                              {/* Aura Alignment Face Guide Overlay */}
+                              <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center">
+                                <div className="w-36 h-48 sm:w-44 sm:h-56 rounded-full border-2 border-dashed border-gold/70 shadow-[0_0_20px_rgba(212,175,55,0.3)] animate-pulse flex items-end justify-center pb-2">
+                                  <span className="text-[9px] text-gold font-bold uppercase tracking-wider bg-black/60 px-2 py-0.5 rounded-full backdrop-blur-sm">
+                                    Align Face
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Camera Actions */}
+                            <div className="flex items-center gap-3 w-full justify-center">
+                              <button
+                                type="button"
+                                onClick={switchCameraFacing}
+                                className="p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors flex items-center gap-1 text-[9px] font-bold uppercase"
+                                title="Flip Camera"
+                              >
+                                <RefreshCw className="w-4 h-4" />
+                              </button>
+
+                              <button
+                                type="button"
+                                disabled={isCapturing}
+                                onClick={captureLiveSelfie}
+                                className="bg-gradient-to-r from-gold to-gold-dark hover:from-gold-dark hover:to-gold text-charcoal-dark font-bold text-xs uppercase tracking-wider py-2.5 px-6 rounded-full flex items-center gap-2 shadow-lg transition-transform active:scale-95 disabled:opacity-50"
+                              >
+                                <Camera className="w-4 h-4" />
+                                <span>{isCapturing ? 'Capturing...' : 'Capture Selfie'}</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={stopCamera}
+                                className="p-2.5 rounded-full bg-white/10 hover:bg-red-500/20 text-white hover:text-red-300 transition-colors"
+                                title="Close Camera"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                            
+                            {/* Hidden canvas for snapshot rendering */}
+                            <canvas ref={canvasRef} className="hidden" />
+                          </div>
+                        ) : (
+                          /* Initial Choices: Live Selfie or Upload Photo */
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            {/* Option 1: Live Selfie */}
+                            <button
+                              type="button"
+                              onClick={() => startCamera('user')}
+                              className="p-5 rounded-2xl border-2 border-gold/40 hover:border-gold bg-gradient-to-br from-gold/10 via-cream-light/30 to-gold/5 flex flex-col items-center text-center gap-2 transition-all duration-300 group hover:shadow-md cursor-pointer"
+                            >
+                              <div className="w-11 h-11 rounded-full bg-gold/20 flex items-center justify-center text-gold-dark group-hover:scale-110 transition-transform">
+                                <Camera className="w-5 h-5" />
+                              </div>
+                              <div className="flex flex-col gap-0.5">
+                                <span className="font-bold text-xs text-charcoal-dark font-serif flex items-center justify-center gap-1">
+                                  Take Live Selfie <Sparkles className="w-3 h-3 text-gold" />
+                                </span>
+                                <span className="text-[10px] text-charcoal-light">
+                                  Capture instantly using your webcam or phone camera
+                                </span>
+                              </div>
+                            </button>
+
+                            {/* Option 2: Upload Photo */}
+                            <label className="p-5 rounded-2xl border-2 border-dashed border-cream-dark hover:border-gold bg-cream-light/30 hover:bg-cream-light/60 flex flex-col items-center text-center gap-2 transition-all duration-300 group cursor-pointer">
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handlePhotoFileChange}
+                                className="hidden"
+                              />
+                              <div className="w-11 h-11 rounded-full bg-cream-dark/30 group-hover:bg-gold/20 flex items-center justify-center text-charcoal group-hover:text-gold-dark group-hover:scale-110 transition-all">
+                                <UploadCloud className="w-5 h-5" />
+                              </div>
+                              <div className="flex flex-col gap-0.5">
+                                <span className="font-bold text-xs text-charcoal-dark font-serif">
+                                  Upload Your Photo
+                                </span>
+                                <span className="text-[10px] text-charcoal-light">
+                                  Browse JPG, PNG, WEBP from your device
+                                </span>
+                              </div>
+                            </label>
+                          </div>
+                        )}
+
+                        {cameraError && (
+                          <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-[10px] text-red-600 flex items-center justify-between gap-2">
+                            <span>{cameraError}</span>
+                            <button
+                              type="button"
+                              onClick={() => setCameraError('')}
+                              className="text-red-700 hover:text-red-900 font-bold"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Customer Details */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div className="flex flex-col gap-1.5">
-                          <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">Your Name</label>
+                          <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">Your Name *</label>
                           <input
                             type="text"
                             required
-                            placeholder="Enter your name"
+                            placeholder="Enter your full name"
                             value={custName}
                             onChange={(e) => setCustName(e.target.value)}
                             className="bg-cream-light/60 border border-cream-dark rounded-xl py-2.5 px-3 focus:outline-none focus:border-gold transition-colors text-xs"
@@ -676,11 +961,11 @@ Chart Base64 Length: ${fileBase64 ? fileBase64.length : 0}`
                         </div>
 
                         <div className="flex flex-col gap-1.5">
-                          <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">WhatsApp / Contact</label>
+                          <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">WhatsApp / Contact Number *</label>
                           <input
                             type="tel"
                             required
-                            placeholder="10-digit number"
+                            placeholder="10-digit mobile or WhatsApp"
                             value={custContact}
                             onChange={(e) => setCustContact(e.target.value)}
                             className="bg-cream-light/60 border border-cream-dark rounded-xl py-2.5 px-3 focus:outline-none focus:border-gold transition-colors text-xs"
@@ -688,69 +973,64 @@ Chart Base64 Length: ${fileBase64 ? fileBase64.length : 0}`
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div className="flex flex-col gap-1.5">
-                          <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">Birth Date</label>
-                          <input
-                            type="date"
-                            required
-                            value={birthDate}
-                            onChange={(e) => setBirthDate(e.target.value)}
-                            className="bg-cream-light/60 border border-cream-dark rounded-xl py-2.5 px-3 focus:outline-none focus:border-gold transition-colors text-xs"
-                          />
-                        </div>
-
-                        <div className="flex flex-col gap-1.5">
-                          <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">Birth Time</label>
-                          <input
-                            type="time"
-                            required
-                            value={birthTime}
-                            onChange={(e) => setBirthTime(e.target.value)}
-                            className="bg-cream-light/60 border border-cream-dark rounded-xl py-2.5 px-3 focus:outline-none focus:border-gold transition-colors text-xs"
-                          />
-                        </div>
-
-                        <div className="flex flex-col gap-1.5">
-                          <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">Birth Place</label>
-                          <input
-                            type="text"
-                            required
-                            placeholder="City, State"
-                            value={birthPlace}
-                            onChange={(e) => setBirthPlace(e.target.value)}
-                            className="bg-cream-light/60 border border-cream-dark rounded-xl py-2.5 px-3 focus:outline-none focus:border-gold transition-colors text-xs"
-                          />
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col gap-1.5">
-                        <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">Upload Birth Chart (Kundli / Natal Chart)</label>
-                        <div className="border border-dashed border-cream-dark/80 rounded-xl p-4 bg-cream-light/30 flex flex-col items-center gap-2 text-center cursor-pointer hover:bg-cream-light/60 transition-colors relative">
-                          <input
-                            type="file"
-                            accept="image/*,application/pdf"
-                            onChange={handleFileChange}
-                            className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                          />
-                          <UploadCloud className="w-6 h-6 text-gold-dark" />
-                          <span className="text-[10px] text-charcoal-light font-medium">
-                            {selectedFile ? `Selected: ${selectedFile.name}` : "Click or drag files here (PNG, JPG, PDF)"}
+                      {/* Optional Birth Details for Cosmic Harmonization */}
+                      <div className="flex flex-col gap-2 pt-1 border-t border-cream-dark/40">
+                        <div className="flex items-center justify-between">
+                          <span className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">
+                            Optional Birth Coordinates (For Combined Astro-Aura Reading)
                           </span>
-                          {selectedFile && (
-                            <span className="text-[8px] text-sage">
-                              File size: {(selectedFile.size / 1024).toFixed(1)} KB
-                            </span>
-                          )}
+                          <span className="text-[9px] text-gold-dark font-medium">Selected Zodiac: {selectedZodiac.name}</span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[9px] text-charcoal-light font-medium">Birth Date</label>
+                            <input
+                              type="date"
+                              value={birthDate}
+                              onChange={(e) => setBirthDate(e.target.value)}
+                              className="bg-cream-light/60 border border-cream-dark rounded-xl py-2 px-3 focus:outline-none focus:border-gold transition-colors text-xs"
+                            />
+                          </div>
+
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[9px] text-charcoal-light font-medium">Birth Time</label>
+                            <input
+                              type="time"
+                              value={birthTime}
+                              onChange={(e) => setBirthTime(e.target.value)}
+                              className="bg-cream-light/60 border border-cream-dark rounded-xl py-2 px-3 focus:outline-none focus:border-gold transition-colors text-xs"
+                            />
+                          </div>
+
+                          <div className="flex flex-col gap-1">
+                            <label className="text-[9px] text-charcoal-light font-medium">Birth Place</label>
+                            <input
+                              type="text"
+                              placeholder="City, State"
+                              value={birthPlace}
+                              onChange={(e) => setBirthPlace(e.target.value)}
+                              className="bg-cream-light/60 border border-cream-dark rounded-xl py-2 px-3 focus:outline-none focus:border-gold transition-colors text-xs"
+                            />
+                          </div>
                         </div>
                       </div>
 
                       <button
                         type="submit"
                         disabled={uploadSubmitting}
-                        className="w-full bg-gold hover:bg-gold-dark text-charcoal-dark font-bold py-2.5 rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center gap-1.5 uppercase tracking-wider disabled:opacity-50 text-[10px]"
+                        className="w-full bg-gold hover:bg-gold-dark text-charcoal-dark font-bold py-3 rounded-xl transition-all duration-300 shadow-md flex items-center justify-center gap-2 uppercase tracking-wider disabled:opacity-50 text-xs mt-1 cursor-pointer"
                       >
-                        {uploadSubmitting ? 'Uploading details...' : 'Submit Horoscope Request'}
+                        {uploadSubmitting ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-charcoal-dark border-t-transparent" />
+                            <span>Analyzing Aura & Submitting...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="w-4 h-4" />
+                            <span>Submit Photo for Aura & Horoscope Recommendation</span>
+                          </>
+                        )}
                       </button>
                     </form>
                   )}
