@@ -818,9 +818,7 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                         </p>
                         <div className="flex justify-between items-center border-t border-cream-dark/50 pt-2 sm:pt-3 mt-2 sm:mt-3 font-sans text-xs">
                           <span className="font-serif font-bold text-gold-dark text-xs sm:text-sm">
-                            {product.name && product.name.toLowerCase().includes('boat')
-                              ? '₹475 - ₹725'
-                              : `₹${product.pricing || 375}`}
+                            ₹{product.pricing || (product.name && product.name.toLowerCase().includes('boat') ? 475 : 375)}
                           </span>
                           <button
                             onClick={() => {
@@ -1444,9 +1442,7 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                             </p>
                             <div className="flex items-center justify-between border-t border-cream-dark/35 pt-3 mt-auto">
                               <span className="font-serif font-bold text-gold-dark text-sm sm:text-base">
-                                {product.name && product.name.toLowerCase().includes('boat')
-                                  ? '₹475 - ₹725'
-                                  : `₹${product.pricing || 999}`}
+                                ₹{product.pricing || (product.name && product.name.toLowerCase().includes('boat') ? 475 : 999)}
                               </span>
                               
                               <button
@@ -1842,9 +1838,7 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                       <span className="text-[9px] uppercase tracking-widest text-sage font-bold">{product.category}</span>
                       <h4 className="font-serif font-bold text-charcoal-dark truncate">{product.name}</h4>
                       <p className="font-bold text-gold-dark mt-1">
-                        {product.name && product.name.toLowerCase().includes('boat')
-                          ? '₹475 - ₹725'
-                          : `₹${product.pricing || 375}`}
+                        ₹{product.pricing || (product.name && product.name.toLowerCase().includes('boat') ? 475 : 375)}
                       </p>
                       <button
                         onClick={() => {

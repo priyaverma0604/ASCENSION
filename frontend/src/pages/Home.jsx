@@ -1432,9 +1432,7 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
 
                       <div className="mt-auto pt-2 border-t border-cream-dark/30 flex justify-between items-center font-sans text-xs">
                         <span className="font-serif font-bold text-gold-dark text-xs sm:text-sm 2xl:text-base">
-                          {product.name && product.name.toLowerCase().includes('boat')
-                            ? '₹475 - ₹725'
-                            : `₹${product.pricing || product.price || 375}`}
+                          ₹{product.pricing || product.price || (product.name && product.name.toLowerCase().includes('boat') ? 475 : 375)}
                         </span>
                         <Link
                           to={`/product/${product._id}`}

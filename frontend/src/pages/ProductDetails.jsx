@@ -695,9 +695,7 @@ const ProductDetails = () => {
                       <h4 className="font-serif font-bold text-xs sm:text-sm text-charcoal-dark truncate hover:text-gold transition-colors">{p.name}</h4>
                     </Link>
                     <p className="font-bold text-gold-dark text-xs sm:text-sm mt-0.5 sm:mt-1">
-                      {p.name && p.name.toLowerCase().includes('boat')
-                        ? '₹475 - ₹725'
-                        : `₹${p.pricing || 375}`}
+                      ₹{p.pricing || (p.name && p.name.toLowerCase().includes('boat') ? 475 : 375)}
                     </p>
                   </div>
                 </div>
