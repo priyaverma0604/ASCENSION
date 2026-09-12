@@ -29,6 +29,30 @@ const getImageUrl = (path) => {
   return `${apiBase}${path}`;
 };
 
+export const getZodiacFromDate = (dateString) => {
+  if (!dateString) return null;
+  const parts = dateString.split('-');
+  if (parts.length < 3) return null;
+  const month = parseInt(parts[1], 10);
+  const day = parseInt(parts[2], 10);
+  if (isNaN(month) || isNaN(day)) return null;
+
+  if ((month === 3 && day >= 21) || (month === 4 && day <= 19)) return "Aries";
+  if ((month === 4 && day >= 20) || (month === 5 && day <= 20)) return "Taurus";
+  if ((month === 5 && day >= 21) || (month === 6 && day <= 20)) return "Gemini";
+  if ((month === 6 && day >= 21) || (month === 7 && day <= 22)) return "Cancer";
+  if ((month === 7 && day >= 23) || (month === 8 && day <= 22)) return "Leo";
+  if ((month === 8 && day >= 23) || (month === 9 && day <= 22)) return "Virgo";
+  if ((month === 9 && day >= 23) || (month === 10 && day <= 22)) return "Libra";
+  if ((month === 10 && day >= 23) || (month === 11 && day <= 21)) return "Scorpio";
+  if ((month === 11 && day >= 22) || (month === 12 && day <= 21)) return "Sagittarius";
+  if ((month === 12 && day >= 22) || (month === 1 && day <= 19)) return "Capricorn";
+  if ((month === 1 && day >= 20) || (month === 2 && day <= 18)) return "Aquarius";
+  if ((month === 2 && day >= 19) || (month === 3 && day <= 20)) return "Pisces";
+
+  return null;
+};
+
 const Shop = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -250,17 +274,39 @@ const Shop = () => {
 
   // Horoscope Photo & Selfie Customizer State
   const [custIntention, setCustIntention] = useState('General Harmony');
-
-  // Horoscope Photo & Selfie Customizer State
   const [birthDate, setBirthDate] = useState('');
   const [birthTime, setBirthTime] = useState('');
   const [birthPlace, setBirthPlace] = useState('');
   const [custName, setCustName] = useState(user ? user.name : '');
-  const [custContact, setCustContact] = useState('');
+  const [custContact, setCustContact] = useState(user?.phone || '');
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [photoPreview, setPhotoPreview] = useState('');
   const [uploadSubmitting, setUploadSubmitting] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [autoDetectedZodiac, setAutoDetectedZodiac] = useState('');
+
+  // Sync logged in user details
+  useEffect(() => {
+    if (user) {
+      if (user.name) setCustName(user.name);
+      if (user.phone) setCustContact(user.phone);
+    }
+  }, [user]);
+
+  // Handle Birth Date change and auto-detect astrological sun sign
+  const handleBirthDateChange = (dateVal) => {
+    setBirthDate(dateVal);
+    const signName = getZodiacFromDate(dateVal);
+    if (signName) {
+      const match = zodiacs.find(z => z.name.toLowerCase() === signName.toLowerCase());
+      if (match) {
+        setSelectedZodiac(match);
+        setAutoDetectedZodiac(signName);
+      }
+    } else {
+      setAutoDetectedZodiac('');
+    }
+  };
 
   // Live Camera state
   const [isCameraActive, setIsCameraActive] = useState(false);
@@ -377,6 +423,12 @@ const Shop = () => {
 
   const handleUploadSubmit = async (e) => {
     e.preventDefault();
+    if (!user) {
+      alert('Please sign in to submit your horoscope & aura customization request. Your personalized crystal recommendation will be sent to your registered account email.');
+      navigate('/login?redirect=/shop?tab=customise');
+      return;
+    }
+
     if (!selectedPhoto && !photoPreview) {
       alert('Please take a live selfie or upload your photo for the facial energy and horoscope reading.');
       return;
@@ -385,12 +437,13 @@ const Shop = () => {
     setUploadSubmitting(true);
     try {
       const formData = new FormData();
-      formData.append('name', custName);
-      formData.append('email', user ? user.email : 'horoscope@custom.com');
-      formData.append('phone', custContact);
+      formData.append('name', custName || user.name);
+      formData.append('email', user.email);
+      formData.append('phone', custContact || user.phone || '');
       formData.append('message', `[HOROSCOPE & AURA PHOTO CUSTOMIZATION REQUEST]
-Name: ${custName}
-WhatsApp/Contact: ${custContact}
+Name: ${custName || user.name}
+Registered Account Email: ${user.email}
+WhatsApp/Contact: ${custContact || user.phone || 'Not specified'}
 Selected Zodiac: ${selectedZodiac?.name || 'Not specified'}
 Primary Intention: ${custIntention}
 Birth Date: ${birthDate || 'Not specified'}
@@ -413,6 +466,7 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
         setBirthDate('');
         setBirthTime('');
         setBirthPlace('');
+        setAutoDetectedZodiac('');
         setCustContact('');
         setSelectedPhoto(null);
         setPhotoPreview('');
@@ -979,6 +1033,58 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                     </p>
                   </div>
 
+                  {/* User Authentication Status Banner */}
+                  {user ? (
+                    <div className="p-3.5 bg-gradient-to-r from-emerald-50 via-cream-light/60 to-emerald-50/50 border border-emerald-300/80 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs text-left animate-fade-in shadow-xs">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 shrink-0">
+                          <CheckCircle className="w-4 h-4" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="font-bold text-charcoal-dark font-sans text-xs">
+                            Account Connected: {user.name}
+                          </span>
+                          <span className="text-[11px] text-charcoal-light">
+                            Your personalized crystal guidance will be sent to registered email: <strong className="text-emerald-800">{user.email}</strong>
+                          </span>
+                        </div>
+                      </div>
+                      <span className="text-[9px] uppercase font-bold tracking-wider text-emerald-800 bg-emerald-100/90 px-3 py-1 rounded-full border border-emerald-300 self-start sm:self-auto shrink-0">
+                        ✓ Verified Account
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-charcoal-dark via-charcoal to-charcoal-dark text-white border border-gold/40 shadow-md flex flex-col sm:flex-row items-center justify-between gap-4 animate-fade-in text-left">
+                      <div className="flex items-center gap-3.5">
+                        <div className="w-12 h-12 rounded-full bg-gold/20 flex items-center justify-center text-gold shrink-0 border border-gold/40">
+                          <Sparkles className="w-6 h-6 animate-pulse" />
+                        </div>
+                        <div className="flex flex-col gap-0.5">
+                          <h4 className="font-serif font-bold text-sm text-gold">
+                            Sign In Required for Horoscope Customisation
+                          </h4>
+                          <p className="text-[11px] text-cream-light/80 font-sans leading-relaxed max-w-md">
+                            Please log in or register to submit your facial aura photo and receive your tailored gemstone recommendation sent directly to your registered email address.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2.5 shrink-0">
+                        <Link
+                          to="/login?redirect=/shop?tab=customise"
+                          className="bg-gold hover:bg-gold-dark text-charcoal-dark font-bold text-xs uppercase tracking-wider py-2.5 px-5 rounded-xl shadow transition-all cursor-pointer"
+                        >
+                          Sign In
+                        </Link>
+                        <Link
+                          to="/register?redirect=/shop?tab=customise"
+                          className="bg-white/10 hover:bg-white/20 text-white font-bold text-xs uppercase tracking-wider py-2.5 px-4 rounded-xl border border-white/20 transition-all cursor-pointer"
+                        >
+                          Register
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+
                   {uploadSuccess ? (
                     <div className="flex flex-col items-center justify-center text-center gap-3 py-8 bg-cream/20 rounded-2xl border border-gold/20 animate-fade-in">
                       <div className="w-14 h-14 rounded-full bg-gold/20 flex items-center justify-center border border-gold/40 mb-1">
@@ -986,7 +1092,7 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                       </div>
                       <h5 className="font-serif text-base font-bold text-charcoal-dark">Photo & Details Received Successfully!</h5>
                       <p className="text-xs text-charcoal-light leading-relaxed max-w-md font-sans">
-                        Thank you! Our energy healers and manifestation coaches will analyze your facial vibration and energetic frequency. We will reach out to you on WhatsApp or Email within 24 hours with your personalized custom crystal bracelet recommendation.
+                        Thank you, <strong>{custName || user?.name}</strong>! Our energy healers and manifestation coaches will analyze your facial vibration and energetic frequency. Your personalized crystal recommendation will be emailed to <strong>{user?.email}</strong>.
                       </p>
                       <button
                         onClick={() => setUploadSuccess(false)}
@@ -1224,21 +1330,31 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                         </div>
                       </div>
 
-                      {/* Optional Birth Details for Cosmic Harmonization */}
-                      <div className="flex flex-col gap-2 pt-1 border-t border-cream-dark/40">
-                        <div className="flex items-center justify-between">
+                      {/* Birth Details with Auto Zodiac Detection */}
+                      <div className="flex flex-col gap-2.5 pt-2 border-t border-cream-dark/40">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
                           <span className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">
-                            Optional Birth Coordinates (For Combined Astro-Aura Reading)
+                            Astrological Birth Coordinates (Auto-Detects Your Sun Sign)
                           </span>
-                          <span className="text-[9px] text-gold-dark font-medium">Selected Zodiac: {selectedZodiac.name}</span>
+                          {autoDetectedZodiac ? (
+                            <span className="text-[10px] text-emerald-800 bg-emerald-100 font-bold px-2.5 py-0.5 rounded-full border border-emerald-300 flex items-center gap-1 shadow-xs animate-pulse">
+                              ✨ Auto-Detected Sign: <strong>{autoDetectedZodiac}</strong> ({selectedZodiac.dates})
+                            </span>
+                          ) : (
+                            <span className="text-[9px] text-gold-dark font-medium">Selected Zodiac: {selectedZodiac.name} ({selectedZodiac.dates})</span>
+                          )}
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                           <div className="flex flex-col gap-1">
-                            <label className="text-[9px] text-charcoal-light font-medium">Birth Date</label>
+                            <label className="text-[9px] text-charcoal-light font-medium flex items-center justify-between">
+                              <span>Birth Date *</span>
+                              <span className="text-[8px] text-gold-dark font-bold">Auto-Selects Sign</span>
+                            </label>
                             <input
                               type="date"
+                              required
                               value={birthDate}
-                              onChange={(e) => setBirthDate(e.target.value)}
+                              onChange={(e) => handleBirthDateChange(e.target.value)}
                               className="bg-cream-light/60 border border-cream-dark rounded-xl py-2 px-3 focus:outline-none focus:border-gold transition-colors text-xs"
                             />
                           </div>
@@ -1257,7 +1373,7 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                             <label className="text-[9px] text-charcoal-light font-medium">Birth Place</label>
                             <input
                               type="text"
-                              placeholder="City, State"
+                              placeholder="City, State, Country"
                               value={birthPlace}
                               onChange={(e) => setBirthPlace(e.target.value)}
                               className="bg-cream-light/60 border border-cream-dark rounded-xl py-2 px-3 focus:outline-none focus:border-gold transition-colors text-xs"
@@ -1279,7 +1395,7 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                         ) : (
                           <>
                             <Sparkles className="w-4 h-4" />
-                            <span>Submit Photo for Aura & Horoscope Recommendation</span>
+                            <span>{user ? 'Submit Photo for Aura & Horoscope Recommendation' : 'Sign In & Submit Customization Request'}</span>
                           </>
                         )}
                       </button>
