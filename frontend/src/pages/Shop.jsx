@@ -85,30 +85,30 @@ const Shop = () => {
       dates: "Mar 21 - Apr 19", 
       element: "Fire", 
       planet: "Mars", 
-      crystals: ["Tiger Eye", "Obsidian", "Citrine", "Pyrite", "Carnelian", "Protection", "Abundance", "Manifestation"],
-      primaryIntention: "Protection & Abundance",
-      primaryBracelet: "Ascension Protection Crystal Bracelet",
-      desc: "As a dynamic and bold Fire sign ruled by Mars, your fierce drive is magnified by protective Tiger Eye & grounding Obsidian, while Citrine & Pyrite channel boundless abundance and leadership without burnout."
+      crystals: ["Aries", "Carnelian", "Sunstone", "Clear Quartz", "Black Obsidian", "Garnet", "Tiger Eye", "Protection", "Abundance"],
+      primaryIntention: "Aries Power & Protection",
+      primaryBracelet: "Ascension Aries Zodiac Sign Crystal Bracelet",
+      desc: "As a bold and confident Fire sign ruled by Mars (Mar 21 - Apr 19), your natural ambition and courageous drive are empowered by Red Carnelian, Sunstone, and Garnet, shielded from burnout by Black Obsidian, and magnified in mental clarity by Clear Quartz."
     },
     { 
       name: "Taurus", 
       dates: "Apr 20 - May 20", 
       element: "Earth", 
       planet: "Venus", 
-      crystals: ["Rose Quartz", "Clear Quartz", "Aventurine", "Pyrite", "Love", "Cleansing", "Health", "Abundance"],
-      primaryIntention: "Love & Inner Peace",
-      primaryBracelet: "Ascension Love & Peace Crystal Bracelet",
-      desc: "Governed by Venus, you thrive in beauty, emotional peace, and stability. Rose Quartz deepens heart-centered harmony and love, while Clear Quartz & Pyrite cleanse and attract grounded prosperity."
+      crystals: ["Taurus", "Green Aventurine", "Rose Quartz", "Tiger's Eye", "Howlite", "Moss Agate", "Clear Quartz", "Love", "Health", "Abundance"],
+      primaryIntention: "Taurus Stability & Abundance",
+      primaryBracelet: "Ascension Taurus Zodiac Sign Crystal Bracelet",
+      desc: "Grounded, reliable, and patient under Venus (Apr 20 - May 20), your serene nature is nourished by Green Aventurine for continuous prosperity, Rose Quartz for unconditional love & peace, Tiger's Eye for focus, and Howlite & Moss Agate for stress relief and emotional balance."
     },
     { 
       name: "Gemini", 
       dates: "May 21 - Jun 20", 
       element: "Air", 
       planet: "Mercury", 
-      crystals: ["Citrine", "Pyrite", "Tiger Eye", "Aventurine", "Clear Quartz", "Amethyst", "Abundance", "Health", "Manifestation"],
-      primaryIntention: "Abundance & Manifestation",
-      primaryBracelet: "Ascension Abundance Crystal Bracelet",
-      desc: "Expressive and intellectually sharp, your mental clarity and communication thrive with abundance-magnet Citrine & Pyrite, while Amethyst and Green Aventurine bring calming balance to your active nervous system."
+      crystals: ["Gemini", "Amethyst", "Citrine", "Howlite", "Clear Quartz", "Pyrite", "Abundance", "Manifestation", "Cleansing"],
+      primaryIntention: "Gemini Clarity & Expression",
+      primaryBracelet: "Ascension Gemini Zodiac Sign Crystal Bracelet",
+      desc: "Curious, versatile, and expressive under Mercury (May 21 - Jun 20), your active mind and communication thrive with joyful Citrine for success, soothing Amethyst and Howlite for mental calm and emotional balance, and Clear Quartz for amplified focus."
     },
     { 
       name: "Cancer", 
@@ -833,6 +833,8 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                 <div className="flex flex-wrap gap-2">
                   {[
                     { id: 'All', label: 'All Crystals', icon: '🌟' },
+                    { id: 'Chakra', label: '7 Chakra Balance', icon: '🌈' },
+                    { id: 'Zodiac', label: 'Zodiac Bracelets', icon: '♈' },
                     { id: 'Manifestation', label: 'Manifestation (Amethyst)', icon: '🔮' },
                     { id: 'Abundance', label: 'Abundance (Citrine+Pyrite)', icon: '💰' },
                     { id: 'Health', label: 'Health (Green Aventurine)', icon: '🌿' },
@@ -1003,6 +1005,8 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                         </label>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                           {[
+                            { name: '7 Chakra Balance & Alignment', icon: '🌈' },
+                            { name: 'Aries / Taurus / Gemini Zodiac Crystal', icon: '♈' },
                             { name: 'Manifestation (Amethyst)', icon: '🔮' },
                             { name: 'Abundance (Citrine+Pyrite)', icon: '💰' },
                             { name: 'Health & Vitality', icon: '🌿' },
