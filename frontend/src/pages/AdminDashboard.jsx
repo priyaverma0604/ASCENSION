@@ -8,18 +8,23 @@ import {
 import axios from 'axios';
 
 const getImageUrl = (path) => {
-  if (!path) return '';
+  if (!path || path === 'razorpay_online') return '';
   if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
     return path;
   }
-  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-  return `${apiBase}${path}`;
+  let apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  if (apiBase) {
+    apiBase = apiBase.replace(/\/api\/?$/, '').replace(/\/$/, '');
+  }
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  return `${apiBase}${cleanPath}`;
 };
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('services');
   const [listData, setListData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [previewImage, setPreviewImage] = useState(null);
 
   // Form Modals
   const [showModal, setShowModal] = useState(false);
@@ -575,22 +580,34 @@ const AdminDashboard = () => {
                         {activeTab === 'program-registrations' && (
                           <div className="flex flex-col gap-1">
                             <span className="font-bold text-charcoal-dark text-[11px]">{item.program?.title || 'Enrolled Program'}</span>
-                            <div className="flex items-center gap-1.5 flex-wrap">
-                              <span className="px-1.5 py-0.5 bg-gold/15 text-gold-dark font-bold text-[9px] rounded uppercase">
-                                {item.paymentScreenshot === 'razorpay_online' || item.transactionId?.startsWith('pay_') ? 'RAZORPAY' : 'UPI QR'}
-                              </span>
-                              <span className="font-mono text-[9.5px] text-charcoal-light">TxID: {item.transactionId || 'N/A'}</span>
-                              {item.paymentScreenshot && item.paymentScreenshot !== 'razorpay_online' && (
-                                <a 
-                                  href={getImageUrl(item.paymentScreenshot)} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer" 
-                                  className="text-sage hover:underline font-bold text-[9.5px] uppercase"
-                                >
-                                  Receipt ↗
-                                </a>
-                              )}
-                            </div>
+                            {item.paymentScreenshot === 'razorpay_online' || item.transactionId?.startsWith('pay_') ? (
+                              <div className="flex flex-col gap-0.5">
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 w-fit">
+                                  ⚡ Razorpay Online (Instant Verified)
+                                </span>
+                                <span className="font-mono text-[10px] text-charcoal-dark font-semibold">
+                                  Razorpay ID: {item.transactionId}
+                                </span>
+                              </div>
+                            ) : (
+                              <div className="flex flex-col gap-0.5">
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-800 border border-purple-300 w-fit">
+                                  📱 Manual UPI QR Payment
+                                </span>
+                                <span className="font-mono text-[10px] text-charcoal-light">
+                                  TxID: {item.transactionId}
+                                </span>
+                                {item.paymentScreenshot && item.paymentScreenshot !== 'razorpay_online' && (
+                                  <button 
+                                    type="button"
+                                    onClick={() => setPreviewImage(getImageUrl(item.paymentScreenshot))} 
+                                    className="text-sage hover:underline font-bold text-[10px] uppercase flex items-center gap-0.5 cursor-pointer text-left mt-0.5"
+                                  >
+                                    📷 View Screenshot Proof ↗
+                                  </button>
+                                )}
+                              </div>
+                            )}
                           </div>
                         )}
 
@@ -598,22 +615,34 @@ const AdminDashboard = () => {
                         {activeTab === 'workshop-registrations' && (
                           <div className="flex flex-col gap-1">
                             <span className="font-bold text-charcoal-dark text-[11px]">{item.workshop?.title || 'Workshop'}</span>
-                            <div className="flex items-center gap-1.5 flex-wrap">
-                              <span className="px-1.5 py-0.5 bg-gold/15 text-gold-dark font-bold text-[9px] rounded uppercase">
-                                {item.paymentScreenshot === 'razorpay_online' || item.transactionId?.startsWith('pay_') ? 'RAZORPAY' : 'UPI QR'}
-                              </span>
-                              <span className="font-mono text-[9.5px] text-charcoal-light">TxID: {item.transactionId || 'N/A'}</span>
-                              {item.paymentScreenshot && item.paymentScreenshot !== 'razorpay_online' && (
-                                <a 
-                                  href={getImageUrl(item.paymentScreenshot)} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer" 
-                                  className="text-sage hover:underline font-bold text-[9.5px] uppercase"
-                                >
-                                  Receipt ↗
-                                </a>
-                              )}
-                            </div>
+                            {item.paymentScreenshot === 'razorpay_online' || item.transactionId?.startsWith('pay_') ? (
+                              <div className="flex flex-col gap-0.5">
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 w-fit">
+                                  ⚡ Razorpay Online (Instant Verified)
+                                </span>
+                                <span className="font-mono text-[10px] text-charcoal-dark font-semibold">
+                                  Razorpay ID: {item.transactionId}
+                                </span>
+                              </div>
+                            ) : (
+                              <div className="flex flex-col gap-0.5">
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-800 border border-purple-300 w-fit">
+                                  📱 Manual UPI QR Payment
+                                </span>
+                                <span className="font-mono text-[10px] text-charcoal-light">
+                                  TxID: {item.transactionId}
+                                </span>
+                                {item.paymentScreenshot && item.paymentScreenshot !== 'razorpay_online' && (
+                                  <button 
+                                    type="button"
+                                    onClick={() => setPreviewImage(getImageUrl(item.paymentScreenshot))} 
+                                    className="text-sage hover:underline font-bold text-[10px] uppercase flex items-center gap-0.5 cursor-pointer text-left mt-0.5"
+                                  >
+                                    📷 View Screenshot Proof ↗
+                                  </button>
+                                )}
+                              </div>
+                            )}
                           </div>
                         )}
 
@@ -621,42 +650,61 @@ const AdminDashboard = () => {
                         {activeTab === 'webinar-registrations' && (
                           <div className="flex flex-col gap-1">
                             <span className="font-bold text-charcoal-dark text-[11px]">{item.webinar?.title || 'Webinar'}</span>
-                            <div className="flex items-center gap-1.5 flex-wrap">
-                              <span className="px-1.5 py-0.5 bg-gold/15 text-gold-dark font-bold text-[9px] rounded uppercase">
-                                {item.paymentScreenshot === 'razorpay_online' || item.transactionId?.startsWith('pay_') ? 'RAZORPAY' : 'UPI QR'}
-                              </span>
-                              <span className="font-mono text-[9.5px] text-charcoal-light">TxID: {item.transactionId || 'N/A'}</span>
-                              {item.paymentScreenshot && item.paymentScreenshot !== 'razorpay_online' && (
-                                <a 
-                                  href={getImageUrl(item.paymentScreenshot)} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer" 
-                                  className="text-sage hover:underline font-bold text-[9.5px] uppercase"
-                                >
-                                  Receipt ↗
-                                </a>
-                              )}
-                            </div>
+                            {item.paymentScreenshot === 'razorpay_online' || item.transactionId?.startsWith('pay_') ? (
+                              <div className="flex flex-col gap-0.5">
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 w-fit">
+                                  ⚡ Razorpay Online (Instant Verified)
+                                </span>
+                                <span className="font-mono text-[10px] text-charcoal-dark font-semibold">
+                                  Razorpay ID: {item.transactionId}
+                                </span>
+                              </div>
+                            ) : (
+                              <div className="flex flex-col gap-0.5">
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-800 border border-purple-300 w-fit">
+                                  📱 Manual UPI QR Payment
+                                </span>
+                                <span className="font-mono text-[10px] text-charcoal-light">
+                                  TxID: {item.transactionId}
+                                </span>
+                                {item.paymentScreenshot && item.paymentScreenshot !== 'razorpay_online' && (
+                                  <button 
+                                    type="button"
+                                    onClick={() => setPreviewImage(getImageUrl(item.paymentScreenshot))} 
+                                    className="text-sage hover:underline font-bold text-[10px] uppercase flex items-center gap-0.5 cursor-pointer text-left mt-0.5"
+                                  >
+                                    📷 View Screenshot Proof ↗
+                                  </button>
+                                )}
+                              </div>
+                            )}
                           </div>
                         )}
 
                         {/* Shop Orders */}
                         {activeTab === 'orders' && (
                           <div className="flex flex-col gap-1">
-                            <span className="font-semibold text-charcoal-dark text-[11px] line-clamp-1">
-                              {item.items?.map(i => `${i.product?.name || i.name || 'Item'} (x${i.quantity})`).join(', ') || 'No Items'}
+                            {item.paymentType === 'RAZORPAY' || item.paymentId?.startsWith('pay_') || item.transactionId?.startsWith('pay_') ? (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 w-fit">
+                                ⚡ Razorpay Online Order
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-800 border border-purple-300 w-fit">
+                                📱 UPI QR Order
+                              </span>
+                            )}
+                            <span className="font-mono text-[10px] text-charcoal-dark">
+                              Ref: {item.paymentId || item.transactionId || item.orderId || item._id}
                             </span>
-                            <div className="flex items-center gap-1.5 flex-wrap">
-                              <span className="px-1.5 py-0.5 bg-gold/15 text-gold-dark font-bold text-[9px] rounded uppercase">
-                                {item.paymentType || 'RAZORPAY'}
-                              </span>
-                              <span className="font-mono text-[9.5px] text-charcoal-light">
-                                ID: {item.paymentId || item.transactionId || item.orderId || 'N/A'}
-                              </span>
-                              <span className="text-[9.5px] text-charcoal-light">
-                                | {item.shippingAddress?.city || 'India'}
-                              </span>
-                            </div>
+                            {item.paymentScreenshot && item.paymentScreenshot !== 'razorpay_online' && (
+                              <button
+                                type="button"
+                                onClick={() => setPreviewImage(getImageUrl(item.paymentScreenshot))}
+                                className="text-sage hover:underline font-bold text-[10px] uppercase flex items-center gap-0.5 cursor-pointer text-left"
+                              >
+                                📷 View Receipt Proof ↗
+                              </button>
+                            )}
                           </div>
                         )}
 
@@ -1969,7 +2017,54 @@ const AdminDashboard = () => {
                 </form>
               )}
             </div>
+          </div>
+        </div>
+      )}
 
+      {/* Screenshot Lightbox Preview Modal */}
+      {previewImage && (
+        <div className="fixed inset-0 z-[100] bg-charcoal/85 backdrop-blur-md flex flex-col items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-xl w-full p-5 shadow-2xl flex flex-col gap-3 max-h-[90vh]">
+            <div className="flex justify-between items-center border-b pb-2">
+              <h4 className="font-bold text-charcoal-dark text-xs uppercase tracking-wider flex items-center gap-1.5">
+                📷 Payment Receipt / Uploaded Proof
+              </h4>
+              <button 
+                type="button" 
+                onClick={() => setPreviewImage(null)} 
+                className="p-1 text-charcoal/60 hover:text-red-600 rounded-lg hover:bg-cream transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="overflow-auto max-h-[65vh] flex items-center justify-center bg-cream/40 rounded-xl p-2 border border-cream-dark/50">
+              <img 
+                src={previewImage} 
+                alt="Payment Proof Screenshot" 
+                className="max-w-full max-h-[60vh] object-contain rounded-lg shadow-sm" 
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = 'https://via.placeholder.com/400x300?text=Screenshot+Not+Available';
+                }}
+              />
+            </div>
+            <div className="flex justify-between items-center pt-2 border-t text-xs">
+              <a 
+                href={previewImage} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-sage font-bold hover:underline flex items-center gap-1"
+              >
+                Open in Full Tab ↗
+              </a>
+              <button 
+                type="button" 
+                onClick={() => setPreviewImage(null)} 
+                className="bg-charcoal text-white font-bold py-1.5 px-4 rounded-xl text-xs hover:bg-charcoal-dark transition-colors"
+              >
+                Close Preview
+              </button>
+            </div>
           </div>
         </div>
       )}

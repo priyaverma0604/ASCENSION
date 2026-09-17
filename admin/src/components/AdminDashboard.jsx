@@ -9,18 +9,23 @@ import axios from 'axios';
 import logo from '../assets/logo.png';
 
 const getImageUrl = (path) => {
-  if (!path) return '';
+  if (!path || path === 'razorpay_online') return '';
   if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
     return path;
   }
-  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-  return `${apiBase}${path}`;
+  const apiBase = import.meta.env.VITE_API_URL || axios.defaults.baseURL || (typeof window !== 'undefined' ? window.location.origin : '');
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  if (apiBase && !apiBase.includes('localhost') && !apiBase.startsWith('http')) {
+    return `https://${apiBase}${cleanPath}`;
+  }
+  return apiBase ? `${apiBase.replace(/\/$/, '')}${cleanPath}` : cleanPath;
 };
 
 const AdminDashboard = ({ user, onLogout }) => {
   const [activeTab, setActiveTab] = useState('services');
   const [listData, setListData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [previewImage, setPreviewImage] = useState(null);
 
   const [gratitudeProgramId, setGratitudeProgramId] = useState('');
   
@@ -797,24 +802,80 @@ const AdminDashboard = ({ user, onLogout }) => {
                               )}
                             </div>
                           )}
-                          {activeTab === 'donations' && <span className="font-mono text-charcoal-light">{item.transactionId}</span>}
-                          {activeTab === 'orders' && <span className="text-charcoal-light font-medium">Status: {item.status}</span>}
+                          {activeTab === 'donations' && (
+                            <div className="flex flex-col gap-0.5">
+                              {item.paymentType === 'RAZORPAY' || item.transactionId?.startsWith('pay_') ? (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 w-fit">
+                                  ⚡ Razorpay Online
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-800 border border-purple-300 w-fit">
+                                  📱 UPI / Manual
+                                </span>
+                              )}
+                              <span className="font-mono text-[10px] text-charcoal-dark font-medium">TxID: {item.transactionId || 'N/A'}</span>
+                            </div>
+                          )}
+                          {activeTab === 'orders' && (
+                            <div className="flex flex-col gap-1">
+                              {item.paymentType === 'RAZORPAY' || item.paymentId?.startsWith('pay_') || item.transactionId?.startsWith('pay_') ? (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 w-fit">
+                                  ⚡ Razorpay Online Order
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-800 border border-purple-300 w-fit">
+                                  📱 UPI QR Order
+                                </span>
+                              )}
+                              <span className="font-mono text-[10px] text-charcoal-dark">
+                                Ref: {item.paymentId || item.transactionId || item.orderId || item._id}
+                              </span>
+                              {item.paymentScreenshot && item.paymentScreenshot !== 'razorpay_online' && (
+                                <button
+                                  type="button"
+                                  onClick={() => setPreviewImage(getImageUrl(item.paymentScreenshot))}
+                                  className="text-sage hover:underline font-bold text-[10px] uppercase flex items-center gap-0.5 cursor-pointer text-left"
+                                >
+                                  📷 View Receipt Proof ↗
+                                </button>
+                              )}
+                            </div>
+                          )}
                           {activeTab === 'testimonials' && <span className="text-gold">{'★'.repeat(item.rating)}</span>}
                           {activeTab === 'webinars' && <span className="text-sage font-medium">Speaker: {item.speakerName} | Date: {new Date(item.date).toLocaleDateString()}</span>}
                           {activeTab === 'webinar-registrations' && (
                             <div className="flex flex-col gap-1">
-                              <span className="font-medium text-charcoal-dark">Webinar: {item.webinar?.title || 'Unknown'}</span>
-                              <span className="font-mono text-[10px] text-charcoal-light">TxID: {item.transactionId}</span>
-                              {item.paymentScreenshot && (
-                                <a 
-                                  href={getImageUrl(item.paymentScreenshot)} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="text-sage hover:underline font-bold text-[10px] uppercase flex items-center gap-0.5"
-                                >
-                                  View Screenshot ↗
-                                </a>
+                              <span className="font-bold text-charcoal-dark">{item.webinar?.title || 'Ancestral Healing Webinar'}</span>
+                              
+                              {item.paymentScreenshot === 'razorpay_online' || item.transactionId?.startsWith('pay_') ? (
+                                <div className="flex flex-col gap-0.5">
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 w-fit">
+                                    ⚡ Razorpay Online (Instant Verified)
+                                  </span>
+                                  <span className="font-mono text-[10px] text-charcoal-dark font-semibold">
+                                    Razorpay ID: {item.transactionId}
+                                  </span>
+                                </div>
+                              ) : (
+                                <div className="flex flex-col gap-0.5">
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-800 border border-purple-300 w-fit">
+                                    📱 Manual UPI QR Payment
+                                  </span>
+                                  <span className="font-mono text-[10px] text-charcoal-light">
+                                    TxID: {item.transactionId}
+                                  </span>
+                                  {item.paymentScreenshot && item.paymentScreenshot !== 'razorpay_online' && (
+                                    <button 
+                                      type="button"
+                                      onClick={() => setPreviewImage(getImageUrl(item.paymentScreenshot))} 
+                                      className="text-sage hover:underline font-bold text-[10px] uppercase flex items-center gap-0.5 cursor-pointer text-left mt-0.5"
+                                    >
+                                      📷 View Screenshot Proof ↗
+                                    </button>
+                                  )}
+                                </div>
                               )}
+
                               {item.webinar && (
                                 <div className="mt-2 pt-2 border-t border-cream-dark/40 flex flex-col sm:flex-row sm:items-center gap-1.5">
                                   <span className="text-[10px] font-bold text-charcoal-light uppercase tracking-wider">Zoom Link:</span>
@@ -852,70 +913,85 @@ const AdminDashboard = ({ user, onLogout }) => {
                           )}
                           {activeTab === 'workshop-registrations' && (
                             <div className="flex flex-col gap-1">
-                              <span className="font-medium text-charcoal-dark">Workshop: {item.workshop?.title || 'Unknown'}</span>
-                              <span className="font-mono text-[10px] text-charcoal-light">TxID: {item.transactionId}</span>
-                              {item.paymentScreenshot && (
-                                <a 
-                                  href={getImageUrl(item.paymentScreenshot)} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="text-sage hover:underline font-bold text-[10px] uppercase flex items-center gap-0.5"
-                                >
-                                  View Screenshot ↗
-                                </a>
+                              <span className="font-bold text-charcoal-dark">{item.workshop?.title || 'Workshop'}</span>
+                              {item.paymentScreenshot === 'razorpay_online' || item.transactionId?.startsWith('pay_') ? (
+                                <div className="flex flex-col gap-0.5">
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 w-fit">
+                                    ⚡ Razorpay Online (Instant Verified)
+                                  </span>
+                                  <span className="font-mono text-[10px] text-charcoal-dark font-semibold">
+                                    Razorpay ID: {item.transactionId}
+                                  </span>
+                                </div>
+                              ) : (
+                                <div className="flex flex-col gap-0.5">
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-800 border border-purple-300 w-fit">
+                                    📱 Manual UPI QR Payment
+                                  </span>
+                                  <span className="font-mono text-[10px] text-charcoal-light">TxID: {item.transactionId}</span>
+                                  {item.paymentScreenshot && item.paymentScreenshot !== 'razorpay_online' && (
+                                    <button 
+                                      type="button"
+                                      onClick={() => setPreviewImage(getImageUrl(item.paymentScreenshot))} 
+                                      className="text-sage hover:underline font-bold text-[10px] uppercase flex items-center gap-0.5 cursor-pointer text-left mt-0.5"
+                                    >
+                                      📷 View Screenshot Proof ↗
+                                    </button>
+                                  )}
+                                </div>
                               )}
                             </div>
                           )}
                           {activeTab === 'program-registrations' && (
                             <div className="flex flex-col gap-1">
-                              <span className="font-medium text-charcoal-dark">Program: {item.program?.title || 'Unknown'}</span>
-                              <span className="font-mono text-[10px] text-charcoal-light">TxID: {item.transactionId}</span>
-                              {item.paymentScreenshot && (
-                                <a 
-                                  href={getImageUrl(item.paymentScreenshot)} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="text-sage hover:underline font-bold text-[10px] uppercase flex items-center gap-0.5"
-                                >
-                                  View Screenshot ↗
-                                </a>
+                              <span className="font-bold text-charcoal-dark">{item.program?.title || 'Ascension Program'}</span>
+                              {item.paymentScreenshot === 'razorpay_online' || item.transactionId?.startsWith('pay_') ? (
+                                <div className="flex flex-col gap-0.5">
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 w-fit">
+                                    ⚡ Razorpay Online Enrollment
+                                  </span>
+                                  <span className="font-mono text-[10px] text-charcoal-dark font-semibold">
+                                    Razorpay ID: {item.transactionId}
+                                  </span>
+                                </div>
+                              ) : (
+                                <div className="flex flex-col gap-0.5">
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-800 border border-purple-300 w-fit">
+                                    📱 Manual UPI QR Enrollment
+                                  </span>
+                                  <span className="font-mono text-[10px] text-charcoal-light">TxID: {item.transactionId}</span>
+                                  {item.paymentScreenshot && item.paymentScreenshot !== 'razorpay_online' && (
+                                    <button 
+                                      type="button"
+                                      onClick={() => setPreviewImage(getImageUrl(item.paymentScreenshot))} 
+                                      className="text-sage hover:underline font-bold text-[10px] uppercase flex items-center gap-0.5 cursor-pointer text-left mt-0.5"
+                                    >
+                                      📷 View Screenshot Proof ↗
+                                    </button>
+                                  )}
+                                </div>
                               )}
                             </div>
                           )}
                           {activeTab === 'service-bookings' && (
                             <div className="flex flex-col gap-1">
-                              <span className="font-medium text-charcoal-dark">
+                              <span className="font-bold text-charcoal-dark">
                                 {item.message?.split('\n')[0]?.replace('[SERVICE BOOKING REQUEST: ', '')?.replace(']', '') || 'Service Session'}
                               </span>
                               <span className="text-[10px] text-charcoal-light font-sans">
                                 Slot: {item.message?.split('\n')[1]?.replace('Preferred Date: ', '') || 'Unspecified'}
                               </span>
-                              {item.transactionId && <span className="font-mono text-[10px] text-charcoal-light">TxID: {item.transactionId}</span>}
-                              {item.paymentScreenshot && (
-                                <a 
-                                  href={getImageUrl(item.paymentScreenshot)} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="text-sage hover:underline font-bold text-[10px] uppercase flex items-center gap-0.5"
-                                >
-                                  View Screenshot ↗
-                                </a>
+                              {item.transactionId && (
+                                <span className="font-mono text-[10px] text-charcoal-dark font-medium">TxID: {item.transactionId}</span>
                               )}
-                            </div>
-                          )}
-                          {activeTab === 'orders' && (
-                            <div className="flex flex-col gap-1">
-                              <span className="font-medium text-charcoal-dark">Payment Type: {item.paymentType || 'RAZORPAY'}</span>
-                              {item.transactionId && <span className="font-mono text-[10px] text-charcoal-light">TxID: {item.transactionId}</span>}
-                              {item.paymentScreenshot && (
-                                <a 
-                                  href={getImageUrl(item.paymentScreenshot)} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="text-sage hover:underline font-bold text-[10px] uppercase flex items-center gap-0.5"
+                              {item.paymentScreenshot && item.paymentScreenshot !== 'razorpay_online' && (
+                                <button 
+                                  type="button"
+                                  onClick={() => setPreviewImage(getImageUrl(item.paymentScreenshot))} 
+                                  className="text-sage hover:underline font-bold text-[10px] uppercase flex items-center gap-0.5 cursor-pointer text-left mt-0.5"
                                 >
-                                  View Screenshot ↗
-                                </a>
+                                  📷 View Screenshot Proof ↗
+                                </button>
                               )}
                             </div>
                           )}
@@ -996,11 +1072,11 @@ const AdminDashboard = ({ user, onLogout }) => {
                           )}
 
                           {/* View Registrants/Inquiries Button */}
-                          {['workshops', 'retreats', 'programs', 'orders', 'contacts', 'donations', 'service-bookings', 'gratitude-assignments', 'gratitude-submissions'].includes(activeTab) && (
+                          {['workshops', 'retreats', 'programs', 'orders', 'contacts', 'donations', 'service-bookings', 'webinars', 'webinar-registrations', 'workshop-registrations', 'program-registrations', 'gratitude-assignments', 'gratitude-submissions'].includes(activeTab) && (
                             <button
                               onClick={() => handleOpenView(item)}
                               className="p-1.5 hover:text-sage text-charcoal/60 transition-colors focus:outline-none"
-                              title="View registrations / details"
+                              title="View Full Details / Payment Proof"
                             >
                               <Eye className="w-4.5 h-4.5" />
                             </button>
@@ -1143,7 +1219,7 @@ const AdminDashboard = ({ user, onLogout }) => {
       {/* Main Form/Viewer Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 bg-charcoal/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="glass max-w-lg w-full rounded-2xl shadow-xl overflow-hidden animate-slide-up max-h-[85vh] flex flex-col text-left">
+          <div className={`glass ${modalMode === 'view' ? 'max-w-2xl' : 'max-w-lg'} w-full rounded-2xl shadow-xl overflow-hidden animate-slide-up max-h-[90vh] flex flex-col text-left`}>
             
             {/* Modal Header */}
             <div className="flex justify-between items-center p-5 border-b border-cream-dark shrink-0">
@@ -1167,6 +1243,518 @@ const AdminDashboard = ({ user, onLogout }) => {
               {modalMode === 'view' ? (
                 /* ---------------- VIEW MODE PANELS ---------------- */
                 <div className="flex flex-col gap-4 font-sans text-xs">
+                  {/* Webinar Registration Single Details */}
+                  {activeTab === 'webinar-registrations' && (
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between border-b pb-2">
+                        <div>
+                          <h4 className="font-bold text-charcoal-dark font-serif text-sm">Webinar Registration Record</h4>
+                          <p className="text-[10px] text-charcoal-light">Webinar: <strong className="text-charcoal-dark">{selectedItem.webinar?.title || 'Webinar'}</strong></p>
+                        </div>
+                        <span className={`py-1 px-2.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                          selectedItem.paymentStatus === 'Paid' ? 'bg-sage/10 text-sage' :
+                          selectedItem.paymentStatus === 'Rejected' ? 'bg-red-500/10 text-red-600' :
+                          'bg-gold/20 text-gold-dark'
+                        }`}>
+                          Status: {selectedItem.paymentStatus}
+                        </span>
+                      </div>
+
+                      {/* Participant Details */}
+                      <div className="bg-cream/70 p-4 rounded-xl border border-cream-dark/60 grid grid-cols-1 sm:grid-cols-2 gap-3 leading-relaxed">
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Participant Name</p>
+                          <p className="font-bold text-charcoal-dark text-sm">{selectedItem.name || selectedItem.user?.name || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Email Address</p>
+                          <p className="font-medium text-charcoal"><a href={`mailto:${selectedItem.email || selectedItem.user?.email}`} className="text-sage hover:underline">{selectedItem.email || selectedItem.user?.email || 'N/A'}</a></p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Phone / WhatsApp</p>
+                          <p className="font-medium text-charcoal">{selectedItem.phone || selectedItem.user?.phone || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Registered On</p>
+                          <p className="font-medium text-charcoal">{new Date(selectedItem.createdAt || selectedItem.registeredAt).toLocaleString()}</p>
+                        </div>
+                      </div>
+
+                      {/* Webinar & Transaction Details */}
+                      <div className="bg-white/80 p-4 rounded-xl border border-cream-dark/60 flex flex-col gap-2">
+                        <h5 className="font-bold text-charcoal-dark text-[11px] uppercase tracking-wider border-b pb-1">Webinar & Payment Details</h5>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                          <p><strong>Speaker:</strong> {selectedItem.webinar?.speakerName || 'N/A'}</p>
+                          <p><strong>Date & Time:</strong> {selectedItem.webinar?.date ? new Date(selectedItem.webinar.date).toLocaleDateString() : 'N/A'} at {selectedItem.webinar?.time || ''}</p>
+                          <p><strong>Payment Mode:</strong> <span className="font-semibold text-charcoal-dark">{selectedItem.paymentScreenshot === 'razorpay_online' || selectedItem.transactionId?.startsWith('pay_') ? 'Razorpay Online Gateway' : 'UPI QR Code / Manual'}</span></p>
+                          <p><strong>Webinar Fee:</strong> <span className="font-bold text-sage">₹{selectedItem.webinar?.price?.toLocaleString() || 'N/A'}</span></p>
+                          <p className="sm:col-span-2"><strong>Transaction ID / Razorpay Ref:</strong> <code className="bg-cream px-1.5 py-0.5 rounded text-[10px] font-mono text-charcoal-dark border">{selectedItem.transactionId || 'N/A'}</code></p>
+                          {selectedItem.webinar?.zoomLink && (
+                            <p className="sm:col-span-2"><strong>Zoom Link:</strong> <a href={selectedItem.webinar.zoomLink} target="_blank" rel="noopener noreferrer" className="text-sage hover:underline font-medium">{selectedItem.webinar.zoomLink}</a></p>
+                          )}
+                          <p><strong>Zoom Link Emailed:</strong> <span className={`font-bold ${selectedItem.zoomLinkSent ? 'text-sage' : 'text-charcoal-light'}`}>{selectedItem.zoomLinkSent ? 'Yes' : 'Automated 1 hr before session'}</span></p>
+                        </div>
+
+                        {selectedItem.paymentScreenshot && selectedItem.paymentScreenshot !== 'razorpay_online' && (
+                          <div className="mt-2 pt-2 border-t flex flex-col gap-1.5">
+                            <span className="font-bold text-charcoal-dark text-[10px] uppercase">Payment Screenshot Proof:</span>
+                            <div className="flex items-center gap-3">
+                              <button
+                                type="button"
+                                onClick={() => setPreviewImage(getImageUrl(selectedItem.paymentScreenshot))}
+                                className="block rounded-lg overflow-hidden border shadow-sm cursor-pointer hover:opacity-90"
+                              >
+                                <img src={getImageUrl(selectedItem.paymentScreenshot)} alt="Payment Proof" className="w-24 h-24 object-cover" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setPreviewImage(getImageUrl(selectedItem.paymentScreenshot))}
+                                className="text-sage font-bold hover:underline text-[11px] cursor-pointer"
+                              >
+                                View Full Size Receipt ↗
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Approval Actions */}
+                      {selectedItem.paymentStatus === 'Pending' && (
+                        <div className="flex gap-2 mt-1">
+                          <button
+                            onClick={() => handleApproveRegistration(selectedItem._id)}
+                            className="flex-1 bg-sage hover:bg-sage-dark text-white font-bold py-2.5 rounded-xl text-center shadow-sm"
+                          >
+                            Approve Webinar Registration
+                          </button>
+                          <button
+                            onClick={() => handleRejectRegistration(selectedItem._id)}
+                            className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-center shadow-sm"
+                          >
+                            Reject Registration
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Program Registration Single Details */}
+                  {activeTab === 'program-registrations' && (
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between border-b pb-2">
+                        <div>
+                          <h4 className="font-bold text-charcoal-dark font-serif text-sm">Program Enrollment Record</h4>
+                          <p className="text-[10px] text-charcoal-light">Enrolled for: <strong className="text-charcoal-dark">{selectedItem.program?.title || 'Ascension Program'}</strong></p>
+                        </div>
+                        <span className={`py-1 px-2.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                          selectedItem.paymentStatus === 'Paid' ? 'bg-sage/10 text-sage' :
+                          selectedItem.paymentStatus === 'Rejected' ? 'bg-red-500/10 text-red-600' :
+                          'bg-gold/20 text-gold-dark'
+                        }`}>
+                          Status: {selectedItem.paymentStatus}
+                        </span>
+                      </div>
+
+                      {/* User & Enrollment Details */}
+                      <div className="bg-cream/70 p-4 rounded-xl border border-cream-dark/60 grid grid-cols-1 sm:grid-cols-2 gap-3 leading-relaxed">
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Student Name</p>
+                          <p className="font-bold text-charcoal-dark text-sm">{selectedItem.name || selectedItem.user?.name || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Email Address</p>
+                          <p className="font-medium text-charcoal"><a href={`mailto:${selectedItem.email || selectedItem.user?.email}`} className="text-sage hover:underline">{selectedItem.email || selectedItem.user?.email || 'N/A'}</a></p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Phone / WhatsApp</p>
+                          <p className="font-medium text-charcoal">{selectedItem.phone || selectedItem.user?.phone || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Enrolled On</p>
+                          <p className="font-medium text-charcoal">{new Date(selectedItem.createdAt).toLocaleString()}</p>
+                        </div>
+                      </div>
+
+                      {/* Payment & Transaction Card */}
+                      <div className="bg-white/80 p-4 rounded-xl border border-cream-dark/60 flex flex-col gap-2">
+                        <h5 className="font-bold text-charcoal-dark text-[11px] uppercase tracking-wider border-b pb-1">Payment & Verification Details</h5>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                          <p><strong>Payment Mode:</strong> <span className="font-semibold text-charcoal-dark">{selectedItem.paymentScreenshot === 'razorpay_online' || selectedItem.transactionId?.startsWith('pay_') ? 'Razorpay Online Gateway' : 'UPI QR Code / Manual'}</span></p>
+                          <p><strong>Program Fee:</strong> <span className="font-bold text-sage">₹{selectedItem.program?.pricing?.toLocaleString() || selectedItem.program?.sellingPrice?.toLocaleString() || 'N/A'}</span></p>
+                          <p className="sm:col-span-2"><strong>Transaction ID / Razorpay Ref:</strong> <code className="bg-cream px-1.5 py-0.5 rounded text-[10px] font-mono text-charcoal-dark border">{selectedItem.transactionId || 'N/A'}</code></p>
+                        </div>
+
+                        {selectedItem.paymentScreenshot && selectedItem.paymentScreenshot !== 'razorpay_online' && (
+                          <div className="mt-2 pt-2 border-t flex flex-col gap-1.5">
+                            <span className="font-bold text-charcoal-dark text-[10px] uppercase">Payment Screenshot Proof:</span>
+                            <div className="flex items-center gap-3">
+                              <button
+                                type="button"
+                                onClick={() => setPreviewImage(getImageUrl(selectedItem.paymentScreenshot))}
+                                className="block rounded-lg overflow-hidden border shadow-sm cursor-pointer hover:opacity-90"
+                              >
+                                <img src={getImageUrl(selectedItem.paymentScreenshot)} alt="Payment Proof" className="w-24 h-24 object-cover" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setPreviewImage(getImageUrl(selectedItem.paymentScreenshot))}
+                                className="text-sage font-bold hover:underline text-[11px] cursor-pointer"
+                              >
+                                View Full Size Receipt ↗
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Approval Actions */}
+                      {selectedItem.paymentStatus === 'Pending' && (
+                        <div className="flex gap-2 mt-1">
+                          <button
+                            onClick={() => handleApproveProgramRegistration(selectedItem._id)}
+                            className="flex-1 bg-sage hover:bg-sage-dark text-white font-bold py-2.5 rounded-xl text-center shadow-sm"
+                          >
+                            Approve Enrollment (Mark as Paid)
+                          </button>
+                          <button
+                            onClick={() => handleRejectProgramRegistration(selectedItem._id)}
+                            className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-center shadow-sm"
+                          >
+                            Reject Enrollment
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Workshop Registration Single Details */}
+                  {activeTab === 'workshop-registrations' && (
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between border-b pb-2">
+                        <div>
+                          <h4 className="font-bold text-charcoal-dark font-serif text-sm">Workshop Registration Record</h4>
+                          <p className="text-[10px] text-charcoal-light">Workshop: <strong className="text-charcoal-dark">{selectedItem.workshop?.title || 'Workshop'}</strong></p>
+                        </div>
+                        <span className={`py-1 px-2.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                          selectedItem.paymentStatus === 'Paid' ? 'bg-sage/10 text-sage' :
+                          selectedItem.paymentStatus === 'Rejected' ? 'bg-red-500/10 text-red-600' :
+                          'bg-gold/20 text-gold-dark'
+                        }`}>
+                          Status: {selectedItem.paymentStatus}
+                        </span>
+                      </div>
+
+                      {/* User details */}
+                      <div className="bg-cream/70 p-4 rounded-xl border border-cream-dark/60 grid grid-cols-1 sm:grid-cols-2 gap-3 leading-relaxed">
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Participant Name</p>
+                          <p className="font-bold text-charcoal-dark text-sm">{selectedItem.name || selectedItem.user?.name || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Email Address</p>
+                          <p className="font-medium text-charcoal"><a href={`mailto:${selectedItem.email || selectedItem.user?.email}`} className="text-sage hover:underline">{selectedItem.email || selectedItem.user?.email || 'N/A'}</a></p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Mobile / WhatsApp</p>
+                          <p className="font-medium text-charcoal">{selectedItem.phone || selectedItem.user?.phone || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Registered Date</p>
+                          <p className="font-medium text-charcoal">{new Date(selectedItem.createdAt || selectedItem.registeredAt).toLocaleString()}</p>
+                        </div>
+                      </div>
+
+                      {/* Workshop & Payment Details */}
+                      <div className="bg-white/80 p-4 rounded-xl border border-cream-dark/60 flex flex-col gap-2">
+                        <h5 className="font-bold text-charcoal-dark text-[11px] uppercase tracking-wider border-b pb-1">Workshop & Transaction Details</h5>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                          <p><strong>Payment Mode:</strong> <span className="font-semibold text-charcoal-dark">{selectedItem.paymentScreenshot === 'razorpay_online' || selectedItem.transactionId?.startsWith('pay_') ? 'Razorpay Online Gateway' : 'UPI QR / Manual Proof'}</span></p>
+                          <p><strong>Workshop Fee:</strong> <span className="font-bold text-sage">₹{selectedItem.workshop?.pricing?.toLocaleString() || 'N/A'}</span></p>
+                          <p className="sm:col-span-2"><strong>Transaction ID / Razorpay Ref:</strong> <code className="bg-cream px-1.5 py-0.5 rounded text-[10px] font-mono text-charcoal-dark border">{selectedItem.transactionId || 'N/A'}</code></p>
+                          {selectedItem.workshop?.zoomLink && (
+                            <p className="sm:col-span-2"><strong>Zoom Link:</strong> <a href={selectedItem.workshop.zoomLink} target="_blank" rel="noopener noreferrer" className="text-sage hover:underline font-medium">{selectedItem.workshop.zoomLink}</a></p>
+                          )}
+                        </div>
+
+                        {selectedItem.paymentScreenshot && selectedItem.paymentScreenshot !== 'razorpay_online' && (
+                          <div className="mt-2 pt-2 border-t flex flex-col gap-1.5">
+                            <span className="font-bold text-charcoal-dark text-[10px] uppercase">Payment Screenshot Proof:</span>
+                            <div className="flex items-center gap-3">
+                              <button
+                                type="button"
+                                onClick={() => setPreviewImage(getImageUrl(selectedItem.paymentScreenshot))}
+                                className="block rounded-lg overflow-hidden border shadow-sm cursor-pointer hover:opacity-90"
+                              >
+                                <img src={getImageUrl(selectedItem.paymentScreenshot)} alt="Payment Proof" className="w-24 h-24 object-cover" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setPreviewImage(getImageUrl(selectedItem.paymentScreenshot))}
+                                className="text-sage font-bold hover:underline text-[11px] cursor-pointer"
+                              >
+                                View Full Size Receipt ↗
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Approval Actions */}
+                      {selectedItem.paymentStatus === 'Pending' && (
+                        <div className="flex gap-2 mt-1">
+                          <button
+                            onClick={() => handleApproveWorkshopRegistration(selectedItem._id)}
+                            className="flex-1 bg-sage hover:bg-sage-dark text-white font-bold py-2.5 rounded-xl text-center shadow-sm"
+                          >
+                            Approve Workshop Registration
+                          </button>
+                          <button
+                            onClick={() => handleRejectWorkshopRegistration(selectedItem._id)}
+                            className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-center shadow-sm"
+                          >
+                            Reject Registration
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Complete Order Details */}
+                  {activeTab === 'orders' && (
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between border-b pb-2">
+                        <div>
+                          <h4 className="font-bold text-charcoal-dark font-serif text-sm">Shop Order Details</h4>
+                          <p className="text-[10px] text-charcoal-light">Placed on: {new Date(selectedItem.createdAt).toLocaleString()}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className={`py-1 px-2.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                            selectedItem.paymentStatus === 'paid' ? 'bg-sage/10 text-sage' :
+                            selectedItem.paymentStatus === 'failed' ? 'bg-red-500/10 text-red-600' :
+                            'bg-gold/20 text-gold-dark'
+                          }`}>
+                            Payment: {selectedItem.paymentStatus}
+                          </span>
+                          <span className={`py-1 px-2.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                            selectedItem.status === 'delivered' ? 'bg-sage/10 text-sage' :
+                            selectedItem.status === 'cancelled' ? 'bg-red-500/10 text-red-600' :
+                            'bg-cream-dark text-charcoal-dark'
+                          }`}>
+                            {selectedItem.status}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Customer & Shipping Details */}
+                      <div className="bg-cream/70 p-4 rounded-xl border border-cream-dark/60 grid grid-cols-1 sm:grid-cols-2 gap-3 leading-relaxed">
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Customer Name</p>
+                          <p className="font-bold text-charcoal-dark text-sm">{selectedItem.user?.name || 'Customer'}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Email Address</p>
+                          <p className="font-medium text-charcoal"><a href={`mailto:${selectedItem.user?.email}`} className="text-sage hover:underline">{selectedItem.user?.email}</a></p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Delivery Phone</p>
+                          <p className="font-medium text-charcoal">{selectedItem.shippingAddress?.phone || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Delivery Address</p>
+                          <p className="font-medium text-charcoal text-[11px] leading-snug">
+                            {selectedItem.shippingAddress?.address}, {selectedItem.shippingAddress?.city}, {selectedItem.shippingAddress?.state} - {selectedItem.shippingAddress?.postalCode}, {selectedItem.shippingAddress?.country}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Payment Identifiers */}
+                      <div className="bg-white/80 p-3.5 rounded-xl border border-cream-dark/60 flex flex-col gap-2">
+                        <h5 className="font-bold text-charcoal-dark text-[11px] uppercase tracking-wider border-b pb-1">Payment & Order Identifiers</h5>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                          <p><strong>Payment Channel:</strong> <span className="font-semibold text-charcoal-dark">{selectedItem.paymentType || 'RAZORPAY'}</span></p>
+                          <p><strong>Razorpay Payment ID:</strong> <code className="bg-cream px-1.5 py-0.5 rounded text-[10px] font-mono text-charcoal-dark border">{selectedItem.paymentId || selectedItem.transactionId || 'N/A'}</code></p>
+                          <p><strong>Razorpay / Internal Order ID:</strong> <code className="bg-cream px-1.5 py-0.5 rounded text-[10px] font-mono text-charcoal-dark border">{selectedItem.orderId || selectedItem._id}</code></p>
+                          <p><strong>Total Amount Paid:</strong> <span className="font-bold text-sage text-sm">₹{selectedItem.totalAmount?.toLocaleString()}</span></p>
+                        </div>
+
+                        {selectedItem.paymentScreenshot && selectedItem.paymentScreenshot !== 'razorpay_online' && (
+                          <div className="mt-2 pt-2 border-t flex flex-col gap-1.5">
+                            <span className="font-bold text-charcoal-dark text-[10px] uppercase">Payment Screenshot Proof:</span>
+                            <div className="flex items-center gap-3">
+                              <button
+                                type="button"
+                                onClick={() => setPreviewImage(getImageUrl(selectedItem.paymentScreenshot))}
+                                className="block rounded-lg overflow-hidden border shadow-sm cursor-pointer hover:opacity-90"
+                              >
+                                <img src={getImageUrl(selectedItem.paymentScreenshot)} alt="Payment Proof" className="w-20 h-20 object-cover" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setPreviewImage(getImageUrl(selectedItem.paymentScreenshot))}
+                                className="text-sage font-bold hover:underline text-[11px] cursor-pointer"
+                              >
+                                View Full Size Receipt ↗
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Itemized Cart Products Table */}
+                      <div className="flex flex-col gap-2">
+                        <h5 className="font-bold text-charcoal-dark text-[11px] uppercase tracking-wider border-b pb-1">
+                          Purchased Products ({selectedItem.items?.length || 0})
+                        </h5>
+                        <div className="border border-cream-dark/60 rounded-xl overflow-hidden">
+                          <table className="w-full text-left text-xs">
+                            <thead className="bg-cream text-[10px] uppercase font-bold text-charcoal-light border-b border-cream-dark/60">
+                              <tr>
+                                <th className="p-2.5">Product</th>
+                                <th className="p-2.5 text-center">Qty</th>
+                                <th className="p-2.5 text-right">Price</th>
+                                <th className="p-2.5 text-right">Subtotal</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-cream-dark/40 bg-white">
+                              {selectedItem.items?.map((item, idx) => {
+                                const prodName = item.name || item.product?.name || 'Product';
+                                const prodImg = item.product?.images?.[0] || item.product?.image;
+                                const unitPrice = item.price || item.product?.pricing || 0;
+                                const lineTotal = (item.quantity || 1) * unitPrice;
+                                return (
+                                  <tr key={idx} className="hover:bg-cream/20">
+                                    <td className="p-2.5 flex items-center gap-2.5">
+                                      {prodImg ? (
+                                        <img src={getImageUrl(prodImg)} alt={prodName} className="w-10 h-10 object-cover rounded-lg border shrink-0 bg-cream" />
+                                      ) : (
+                                        <div className="w-10 h-10 rounded-lg bg-cream flex items-center justify-center text-[10px] text-charcoal-light shrink-0">🛒</div>
+                                      )}
+                                      <span className="font-bold text-charcoal-dark text-[11px] leading-tight line-clamp-2">{prodName}</span>
+                                    </td>
+                                    <td className="p-2.5 text-center font-bold text-charcoal">{item.quantity}</td>
+                                    <td className="p-2.5 text-right text-charcoal-light">₹{unitPrice.toLocaleString()}</td>
+                                    <td className="p-2.5 text-right font-bold text-charcoal-dark">₹{lineTotal.toLocaleString()}</td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                            <tfoot className="bg-cream/50 font-bold border-t border-cream-dark/60">
+                              <tr>
+                                <td colSpan="3" className="p-2.5 text-right uppercase text-[10px] text-charcoal-light">Grand Total:</td>
+                                <td className="p-2.5 text-right text-sage text-sm font-serif">₹{selectedItem.totalAmount?.toLocaleString()}</td>
+                              </tr>
+                            </tfoot>
+                          </table>
+                        </div>
+                      </div>
+
+                      {/* Order Fulfillment & Status Update */}
+                      <div className="bg-cream/40 p-4 rounded-xl border border-cream-dark/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-1">
+                        <div className="flex flex-col gap-1">
+                          <label className="font-bold text-charcoal-dark uppercase text-[10px] tracking-wider">Update Fulfillment Status</label>
+                          <select
+                            value={selectedItem.status}
+                            onChange={(e) => handleUpdateStatus(selectedItem._id, 'status', e.target.value)}
+                            className="bg-white border border-cream-dark rounded-xl py-2 px-3 text-xs font-semibold focus:outline-none focus:border-gold"
+                          >
+                            <option value="processing">Processing</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                          </select>
+                        </div>
+
+                        {selectedItem.paymentStatus === 'pending' && (
+                          <button
+                            type="button"
+                            onClick={() => handleApproveOrderPayment(selectedItem._id)}
+                            className="bg-sage hover:bg-sage-dark text-white font-bold py-2.5 px-4 rounded-xl text-xs uppercase tracking-wider transition-colors shadow-sm self-end sm:self-auto"
+                          >
+                            Mark Payment as Paid
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Service Bookings query viewer */}
+                  {activeTab === 'service-bookings' && (
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between border-b pb-2">
+                        <div>
+                          <h4 className="font-bold text-charcoal-dark font-serif text-sm">1-on-1 Consultation Booking</h4>
+                          <p className="text-[10px] text-charcoal-light">Received on: {new Date(selectedItem.createdAt).toLocaleString()}</p>
+                        </div>
+                        <span className={`py-1 px-2.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                          selectedItem.status === 'resolved' ? 'bg-sage/10 text-sage' : 'bg-gold/20 text-gold-dark'
+                        }`}>
+                          {selectedItem.status === 'resolved' ? 'Confirmed / Resolved' : 'Pending Verification'}
+                        </span>
+                      </div>
+
+                      <div className="bg-cream/70 p-4 rounded-xl border border-cream-dark/60 grid grid-cols-1 sm:grid-cols-2 gap-3 leading-relaxed">
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Client Name</p>
+                          <p className="font-bold text-charcoal-dark text-sm">{selectedItem.name}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Email Address</p>
+                          <p className="font-medium text-charcoal"><a href={`mailto:${selectedItem.email}`} className="text-sage hover:underline">{selectedItem.email}</a></p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Phone / WhatsApp</p>
+                          <p className="font-medium text-charcoal">{selectedItem.phone || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Transaction Reference ID</p>
+                          <code className="bg-cream px-1.5 py-0.5 rounded text-[10px] font-mono text-charcoal-dark border">{selectedItem.transactionId || 'N/A'}</code>
+                        </div>
+                      </div>
+
+                      {selectedItem.paymentScreenshot && selectedItem.paymentScreenshot !== 'razorpay_online' && (
+                        <div className="bg-white/80 p-3.5 rounded-xl border border-cream-dark/60 flex flex-col gap-1.5">
+                          <span className="font-bold text-charcoal-dark text-[10px] uppercase">Payment Screenshot:</span>
+                          <div className="flex items-center gap-3">
+                            <button
+                              type="button"
+                              onClick={() => setPreviewImage(getImageUrl(selectedItem.paymentScreenshot))}
+                              className="block rounded-lg overflow-hidden border shadow-sm cursor-pointer hover:opacity-90"
+                            >
+                              <img src={getImageUrl(selectedItem.paymentScreenshot)} alt="Payment Screenshot" className="w-20 h-20 object-cover" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setPreviewImage(getImageUrl(selectedItem.paymentScreenshot))}
+                              className="text-sage font-bold hover:underline text-[11px] cursor-pointer"
+                            >
+                              View Full Size Receipt ↗
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="bg-white/80 p-3.5 rounded-xl border border-cream-dark/60 flex flex-col gap-1">
+                        <span className="font-bold text-charcoal-dark text-[10px] uppercase tracking-wider">Session Details & Notes:</span>
+                        <p className="font-sans whitespace-pre-wrap text-charcoal text-[11px] leading-relaxed bg-cream/40 p-2.5 rounded-lg border">
+                          {selectedItem.message}
+                        </p>
+                      </div>
+
+                      {selectedItem.status === 'unread' && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            handleUpdateStatus(selectedItem._id, 'status', 'resolved');
+                            setShowModal(false);
+                          }}
+                          className="bg-sage hover:bg-sage-dark text-white font-bold py-2.5 px-4 rounded-xl text-xs uppercase tracking-wider transition-colors shadow-sm"
+                        >
+                          Mark Consultation as Confirmed & Resolved
+                        </button>
+                      )}
+                    </div>
+                  )}
+
                   {/* Workshop registrations details */}
                   {activeTab === 'workshops' && (
                     <div className="flex flex-col gap-3">
@@ -1284,10 +1872,20 @@ const AdminDashboard = ({ user, onLogout }) => {
                         {selectedItem.imageUrl && (
                           <div className="mt-2">
                             <span className="font-bold block mb-1">Uploaded Proof:</span>
-                            <a href={getImageUrl(selectedItem.imageUrl)} target="_blank" rel="noopener noreferrer">
-                              <img src={getImageUrl(selectedItem.imageUrl)} className="w-full max-h-64 object-contain rounded-xl border bg-white cursor-zoom-in" />
-                            </a>
-                            <span className="text-[9px] text-charcoal-light block text-center mt-1">(Click image to view full resolution ↗)</span>
+                            <button
+                              type="button"
+                              onClick={() => setPreviewImage(getImageUrl(selectedItem.imageUrl))}
+                              className="block w-full cursor-zoom-in"
+                            >
+                              <img src={getImageUrl(selectedItem.imageUrl)} className="w-full max-h-64 object-contain rounded-xl border bg-white" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setPreviewImage(getImageUrl(selectedItem.imageUrl))}
+                              className="text-[9px] text-sage font-bold block text-center mt-1 hover:underline cursor-pointer"
+                            >
+                              (Click image to view in lightbox preview ↗)
+                            </button>
                           </div>
                         )}
                       </div>
@@ -1352,16 +1950,16 @@ const AdminDashboard = ({ user, onLogout }) => {
                                     <img 
                                       src={getImageUrl(sub.photo)} 
                                       alt={`Day ${sub.day}`} 
-                                      className="w-full h-full object-cover" 
+                                      className="w-full h-full object-cover cursor-pointer" 
+                                      onClick={() => setPreviewImage(getImageUrl(sub.photo))}
                                     />
-                                    <a
-                                      href={getImageUrl(sub.photo)}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="absolute inset-0 bg-charcoal/20 opacity-0 hover:opacity-100 flex items-center justify-center text-white text-[9px] font-bold"
+                                    <button
+                                      type="button"
+                                      onClick={() => setPreviewImage(getImageUrl(sub.photo))}
+                                      className="absolute inset-0 bg-charcoal/20 opacity-0 hover:opacity-100 flex items-center justify-center text-white text-[9px] font-bold cursor-pointer"
                                     >
-                                      Full Image ↗
-                                    </a>
+                                      Preview ↗
+                                    </button>
                                   </div>
                                   <div className="flex justify-between font-bold text-charcoal-dark px-1">
                                     <span>Day {sub.day}</span>
@@ -1414,52 +2012,6 @@ const AdminDashboard = ({ user, onLogout }) => {
                     </div>
                   )}
 
-                  {/* Order shipment details */}
-                  {activeTab === 'orders' && (
-                    <div className="flex flex-col gap-3">
-                      <h4 className="font-bold text-charcoal-dark border-b pb-1">Customer Order Shipment</h4>
-                      <div className="bg-cream p-3.5 rounded-xl border flex flex-col gap-1 leading-relaxed text-left">
-                        <p><strong>Customer:</strong> {selectedItem.user?.name} ({selectedItem.user?.email})</p>
-                        <p><strong>Shipping Address:</strong> {selectedItem.shippingAddress?.address}, {selectedItem.shippingAddress?.city}, {selectedItem.shippingAddress?.state} - {selectedItem.shippingAddress?.postalCode}, {selectedItem.shippingAddress?.country}</p>
-                        <p><strong>Contact Phone:</strong> {selectedItem.shippingAddress?.phone}</p>
-                        {selectedItem.paymentType === 'UPI_QR' && (
-                          <>
-                            <p><strong>Payment Type:</strong> UPI QR Code</p>
-                            <p><strong>Transaction ID:</strong> {selectedItem.transactionId}</p>
-                            {selectedItem.paymentScreenshot && (
-                              <p>
-                                <strong>Receipt Screenshot:</strong>{' '}
-                                <a 
-                                  href={getImageUrl(selectedItem.paymentScreenshot)} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer" 
-                                  className="text-sage font-bold hover:underline"
-                                >
-                                  View Screenshot ↗
-                                </a>
-                              </p>
-                            )}
-                          </>
-                        )}
-                      </div>
-
-                      {/* Update Shipping Status */}
-                      <div className="flex flex-col gap-1.5 mt-2">
-                        <label className="font-bold text-charcoal-light uppercase text-[10px]">Update shipment Status</label>
-                        <select
-                          value={selectedItem.status}
-                          onChange={(e) => handleUpdateStatus(selectedItem._id, 'status', e.target.value)}
-                          className="bg-cream-light border border-cream-dark/65 rounded-xl py-2 px-3 focus:outline-none"
-                        >
-                          <option value="processing">Processing</option>
-                          <option value="shipped">Shipped</option>
-                          <option value="delivered">Delivered</option>
-                          <option value="cancelled">Cancelled</option>
-                        </select>
-                      </div>
-                    </div>
-                  )}
-
                   {/* Donation verify logs details */}
                   {activeTab === 'donations' && (
                     <div className="flex flex-col gap-3">
@@ -1467,7 +2019,8 @@ const AdminDashboard = ({ user, onLogout }) => {
                       <div className="bg-cream p-3.5 rounded-xl border flex flex-col gap-1 text-[11.5px] leading-relaxed">
                         <p><strong>Donor:</strong> {selectedItem.name} ({selectedItem.email || 'N/A'})</p>
                         <p><strong>Contact phone:</strong> {selectedItem.phone || 'N/A'}</p>
-                        <p><strong>Type:</strong> {selectedItem.paymentType} | Ref Ref: {selectedItem.transactionId}</p>
+                        <p><strong>Amount:</strong> <span className="font-bold text-sage">₹{selectedItem.amount?.toLocaleString()}</span></p>
+                        <p><strong>Type:</strong> {selectedItem.paymentType} | Ref: {selectedItem.transactionId}</p>
                         {selectedItem.message && <p className="italic">Message: "{selectedItem.message}"</p>}
                       </div>
                       
@@ -2042,7 +2595,54 @@ const AdminDashboard = ({ user, onLogout }) => {
                 </form>
               )}
             </div>
+          </div>
+        </div>
+      )}
 
+      {/* Screenshot Lightbox Preview Modal */}
+      {previewImage && (
+        <div className="fixed inset-0 z-[100] bg-charcoal/85 backdrop-blur-md flex flex-col items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-xl w-full p-5 shadow-2xl flex flex-col gap-3 max-h-[90vh]">
+            <div className="flex justify-between items-center border-b pb-2">
+              <h4 className="font-bold text-charcoal-dark text-xs uppercase tracking-wider flex items-center gap-1.5">
+                📷 Payment Receipt / Uploaded Proof
+              </h4>
+              <button 
+                type="button" 
+                onClick={() => setPreviewImage(null)} 
+                className="p-1 text-charcoal/60 hover:text-red-600 rounded-lg hover:bg-cream transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="overflow-auto max-h-[65vh] flex items-center justify-center bg-cream/40 rounded-xl p-2 border border-cream-dark/50">
+              <img 
+                src={previewImage} 
+                alt="Payment Proof Screenshot" 
+                className="max-w-full max-h-[60vh] object-contain rounded-lg shadow-sm" 
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = 'https://via.placeholder.com/400x300?text=Screenshot+Not+Available';
+                }}
+              />
+            </div>
+            <div className="flex justify-between items-center pt-2 border-t text-xs">
+              <a 
+                href={previewImage} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-sage font-bold hover:underline flex items-center gap-1"
+              >
+                Open in Full Tab ↗
+              </a>
+              <button 
+                type="button" 
+                onClick={() => setPreviewImage(null)} 
+                className="bg-charcoal text-white font-bold py-1.5 px-4 rounded-xl text-xs hover:bg-charcoal-dark transition-colors"
+              >
+                Close Preview
+              </button>
+            </div>
           </div>
         </div>
       )}
