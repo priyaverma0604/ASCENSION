@@ -1211,6 +1211,7 @@ const AdminDashboard = () => {
                             <option value="Candles">Candles</option>
                             <option value="Wax Tablets">Wax Tablets</option>
                             <option value="Crystals">Crystals</option>
+                            <option value="Pyramids">Pyramids</option>
                             <option value="Lamps">Lamps</option>
                             <option value="Crystal Trees">Crystal Trees</option>
                             <option value="Pendants">Pendants</option>
