@@ -141,6 +141,116 @@ Where to Place:
 
 Affirmation:
 "I flow with graceful ease, trust my feminine intuition, and radiate divine peace."`
+  },
+  {
+    name: "Ascension Clear Quartz Orgone Energy Pyramid",
+    category: "Pyramids",
+    pricing: 999,
+    stock: 50,
+    images: ["/uploads/clear_quartz_orgone_pyramid.png"],
+    description: `Tagline: Master Healer • Energy Amplifier • Divine Light • Aura Purification | Infinite Clarity & Higher Frequency
+
+Composition & Sacred Elements:
+Features genuine, pristine natural Clear Quartz crystal chips, a master Quartz Generator point, a top-to-bottom Copper Vortex Energy Spiral, and shimmering gold foil flakes embedded in optical-grade orgone resin.
+
+Spiritual Properties & Energy:
+Universally celebrated as the "Master Healer" and "Stone of Power", Clear Quartz absorbs, stores, releases, and regulates energy. When coupled with sacred pyramid geometry and an orgone energy matrix, it harmonizes all 7 chakras, dissolves energetic stagnation, magnifies manifestations by 10x, and fills your surroundings with pure, luminous high-vibrational light.
+
+Where to Place:
+- Center of Home / Living Room: Cleanses household energy and radiates infinite positive vibration
+- Meditation Altar: Magnifies spiritual intentions, prayer power, and higher realm communication
+- Work Desk / Study: Clears mental fog, sharpens intellectual focus, and shields against electronic static
+
+Affirmation:
+"I am a pure channel of divine light, clarity, and infinite positive energy."`
+  },
+  {
+    name: "Ascension Rudraksha & Gomti Chakra Orgone Energy Pyramid",
+    category: "Pyramids",
+    pricing: 999,
+    stock: 50,
+    images: ["/uploads/rudraksha_orgone_pyramid.png"],
+    description: `Tagline: Lord Shiva's Grace • Goddess Lakshmi Abundance • Vastu Shield | Sacred Rudraksha, Gomti Chakra & Cowrie Shells
+
+Composition & Sacred Elements:
+A deeply sacred Vedic orgone masterpiece handcrafted with authentic Panchmukhi Rudraksha beads, auspicious white Gomti Chakras, Laxmi Cowrie (Kaudi) shells, sacred Red Gunja / Chirmi beads, 24k gold leaf flakes, and a high-conductivity copper energy vortex spiral.
+
+Spiritual Properties & Energy:
+Combining the fierce spiritual protection and ascetic consciousness of Lord Shiva with the auspicious wealth-attracting blessings of Goddess Mahalakshmi, this pyramid is a powerhouse of positive vastu energy. It removes planetary afflictions, repels nazar (evil eye), purges negative debts and financial blockages, and sanctifies any living or business premises.
+
+Where to Place:
+- Puja Mandir / Home Temple: Anchors divine blessings, daily spiritual peace, and sacred vibrations
+- Cash Box / Locker / Billing Counter: Attracts steady commercial wealth, prosperity, and customer goodwill
+- Main Entrance: Creates an auspicious Vedic boundary that repels evil eye, jealousy, and negative energies
+
+Affirmation:
+"Divine grace, eternal protection, and boundless prosperity flow into my sacred space."`
+  },
+  {
+    name: "Ascension Rose Quartz Orgone Energy Pyramid",
+    category: "Pyramids",
+    pricing: 999,
+    stock: 50,
+    images: ["/uploads/rose_quartz_orgone_pyramid.png"],
+    description: `Tagline: Unconditional Love • Heart Healing • Compassion & Harmony | Anahata Chakra & Relationship Blessing
+
+Composition & Sacred Elements:
+Crafted with hand-selected, soft pink Madagascar Rose Quartz gemstone chips, an upward conducting Copper Energy Spiral, radiant golden flakes, and a quartz activator matrix encased in clear orgonite resin.
+
+Spiritual Properties & Energy:
+As the quintessential stone of the Heart Chakra (Anahata), Rose Quartz embodies unconditional love, deep emotional healing, tender compassion, and inner peace. The orgone pyramid continually radiates a soft, loving frequency that melts emotional trauma, dissolves grief, fosters romantic intimacy, and promotes profound self-love and acceptance.
+
+Where to Place:
+- Bedroom / Master Bedside: Deepens marital bonding, romance, warmth, and peaceful rest
+- Living Room: Resolves family conflicts and fills the home with loving, nurturing energy
+- Personal Sanctuary: Heals past emotional wounds, calms grief, and nurtures self-worth
+
+Affirmation:
+"My heart is open to giving and receiving pure, unconditional divine love."`
+  },
+  {
+    name: "Ascension Citrine Orgone Energy Pyramid",
+    category: "Pyramids",
+    pricing: 999,
+    stock: 50,
+    images: ["/uploads/citrine_orgone_pyramid.png"],
+    description: `Tagline: Merchant's Stone • Wealth Magnet • Solar Radiance • Joyful Success | Manipura Chakra & Abundance
+
+Composition & Sacred Elements:
+Features vibrant, golden-amber Brazilian Citrine crystals, an energy-conducting Copper Vortex Spiral, radiant gold leaf flakes, and clear orgonite matrix.
+
+Spiritual Properties & Energy:
+Renowned throughout history as the "Merchant's Stone" and "Success Stone", Citrine carries the invigorating power of the Sun. It energizes the Solar Plexus Chakra (Manipura), stimulating creativity, self-confidence, financial manifestation, and professional triumphs. Unlike many stones, Citrine never holds negative energy—instead, it continuously transmutes doubt into golden abundance.
+
+Where to Place:
+- Office Desk / Business Cash Counter: Attracts lucrative sales, commercial expansion, and financial gains
+- Southeast Corner (Wealth Corner of Home/Office): Activates feng shui and vastu wealth sectors
+- Work Station: Boosts creative brainstorming, optimistic leadership, and relentless motivation
+
+Affirmation:
+"I effortlessly attract wealth, abundance, joy, and success into every area of my life."`
+  },
+  {
+    name: "Ascension Tiger's Eye Orgone Energy Pyramid",
+    category: "Pyramids",
+    pricing: 999,
+    stock: 50,
+    images: ["/uploads/tiger_eye_orgone_pyramid.png"],
+    description: `Tagline: Courage • Evil Eye Protection • Grounding Power • Fearlessness | Solar Plexus & Root Stability
+
+Composition & Sacred Elements:
+Handcrafted with natural chatoyant golden-brown Tiger's Eye gemstone chips, a high-conductivity Copper Energy Spiral, golden leaf flakes, and clear orgonite resin.
+
+Spiritual Properties & Energy:
+Combining the grounding earth energy with the fiery vitality of the sun, Tiger's Eye is the supreme talisman of courage, personal willpower, and psychic defense. This orgone pyramid shields your aura against jealousy and malicious intentions while anchoring confidence, practical decision-making, and fearless perseverance through life's challenges.
+
+Where to Place:
+- Work Desk / Executive Office: Shields against office politics and inspires fearless, decisive leadership
+- Main Entrance: Reflects evil eye, psychic attacks, and hostile intentions back to their source
+- Study / Creative Space: Sharpens mental clarity, determination, and focus during demanding projects
+
+Affirmation:
+"I am fearless, strong, completely protected, and aligned with my highest power."`
   }
 ];
 
