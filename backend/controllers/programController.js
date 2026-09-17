@@ -498,6 +498,22 @@ exports.verifyProgramRegistration = async (req, res, next) => {
   }
 };
 
+// @desc    Delete program registration (Admin only)
+// @route   DELETE /api/programs/registrations/:regId
+// @access  Private/Admin
+exports.deleteProgramRegistration = async (req, res, next) => {
+  try {
+    const reg = await ProgramRegistration.findById(req.params.regId);
+    if (!reg) {
+      return res.status(404).json({ success: false, message: 'Registration not found' });
+    }
+    await reg.deleteOne();
+    res.json({ success: true, message: 'Program registration deleted successfully' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // @desc    Get user program progress
 // @route   GET /api/programs/:id/progress
 // @access  Private

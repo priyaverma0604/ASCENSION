@@ -11,6 +11,7 @@ const {
   enrollProgramQR,
   getProgramRegistrations,
   verifyProgramRegistration,
+  deleteProgramRegistration,
   getProgramProgress,
   submitProgramProgressDay,
   getAllProgramProgress
@@ -36,6 +37,7 @@ const upload = require('../middleware/upload');
 // Admin Registrations management (Must be defined before /:id routes)
 router.get('/registrations', protect, admin, getProgramRegistrations);
 router.post('/registrations/:regId/verify', protect, admin, verifyProgramRegistration);
+router.delete('/registrations/:regId', protect, admin, deleteProgramRegistration);
 
 router.route('/')
   .get(getPrograms)

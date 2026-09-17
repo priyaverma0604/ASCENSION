@@ -93,15 +93,17 @@ const AdminDashboard = () => {
   const tabs = [
     { id: 'services', label: 'Services', icon: <Layers className="w-4 h-4" /> },
     { id: 'programs', label: 'Programs', icon: <ShieldCheck className="w-4 h-4" /> },
+    { id: 'program-registrations', label: 'Program Enrollments', icon: <FileText className="w-4 h-4" /> },
     { id: 'products', label: 'Products', icon: <ShoppingBag className="w-4 h-4" /> },
-    { id: 'orders', label: 'Orders', icon: <ShoppingBag className="w-4 h-4" /> },
+    { id: 'orders', label: 'Shop Orders', icon: <ShoppingBag className="w-4 h-4" /> },
     { id: 'workshops', label: 'Workshops', icon: <Calendar className="w-4 h-4" /> },
+    { id: 'workshop-registrations', label: 'Workshop Registrations', icon: <FileText className="w-4 h-4" /> },
     { id: 'webinars', label: 'Webinars', icon: <Calendar className="w-4 h-4" /> },
     { id: 'webinar-registrations', label: 'Webinar Registrations', icon: <FileText className="w-4 h-4" /> },
     { id: 'retreats', label: 'Retreats', icon: <MapPin className="w-4 h-4" /> },
     { id: 'donations', label: 'Donations', icon: <DollarSign className="w-4 h-4" /> },
     { id: 'community', label: 'Community', icon: <MessageCircle className="w-4 h-4" /> },
-    { id: 'contacts', label: 'Contacts', icon: <FileText className="w-4 h-4" /> },
+    { id: 'contacts', label: 'Contacts & Bookings', icon: <FileText className="w-4 h-4" /> },
     { id: 'testimonials', label: 'Testimonials', icon: <Smile className="w-4 h-4" /> }
   ];
 
@@ -116,6 +118,8 @@ const AdminDashboard = () => {
       let endpoint = `/api/${activeTab}`;
       if (activeTab === 'community') endpoint = '/api/community';
       if (activeTab === 'webinar-registrations') endpoint = '/api/webinars/registrations';
+      if (activeTab === 'program-registrations') endpoint = '/api/programs/registrations';
+      if (activeTab === 'workshop-registrations') endpoint = '/api/workshops/registrations';
       
       const { data } = await axios.get(endpoint);
       if (data.success) {
@@ -134,6 +138,8 @@ const AdminDashboard = () => {
       let endpoint = `/api/${activeTab}/${id}`;
       if (activeTab === 'community') endpoint = `/api/community/${id}`;
       if (activeTab === 'webinar-registrations') endpoint = `/api/webinars/registrations/${id}`;
+      if (activeTab === 'program-registrations') endpoint = `/api/programs/registrations/${id}`;
+      if (activeTab === 'workshop-registrations') endpoint = `/api/workshops/registrations/${id}`;
 
       const { data } = await axios.delete(endpoint);
       if (data.success) {
@@ -388,10 +394,19 @@ const AdminDashboard = () => {
   const handleApproveRegistration = async (id) => {
     if (!window.confirm('Are you sure you want to approve this registration?')) return;
     try {
-      const { data } = await axios.put(`/api/webinars/registrations/${id}/approve`);
-      if (data.success) {
-        alert('Registration approved successfully.');
-        fetchTabData();
+      if (activeTab === 'webinar-registrations') {
+        await axios.put(`/api/webinars/registrations/${id}/approve`);
+      } else if (activeTab === 'workshop-registrations') {
+        await axios.put(`/api/workshops/registrations/${id}/approve`);
+      } else if (activeTab === 'program-registrations') {
+        await axios.post(`/api/programs/registrations/${id}/verify`, { status: 'Paid' });
+      } else if (activeTab === 'orders') {
+        await axios.post(`/api/orders/${id}/verify-upi`);
+      }
+      alert('Approved successfully.');
+      fetchTabData();
+      if (showModal && selectedItem?._id === id) {
+        setShowModal(false);
       }
     } catch (err) {
       alert(err.response?.data?.message || 'Approval failed');
@@ -401,10 +416,17 @@ const AdminDashboard = () => {
   const handleRejectRegistration = async (id) => {
     if (!window.confirm('Are you sure you want to reject this registration?')) return;
     try {
-      const { data } = await axios.put(`/api/webinars/registrations/${id}/reject`);
-      if (data.success) {
-        alert('Registration rejected successfully.');
-        fetchTabData();
+      if (activeTab === 'webinar-registrations') {
+        await axios.put(`/api/webinars/registrations/${id}/reject`);
+      } else if (activeTab === 'workshop-registrations') {
+        await axios.put(`/api/workshops/registrations/${id}/reject`);
+      } else if (activeTab === 'program-registrations') {
+        await axios.post(`/api/programs/registrations/${id}/verify`, { status: 'Rejected' });
+      }
+      alert('Rejected successfully.');
+      fetchTabData();
+      if (showModal && selectedItem?._id === id) {
+        setShowModal(false);
       }
     } catch (err) {
       alert(err.response?.data?.message || 'Rejection failed');
@@ -515,94 +537,219 @@ const AdminDashboard = () => {
                 <tbody>
                   {listData.map((item) => (
                     <tr key={item._id} className="border-b border-cream-dark/40 hover:bg-cream/20 transition-colors">
-                      {/* Column 1: Details */}
+                      {/* Column 1: Details / Customer Information */}
                       <td className="py-3 px-4">
                         <p className="font-bold text-charcoal-dark">
-                          {item.title || item.name || `Log ID: ${item._id.substring(0, 10)}`}
+                          {activeTab === 'orders' 
+                            ? (item.user?.name || item.shippingAddress?.name || 'Shop Customer')
+                            : activeTab === 'program-registrations' || activeTab === 'workshop-registrations' || activeTab === 'webinar-registrations'
+                              ? item.name
+                              : activeTab === 'donations'
+                                ? (item.name || 'Anonymous Donor')
+                                : (item.title || item.name || `Log ID: ${item._id.substring(0, 10)}`)}
                         </p>
                         <p className="text-[10px] text-charcoal-light line-clamp-1 max-w-sm mt-0.5">
-                          {activeTab === 'webinar-registrations' 
-                            ? `Email: ${item.email} | Phone: ${item.phone}` 
-                            : item.description || item.shortDescription || item.reviewText || item.message || item.content || `Date: ${new Date(item.createdAt).toLocaleDateString()}`}
+                          {activeTab === 'orders'
+                            ? `Email: ${item.user?.email || 'N/A'} | Phone: ${item.shippingAddress?.phone || 'N/A'}`
+                            : activeTab === 'program-registrations' || activeTab === 'workshop-registrations' || activeTab === 'webinar-registrations'
+                              ? `Email: ${item.email} | Phone: ${item.phone}`
+                              : activeTab === 'donations'
+                                ? `Email: ${item.email || 'N/A'} | Phone: ${item.phone || 'N/A'}`
+                                : activeTab === 'contacts'
+                                  ? `Email: ${item.email} | Phone: ${item.phone || 'N/A'}`
+                                  : item.description || item.shortDescription || item.reviewText || item.message || item.content || `Date: ${new Date(item.createdAt).toLocaleDateString()}`}
                         </p>
                       </td>
 
-                      {/* Column 2: Details 2 */}
+                      {/* Column 2: Specific Details & Payment / Registration References */}
                       <td className="py-3 px-4">
                         {activeTab === 'products' && <span className="bg-cream-dark text-charcoal-light py-0.5 px-2 rounded-md font-semibold">{item.category} (Stock: {item.stock})</span>}
-                        {activeTab === 'workshops' && <span className="text-sage font-medium">Slots: {item.registeredUsers?.length} / {item.capacity}</span>}
-                        {activeTab === 'retreats' && <span className="text-sage font-medium">Interested: {item.interestedUsers?.length} logged</span>}
-                        {activeTab === 'programs' && <span className="text-sage font-medium">Enrolled: {item.enrolledUsers?.length} / {item.enrollmentCapacity}</span>}
+                        {activeTab === 'programs' && <span className="text-sage font-medium">Enrolled: {item.enrolledUsers?.length || 0} / {item.enrollmentCapacity || '∞'}</span>}
+                        {activeTab === 'workshops' && <span className="text-sage font-medium">Registered: {item.registeredUsers?.length || 0} / {item.capacity}</span>}
+                        {activeTab === 'webinars' && <span className="text-sage font-medium">Speaker: {item.speakerName} | Date: {new Date(item.date).toLocaleDateString()}</span>}
+                        {activeTab === 'retreats' && <span className="text-sage font-medium">Interested: {item.interestedUsers?.length || 0} logged</span>}
                         {activeTab === 'community' && <span className="bg-lavender text-charcoal-dark py-0.5 px-2 rounded-md font-semibold uppercase">{item.type}</span>}
+                        {activeTab === 'testimonials' && <span className="text-gold">{'★'.repeat(item.rating)}</span>}
+                        
+                        {/* Program Registrations */}
+                        {activeTab === 'program-registrations' && (
+                          <div className="flex flex-col gap-1">
+                            <span className="font-bold text-charcoal-dark text-[11px]">{item.program?.title || 'Enrolled Program'}</span>
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="px-1.5 py-0.5 bg-gold/15 text-gold-dark font-bold text-[9px] rounded uppercase">
+                                {item.paymentScreenshot === 'razorpay_online' || item.transactionId?.startsWith('pay_') ? 'RAZORPAY' : 'UPI QR'}
+                              </span>
+                              <span className="font-mono text-[9.5px] text-charcoal-light">TxID: {item.transactionId || 'N/A'}</span>
+                              {item.paymentScreenshot && item.paymentScreenshot !== 'razorpay_online' && (
+                                <a 
+                                  href={getImageUrl(item.paymentScreenshot)} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer" 
+                                  className="text-sage hover:underline font-bold text-[9.5px] uppercase"
+                                >
+                                  Receipt ↗
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Workshop Registrations */}
+                        {activeTab === 'workshop-registrations' && (
+                          <div className="flex flex-col gap-1">
+                            <span className="font-bold text-charcoal-dark text-[11px]">{item.workshop?.title || 'Workshop'}</span>
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="px-1.5 py-0.5 bg-gold/15 text-gold-dark font-bold text-[9px] rounded uppercase">
+                                {item.paymentScreenshot === 'razorpay_online' || item.transactionId?.startsWith('pay_') ? 'RAZORPAY' : 'UPI QR'}
+                              </span>
+                              <span className="font-mono text-[9.5px] text-charcoal-light">TxID: {item.transactionId || 'N/A'}</span>
+                              {item.paymentScreenshot && item.paymentScreenshot !== 'razorpay_online' && (
+                                <a 
+                                  href={getImageUrl(item.paymentScreenshot)} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer" 
+                                  className="text-sage hover:underline font-bold text-[9.5px] uppercase"
+                                >
+                                  Receipt ↗
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Webinar Registrations */}
+                        {activeTab === 'webinar-registrations' && (
+                          <div className="flex flex-col gap-1">
+                            <span className="font-bold text-charcoal-dark text-[11px]">{item.webinar?.title || 'Webinar'}</span>
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="px-1.5 py-0.5 bg-gold/15 text-gold-dark font-bold text-[9px] rounded uppercase">
+                                {item.paymentScreenshot === 'razorpay_online' || item.transactionId?.startsWith('pay_') ? 'RAZORPAY' : 'UPI QR'}
+                              </span>
+                              <span className="font-mono text-[9.5px] text-charcoal-light">TxID: {item.transactionId || 'N/A'}</span>
+                              {item.paymentScreenshot && item.paymentScreenshot !== 'razorpay_online' && (
+                                <a 
+                                  href={getImageUrl(item.paymentScreenshot)} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer" 
+                                  className="text-sage hover:underline font-bold text-[9.5px] uppercase"
+                                >
+                                  Receipt ↗
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Shop Orders */}
+                        {activeTab === 'orders' && (
+                          <div className="flex flex-col gap-1">
+                            <span className="font-semibold text-charcoal-dark text-[11px] line-clamp-1">
+                              {item.items?.map(i => `${i.product?.name || i.name || 'Item'} (x${i.quantity})`).join(', ') || 'No Items'}
+                            </span>
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="px-1.5 py-0.5 bg-gold/15 text-gold-dark font-bold text-[9px] rounded uppercase">
+                                {item.paymentType || 'RAZORPAY'}
+                              </span>
+                              <span className="font-mono text-[9.5px] text-charcoal-light">
+                                ID: {item.paymentId || item.transactionId || item.orderId || 'N/A'}
+                              </span>
+                              <span className="text-[9.5px] text-charcoal-light">
+                                | {item.shippingAddress?.city || 'India'}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Contacts & Bookings */}
                         {activeTab === 'contacts' && (
                           <div className="flex flex-col gap-1">
-                            <span className="text-charcoal-light font-medium">{item.email}</span>
-                            {item.message && (item.message.includes('[HOROSCOPE') || item.message.includes('HOROSCOPE') || item.message.includes('AURA PHOTO')) && (
+                            {item.message && item.message.includes('[SERVICE BOOKING REQUEST:') ? (
+                              <span className="inline-flex items-center gap-1 text-[9.5px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 w-fit">
+                                💳 Paid Service Booking
+                              </span>
+                            ) : item.message && (item.message.includes('[HOROSCOPE') || item.message.includes('HOROSCOPE') || item.message.includes('AURA PHOTO')) ? (
                               <span className="inline-flex items-center gap-1 text-[9px] font-bold text-gold-dark bg-gold/15 px-2 py-0.5 rounded-full border border-gold/30 w-fit">
                                 <Sparkles className="w-3 h-3" /> Horoscope & Aura Request
                               </span>
+                            ) : (
+                              <span className="text-charcoal-light font-medium">{item.email}</span>
                             )}
+                            
                             {item.recommendedCrystal && (
                               <span className="text-[9px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 w-fit">
                                 💎 {item.recommendedCrystal}
                               </span>
                             )}
+                            {item.transactionId && (
+                              <span className="font-mono text-[9.5px] text-charcoal-light">TxID: {item.transactionId}</span>
+                            )}
                             {item.paymentScreenshot && (
                               <a 
                                 href={getImageUrl(item.paymentScreenshot)} 
                                 target="_blank" 
-                                rel="noopener noreferrer"
+                                rel="noopener noreferrer" 
                                 className="text-sage hover:underline font-bold text-[10px] uppercase flex items-center gap-0.5"
                               >
-                                View Selfie / Photo ↗
+                                View Photo / Proof ↗
                               </a>
                             )}
                           </div>
                         )}
-                        {activeTab === 'donations' && <span className="font-mono text-charcoal-light">{item.transactionId}</span>}
-                        {activeTab === 'orders' && <span className="text-charcoal-light font-medium">Status: {item.status}</span>}
-                        {activeTab === 'testimonials' && <span className="text-gold">{'★'.repeat(item.rating)}</span>}
-                        {activeTab === 'webinars' && <span className="text-sage font-medium">Speaker: {item.speakerName} | Date: {new Date(item.date).toLocaleDateString()}</span>}
-                        {activeTab === 'webinar-registrations' && (
+
+                        {/* Donations */}
+                        {activeTab === 'donations' && (
                           <div className="flex flex-col gap-1">
-                            <span className="font-medium text-charcoal-dark">Webinar: {item.webinar?.title || 'Unknown'}</span>
-                            <span className="font-mono text-[10px] text-charcoal-light">TxID: {item.transactionId}</span>
-                            {item.paymentScreenshot && (
-                              <a 
-                                href={getImageUrl(item.paymentScreenshot)} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="text-sage hover:underline font-bold text-[10px] uppercase flex items-center gap-0.5"
-                              >
-                                View Screenshot ↗
-                              </a>
-                            )}
+                            <span className="font-mono text-[10px] text-charcoal-light">TxID: {item.transactionId || 'N/A'}</span>
+                            <span className="px-1.5 py-0.5 bg-gold/15 text-gold-dark font-bold text-[9px] rounded uppercase w-fit">
+                              {item.paymentType || 'RAZORPAY'}
+                            </span>
                           </div>
                         )}
                       </td>
 
                       {/* Column 3: Pricing / Status */}
                       <td className="py-3 px-4">
-                        {item.pricing !== undefined && <span className="font-bold text-gold-dark">₹{item.pricing}</span>}
-                        {item.price !== undefined && <span className="font-bold text-gold-dark">₹{item.price}</span>}
-                        {item.totalAmount !== undefined && <span className="font-bold text-gold-dark">₹{item.totalAmount}</span>}
-                        {item.amount !== undefined && <span className="font-bold text-gold-dark">₹{item.amount}</span>}
-                        {item.paymentStatus && (
-                          <span className={`py-0.5 px-2.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${
-                            item.paymentStatus === 'Paid' || item.paymentStatus === 'paid' || item.status === 'completed' 
-                              ? 'bg-sage/10 text-sage' 
-                              : item.paymentStatus === 'Rejected' || item.paymentStatus === 'rejected'
-                                ? 'bg-red-500/10 text-red-600'
-                                  : 'bg-gold/15 text-gold-dark'
-                          }`}>
-                            {item.paymentStatus || item.status}
-                          </span>
-                        )}
-                        {item.status && !item.paymentStatus && (
-                          <span className="bg-cream-dark text-charcoal-light py-0.5 px-2 rounded-full text-[9px] font-bold uppercase tracking-wider ml-1">
-                            {item.status}
-                          </span>
-                        )}
+                        <div className="flex flex-col gap-1">
+                          {item.totalAmount !== undefined && <span className="font-bold text-gold-dark text-xs">₹{item.totalAmount}</span>}
+                          {item.pricing !== undefined && <span className="font-bold text-gold-dark text-xs">₹{item.pricing}</span>}
+                          {item.price !== undefined && <span className="font-bold text-gold-dark text-xs">₹{item.price}</span>}
+                          {item.amount !== undefined && <span className="font-bold text-gold-dark text-xs">₹{item.amount}</span>}
+                          {activeTab === 'program-registrations' && item.program?.pricing && (
+                            <span className="font-bold text-gold-dark text-xs">₹{item.program.pricing}</span>
+                          )}
+                          {activeTab === 'workshop-registrations' && item.workshop?.pricing && (
+                            <span className="font-bold text-gold-dark text-xs">₹{item.workshop.pricing}</span>
+                          )}
+                          {activeTab === 'webinar-registrations' && item.webinar?.price && (
+                            <span className="font-bold text-gold-dark text-xs">₹{item.webinar.price}</span>
+                          )}
+
+                          {/* Payment / Fulfillment Status Badges */}
+                          <div className="flex items-center gap-1 flex-wrap">
+                            {item.paymentStatus && (
+                              <span className={`py-0.5 px-2 rounded-full text-[9px] font-bold uppercase tracking-wider ${
+                                item.paymentStatus === 'Paid' || item.paymentStatus === 'paid' || item.status === 'completed' 
+                                  ? 'bg-sage/10 text-sage' 
+                                  : item.paymentStatus === 'Rejected' || item.paymentStatus === 'rejected' || item.status === 'failed'
+                                    ? 'bg-red-500/10 text-red-600'
+                                    : 'bg-gold/15 text-gold-dark'
+                              }`}>
+                                {item.paymentStatus}
+                              </span>
+                            )}
+                            {item.status && !item.paymentStatus && (
+                              <span className={`py-0.5 px-2 rounded-full text-[9px] font-bold uppercase tracking-wider ${
+                                item.status === 'resolved' || item.status === 'Approved' || item.status === 'delivered' || item.status === 'completed'
+                                  ? 'bg-sage/10 text-sage'
+                                  : item.status === 'cancelled'
+                                    ? 'bg-red-500/10 text-red-600'
+                                    : 'bg-cream-dark text-charcoal-light'
+                              }`}>
+                                {item.status}
+                              </span>
+                            )}
+                          </div>
+                        </div>
                       </td>
 
                       {/* Column 4: Actions */}
@@ -628,12 +775,12 @@ const AdminDashboard = () => {
                           </button>
                         )}
 
-                        {/* View Registrants/Inquiries Button */}
-                        {['workshops', 'retreats', 'programs', 'orders', 'contacts', 'donations'].includes(activeTab) && (
+                        {/* View Registrants/Inquiries/Order Details Button */}
+                        {['workshops', 'retreats', 'programs', 'orders', 'contacts', 'donations', 'webinars', 'webinar-registrations', 'program-registrations', 'workshop-registrations'].includes(activeTab) && (
                           <button
                             onClick={() => handleOpenView(item)}
                             className="p-1.5 hover:text-sage text-charcoal/60 transition-colors focus:outline-none"
-                            title="View registrations / details"
+                            title="View Full Details / Payment Proof"
                           >
                             <Eye className="w-4.5 h-4.5" />
                           </button>
@@ -644,12 +791,13 @@ const AdminDashboard = () => {
                           <button
                             onClick={() => handleOpenEdit(item)}
                             className="p-1.5 hover:text-gold text-charcoal/60 transition-colors focus:outline-none"
+                            title="Edit"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
                         )}
 
-                        {/* Custom quick Actions */}
+                        {/* Custom quick Actions for Donations */}
                         {activeTab === 'donations' && item.status === 'pending' && (
                           <button
                             onClick={() => handleUpdateStatus(item._id, 'status', 'completed')}
@@ -658,6 +806,8 @@ const AdminDashboard = () => {
                             Approve
                           </button>
                         )}
+
+                        {/* Custom quick Actions for Contacts / Horoscope / Service Bookings */}
                         {activeTab === 'contacts' && item.status === 'unread' && (
                           item.message && (item.message.includes('[HOROSCOPE') || item.message.includes('HOROSCOPE') || item.message.includes('AURA PHOTO')) ? (
                             <button
@@ -676,8 +826,8 @@ const AdminDashboard = () => {
                           )
                         )}
 
-                        {/* Webinar Approval/Rejection Buttons */}
-                        {activeTab === 'webinar-registrations' && item.paymentStatus === 'Pending' && (
+                        {/* Quick Approval/Rejection Buttons for Pending Registrations */}
+                        {['webinar-registrations', 'workshop-registrations', 'program-registrations'].includes(activeTab) && (item.paymentStatus === 'Pending' || item.paymentStatus === 'pending') && (
                           <div className="flex gap-1 shrink-0">
                             <button
                               onClick={() => handleApproveRegistration(item._id)}
@@ -695,10 +845,11 @@ const AdminDashboard = () => {
                         )}
 
                         {/* Delete Button */}
-                        {['services', 'programs', 'products', 'workshops', 'retreats', 'community', 'testimonials', 'webinars', 'webinar-registrations'].includes(activeTab) && (
+                        {['services', 'programs', 'products', 'workshops', 'retreats', 'community', 'testimonials', 'webinars', 'webinar-registrations', 'program-registrations', 'workshop-registrations', 'orders'].includes(activeTab) && (
                           <button
                             onClick={() => handleDelete(item._id)}
                             className="p-1.5 hover:text-red-600 text-charcoal/60 transition-colors focus:outline-none"
+                            title="Delete"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
@@ -722,7 +873,7 @@ const AdminDashboard = () => {
       {/* Main Form/Viewer Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 bg-charcoal/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="glass max-w-lg w-full rounded-2xl shadow-xl overflow-hidden animate-slide-up max-h-[85vh] flex flex-col text-left">
+          <div className={`glass ${modalMode === 'view' ? 'max-w-2xl' : 'max-w-lg'} w-full rounded-2xl shadow-xl overflow-hidden animate-slide-up max-h-[90vh] flex flex-col text-left`}>
             
             {/* Modal Header */}
             <div className="flex justify-between items-center p-5 border-b border-cream-dark shrink-0">
@@ -746,7 +897,409 @@ const AdminDashboard = () => {
               {modalMode === 'view' ? (
                 /* ---------------- VIEW MODE PANELS ---------------- */
                 <div className="flex flex-col gap-4 font-sans text-xs">
-                  {/* Workshop registrations details */}
+                  {/* Program Registration Single Details */}
+                  {activeTab === 'program-registrations' && (
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between border-b pb-2">
+                        <div>
+                          <h4 className="font-bold text-charcoal-dark font-serif text-sm">Program Enrollment Record</h4>
+                          <p className="text-[10px] text-charcoal-light">Enrolled for: <strong className="text-charcoal-dark">{selectedItem.program?.title || 'Ascension Program'}</strong></p>
+                        </div>
+                        <span className={`py-1 px-2.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                          selectedItem.paymentStatus === 'Paid' ? 'bg-sage/10 text-sage' :
+                          selectedItem.paymentStatus === 'Rejected' ? 'bg-red-500/10 text-red-600' :
+                          'bg-gold/20 text-gold-dark'
+                        }`}>
+                          Status: {selectedItem.paymentStatus}
+                        </span>
+                      </div>
+
+                      {/* User & Enrollment Details */}
+                      <div className="bg-cream/70 p-4 rounded-xl border border-cream-dark/60 grid grid-cols-1 sm:grid-cols-2 gap-3 leading-relaxed">
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Student Name</p>
+                          <p className="font-bold text-charcoal-dark text-sm">{selectedItem.name || selectedItem.user?.name || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Email Address</p>
+                          <p className="font-medium text-charcoal"><a href={`mailto:${selectedItem.email || selectedItem.user?.email}`} className="text-sage hover:underline">{selectedItem.email || selectedItem.user?.email || 'N/A'}</a></p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Phone / WhatsApp</p>
+                          <p className="font-medium text-charcoal">{selectedItem.phone || selectedItem.user?.phone || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Enrolled On</p>
+                          <p className="font-medium text-charcoal">{new Date(selectedItem.createdAt).toLocaleString()}</p>
+                        </div>
+                      </div>
+
+                      {/* Payment & Transaction Card */}
+                      <div className="bg-white/80 p-4 rounded-xl border border-cream-dark/60 flex flex-col gap-2">
+                        <h5 className="font-bold text-charcoal-dark text-[11px] uppercase tracking-wider border-b pb-1">Payment & Verification Details</h5>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                          <p><strong>Payment Mode:</strong> <span className="font-semibold text-charcoal-dark">{selectedItem.paymentScreenshot === 'razorpay_online' ? 'Razorpay Online Gateway' : 'UPI QR Code / Manual'}</span></p>
+                          <p><strong>Program Fee:</strong> <span className="font-bold text-sage">₹{selectedItem.program?.pricing?.toLocaleString() || selectedItem.program?.sellingPrice?.toLocaleString() || 'N/A'}</span></p>
+                          <p className="sm:col-span-2"><strong>Transaction ID / Razorpay Ref:</strong> <code className="bg-cream px-1.5 py-0.5 rounded text-[10px] font-mono text-charcoal-dark border">{selectedItem.transactionId || 'N/A'}</code></p>
+                        </div>
+
+                        {selectedItem.paymentScreenshot && selectedItem.paymentScreenshot !== 'razorpay_online' && (
+                          <div className="mt-2 pt-2 border-t flex flex-col gap-1.5">
+                            <span className="font-bold text-charcoal-dark text-[10px] uppercase">Payment Screenshot Proof:</span>
+                            <div className="flex items-center gap-3">
+                              <a href={getImageUrl(selectedItem.paymentScreenshot)} target="_blank" rel="noopener noreferrer" className="block rounded-lg overflow-hidden border shadow-sm">
+                                <img src={getImageUrl(selectedItem.paymentScreenshot)} alt="Payment Proof" className="w-24 h-24 object-cover" />
+                              </a>
+                              <a href={getImageUrl(selectedItem.paymentScreenshot)} target="_blank" rel="noopener noreferrer" className="text-sage font-bold hover:underline text-[11px]">
+                                View Full Size Receipt ↗
+                              </a>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Approval Actions */}
+                      {selectedItem.paymentStatus === 'Pending' && (
+                        <div className="flex gap-2 mt-1">
+                          <button
+                            onClick={() => handleApproveRegistration(selectedItem._id)}
+                            className="flex-1 bg-sage hover:bg-sage-dark text-white font-bold py-2.5 rounded-xl text-center shadow-sm"
+                          >
+                            Approve Enrollment (Mark as Paid)
+                          </button>
+                          <button
+                            onClick={() => handleRejectRegistration(selectedItem._id)}
+                            className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-center shadow-sm"
+                          >
+                            Reject Enrollment
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Workshop Registration Single Details */}
+                  {activeTab === 'workshop-registrations' && (
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between border-b pb-2">
+                        <div>
+                          <h4 className="font-bold text-charcoal-dark font-serif text-sm">Workshop Registration Record</h4>
+                          <p className="text-[10px] text-charcoal-light">Workshop: <strong className="text-charcoal-dark">{selectedItem.workshop?.title || 'Workshop'}</strong></p>
+                        </div>
+                        <span className={`py-1 px-2.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                          selectedItem.paymentStatus === 'Paid' ? 'bg-sage/10 text-sage' :
+                          selectedItem.paymentStatus === 'Rejected' ? 'bg-red-500/10 text-red-600' :
+                          'bg-gold/20 text-gold-dark'
+                        }`}>
+                          Status: {selectedItem.paymentStatus}
+                        </span>
+                      </div>
+
+                      {/* User details */}
+                      <div className="bg-cream/70 p-4 rounded-xl border border-cream-dark/60 grid grid-cols-1 sm:grid-cols-2 gap-3 leading-relaxed">
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Participant Name</p>
+                          <p className="font-bold text-charcoal-dark text-sm">{selectedItem.name || selectedItem.user?.name || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Email Address</p>
+                          <p className="font-medium text-charcoal"><a href={`mailto:${selectedItem.email || selectedItem.user?.email}`} className="text-sage hover:underline">{selectedItem.email || selectedItem.user?.email || 'N/A'}</a></p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Mobile / WhatsApp</p>
+                          <p className="font-medium text-charcoal">{selectedItem.phone || selectedItem.user?.phone || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Registered Date</p>
+                          <p className="font-medium text-charcoal">{new Date(selectedItem.createdAt || selectedItem.registeredAt).toLocaleString()}</p>
+                        </div>
+                      </div>
+
+                      {/* Workshop & Payment Details */}
+                      <div className="bg-white/80 p-4 rounded-xl border border-cream-dark/60 flex flex-col gap-2">
+                        <h5 className="font-bold text-charcoal-dark text-[11px] uppercase tracking-wider border-b pb-1">Workshop & Transaction Details</h5>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                          <p><strong>Payment Mode:</strong> <span className="font-semibold text-charcoal-dark">{selectedItem.paymentScreenshot === 'razorpay_online' ? 'Razorpay Online' : 'UPI QR / Manual Proof'}</span></p>
+                          <p><strong>Workshop Fee:</strong> <span className="font-bold text-sage">₹{selectedItem.workshop?.pricing?.toLocaleString() || 'N/A'}</span></p>
+                          <p className="sm:col-span-2"><strong>Transaction ID / Razorpay Ref:</strong> <code className="bg-cream px-1.5 py-0.5 rounded text-[10px] font-mono text-charcoal-dark border">{selectedItem.transactionId || 'N/A'}</code></p>
+                          {selectedItem.workshop?.zoomLink && (
+                            <p className="sm:col-span-2"><strong>Zoom Link:</strong> <a href={selectedItem.workshop.zoomLink} target="_blank" rel="noopener noreferrer" className="text-sage hover:underline font-medium">{selectedItem.workshop.zoomLink}</a></p>
+                          )}
+                        </div>
+
+                        {selectedItem.paymentScreenshot && selectedItem.paymentScreenshot !== 'razorpay_online' && (
+                          <div className="mt-2 pt-2 border-t flex flex-col gap-1.5">
+                            <span className="font-bold text-charcoal-dark text-[10px] uppercase">Payment Screenshot Proof:</span>
+                            <div className="flex items-center gap-3">
+                              <a href={getImageUrl(selectedItem.paymentScreenshot)} target="_blank" rel="noopener noreferrer" className="block rounded-lg overflow-hidden border shadow-sm">
+                                <img src={getImageUrl(selectedItem.paymentScreenshot)} alt="Payment Proof" className="w-24 h-24 object-cover" />
+                              </a>
+                              <a href={getImageUrl(selectedItem.paymentScreenshot)} target="_blank" rel="noopener noreferrer" className="text-sage font-bold hover:underline text-[11px]">
+                                View Full Size Receipt ↗
+                              </a>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Approval Actions */}
+                      {selectedItem.paymentStatus === 'Pending' && (
+                        <div className="flex gap-2 mt-1">
+                          <button
+                            onClick={() => handleApproveRegistration(selectedItem._id)}
+                            className="flex-1 bg-sage hover:bg-sage-dark text-white font-bold py-2.5 rounded-xl text-center shadow-sm"
+                          >
+                            Approve Workshop Registration
+                          </button>
+                          <button
+                            onClick={() => handleRejectRegistration(selectedItem._id)}
+                            className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-center shadow-sm"
+                          >
+                            Reject Registration
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Webinar Registration Single Details */}
+                  {activeTab === 'webinar-registrations' && (
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between border-b pb-2">
+                        <div>
+                          <h4 className="font-bold text-charcoal-dark font-serif text-sm">Webinar Registration Record</h4>
+                          <p className="text-[10px] text-charcoal-light">Webinar: <strong className="text-charcoal-dark">{selectedItem.webinar?.title || 'Webinar'}</strong></p>
+                        </div>
+                        <span className={`py-1 px-2.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                          selectedItem.paymentStatus === 'Paid' ? 'bg-sage/10 text-sage' :
+                          selectedItem.paymentStatus === 'Rejected' ? 'bg-red-500/10 text-red-600' :
+                          'bg-gold/20 text-gold-dark'
+                        }`}>
+                          Status: {selectedItem.paymentStatus}
+                        </span>
+                      </div>
+
+                      {/* Participant Details */}
+                      <div className="bg-cream/70 p-4 rounded-xl border border-cream-dark/60 grid grid-cols-1 sm:grid-cols-2 gap-3 leading-relaxed">
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Participant Name</p>
+                          <p className="font-bold text-charcoal-dark text-sm">{selectedItem.name || selectedItem.user?.name || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Email Address</p>
+                          <p className="font-medium text-charcoal"><a href={`mailto:${selectedItem.email || selectedItem.user?.email}`} className="text-sage hover:underline">{selectedItem.email || selectedItem.user?.email || 'N/A'}</a></p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Phone / WhatsApp</p>
+                          <p className="font-medium text-charcoal">{selectedItem.phone || selectedItem.user?.phone || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Registered On</p>
+                          <p className="font-medium text-charcoal">{new Date(selectedItem.createdAt || selectedItem.registeredAt).toLocaleString()}</p>
+                        </div>
+                      </div>
+
+                      {/* Webinar & Transaction Details */}
+                      <div className="bg-white/80 p-4 rounded-xl border border-cream-dark/60 flex flex-col gap-2">
+                        <h5 className="font-bold text-charcoal-dark text-[11px] uppercase tracking-wider border-b pb-1">Webinar & Payment Details</h5>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                          <p><strong>Speaker:</strong> {selectedItem.webinar?.speakerName || 'N/A'}</p>
+                          <p><strong>Date & Time:</strong> {selectedItem.webinar?.date ? new Date(selectedItem.webinar.date).toLocaleDateString() : 'N/A'} at {selectedItem.webinar?.time || ''}</p>
+                          <p><strong>Payment Mode:</strong> <span className="font-semibold text-charcoal-dark">{selectedItem.paymentScreenshot === 'razorpay_online' ? 'Razorpay Online Gateway' : 'UPI QR Code'}</span></p>
+                          <p><strong>Webinar Fee:</strong> <span className="font-bold text-sage">₹{selectedItem.webinar?.price?.toLocaleString() || 'N/A'}</span></p>
+                          <p className="sm:col-span-2"><strong>Transaction ID / Razorpay Ref:</strong> <code className="bg-cream px-1.5 py-0.5 rounded text-[10px] font-mono text-charcoal-dark border">{selectedItem.transactionId || 'N/A'}</code></p>
+                          {selectedItem.webinar?.zoomLink && (
+                            <p className="sm:col-span-2"><strong>Zoom Link:</strong> <a href={selectedItem.webinar.zoomLink} target="_blank" rel="noopener noreferrer" className="text-sage hover:underline font-medium">{selectedItem.webinar.zoomLink}</a></p>
+                          )}
+                          <p><strong>Zoom Link Emailed:</strong> <span className={`font-bold ${selectedItem.zoomLinkSent ? 'text-sage' : 'text-charcoal-light'}`}>{selectedItem.zoomLinkSent ? 'Yes' : 'Automated 1 hr before session'}</span></p>
+                        </div>
+
+                        {selectedItem.paymentScreenshot && selectedItem.paymentScreenshot !== 'razorpay_online' && (
+                          <div className="mt-2 pt-2 border-t flex flex-col gap-1.5">
+                            <span className="font-bold text-charcoal-dark text-[10px] uppercase">Payment Screenshot Proof:</span>
+                            <div className="flex items-center gap-3">
+                              <a href={getImageUrl(selectedItem.paymentScreenshot)} target="_blank" rel="noopener noreferrer" className="block rounded-lg overflow-hidden border shadow-sm">
+                                <img src={getImageUrl(selectedItem.paymentScreenshot)} alt="Payment Proof" className="w-24 h-24 object-cover" />
+                              </a>
+                              <a href={getImageUrl(selectedItem.paymentScreenshot)} target="_blank" rel="noopener noreferrer" className="text-sage font-bold hover:underline text-[11px]">
+                                View Full Size Receipt ↗
+                              </a>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Approval Actions */}
+                      {selectedItem.paymentStatus === 'Pending' && (
+                        <div className="flex gap-2 mt-1">
+                          <button
+                            onClick={() => handleApproveRegistration(selectedItem._id)}
+                            className="flex-1 bg-sage hover:bg-sage-dark text-white font-bold py-2.5 rounded-xl text-center shadow-sm"
+                          >
+                            Approve Webinar Registration
+                          </button>
+                          <button
+                            onClick={() => handleRejectRegistration(selectedItem._id)}
+                            className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-center shadow-sm"
+                          >
+                            Reject Registration
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Complete Order Details */}
+                  {activeTab === 'orders' && (
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between border-b pb-2">
+                        <div>
+                          <h4 className="font-bold text-charcoal-dark font-serif text-sm">Shop Order Details</h4>
+                          <p className="text-[10px] text-charcoal-light">Placed on: {new Date(selectedItem.createdAt).toLocaleString()}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className={`py-1 px-2.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                            selectedItem.paymentStatus === 'paid' ? 'bg-sage/10 text-sage' :
+                            selectedItem.paymentStatus === 'failed' ? 'bg-red-500/10 text-red-600' :
+                            'bg-gold/20 text-gold-dark'
+                          }`}>
+                            Payment: {selectedItem.paymentStatus}
+                          </span>
+                          <span className={`py-1 px-2.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                            selectedItem.status === 'delivered' ? 'bg-sage/10 text-sage' :
+                            selectedItem.status === 'cancelled' ? 'bg-red-500/10 text-red-600' :
+                            'bg-cream-dark text-charcoal-dark'
+                          }`}>
+                            {selectedItem.status}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Customer & Shipping Details */}
+                      <div className="bg-cream/70 p-4 rounded-xl border border-cream-dark/60 grid grid-cols-1 sm:grid-cols-2 gap-3 leading-relaxed">
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Customer Name</p>
+                          <p className="font-bold text-charcoal-dark text-sm">{selectedItem.user?.name || 'Customer'}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Email Address</p>
+                          <p className="font-medium text-charcoal"><a href={`mailto:${selectedItem.user?.email}`} className="text-sage hover:underline">{selectedItem.user?.email}</a></p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Delivery Phone</p>
+                          <p className="font-medium text-charcoal">{selectedItem.shippingAddress?.phone || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Delivery Address</p>
+                          <p className="font-medium text-charcoal text-[11px] leading-snug">
+                            {selectedItem.shippingAddress?.address}, {selectedItem.shippingAddress?.city}, {selectedItem.shippingAddress?.state} - {selectedItem.shippingAddress?.postalCode}, {selectedItem.shippingAddress?.country}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Payment Identifiers */}
+                      <div className="bg-white/80 p-3.5 rounded-xl border border-cream-dark/60 flex flex-col gap-2">
+                        <h5 className="font-bold text-charcoal-dark text-[11px] uppercase tracking-wider border-b pb-1">Payment & Order Identifiers</h5>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                          <p><strong>Payment Channel:</strong> <span className="font-semibold text-charcoal-dark">{selectedItem.paymentType || 'RAZORPAY'}</span></p>
+                          <p><strong>Razorpay Payment ID:</strong> <code className="bg-cream px-1.5 py-0.5 rounded text-[10px] font-mono text-charcoal-dark border">{selectedItem.paymentId || selectedItem.transactionId || 'N/A'}</code></p>
+                          <p><strong>Razorpay / Internal Order ID:</strong> <code className="bg-cream px-1.5 py-0.5 rounded text-[10px] font-mono text-charcoal-dark border">{selectedItem.orderId || selectedItem._id}</code></p>
+                          <p><strong>Total Amount Paid:</strong> <span className="font-bold text-sage text-sm">₹{selectedItem.totalAmount?.toLocaleString()}</span></p>
+                        </div>
+
+                        {selectedItem.paymentScreenshot && (
+                          <div className="mt-2 pt-2 border-t flex flex-col gap-1.5">
+                            <span className="font-bold text-charcoal-dark text-[10px] uppercase">Payment Screenshot Proof:</span>
+                            <div className="flex items-center gap-3">
+                              <a href={getImageUrl(selectedItem.paymentScreenshot)} target="_blank" rel="noopener noreferrer" className="block rounded-lg overflow-hidden border shadow-sm">
+                                <img src={getImageUrl(selectedItem.paymentScreenshot)} alt="Payment Proof" className="w-20 h-20 object-cover" />
+                              </a>
+                              <a href={getImageUrl(selectedItem.paymentScreenshot)} target="_blank" rel="noopener noreferrer" className="text-sage font-bold hover:underline text-[11px]">
+                                View Full Size Receipt ↗
+                              </a>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Itemized Cart Products Table */}
+                      <div className="flex flex-col gap-2">
+                        <h5 className="font-bold text-charcoal-dark text-[11px] uppercase tracking-wider border-b pb-1">
+                          Purchased Products ({selectedItem.items?.length || 0})
+                        </h5>
+                        <div className="border border-cream-dark/60 rounded-xl overflow-hidden">
+                          <table className="w-full text-left text-xs">
+                            <thead className="bg-cream text-[10px] uppercase font-bold text-charcoal-light border-b border-cream-dark/60">
+                              <tr>
+                                <th className="p-2.5">Product</th>
+                                <th className="p-2.5 text-center">Qty</th>
+                                <th className="p-2.5 text-right">Price</th>
+                                <th className="p-2.5 text-right">Subtotal</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-cream-dark/40 bg-white">
+                              {selectedItem.items?.map((item, idx) => {
+                                const prodName = item.name || item.product?.name || 'Product';
+                                const prodImg = item.product?.images?.[0] || item.product?.image;
+                                const unitPrice = item.price || item.product?.pricing || 0;
+                                const lineTotal = (item.quantity || 1) * unitPrice;
+                                return (
+                                  <tr key={idx} className="hover:bg-cream/20">
+                                    <td className="p-2.5 flex items-center gap-2.5">
+                                      {prodImg ? (
+                                        <img src={getImageUrl(prodImg)} alt={prodName} className="w-10 h-10 object-cover rounded-lg border shrink-0 bg-cream" />
+                                      ) : (
+                                        <div className="w-10 h-10 rounded-lg bg-cream flex items-center justify-center text-[10px] text-charcoal-light shrink-0">🛒</div>
+                                      )}
+                                      <span className="font-bold text-charcoal-dark text-[11px] leading-tight line-clamp-2">{prodName}</span>
+                                    </td>
+                                    <td className="p-2.5 text-center font-bold text-charcoal">{item.quantity}</td>
+                                    <td className="p-2.5 text-right text-charcoal-light">₹{unitPrice.toLocaleString()}</td>
+                                    <td className="p-2.5 text-right font-bold text-charcoal-dark">₹{lineTotal.toLocaleString()}</td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                            <tfoot className="bg-cream/50 font-bold border-t border-cream-dark/60">
+                              <tr>
+                                <td colSpan="3" className="p-2.5 text-right uppercase text-[10px] text-charcoal-light">Grand Total:</td>
+                                <td className="p-2.5 text-right text-sage text-sm font-serif">₹{selectedItem.totalAmount?.toLocaleString()}</td>
+                              </tr>
+                            </tfoot>
+                          </table>
+                        </div>
+                      </div>
+
+                      {/* Order Fulfillment & Status Update */}
+                      <div className="bg-cream/40 p-4 rounded-xl border border-cream-dark/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 mt-1">
+                        <div className="flex flex-col gap-1">
+                          <label className="font-bold text-charcoal-dark uppercase text-[10px] tracking-wider">Update Fulfillment Status</label>
+                          <select
+                            value={selectedItem.status}
+                            onChange={(e) => handleUpdateStatus(selectedItem._id, 'status', e.target.value)}
+                            className="bg-white border border-cream-dark rounded-xl py-2 px-3 text-xs font-semibold focus:outline-none focus:border-gold"
+                          >
+                            <option value="processing">Processing</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                          </select>
+                        </div>
+
+                        {selectedItem.paymentStatus === 'pending' && (
+                          <button
+                            type="button"
+                            onClick={() => handleApproveRegistration(selectedItem._id)}
+                            className="bg-sage hover:bg-sage-dark text-white font-bold py-2.5 px-4 rounded-xl text-xs uppercase tracking-wider transition-colors shadow-sm self-end sm:self-auto"
+                          >
+                            Mark Payment as Paid
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Workshop registrations list on single workshop item */}
                   {activeTab === 'workshops' && (
                     <div className="flex flex-col gap-3">
                       <h4 className="font-bold text-charcoal-dark border-b pb-1">Participants Registered ({selectedItem.registeredUsers?.length})</h4>
@@ -912,33 +1465,6 @@ const AdminDashboard = () => {
                     </div>
                   )}
 
-                  {/* Order shipment details */}
-                  {activeTab === 'orders' && (
-                    <div className="flex flex-col gap-3">
-                      <h4 className="font-bold text-charcoal-dark border-b pb-1">Customer Order Shipment</h4>
-                      <div className="bg-cream p-3.5 rounded-xl border flex flex-col gap-1 leading-relaxed">
-                        <p><strong>Customer:</strong> {selectedItem.user?.name} ({selectedItem.user?.email})</p>
-                        <p><strong>Shipping Address:</strong> {selectedItem.shippingAddress?.address}, {selectedItem.shippingAddress?.city}, {selectedItem.shippingAddress?.state} - {selectedItem.shippingAddress?.postalCode}, {selectedItem.shippingAddress?.country}</p>
-                        <p><strong>Contact Phone:</strong> {selectedItem.shippingAddress?.phone}</p>
-                      </div>
-
-                      {/* Update Shipping Status */}
-                      <div className="flex flex-col gap-1.5 mt-2">
-                        <label className="font-bold text-charcoal-light uppercase text-[10px]">Update shipment Status</label>
-                        <select
-                          value={selectedItem.status}
-                          onChange={(e) => handleUpdateStatus(selectedItem._id, 'status', e.target.value)}
-                          className="bg-cream-light border border-cream-dark/65 rounded-xl py-2 px-3 focus:outline-none"
-                        >
-                          <option value="processing">Processing</option>
-                          <option value="shipped">Shipped</option>
-                          <option value="delivered">Delivered</option>
-                          <option value="cancelled">Cancelled</option>
-                        </select>
-                      </div>
-                    </div>
-                  )}
-
                   {/* Donation verify logs details */}
                   {activeTab === 'donations' && (
                     <div className="flex flex-col gap-3">
@@ -946,7 +1472,8 @@ const AdminDashboard = () => {
                       <div className="bg-cream p-3.5 rounded-xl border flex flex-col gap-1 text-[11.5px] leading-relaxed">
                         <p><strong>Donor:</strong> {selectedItem.name} ({selectedItem.email || 'N/A'})</p>
                         <p><strong>Contact phone:</strong> {selectedItem.phone || 'N/A'}</p>
-                        <p><strong>Type:</strong> {selectedItem.paymentType} | Ref Ref: {selectedItem.transactionId}</p>
+                        <p><strong>Amount:</strong> <span className="font-bold text-sage">₹{selectedItem.amount?.toLocaleString()}</span></p>
+                        <p><strong>Type:</strong> {selectedItem.paymentType} | Ref: {selectedItem.transactionId}</p>
                         {selectedItem.message && <p className="italic">Message: "{selectedItem.message}"</p>}
                       </div>
                       

@@ -307,6 +307,22 @@ exports.verifyWorkshopPayment = async (req, res, next) => {
     });
     await workshop.save();
 
+    // Create WorkshopRegistration record as Paid for unified admin management
+    try {
+      await WorkshopRegistration.create({
+        workshop: workshop._id,
+        user: user_details.userId || null,
+        name: user_details.name,
+        email: user_details.email.toLowerCase(),
+        phone: user_details.phone,
+        paymentScreenshot: 'razorpay_online',
+        transactionId: payId,
+        paymentStatus: 'Paid'
+      });
+    } catch (regErr) {
+      console.error('WorkshopRegistration creation note:', regErr.message);
+    }
+
     // Format Date beautifully
     const formattedDate = new Date(workshop.date).toLocaleDateString(undefined, {
       weekday: 'long',
