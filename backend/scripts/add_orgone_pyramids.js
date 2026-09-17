@@ -251,6 +251,72 @@ Where to Place:
 
 Affirmation:
 "I am fearless, strong, completely protected, and aligned with my highest power."`
+  },
+  {
+    name: "Ascension Carnelian Orgone Energy Pyramid",
+    category: "Pyramids",
+    pricing: 999,
+    stock: 50,
+    images: ["/uploads/carnelian_orgone_pyramid.png"],
+    description: `Tagline: Vitality • Motivation • Creative Passion • Sacral Energy | Fiery Ambition & Stamina
+
+Composition & Sacred Elements:
+Handcrafted with vibrant fiery-orange Carnelian gemstone chips, a copper vortex energy spiral, radiant golden flakes, and a quartz activator matrix encased in clear orgonite resin.
+
+Spiritual Properties & Energy:
+Known as the "Stone of Motivation and Endurance", Carnelian stimulates the Sacral Chakra (Svadhisthana), restoring vitality, igniting creative drive, boosting self-confidence, and dispelling apathy or procrastination. It grounds creative power and stimulates positive life choices.
+
+Where to Place:
+- Creative Studio / Workspace: Inspires bold ideas, artistic expression, and removes creative blocks
+- Home Office: Boosts physical stamina, ambition, and sustained work motivation
+- Living Area: Fosters warmth, social confidence, and joyous enthusiasm
+
+Affirmation:
+"I am filled with vital passion, creative energy, and fearless motivation."`
+  },
+  {
+    name: "Ascension Labradorite Sacred Metatron Orgone Energy Pyramid",
+    category: "Pyramids",
+    pricing: 999,
+    stock: 50,
+    images: ["/uploads/labradorite_orgone_pyramid.png"],
+    description: `Tagline: Mystic Flash • Metatron's Cube • Aura Shield • Higher Dimensions | The Stone of Magic & Destiny
+
+Composition & Sacred Elements:
+Featuring iridescent flash Labradorite gemstone chips crowned with an elevated, polished Labradorite sphere and a golden Sacred Metatron's Cube sacred geometry energy conductor encased in clear orgonite resin.
+
+Spiritual Properties & Energy:
+Revered as the "Stone of Magic and Transformation", Labradorite awakens psychic abilities, protects the aura from energetic leaks, expands conscious awareness, and connects deeply with universal sacred geometry and higher dimensional guidance.
+
+Where to Place:
+- Meditation Altar / Sacred Space: Deepens trance states, enhances psychic vision, and invokes angelic protection
+- Beside Bed: Shields against energetic drain and stimulates lucid, visionary dream states
+- Work Desk: Enhances intuition, creative problem solving, and synchronicity
+
+Affirmation:
+"I trust the magic of the universe, embrace spiritual expansion, and walk in divine destiny."`
+  },
+  {
+    name: "Ascension Green Aventurine Orgone Energy Pyramid",
+    category: "Pyramids",
+    pricing: 999,
+    stock: 50,
+    images: ["/uploads/green_aventurine_orgone_pyramid.png"],
+    description: `Tagline: Stone of Opportunity • Wealth Luck • Heart Healing • Growth | Prosperity & Emotional Serenity
+
+Composition & Sacred Elements:
+Crafted with lush green natural Aventurine gemstone chips, a copper vortex energy spiral, radiant golden flakes, and clear orgonite resin.
+
+Spiritual Properties & Energy:
+Celebrated worldwide as the supreme "Stone of Opportunity", Green Aventurine aligns with the Heart Chakra (Anahata), attracting good luck in finances and new ventures, releasing old emotional blockages, and fostering harmonious, tranquil growth.
+
+Where to Place:
+- Cash Counter / Financial Desk: Attracts windfall opportunities, lucky breaks, and steady prosperity
+- Living Room / Garden Area: Radiates lush renewal energy and harmonizes family vitality
+- Personal Altar: Inspires compassionate heart opening, optimism, and emotional renewal
+
+Affirmation:
+"I attract endless opportunities, boundless abundance, and heart-centered peace."`
   }
 ];
 
