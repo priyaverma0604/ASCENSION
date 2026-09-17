@@ -348,6 +348,64 @@ Why Wear:
 
 Affirmation:
 "I build my legacy with discipline and patience, grounded in unwavering strength and success."`
+  },
+  {
+    name: "Ascension Aquarius Zodiac Sign Crystal Bracelet",
+    category: "Crystals",
+    pricing: 999,
+    stock: 50,
+    images: ["/uploads/aquarius_zodiac_crystal_bracelet.png"],
+    description: `Tagline: Innovative • Independent • Humanitarian | Vision • Cosmic Flow • Higher Intellect
+
+Zodiac Alignment: Aquarius (♒) | January 20 – February 18 | Element: Air | Ruling Planet: Uranus & Saturn
+
+Gemstone Composition & Properties:
+Featuring celestial natural gemstone beads with an engraved Golden Aquarius Astrological Charm:
+- Royal Lapis Lazuli: Activates higher intellectual vision, cosmic consciousness, and boundless inventive intuition.
+- Aquamarine: Clears communication channels, brings flowing mental calm, and dissolves rigid mental blocks.
+- Rainbow Moonstone & Labradorite: Connects personal vision with universal frequency, awakening innovative genius.
+- Clear Quartz: Supercharges quantum clarity and manifestation of progressive ideas.
+
+Spiritual Properties & Energy:
+Formulated for the trailblazing visionary, rebel, and humanitarian spirit of Aquarius. Governed by Uranus, Aquarius brings forward revolutionary ideas that change the world. This bracelet keeps your upper chakras electrified with inspiration while maintaining smooth energetic flow and mental freedom.
+
+Why Wear:
+- Ignites out-of-the-box innovative thinking, inventiveness, and higher intellect
+- Protects visionary leaders from mental burnout, cognitive overload, and static energy
+- Fosters authentic independence, humanitarian connection, and cosmic awareness
+- Golden Aquarius astrological emblem radiates individuality, genius, and cosmic flow
+
+Affirmation:
+"I channel visionary breakthroughs, honor my authentic truth, and inspire universal elevation."`
+  },
+  {
+    name: "Ascension Pisces Zodiac Sign Crystal Bracelet",
+    category: "Crystals",
+    pricing: 999,
+    stock: 50,
+    images: ["/uploads/pisces_zodiac_crystal_bracelet.png"],
+    description: `Tagline: Intuitive • Compassionate • Creative | Mystic Dreams • Soul Serenity • Universal Love
+
+Zodiac Alignment: Pisces (♓) | February 19 – March 20 | Element: Water | Ruling Planet: Neptune & Jupiter
+
+Gemstone Composition & Properties:
+Featuring dreamy mystical gemstone beads with an engraved Golden Pisces Astrological Charm:
+- Deep Amethyst: Sacred stone of mystical awakening, psychic intuition, and serene spiritual protection.
+- Aquamarine & Fluorite: Channels soothing oceanic peace, washes away emotional overwhelm, and unlocks creative imagination.
+- Rainbow Moonstone: Deepens connection to cyclical divine wisdom, lucid dreaming, and universal compassion.
+- Clear Quartz: Master purifier that protects delicate empathic auras while amplifying artistic flow.
+
+Spiritual Properties & Energy:
+Consecrated for the mystic, dreamer, and soulful healer of Pisces. Ruled by Neptune, Pisces navigates the oceanic depths of emotions and spiritual realms. This bracelet creates a luminous protective shield around your empathic aura, transmuting emotional overwhelm into profound artistic creativity and peace.
+
+Why Wear:
+- Shields highly sensitive empathic energy from outside psychic clutter
+- Awakens mystical dreams, heightened spiritual intuition, and artistic flow
+- Soothes restless anxiety and connects deeply with universal love
+- Golden Pisces astrological emblem radiates soulful grace, mystic wisdom, and divine creativity
+
+Affirmation:
+"I flow with boundless compassion, trust my psychic dreams, and anchor divine peace in every moment."`
   }
 ];
 

@@ -17,6 +17,8 @@ def get_clean_source(filename, temp_clean_dir):
         'scorpio_zodiac_crystal_bracelet.png': r'C:\Users\Dell\.gemini\antigravity-ide\brain\3585e767-d13f-4772-abd3-451e8f2fac44\.user_uploaded\media_1789634692569.png',
         'sagittarius_zodiac_crystal_bracelet.png': r'C:\Users\Dell\.gemini\antigravity-ide\brain\3585e767-d13f-4772-abd3-451e8f2fac44\.user_uploaded\media_1789634703766.png',
         'capricorn_zodiac_crystal_bracelet.png': r'C:\Users\Dell\.gemini\antigravity-ide\brain\3585e767-d13f-4772-abd3-451e8f2fac44\.user_uploaded\media_1789634769726.png',
+        'aquarius_zodiac_crystal_bracelet.png': r'C:\Users\Dell\.gemini\antigravity-ide\brain\3585e767-d13f-4772-abd3-451e8f2fac44\.user_uploaded\media_1789635371188.png',
+        'pisces_zodiac_crystal_bracelet.png': r'C:\Users\Dell\.gemini\antigravity-ide\brain\3585e767-d13f-4772-abd3-451e8f2fac44\.user_uploaded\media_1789635382504.png',
         'tiger_eye_crystal_bracelet.png': r'C:\Users\Dell\.gemini\antigravity-ide\brain\3585e767-d13f-4772-abd3-451e8f2fac44\.user_uploaded\media_1789580482695.jpg',
         'tiger_eye_single_bracelet.jpg': r'C:\Users\Dell\.gemini\antigravity-ide\brain\3585e767-d13f-4772-abd3-451e8f2fac44\.user_uploaded\media_1789580482695.jpg',
         'pocha_salt.png': r'C:\Users\Dell\.gemini\antigravity-ide\brain\c3216775-704f-4973-b965-354b312bc950\.user_uploaded\media_1789120249413.png',

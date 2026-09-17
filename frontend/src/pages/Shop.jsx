@@ -209,20 +209,20 @@ const Shop = () => {
       dates: "Jan 20 - Feb 18", 
       element: "Air", 
       planet: "Uranus", 
-      crystals: ["Amethyst", "Clear Quartz", "Rose Quartz", "Manifestation", "Cleansing", "Love"],
-      primaryIntention: "Manifestation & Higher Vibes",
-      primaryBracelet: "Ascension Manifestation Crystal Bracelet",
-      desc: "Visionary, innovative, and high-frequency, your cosmic ideas connect seamlessly with Amethyst and Clear Quartz to channel higher intuition and clear static energy from your auric field."
+      crystals: ["Aquarius", "Lapis Lazuli", "Aquamarine", "Moonstone", "Labradorite", "Clear Quartz", "Innovative", "Independent", "Humanitarian", "Manifestation", "Cleansing"],
+      primaryIntention: "Innovative • Independent • Humanitarian",
+      primaryBracelet: "Ascension Aquarius Zodiac Sign Crystal Bracelet",
+      desc: "Innovative, independent, and humanitarian under Uranus (Jan 20 - Feb 18), your visionary ideas and inventive genius are empowered by royal Lapis Lazuli, flowing Aquamarine for clear intuition, and Rainbow Moonstone for cosmic insight."
     },
     { 
       name: "Pisces", 
       dates: "Feb 19 - Mar 20", 
       element: "Water", 
       planet: "Neptune", 
-      crystals: ["Amethyst", "Rose Quartz", "Aventurine", "Clear Quartz", "Manifestation", "Cleansing", "Love", "Health"],
-      primaryIntention: "Cleansing & Inner Peace",
-      primaryBracelet: "Ascension Cleansing Crystal Bracelet",
-      desc: "Dreamy, mystical, and deeply compassionate, your sensitive spiritual nature is nurtured by purifying Clear Quartz and Amethyst, shielding you from psychic overload while enveloping you in universal love."
+      crystals: ["Pisces", "Amethyst", "Aquamarine", "Moonstone", "Fluorite", "Clear Quartz", "Intuitive", "Compassionate", "Creative", "Love", "Cleansing"],
+      primaryIntention: "Intuitive • Compassionate • Creative",
+      primaryBracelet: "Ascension Pisces Zodiac Sign Crystal Bracelet",
+      desc: "Intuitive, compassionate, and artistic under Neptune (Feb 19 - Mar 20), your soulful mystic nature is cocooned and nurtured by deep Amethyst for spiritual shielding, oceanic Aquamarine for calming emotional tides, and Fluorite for creative flow."
     }
   ];
 
