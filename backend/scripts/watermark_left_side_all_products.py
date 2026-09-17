@@ -7,9 +7,11 @@ def get_clean_source(filename, temp_clean_dir):
     # Check if we have a direct clean mapping
     manual_sources = {
         'seven_chakra_crystal_bracelet.png': r'C:\Users\Dell\.gemini\antigravity-ide\brain\c3216775-704f-4973-b965-354b312bc950\.user_uploaded\media_1789195786734.jpg',
-        'aries_zodiac_crystal_bracelet.png': r'C:\Users\Dell\.gemini\antigravity-ide\brain\c3216775-704f-4973-b965-354b312bc950\.user_uploaded\media_1789195824369.png',
-        'taurus_zodiac_crystal_bracelet.png': r'C:\Users\Dell\.gemini\antigravity-ide\brain\c3216775-704f-4973-b965-354b312bc950\.user_uploaded\media_1789195838515.jpg',
-        'gemini_zodiac_crystal_bracelet.png': r'C:\Users\Dell\.gemini\antigravity-ide\brain\c3216775-704f-4973-b965-354b312bc950\.user_uploaded\media_1789195847191.png',
+        'aries_zodiac_crystal_bracelet.png': r'C:\Users\Dell\.gemini\antigravity-ide\brain\3585e767-d13f-4772-abd3-451e8f2fac44\.user_uploaded\media_1789633707940.png',
+        'taurus_zodiac_crystal_bracelet.png': r'C:\Users\Dell\.gemini\antigravity-ide\brain\3585e767-d13f-4772-abd3-451e8f2fac44\.user_uploaded\media_1789633718649.png',
+        'gemini_zodiac_crystal_bracelet.png': r'C:\Users\Dell\.gemini\antigravity-ide\brain\3585e767-d13f-4772-abd3-451e8f2fac44\.user_uploaded\media_1789633741573.png',
+        'cancer_zodiac_crystal_bracelet.png': r'C:\Users\Dell\.gemini\antigravity-ide\brain\3585e767-d13f-4772-abd3-451e8f2fac44\.user_uploaded\media_1789633752193.png',
+        'leo_zodiac_crystal_bracelet.png': r'C:\Users\Dell\.gemini\antigravity-ide\brain\3585e767-d13f-4772-abd3-451e8f2fac44\.user_uploaded\media_1789633764698.png',
         'tiger_eye_crystal_bracelet.png': r'C:\Users\Dell\.gemini\antigravity-ide\brain\3585e767-d13f-4772-abd3-451e8f2fac44\.user_uploaded\media_1789580482695.jpg',
         'tiger_eye_single_bracelet.jpg': r'C:\Users\Dell\.gemini\antigravity-ide\brain\3585e767-d13f-4772-abd3-451e8f2fac44\.user_uploaded\media_1789580482695.jpg',
         'pocha_salt.png': r'C:\Users\Dell\.gemini\antigravity-ide\brain\c3216775-704f-4973-b965-354b312bc950\.user_uploaded\media_1789120249413.png',

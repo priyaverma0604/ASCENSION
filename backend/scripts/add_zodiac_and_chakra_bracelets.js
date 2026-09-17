@@ -65,7 +65,7 @@ Cleanse regularly with sacred white sage smoke, camphor fumes, or Selenite plate
     pricing: 999,
     stock: 50,
     images: ["/uploads/aries_zodiac_crystal_bracelet.png"],
-    description: `Tagline: Confident • Courageous • Determined | Bolder • Brighter • Stronger You
+    description: `Tagline: Courage • Passion • New Beginnings | Bolder • Brighter • Stronger You
 
 Zodiac Alignment: Aries (♈) | March 21 – April 19 | Element: Fire | Ruling Planet: Mars
 
@@ -95,7 +95,7 @@ Affirmation:
     pricing: 999,
     stock: 50,
     images: ["/uploads/taurus_zodiac_crystal_bracelet.png"],
-    description: `Tagline: Reliable • Patient • Grounded | Stability • Abundance • A Brighter Tomorrow
+    description: `Tagline: Strength • Stability • Abundance | Grounded • Peaceful • Prosperous
 
 Zodiac Alignment: Taurus (♉) | April 20 – May 20 | Element: Earth | Ruling Planet: Venus
 
@@ -125,7 +125,7 @@ Affirmation:
     pricing: 999,
     stock: 50,
     images: ["/uploads/gemini_zodiac_crystal_bracelet.png"],
-    description: `Tagline: Curious • Balanced • Expressive | Explore • Grow • Be You
+    description: `Tagline: Communication • Curiosity • Adaptability | Clear • Inspired • Expressive
 
 Zodiac Alignment: Gemini (♊) | May 21 – June 20 | Element: Air | Ruling Planet: Mercury
 
@@ -147,6 +147,62 @@ Why Wear:
 
 Affirmation:
 "My mind is clear, calm, and inspired. I express my truth with wisdom, joy, and confidence."`
+  },
+  {
+    name: "Ascension Cancer Zodiac Sign Crystal Bracelet",
+    category: "Crystals",
+    pricing: 999,
+    stock: 50,
+    images: ["/uploads/cancer_zodiac_crystal_bracelet.png"],
+    description: `Tagline: Emotional • Intuitive • Protective | Harmony • Heart Healing • Divine Flow
+
+Zodiac Alignment: Cancer (♋) | June 21 – July 22 | Element: Water | Ruling Planet: Moon
+
+Gemstone Composition & Properties:
+Featuring authentic hand-selected natural gemstone beads with an engraved Golden Cancer Astrological Charm:
+- Blue Lace Agate / Blue Chalcedony: Soothes emotional overwhelm, restores inner calm, and supports peaceful authentic self-expression.
+- Rainbow Moonstone: Sacred stone of lunar divine intuition, enhances psychic perception, and brings emotional balance with cyclical harmony.
+- Clear Quartz: Amplifies sacred intentions, provides radiant aura cleansing, and sharpens intuitive foresight.
+
+Spiritual Properties & Energy:
+Formulated specifically for the deeply intuitive, empathetic, and protective energy of Cancer. Ruled by the Moon, Cancer's emotional world is vast and sacred. This bracelet creates a serene, protective aura cocoon, dissolving psychic sensitivity and emotional burnout while awakening profound intuitive clarity.
+
+Why Wear:
+- Deeply balances emotional tides and calms empathetic anxiety
+- Enhances psychic dreams, spiritual intuition, and inner wisdom
+- Shields delicate auric energy from toxic projections and negative environments
+- Golden Cancer astrological emblem radiates grace, emotional mastery, and sacred protection
+
+Affirmation:
+"I trust my intuitive wisdom, protect my sacred energy, and flow with divine peace."`
+  },
+  {
+    name: "Ascension Leo Zodiac Sign Crystal Bracelet",
+    category: "Crystals",
+    pricing: 999,
+    stock: 50,
+    images: ["/uploads/leo_zodiac_crystal_bracelet.png"],
+    description: `Tagline: Confidence • Creativity • Leadership | Radiance • Power • Solar Fire
+
+Zodiac Alignment: Leo (♌) | July 23 – August 22 | Element: Fire | Ruling Planet: Sun
+
+Gemstone Composition & Properties:
+Featuring premium hand-selected natural gemstone beads with an engraved Golden Leo Astrological Charm:
+- Golden Tiger's Eye: Unlocks fearless self-confidence, grounding protection, and executive decision-making.
+- Citrine & Golden Rutile Quartz: Attracts boundless abundance, joyful solar magnetism, and royal creative manifestation.
+- Sunstone & Yellow Jasper: Channels radiant solar vitality, ignites passionate leadership, and inspires generous warmth.
+
+Spiritual Properties & Energy:
+Blessed for the bold, majestic, and magnetic spirit of Leo. Governed by the radiant Sun, Leos are born leaders, visionaries, and creators. This bracelet infuses your chakras with sovereign solar fire, attracting wealth, creative breakthroughs, and unstoppable charisma.
+
+Why Wear:
+- Amplifies royal confidence, charismatic presence, and visionary leadership
+- Unlocks creative flow, executive magnetism, and boundless abundance
+- Protects your personal solar plexus power against jealousy and energy drains
+- Golden Leo astrological emblem radiates royalty, triumph, and personal brilliance
+
+Affirmation:
+"I shine with radiant confidence, lead with an open heart, and create effortless abundance."`
   }
 ];
 

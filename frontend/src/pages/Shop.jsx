@@ -109,28 +109,28 @@ const Shop = () => {
       dates: "Mar 21 - Apr 19", 
       element: "Fire", 
       planet: "Mars", 
-      crystals: ["Aries", "Carnelian", "Sunstone", "Clear Quartz", "Black Obsidian", "Garnet", "Tiger Eye", "Protection", "Abundance"],
-      primaryIntention: "Aries Power & Protection",
+      crystals: ["Aries", "Carnelian", "Sunstone", "Clear Quartz", "Black Obsidian", "Garnet", "Courage", "Passion", "New Beginnings", "Protection", "Abundance"],
+      primaryIntention: "Courage • Passion • New Beginnings",
       primaryBracelet: "Ascension Aries Zodiac Sign Crystal Bracelet",
-      desc: "As a bold and confident Fire sign ruled by Mars (Mar 21 - Apr 19), your natural ambition and courageous drive are empowered by Red Carnelian, Sunstone, and Garnet, shielded from burnout by Black Obsidian, and magnified in mental clarity by Clear Quartz."
+      desc: "As a bold and confident Fire sign ruled by Mars (Mar 21 - Apr 19), your natural ambition and courageous drive for new beginnings are empowered by Red Carnelian, Sunstone, and Garnet, shielded from burnout by Black Obsidian, and magnified in mental clarity by Clear Quartz."
     },
     { 
       name: "Taurus", 
       dates: "Apr 20 - May 20", 
       element: "Earth", 
       planet: "Venus", 
-      crystals: ["Taurus", "Green Aventurine", "Rose Quartz", "Tiger's Eye", "Howlite", "Moss Agate", "Clear Quartz", "Love", "Health", "Abundance"],
-      primaryIntention: "Taurus Stability & Abundance",
+      crystals: ["Taurus", "Green Aventurine", "Rose Quartz", "Tiger's Eye", "Howlite", "Moss Agate", "Clear Quartz", "Strength", "Stability", "Abundance", "Love", "Health"],
+      primaryIntention: "Strength • Stability • Abundance",
       primaryBracelet: "Ascension Taurus Zodiac Sign Crystal Bracelet",
-      desc: "Grounded, reliable, and patient under Venus (Apr 20 - May 20), your serene nature is nourished by Green Aventurine for continuous prosperity, Rose Quartz for unconditional love & peace, Tiger's Eye for focus, and Howlite & Moss Agate for stress relief and emotional balance."
+      desc: "Grounded, reliable, and patient under Venus (Apr 20 - May 20), your serene nature, inner strength, and stability are nourished by Green Aventurine for continuous prosperity, Rose Quartz for unconditional love & peace, and Moss Agate for restorative balance."
     },
     { 
       name: "Gemini", 
       dates: "May 21 - Jun 20", 
       element: "Air", 
       planet: "Mercury", 
-      crystals: ["Gemini", "Amethyst", "Citrine", "Howlite", "Clear Quartz", "Pyrite", "Abundance", "Manifestation", "Cleansing"],
-      primaryIntention: "Gemini Clarity & Expression",
+      crystals: ["Gemini", "Amethyst", "Citrine", "Howlite", "Clear Quartz", "Communication", "Curiosity", "Adaptability", "Abundance", "Manifestation", "Cleansing"],
+      primaryIntention: "Communication • Curiosity • Adaptability",
       primaryBracelet: "Ascension Gemini Zodiac Sign Crystal Bracelet",
       desc: "Curious, versatile, and expressive under Mercury (May 21 - Jun 20), your active mind and communication thrive with joyful Citrine for success, soothing Amethyst and Howlite for mental calm and emotional balance, and Clear Quartz for amplified focus."
     },
@@ -139,20 +139,20 @@ const Shop = () => {
       dates: "Jun 21 - Jul 22", 
       element: "Water", 
       planet: "Moon", 
-      crystals: ["Rose Quartz", "Obsidian", "Moonstone", "Clear Quartz", "Amethyst", "Love", "Protection", "Manifestation"],
-      primaryIntention: "Love & Protection",
-      primaryBracelet: "Ascension Love & Peace Crystal Bracelet",
-      desc: "Deeply empathetic and intuitive, you benefit from soothing Rose Quartz for heart healing and protective Black Obsidian/Tiger Eye to shield your sensitive empathic aura from outside energies."
+      crystals: ["Cancer", "Moonstone", "Blue Lace Agate", "Clear Quartz", "Rose Quartz", "Emotional", "Intuitive", "Protective", "Love", "Protection"],
+      primaryIntention: "Emotional • Intuitive • Protective",
+      primaryBracelet: "Ascension Cancer Zodiac Sign Crystal Bracelet",
+      desc: "Deeply empathetic, intuitive, and protective under the Moon (Jun 21 - Jul 22), your delicate auric field is nurtured by soothing Blue Lace Agate, mystical Moonstone for lunar intuition, and Clear Quartz for pure emotional equilibrium."
     },
     { 
       name: "Leo", 
       dates: "Jul 23 - Aug 22", 
       element: "Fire", 
       planet: "Sun", 
-      crystals: ["Tiger Eye", "Citrine", "Pyrite", "Clear Quartz", "Abundance", "Protection"],
-      primaryIntention: "Abundance & Tiger Eye Power",
-      primaryBracelet: "Ascension Tiger Eye Crystal Bracelet",
-      desc: "Radiant, generous, and sun-governed, your natural magnetic charisma aligns with pure Tiger Eye for fearless leadership, paired with Citrine & Pyrite for regal prosperity and solar fire."
+      crystals: ["Leo", "Tiger Eye", "Citrine", "Sunstone", "Pyrite", "Clear Quartz", "Confidence", "Creativity", "Leadership", "Abundance", "Protection"],
+      primaryIntention: "Confidence • Creativity • Leadership",
+      primaryBracelet: "Ascension Leo Zodiac Sign Crystal Bracelet",
+      desc: "Radiant, creative, and sun-governed (Jul 23 - Aug 22), your natural magnetic charisma and visionary leadership align with golden Tiger's Eye for courage, paired with Citrine & Sunstone for regal prosperity and solar fire."
     },
     { 
       name: "Virgo", 
