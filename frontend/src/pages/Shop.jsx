@@ -159,50 +159,50 @@ const Shop = () => {
       dates: "Aug 23 - Sep 22", 
       element: "Earth", 
       planet: "Mercury", 
-      crystals: ["Aventurine", "Citrine", "Clear Quartz", "Pyrite", "Amethyst", "Health", "Abundance", "Manifestation"],
-      primaryIntention: "Health & Vitality",
-      primaryBracelet: "Ascension Health Crystal Bracelet",
-      desc: "Practical, analytical, and wellness-focused, you thrive with Green Aventurine and Clear Quartz for cellular vitality, mental calm, and physical stress relief, alongside Citrine for smooth success."
+      crystals: ["Virgo", "Aventurine", "Jade", "Moonstone", "Clear Quartz", "Moss Agate", "Practical", "Analytical", "Kind", "Health", "Abundance"],
+      primaryIntention: "Practical • Analytical • Kind",
+      primaryBracelet: "Ascension Virgo Zodiac Sign Crystal Bracelet",
+      desc: "Practical, analytical, and kind-hearted under Mercury (Aug 23 - Sep 22), your devoted nature thrives with Green Jade and Moss Agate for physical healing and prosperity, Moonstone for intuitive balance, and Clear Quartz for analytical clarity."
     },
     { 
       name: "Libra", 
       dates: "Sep 23 - Oct 22", 
       element: "Air", 
       planet: "Venus", 
-      crystals: ["Rose Quartz", "Clear Quartz", "Amethyst", "Citrine", "Love", "Cleansing", "Manifestation"],
-      primaryIntention: "Love & Harmony",
-      primaryBracelet: "Ascension Love & Peace Crystal Bracelet",
-      desc: "Seeking divine harmony, peace, and soulful relationships, you resonate with soft Rose Quartz for unconditional love and Clear Quartz to clear mental dilemmas and restore pristine equilibrium."
+      crystals: ["Libra", "Rose Quartz", "Amethyst", "Moonstone", "Clear Quartz", "Harmony", "Balance", "Love", "Cleansing"],
+      primaryIntention: "Harmony • Balance • Love",
+      primaryBracelet: "Ascension Libra Zodiac Sign Crystal Bracelet",
+      desc: "Graceful, aesthetic, and diplomatic under Venus (Sep 23 - Oct 22), your quest for divine harmony and soul connections is enriched by Rose Quartz for unconditional love, Amethyst for inner peace, and Moonstone for emotional diplomacy."
     },
     { 
       name: "Scorpio", 
       dates: "Oct 23 - Nov 21", 
       element: "Water", 
       planet: "Pluto", 
-      crystals: ["Obsidian", "Tiger Eye", "Clear Quartz", "Pyrite", "Protection", "Cleansing"],
-      primaryIntention: "Protection & Grounding",
-      primaryBracelet: "Ascension Protection Crystal Bracelet",
-      desc: "Intense, magnetic, and transformative, you benefit from deep protective Black Obsidian and Tiger Eye to transmute heavy emotions, alongside Clear Quartz to purify and elevate your psychic intuition."
+      crystals: ["Scorpio", "Amethyst", "Obsidian", "Smoky Quartz", "Clear Quartz", "Passionate", "Intuitive", "Transformative", "Protection", "Cleansing"],
+      primaryIntention: "Passionate • Intuitive • Transformative",
+      primaryBracelet: "Ascension Scorpio Zodiac Sign Crystal Bracelet",
+      desc: "Passionate, magnetic, and deeply intuitive under Pluto (Oct 23 - Nov 21), your transformative power is anchored by protective Black Obsidian, transmuted by Smoky Quartz, and illuminated by deep Amethyst for psychic shield."
     },
     { 
       name: "Sagittarius", 
       dates: "Nov 22 - Dec 21", 
       element: "Fire", 
       planet: "Jupiter", 
-      crystals: ["Amethyst", "Citrine", "Pyrite", "Tiger Eye", "Clear Quartz", "Manifestation", "Abundance", "Protection"],
-      primaryIntention: "Manifestation & Expansion",
-      primaryBracelet: "Ascension Manifestation Crystal Bracelet",
-      desc: "Adventurous, philosophical, and vision-driven, your lucky expansive Jupiter energy matches with Amethyst for visionary manifestation and Pyrite & Citrine for commercial abundance and good fortune."
+      crystals: ["Sagittarius", "Lapis Lazuli", "Citrine", "Amethyst", "Clear Quartz", "Adventurous", "Optimistic", "Truth-Seeking", "Manifestation", "Abundance"],
+      primaryIntention: "Adventurous • Optimistic • Truth-Seeking",
+      primaryBracelet: "Ascension Sagittarius Zodiac Sign Crystal Bracelet",
+      desc: "Adventurous, philosophical, and optimistic under Jupiter (Nov 22 - Dec 21), your truth-seeking spirit is amplified by royal Lapis Lazuli for higher wisdom, golden Citrine for expansive wealth luck, and Amethyst for divine insight."
     },
     { 
       name: "Capricorn", 
       dates: "Dec 22 - Jan 19", 
       element: "Earth", 
       planet: "Saturn", 
-      crystals: ["Tiger Eye", "Obsidian", "Pyrite", "Citrine", "Clear Quartz", "Protection", "Abundance"],
-      primaryIntention: "Pyrite Wealth & Protection",
-      primaryBracelet: "Ascension Pyrite Crystal Bracelet",
-      desc: "Ambitious, structured, and persevering, your long-term empire-building goals are empowered by metallic Pyrite for unyielding financial magnetism, paired with Tiger Eye & Obsidian for resilience."
+      crystals: ["Capricorn", "Onyx", "Obsidian", "Smoky Quartz", "Labradorite", "Clear Quartz", "Disciplined", "Ambitious", "Strong", "Protection", "Abundance"],
+      primaryIntention: "Disciplined • Ambitious • Strong",
+      primaryBracelet: "Ascension Capricorn Zodiac Sign Crystal Bracelet",
+      desc: "Disciplined, ambitious, and unshakably strong under Saturn (Dec 22 - Jan 19), your empire-building vision is fortified by Black Onyx and Smoky Quartz for stamina and grounding, alongside Labradorite for strategic breakthroughs."
     },
     { 
       name: "Aquarius", 

@@ -203,6 +203,151 @@ Why Wear:
 
 Affirmation:
 "I shine with radiant confidence, lead with an open heart, and create effortless abundance."`
+  },
+  {
+    name: "Ascension Virgo Zodiac Sign Crystal Bracelet",
+    category: "Crystals",
+    pricing: 999,
+    stock: 50,
+    images: ["/uploads/virgo_zodiac_crystal_bracelet.png"],
+    description: `Tagline: Practical • Analytical • Kind | Purity • Focus • Radiant Health
+
+Zodiac Alignment: Virgo (♍) | August 23 – September 22 | Element: Earth | Ruling Planet: Mercury
+
+Gemstone Composition & Properties:
+Featuring authentic hand-selected natural gemstone beads with an engraved Golden Virgo Astrological Charm:
+- Green Jade & Aventurine: Attracts wholesome vitality, harmonizes heart energy, and promotes deep physical healing.
+- White Quartz & Moonstone: Gently calms perfectionist overthinking, brings mental clarity, and supports intuitive balance.
+- Moss Agate: Grounds daily routines with restorative earthy peace and enhances practical prosperity.
+- Clear Quartz: Amplifies analytical focus, purifies energetic fields, and sharpens organization.
+
+Spiritual Properties & Energy:
+Crafted for the devoted, detail-oriented, and noble spirit of Virgo. Governed by Mercury, Virgos channel profound healing and analytical wisdom. This bracelet clears nervous exhaustion and mental clutter while grounding you in serene vitality and loving self-compassion.
+
+Why Wear:
+- Calms perfectionist anxiety, stress, and nervous fatigue
+- Enhances analytical precision, focus, and organized execution
+- Supports cellular vitality, digestive harmony, and overall wellness
+- Golden Virgo astrological emblem radiates purity, kindness, and meticulous brilliance
+
+Affirmation:
+"I cultivate wellness, embrace clarity, and serve my highest path with wisdom and kindness."`
+  },
+  {
+    name: "Ascension Libra Zodiac Sign Crystal Bracelet",
+    category: "Crystals",
+    pricing: 999,
+    stock: 50,
+    images: ["/uploads/libra_zodiac_crystal_bracelet.png"],
+    description: `Tagline: Harmony • Balance • Love | Beauty • Serenity • Soul Connection
+
+Zodiac Alignment: Libra (♎) | September 23 – October 22 | Element: Air | Ruling Planet: Venus
+
+Gemstone Composition & Properties:
+Featuring exquisite natural gemstone beads with an engraved Golden Libra Astrological Charm:
+- Rose Quartz: Awakens unconditional love, deep emotional healing, and dissolves relational conflicts.
+- Amethyst: Restores serene mental equilibrium, enhances spiritual intuition, and clears decision paralysis.
+- Moonstone: Brings emotional diplomacy, cyclical harmony, and soothing lunar grace.
+- Clear Quartz: Balances energetic polarities and radiates pure crystalline clarity.
+
+Spiritual Properties & Energy:
+Blessed for the diplomatic, aesthetic, and heart-centered energy of Libra. Ruled by Venus, Libras thrive in harmonious, peaceful, and loving environments. This bracelet balances intellectual indecision with heart-centered confidence, attracting soulful relationships and divine peace.
+
+Why Wear:
+- Fosters unconditional love, emotional balance, and relationship harmony
+- Dissolves dilemma overthinking, indecision, and energetic disharmony
+- Magnifies artistic aesthetic charm, diplomatic magnetism, and social grace
+- Golden Libra astrological emblem radiates fairness, beauty, and equilibrium
+
+Affirmation:
+"I am centered in divine peace, open to unconditional love, and balanced in all my relationships."`
+  },
+  {
+    name: "Ascension Scorpio Zodiac Sign Crystal Bracelet",
+    category: "Crystals",
+    pricing: 999,
+    stock: 50,
+    images: ["/uploads/scorpio_zodiac_crystal_bracelet.png"],
+    description: `Tagline: Passionate • Intuitive • Transformative | Inner Power • Psychic Shield • Renewal
+
+Zodiac Alignment: Scorpio (♏) | October 23 – November 21 | Element: Water | Ruling Planet: Pluto & Mars
+
+Gemstone Composition & Properties:
+Featuring powerful natural gemstone beads with an engraved Golden Scorpio Astrological Charm:
+- Deep Amethyst: Channels profound spiritual transformation, psychic insight, and mental serenity.
+- Black Obsidian & Tourmaline: Forms an impenetrable energetic fortress, repelling psychic attacks and absorbing dark energies.
+- Smoky Quartz: Transmutes intense emotional grief or stress into grounded personal empowerment.
+- Clear Quartz: Amplifies mystical rebirth, purification, and razor-sharp intuitive vision.
+
+Spiritual Properties & Energy:
+Consecrated for the magnetic, intense, and transformative energy of Scorpio. Governed by Pluto, Scorpio holds unmatched power for personal rebirth and deep emotional mastery. This bracelet grounds raw passion into purposeful triumph while shielding your psychic aura from lower vibrational interference.
+
+Why Wear:
+- Protects the psychic field against psychic drains, jealousy, and negative energy
+- Transmutes emotional intensity and trauma into unstoppable personal empowerment
+- Deepens spiritual rebirth, mystic intuition, and occult discernment
+- Golden Scorpio astrological emblem radiates magnetic mystery, power, and triumph
+
+Affirmation:
+"I release the old with grace, embrace my intuitive power, and transform with fearless strength."`
+  },
+  {
+    name: "Ascension Sagittarius Zodiac Sign Crystal Bracelet",
+    category: "Crystals",
+    pricing: 999,
+    stock: 50,
+    images: ["/uploads/sagittarius_zodiac_crystal_bracelet.png"],
+    description: `Tagline: Adventurous • Optimistic • Truth-Seeking | Wisdom • Expansion • Good Fortune
+
+Zodiac Alignment: Sagittarius (♐) | November 22 – December 21 | Element: Fire | Ruling Planet: Jupiter
+
+Gemstone Composition & Properties:
+Featuring vibrant natural gemstone beads with an engraved Golden Sagittarius Astrological Charm:
+- Royal Lapis Lazuli: Activates the Third Eye & Throat Chakra for truth, higher wisdom, and cosmic vision.
+- Golden Citrine: Attracts continuous prosperity, auspicious luck, and boundless expansive optimism.
+- Amethyst: Connects philosophical curiosity with spiritual intuition and peaceful discernment.
+- Clear Quartz: Amplifies manifestation speed, sharp focus, and expansive aspirations.
+
+Spiritual Properties & Energy:
+Formulated for the vision-driven, philosophical, and free-spirited archer of Sagittarius. Governed by Jupiter, the planet of luck and grand expansion, this bracelet magnifies your auspicious fortunes, shields you on long travels, and aligns your daily actions with universal truth.
+
+Why Wear:
+- Attracts expansive good luck, wealth opportunities, and auspicious synchronicities
+- Enhances philosophical wisdom, articulate truth-seeking, and higher learning
+- Protects travelers and adventurous souls while maintaining joyful optimism
+- Golden Sagittarius astrological emblem radiates fearless truth, joy, and victory
+
+Affirmation:
+"I expand my horizons, align with cosmic wisdom, and attract limitless opportunities and joy."`
+  },
+  {
+    name: "Ascension Capricorn Zodiac Sign Crystal Bracelet",
+    category: "Crystals",
+    pricing: 999,
+    stock: 50,
+    images: ["/uploads/capricorn_zodiac_crystal_bracelet.png"],
+    description: `Tagline: Disciplined • Ambitious • Strong | Mastery • Resilience • Unshakable Success
+
+Zodiac Alignment: Capricorn (♑) | December 22 – January 19 | Element: Earth | Ruling Planet: Saturn
+
+Gemstone Composition & Properties:
+Featuring premium grounded gemstone beads with an engraved Golden Capricorn Astrological Charm:
+- Black Onyx & Obsidian: Unyielding root grounding, shields ambitious leaders from burnout and negative projections.
+- Smoky Quartz: Dissolves stress, fear, and heavy responsibilities into pragmatic resilience.
+- Mystical Labradorite: Awakens strategic intuition, persevering magic, and unlocks career breakthroughs.
+- Clear Quartz: Clarifies long-term empire-building vision and masterfully amplifies goal achievement.
+
+Spiritual Properties & Energy:
+Blessed for the ambitious, disciplined, and unshakable empire-builder of Capricorn. Governed by Saturn, the master of mastery and time, this bracelet empowers you with immense stamina, perseverance, and strategic clarity to climb every mountain and claim lasting success.
+
+Why Wear:
+- Fortifies unshakable discipline, patience, and executive resilience
+- Protects against professional burnout, heavy burdens, and mental fatigue
+- Magnetizes career breakthroughs, empire-building stability, and lasting wealth
+- Golden Capricorn astrological emblem radiates authority, mastery, and enduring strength
+
+Affirmation:
+"I build my legacy with discipline and patience, grounded in unwavering strength and success."`
   }
 ];
 
