@@ -18,8 +18,8 @@ const navratriProgramData = {
   originalPrice: 1999,
   sellingPrice: 999,
   enrollmentCapacity: 500,
-  images: ["/uploads/ancestral_healing_webinar_bg.png"],
-  youtubeUrl: "https://www.youtube.com/embed/jIs3IH-brtg",
+  images: ["/uploads/navratri_9_days_banner.jpg"],
+  youtubeUrl: "",
   requiresAssignmentApproval: false
 };
 

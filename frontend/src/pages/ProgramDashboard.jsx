@@ -720,8 +720,34 @@ const ProgramDashboard = () => {
           {/* LEFT: Active Assignment Card */}
           <div className="lg:col-span-2 flex flex-col gap-6">
 
-            {/* Intro Welcome Video Card */}
-            {getWelcomeVideoUrl() && (
+            {/* Navratri Sacred Static Banner Card OR Other Program Intro Video */}
+            {isNavratri ? (
+              <div className="glass p-4 md:p-5 rounded-3xl border-2 border-gold/40 flex flex-col gap-3 text-left relative overflow-hidden bg-gradient-to-br from-[#FFFDF7] via-[#FFF9ED] to-[#FFF3DC] shadow-md">
+                <div className="flex items-center justify-between border-b border-gold/30 pb-2.5">
+                  <div className="flex items-center gap-2">
+                    <span className="bg-gold text-charcoal-dark font-black py-1 px-3 rounded-full text-[9px] uppercase tracking-wider flex items-center gap-1 shadow-xs">
+                      <Sparkles className="w-3 h-3 animate-pulse fill-charcoal-dark" /> 9 Days Navratri
+                    </span>
+                    <span className="font-serif text-sm font-bold text-charcoal-dark">
+                      Sacred Navdurga Audio Journey
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-bold text-sage bg-sage/10 px-2.5 py-0.5 rounded-full border border-sage/20">
+                    10 Days Sacred Access
+                  </span>
+                </div>
+                <div className="w-full rounded-2xl overflow-hidden border border-gold/30 shadow-sm relative group bg-black">
+                  <img 
+                    src={getImageUrl('/uploads/navratri_9_days_banner.jpg')} 
+                    alt="9 Days Navratri Sacred Program" 
+                    className="w-full h-auto max-h-[460px] object-contain mx-auto transition-transform duration-500 group-hover:scale-[1.01]"
+                  />
+                </div>
+                <p className="text-[11px] text-charcoal-light leading-relaxed">
+                  Welcome to the 9-Day Navratri Sacred Audio Transformation. Experience the divine transmissions of Maa Durga across 9 days. Each day unlocks sequentially upon completing the previous day's audiobook.
+                </p>
+              </div>
+            ) : getWelcomeVideoUrl() ? (
               <div className="glass p-5 md:p-6 rounded-3xl border border-cream-dark/50 flex flex-col gap-4 text-left relative overflow-hidden">
                 <div className="flex items-center justify-between border-b border-cream-dark/60 pb-3">
                   <div className="flex items-center gap-2">
@@ -746,7 +772,7 @@ const ProgramDashboard = () => {
                   Before you begin your practice, watch this welcome video from Sonali Bhasin to understand the power of this journey and how to get the most out of it!
                 </p>
               </div>
-            )}
+            ) : null}
             
             {isCompleted ? (
               /* Success / Completed state */
