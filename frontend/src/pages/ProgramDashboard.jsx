@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Lock, CheckCircle, UploadCloud, Image as ImageIcon, 
   ArrowRight, Sparkles, Compass, AlertCircle, Eye,
-  Calendar, Clock, Video, MessageSquare, Star, ExternalLink, ShieldCheck, BookOpen, UserCheck
+  Calendar, Clock, Video, MessageSquare, Star, ExternalLink, ShieldCheck, BookOpen, UserCheck,
+  Play, Pause, Volume2, VolumeX, RotateCcw, RotateCw, Headphones, Flame
 } from 'lucide-react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
@@ -51,6 +52,88 @@ const ProgramDashboard = () => {
   
   // Lightbox modal state
   const [lightboxImage, setLightboxImage] = useState(null);
+
+  // Audio Player State
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [audioDuration, setAudioDuration] = useState(0);
+  const [playbackRate, setPlaybackRate] = useState(1);
+  const [volume, setVolume] = useState(1);
+  const [isMuted, setIsMuted] = useState(false);
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    // Reset audio state on assignment change
+    setIsPlaying(false);
+    setCurrentTime(0);
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+    }
+  }, [selectedAssignment?._id]);
+
+  const togglePlayAudio = () => {
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play().then(() => {
+        setIsPlaying(true);
+      }).catch(err => {
+        console.error("Audio playback error:", err);
+      });
+    }
+  };
+
+  const handleAudioTimeUpdate = () => {
+    if (audioRef.current) {
+      setCurrentTime(audioRef.current.currentTime);
+    }
+  };
+
+  const handleAudioLoadedMetadata = () => {
+    if (audioRef.current) {
+      setAudioDuration(audioRef.current.duration || 0);
+    }
+  };
+
+  const handleAudioSeek = (e) => {
+    const seekTime = Number(e.target.value);
+    setCurrentTime(seekTime);
+    if (audioRef.current) {
+      audioRef.current.currentTime = seekTime;
+    }
+  };
+
+  const skipAudio = (seconds) => {
+    if (audioRef.current) {
+      const newTime = Math.min(Math.max(audioRef.current.currentTime + seconds, 0), audioDuration || 3600);
+      audioRef.current.currentTime = newTime;
+      setCurrentTime(newTime);
+    }
+  };
+
+  const toggleAudioMute = () => {
+    if (audioRef.current) {
+      audioRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
+    }
+  };
+
+  const changePlaybackRate = (rate) => {
+    setPlaybackRate(rate);
+    if (audioRef.current) {
+      audioRef.current.playbackRate = rate;
+    }
+  };
+
+  const formatAudioTime = (seconds) => {
+    if (isNaN(seconds) || seconds === null || seconds === undefined) return "00:00";
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   useEffect(() => {
     fetchProgramAndProgress();
@@ -213,11 +296,12 @@ const ProgramDashboard = () => {
   }
 
   const isAncestral = program.title && program.title.toLowerCase().includes('ancestral');
+  const isNavratri = program && (program.title.toLowerCase().includes('navratri') || program._id === '6a4963f49e941f93f91f5ac5' || program.duration === '9 Days');
   const hasSessions = (program.sessions && program.sessions.length > 0) || isAncestral;
   const sessionsList = (program.sessions && program.sessions.length > 0) ? program.sessions : (isAncestral ? DEFAULT_ANCESTRAL_SESSIONS : []);
 
   // Compute progress percentage
-  const totalDays = program && program.duration ? (parseInt(program.duration, 10) || 30) : 30;
+  const totalDays = program && program.duration ? (parseInt(program.duration, 10) || (isNavratri ? 9 : 30)) : (isNavratri ? 9 : 30);
   const completedDaysCount = progress ? progress.submissions.length : 0;
   const progressPercent = Math.round((completedDaysCount / totalDays) * 100);
 
@@ -226,6 +310,7 @@ const ProgramDashboard = () => {
 
   const isPhotoRequired = program && (program.title.toLowerCase().includes('gratitude') || program._id === '6a4963f49e941f93f91f5abf');
   const isPrayerProgram = program && (program.title.toLowerCase().includes('prayer') || program._id === '6a4963f49e941f93f91f5ac1');
+  const isAudioProgram = isNavratri || (selectedAssignment && selectedAssignment.audioUrl);
 
   const getEmbedVideoUrl = (contentString) => {
     if (!contentString) return null;
@@ -238,6 +323,9 @@ const ProgramDashboard = () => {
     const title = program.title.toLowerCase();
     const progId = program._id.toString();
     
+    if (title.includes('navratri') || progId === '6a4963f49e941f93f91f5ac5') {
+      return program.youtubeUrl || null;
+    }
     if (title.includes('ancestral')) {
       return program.youtubeUrl || "https://www.youtube.com/embed/jIs3IH-brtg";
     }
@@ -253,10 +341,12 @@ const ProgramDashboard = () => {
     return program.youtubeUrl || null;
   };
 
+  const maxProgramAccessDays = isNavratri ? 10 : (program && (program.title.toLowerCase().includes('gratitude') || program._id === '6a4963f49e941f93f91f5abf') ? 35 : 0);
+
   const getRemainingDaysText = () => {
-    if (!progress || !progress.createdAt) return '';
+    if (!progress || !progress.createdAt || maxProgramAccessDays === 0) return '';
     const startDate = new Date(progress.createdAt);
-    const expirationDate = new Date(startDate.getTime() + 35 * 24 * 60 * 60 * 1000);
+    const expirationDate = new Date(startDate.getTime() + maxProgramAccessDays * 24 * 60 * 60 * 1000);
     const today = new Date();
     const diffTime = expirationDate - today;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -268,11 +358,11 @@ const ProgramDashboard = () => {
     });
 
     if (diffDays <= 0) {
-      return `Expired on ${formattedExpiryDate}`;
+      return `Access Expired on ${formattedExpiryDate}`;
     } else if (diffDays === 1) {
-      return `Expires tomorrow (Expiry: ${formattedExpiryDate})`;
+      return `Expires tomorrow (${formattedExpiryDate})`;
     } else {
-      return `${diffDays} days remaining (Expiry: ${formattedExpiryDate})`;
+      return `${diffDays} days access left (Valid till: ${formattedExpiryDate})`;
     }
   };
 
@@ -603,8 +693,8 @@ const ProgramDashboard = () => {
             <span className="font-serif text-lg font-bold text-charcoal-dark">
               {completedDaysCount} of {totalDays} Days Completed ({progressPercent}%)
             </span>
-            {program && (program.title.toLowerCase().includes('gratitude') || program._id === '6a4963f49e941f93f91f5abf') && (
-              <span className="text-[10px] text-red-500 font-bold uppercase tracking-wider mt-0.5 flex items-center gap-1 font-sans">
+            {maxProgramAccessDays > 0 && (
+              <span className="text-[10px] text-red-600 font-bold uppercase tracking-wider mt-0.5 flex items-center gap-1 font-sans bg-red-50 border border-red-200/70 px-2 py-0.5 rounded-md">
                 ⏳ {getRemainingDaysText()}
               </span>
             )}
@@ -734,7 +824,128 @@ const ProgramDashboard = () => {
                     </div>
                   )}
                   
-                  {/* Task Content */}
+                  {/* Dedicated Interactive Audio Book Player for Navratri & Audio Programs */}
+                  {selectedAssignment.audioUrl && (
+                    <div className="bg-gradient-to-br from-[#FFFDF7] via-[#FFF9ED] to-[#FFF3DC] border-2 border-gold/40 p-5 md:p-6 rounded-3xl shadow-md flex flex-col gap-4 text-left relative overflow-hidden">
+                      <div className="flex items-center justify-between border-b border-gold/25 pb-3">
+                        <div className="flex items-center gap-2">
+                          <span className="p-2 rounded-xl bg-gold text-charcoal-dark shadow-sm">
+                            <Headphones className="w-5 h-5 animate-pulse" />
+                          </span>
+                          <div className="flex flex-col">
+                            <span className="text-[10px] font-bold text-gold-dark uppercase tracking-widest">
+                              {isNavratri ? 'Sacred Navratri Audiobook' : 'Audio Meditation Session'}
+                            </span>
+                            <span className="font-serif text-sm font-bold text-charcoal-dark line-clamp-1">
+                              {selectedAssignment.title}
+                            </span>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-bold text-sage bg-sage/10 px-2.5 py-1 rounded-full border border-sage/25">
+                          {selectedAssignment.estimatedDuration || selectedAssignment.audioDuration || '25 mins'}
+                        </span>
+                      </div>
+
+                      {/* Hidden HTML5 Audio Element */}
+                      <audio
+                        ref={audioRef}
+                        src={selectedAssignment.audioUrl}
+                        onTimeUpdate={handleAudioTimeUpdate}
+                        onLoadedMetadata={handleAudioLoadedMetadata}
+                        onEnded={() => setIsPlaying(false)}
+                      />
+
+                      {/* Audio Controls Bar */}
+                      <div className="flex flex-col gap-3 pt-1">
+                        {/* Seeker slider */}
+                        <div className="flex items-center gap-3 w-full">
+                          <span className="text-[10px] font-mono font-bold text-charcoal-light w-10 text-right">
+                            {formatAudioTime(currentTime)}
+                          </span>
+                          <input
+                            type="range"
+                            min="0"
+                            max={audioDuration || 100}
+                            value={currentTime}
+                            onChange={handleAudioSeek}
+                            className="flex-grow h-2 bg-cream-dark/60 rounded-lg appearance-none cursor-pointer accent-[#D4A017]"
+                          />
+                          <span className="text-[10px] font-mono font-bold text-charcoal-light w-10">
+                            {formatAudioTime(audioDuration || (parseInt(selectedAssignment.estimatedDuration, 10) * 60) || 1500)}
+                          </span>
+                        </div>
+
+                        {/* Player Buttons Row */}
+                        <div className="flex items-center justify-between flex-wrap gap-3 pt-2">
+                          {/* Left: Speed chips */}
+                          <div className="flex items-center gap-1">
+                            <span className="text-[9px] text-charcoal-light font-bold uppercase tracking-wider mr-1">Speed:</span>
+                            {[0.75, 1, 1.25, 1.5].map((rate) => (
+                              <button
+                                key={rate}
+                                type="button"
+                                onClick={() => changePlaybackRate(rate)}
+                                className={`text-[9px] font-bold px-2 py-0.5 rounded-md transition-all ${
+                                  playbackRate === rate 
+                                    ? 'bg-gold text-charcoal-dark font-extrabold shadow-xs' 
+                                    : 'bg-white/80 text-charcoal-light hover:text-charcoal border border-cream-dark/60'
+                                }`}
+                              >
+                                {rate}x
+                              </button>
+                            ))}
+                          </div>
+
+                          {/* Center: Play / Pause / Skip */}
+                          <div className="flex items-center gap-3">
+                            <button
+                              type="button"
+                              onClick={() => skipAudio(-15)}
+                              className="p-2 rounded-full bg-white hover:bg-cream border border-cream-dark/60 text-charcoal hover:text-gold transition-colors shadow-2xs"
+                              title="Skip back 15s"
+                            >
+                              <RotateCcw className="w-4 h-4" />
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={togglePlayAudio}
+                              className="w-12 h-12 rounded-full bg-gold hover:bg-gold-dark text-charcoal-dark flex items-center justify-center transition-all duration-300 transform hover:scale-105 shadow-md border-2 border-white ring-2 ring-gold/40"
+                              title={isPlaying ? "Pause Audiobook" : "Play Audiobook"}
+                            >
+                              {isPlaying ? (
+                                <Pause className="w-5 h-5 fill-charcoal-dark" />
+                              ) : (
+                                <Play className="w-5 h-5 fill-charcoal-dark translate-x-0.5" />
+                              )}
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => skipAudio(15)}
+                              className="p-2 rounded-full bg-white hover:bg-cream border border-cream-dark/60 text-charcoal hover:text-gold transition-colors shadow-2xs"
+                              title="Skip forward 15s"
+                            >
+                              <RotateCw className="w-4 h-4" />
+                            </button>
+                          </div>
+
+                          {/* Right: Volume */}
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={toggleAudioMute}
+                              className="p-1.5 rounded-lg bg-white/80 hover:bg-white text-charcoal border border-cream-dark/50"
+                            >
+                              {isMuted ? <VolumeX className="w-3.5 h-3.5 text-red-500" /> : <Volume2 className="w-3.5 h-3.5 text-gold-dark" />}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Task Content / Description */}
                   <div className="bg-cream/40 border border-cream-dark/40 p-5 rounded-xl leading-relaxed">
                     <div className="text-xs text-charcoal text-justify whitespace-pre-wrap font-medium">
                       {selectedAssignment.content}
@@ -806,7 +1017,13 @@ const ProgramDashboard = () => {
                         </>
                       ) : (
                         <>
-                          <span>{isPrayerProgram ? "Mark as Read & Unlock Next Day" : "Complete Assignment & Unlock Next Day"}</span>
+                          <span>
+                            {isNavratri
+                              ? "Mark Audio Session as Complete & Unlock Next Day"
+                              : isPrayerProgram 
+                                ? "Mark as Read & Unlock Next Day" 
+                                : "Complete Assignment & Unlock Next Day"}
+                          </span>
                           <ArrowRight className="w-4 h-4" />
                         </>
                       )}

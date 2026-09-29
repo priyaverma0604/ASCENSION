@@ -27,6 +27,14 @@ const assignmentSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  audioUrl: {
+    type: String,
+    default: ''
+  },
+  audioDuration: {
+    type: String,
+    default: ''
+  },
   status: {
     type: String,
     enum: ['Active', 'Inactive'],

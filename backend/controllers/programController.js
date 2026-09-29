@@ -547,15 +547,19 @@ exports.getProgramProgress = async (req, res, next) => {
       });
     }
 
-    // Check expiration: 35 days limit for Gratitude Program
-    if (program.title.toLowerCase().includes('gratitude') || program._id.toString() === '6a4963f49e941f93f91f5abf') {
+    // Check expiration: 10 days limit for Navratri Program, 35 days for Gratitude Program
+    const isNavratriProgram = program.title.toLowerCase().includes('navratri') || program._id.toString() === '6a4963f49e941f93f91f5ac5';
+    const isGratitudeProgram = program.title.toLowerCase().includes('gratitude') || program._id.toString() === '6a4963f49e941f93f91f5abf';
+    const maxAccessDays = isNavratriProgram ? 10 : (isGratitudeProgram ? 35 : 0);
+
+    if (maxAccessDays > 0) {
       const startDate = progress.createdAt || new Date();
-      const expirationDate = new Date(startDate.getTime() + 35 * 24 * 60 * 60 * 1000);
+      const expirationDate = new Date(startDate.getTime() + maxAccessDays * 24 * 60 * 60 * 1000);
       if (new Date() > expirationDate) {
         return res.status(403).json({ 
           success: false, 
           code: 'PROGRAM_EXPIRED', 
-          message: 'Your 35-day access to this program has expired. Please contact support or re-enroll to gain access.' 
+          message: `Your ${maxAccessDays}-day access to this program has expired. Please contact support or re-enroll to gain access.` 
         });
       }
     }

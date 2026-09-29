@@ -24,7 +24,21 @@ const getSingleImagePath = (req, fieldName) => {
 // @access  Public
 exports.getWebinars = async (req, res, next) => {
   try {
-    let query = Webinar.find({}).sort({ date: 1 });
+    // Auto-update past webinars whose date has passed to 'Completed'
+    const now = new Date();
+    await Webinar.updateMany(
+      { date: { $lt: now }, status: 'Upcoming' },
+      { $set: { status: 'Completed' } }
+    );
+
+    let filter = {};
+    if (req.query.upcoming === 'true') {
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      filter = { date: { $gte: todayStart }, status: { $ne: 'Cancelled' } };
+    }
+
+    let query = Webinar.find(filter).sort({ date: 1 });
     
     // Check if requester is Admin to expose Zoom link
     // Note: On public GET route, we project out zoomLink by default unless admin is querying

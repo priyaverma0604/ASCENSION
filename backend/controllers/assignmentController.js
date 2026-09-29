@@ -279,6 +279,8 @@ exports.getAssignmentsUser = async (req, res, next) => {
         dayNumber: assign.dayNumber,
         title: assign.title,
         estimatedDuration: assign.estimatedDuration,
+        audioUrl: assign.audioUrl || '',
+        audioDuration: assign.audioDuration || assign.estimatedDuration || '',
         isLocked,
         isCompleted
       };
@@ -354,17 +356,23 @@ exports.submitAssignment = async (req, res, next) => {
       });
     }
 
-    // Check expiration: 35 days limit for Gratitude Program
-    if (program.title.toLowerCase().includes('gratitude') || program._id.toString() === '6a4963f49e941f93f91f5abf') {
+    // Check expiration: 10 days limit for Navratri Program, 35 days for Gratitude Program
+    const isNavratriProgram = program.title.toLowerCase().includes('navratri') || program._id.toString() === '6a4963f49e941f93f91f5ac5';
+    const isGratitudeProgram = program.title.toLowerCase().includes('gratitude') || program._id.toString() === '6a4963f49e941f93f91f5abf';
+    const maxAccessDays = isNavratriProgram ? 10 : (isGratitudeProgram ? 35 : 0);
+
+    if (maxAccessDays > 0) {
       const startDate = progress.createdAt || new Date();
-      const expirationDate = new Date(startDate.getTime() + 35 * 24 * 60 * 60 * 1000);
+      const expirationDate = new Date(startDate.getTime() + maxAccessDays * 24 * 60 * 60 * 1000);
       if (new Date() > expirationDate) {
-        return res.status(403).json({ success: false, message: 'Your enrollment in this program has expired (maximum 35 days limit).' });
+        return res.status(403).json({ success: false, message: `Your enrollment in this program has expired (maximum ${maxAccessDays} days access limit).` });
       }
     }
 
+    const totalProgramDays = program.duration ? (parseInt(program.duration, 10) || 30) : 30;
+
     if (progress.completed) {
-      return res.status(400).json({ success: false, message: 'You have already completed this 30-day program!' });
+      return res.status(400).json({ success: false, message: `You have already completed this ${totalProgramDays}-day program!` });
     }
 
     // Backend Security: Verify that the submitted assignment day matches the user's progress day
@@ -416,7 +424,7 @@ exports.submitAssignment = async (req, res, next) => {
       submittedAt: new Date()
     });
 
-    if (assignment.dayNumber >= 30) {
+    if (assignment.dayNumber >= totalProgramDays) {
       progress.completed = true;
     } else {
       progress.currentDay = assignment.dayNumber + 1;

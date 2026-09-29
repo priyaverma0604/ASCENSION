@@ -102,29 +102,14 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
       searchParams.get('register') === 'true';
 
     if (isAncestralRoute) {
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
       const found = workshops.find(
-        w => (w.title && w.title.toLowerCase().includes('ancestral')) || (w.name && w.name.toLowerCase().includes('ancestral'))
-      ) || workshops.find(w => w.isWebinar) || workshops[0];
+        w => ((w.title && w.title.toLowerCase().includes('ancestral')) || (w.name && w.name.toLowerCase().includes('ancestral')) || w.isWebinar) && new Date(w.date) >= todayStart
+      );
 
       if (found) {
         setActiveWorkshop(found);
-      } else if (!loading) {
-        setActiveWorkshop({
-          _id: "ancestral-healing-webinar-id",
-          title: "Ancestral Healing Webinar",
-          shortDescription: "Join Sonali Bhasin Kumar for a powerful live introductory Ancestral Healing Webinar. Discover the foundations of healing family karma, clearing intergenerational trauma, and receiving sacred ancestral blessings.",
-          speakerName: "Sonali Bhasin Kumar",
-          date: new Date('2026-09-23T19:00:00+05:30'),
-          time: "7:00 PM - 8:30 PM IST",
-          duration: "90 minutes",
-          price: 99,
-          coverImage: "/uploads/ancestral_healing_webinar_bg.png",
-          upiQrCodeImage: "/uploads/default_upi_qr.jpg",
-          upiId: "sonalibhasinkumar@ptaxis",
-          mobileNumber: "9999999999",
-          whatsappGroupLink: "https://chat.whatsapp.com/J4nXj2mznEfLCj2YZd1v16",
-          isWebinar: true
-        });
       }
     }
   }, [location, searchParams, workshops, loading, autoOpenAncestral]);
@@ -276,7 +261,7 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
       }
       if (resWebinars.data.success) {
         const activeWebinars = resWebinars.data.data
-          .filter(w => new Date(w.date) >= todayStart)
+          .filter(w => new Date(w.date) >= todayStart && w.status !== 'Completed' && w.status !== 'Cancelled')
           .map(w => ({ ...w, isWebinar: true }));
         combined = [...combined, ...activeWebinars];
       }
@@ -478,45 +463,35 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
 
         <div className="flex flex-col items-center gap-3 sm:gap-4 relative z-10 w-full max-w-4xl 2xl:max-w-5xl 3xl:max-w-6xl mx-auto animate-fade-in lg:-translate-y-8 2xl:-translate-y-12">
 
-          {/* Flashy Live Webinar Announcement Flash Banner */}
-          <div 
-            onClick={() => {
-              const ancestral = workshops.find(w => (w.title && w.title.toLowerCase().includes('ancestral')) || (w.name && w.name.toLowerCase().includes('ancestral'))) || workshops.find(w => w.isWebinar);
-              if (ancestral) handleOpenWorkshop(ancestral);
-              else handleOpenWorkshop({
-                _id: "ancestral-healing-webinar-id",
-                title: "Ancestral Healing Webinar",
-                shortDescription: "Join Sonali Bhasin Kumar for a powerful live introductory Ancestral Healing Webinar. Discover the foundations of healing family karma, clearing intergenerational trauma, and receiving sacred ancestral blessings.",
-                speakerName: "Sonali Bhasin Kumar",
-                date: new Date('2026-09-23T19:00:00+05:30'),
-                time: "7:00 PM - 8:30 PM IST",
-                duration: "90 minutes",
-                price: 99,
-                coverImage: "/uploads/ancestral_healing_webinar_bg.png",
-                upiQrCodeImage: "/uploads/default_upi_qr.jpg",
-                upiId: "sonalibhasinkumar@ptaxis",
-                mobileNumber: "9999999999",
-                whatsappGroupLink: "https://chat.whatsapp.com/J4nXj2mznEfLCj2YZd1v16",
-                isWebinar: true
-              });
-            }}
-            className="group cursor-pointer inline-flex items-center gap-2 sm:gap-2.5 px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full bg-white/95 hover:bg-white border-2 border-[#D4A017] shadow-[0_4px_25px_rgba(212,160,23,0.35)] hover:shadow-[0_8px_35px_rgba(212,160,23,0.5)] transition-all duration-300 transform hover:scale-[1.03] mb-1 select-none animate-pulse"
-          >
-            <span className="relative flex h-2.5 w-2.5 shrink-0">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-90"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-600"></span>
-            </span>
-            <span className="bg-red-600 text-white text-[9px] sm:text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs flex items-center gap-1">
-              <Zap className="w-3 h-3 text-yellow-300 fill-yellow-300" />
-              <span>REGISTRATIONS LIVE</span>
-            </span>
-            <span className="text-[11px] sm:text-xs font-bold text-charcoal-dark tracking-wide font-sans truncate max-w-[170px] sm:max-w-none">
-              Ancestral Healing Live Webinar
-            </span>
-            <span className="text-[11px] sm:text-xs font-serif font-bold text-gold-dark flex items-center gap-1 group-hover:text-gold-darker">
-              <span className="hidden sm:inline">•</span> ₹99 Pass <span className="group-hover:translate-x-1 transition-transform">→</span>
-            </span>
-          </div>
+          {/* Flashy Live Webinar Announcement Flash Banner - Dynamic: only render when an active upcoming webinar exists */}
+          {(() => {
+            const todayStart = new Date();
+            todayStart.setHours(0, 0, 0, 0);
+            const activeWebinar = workshops.find(w => w.isWebinar && new Date(w.date) >= todayStart && w.status !== 'Completed' && w.status !== 'Cancelled');
+            if (!activeWebinar) return null;
+
+            return (
+              <div 
+                onClick={() => handleOpenWorkshop(activeWebinar)}
+                className="group cursor-pointer inline-flex items-center gap-2 sm:gap-2.5 px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full bg-white/95 hover:bg-white border-2 border-[#D4A017] shadow-[0_4px_25px_rgba(212,160,23,0.35)] hover:shadow-[0_8px_35px_rgba(212,160,23,0.5)] transition-all duration-300 transform hover:scale-[1.03] mb-1 select-none animate-pulse"
+              >
+                <span className="relative flex h-2.5 w-2.5 shrink-0">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-90"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-600"></span>
+                </span>
+                <span className="bg-red-600 text-white text-[9px] sm:text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs flex items-center gap-1">
+                  <Zap className="w-3 h-3 text-yellow-300 fill-yellow-300" />
+                  <span>REGISTRATIONS LIVE</span>
+                </span>
+                <span className="text-[11px] sm:text-xs font-bold text-charcoal-dark tracking-wide font-sans truncate max-w-[170px] sm:max-w-none">
+                  {activeWebinar.title}
+                </span>
+                <span className="text-[11px] sm:text-xs font-serif font-bold text-gold-dark flex items-center gap-1 group-hover:text-gold-darker">
+                  <span className="hidden sm:inline">•</span> ₹{activeWebinar.price} Pass <span className="group-hover:translate-x-1 transition-transform">→</span>
+                </span>
+              </div>
+            );
+          })()}
 
           <span className="font-cormorant text-xs sm:text-base 2xl:text-lg text-black font-bold tracking-wider uppercase">
             Reclaim your peace. Reconnect with your light.
@@ -707,13 +682,15 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
           <span id="webinar" className="absolute -top-24"></span>
           <span id="upcoming-events" className="absolute -top-24"></span>
           <div className="max-w-6xl 2xl:max-w-7xl 3xl:max-w-screen-2xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-red-600/10 border border-red-500/25 text-red-600 font-sans text-[10px] font-extrabold uppercase tracking-widest mb-3 animate-pulse">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-90"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
-              </span>
-              <span>LIVE GATHERINGS & WEBINARS</span>
-            </div>
+            {workshops.some(w => w.isWebinar) && (
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-red-600/10 border border-red-500/25 text-red-600 font-sans text-[10px] font-extrabold uppercase tracking-widest mb-3 animate-pulse">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-90"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
+                </span>
+                <span>LIVE GATHERINGS & WEBINARS</span>
+              </div>
+            )}
             <h2 className="font-serif text-3xl 2xl:text-4xl font-bold text-charcoal-dark mt-1 mb-10 sm:mb-12">Upcoming Webinars & Workshops</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">

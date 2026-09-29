@@ -172,8 +172,8 @@ const startWebinarReminderCron = () => {
         const timeDiffMs = exactStartTime.getTime() - now.getTime();
         const minutesDiff = timeDiffMs / (1000 * 60);
 
-        // If webinar starts in between -15 minutes (just started) and +65 minutes (starts in an hour)
-        if (minutesDiff <= 65 && minutesDiff >= -15) {
+        // If webinar starts in between -15 minutes (just started) and +125 minutes (triggers 2 hours before, e.g. 5:00 PM for 7:00 PM)
+        if (minutesDiff <= 125 && minutesDiff >= -15) {
           const registrations = await WebinarRegistration.find({
             webinar: webinar._id,
             paymentStatus: 'Paid',
@@ -202,9 +202,9 @@ const startWebinarReminderCron = () => {
             const emailOptions = {
               to: reg.email,
               subject: `Webinar Alert: Your Zoom Link for "${webinar.title}"`,
-              text: `Hello ${reg.name},\n\nYour registered webinar "${webinar.title}" starts in less than an hour.\n\nWebinar Details:\n- Webinar Name: ${webinar.title}\n- Date: ${formattedDate}\n- Time: ${webinar.time}\n- Speaker: ${webinar.speakerName}\n\nZoom Meeting Link:\n${webinar.zoomLink}${meetingInfoText}${actionBlocksText}\nPlease join 10 minutes early.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
+              text: `Hello ${reg.name},\n\nYour registered webinar "${webinar.title}" starts today.\n\nWebinar Details:\n- Webinar Name: ${webinar.title}\n- Date: ${formattedDate}\n- Time: ${webinar.time}\n- Speaker: ${webinar.speakerName}\n\nZoom Meeting Link:\n${webinar.zoomLink}${meetingInfoText}${actionBlocksText}\nPlease join 10 minutes early.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
               html: `<p>Hello <strong>${reg.name}</strong>,</p>
-                     <p>Your registered webinar "<strong>${webinar.title}</strong>" starts in less than an hour.</p>
+                     <p>Your registered webinar "<strong>${webinar.title}</strong>" starts today at <strong>${webinar.time}</strong>.</p>
                      <h4>Webinar Details:</h4>
                      <ul>
                        <li><strong>Webinar Name:</strong> ${webinar.title}</li>
@@ -231,7 +231,7 @@ const startWebinarReminderCron = () => {
         }
       }
     } catch (error) {
-      console.error('Cron Service: Error checking for 1-hour webinar reminders:', error.message);
+      console.error('Cron Service: Error checking for webinar Zoom link reminders:', error.message);
     }
   });
   

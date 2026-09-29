@@ -5,6 +5,7 @@ import { AuthContext } from '../context/AuthContext';
 import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
 import logo from '../assets/logo.png';
+import axios from 'axios';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,6 +13,7 @@ const Navbar = () => {
   const [sevaDropdownOpen, setSevaDropdownOpen] = useState(false);
   const [mobileSevaOpen, setMobileSevaOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [hasLiveWebinars, setHasLiveWebinars] = useState(false);
 
   const { user, logout } = useContext(AuthContext);
   const { getCartCount } = useContext(CartContext);
@@ -29,6 +31,25 @@ const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+    const checkLiveWebinars = async () => {
+      try {
+        const res = await axios.get('/api/webinars');
+        if (res.data && res.data.success && isMounted) {
+          const todayStart = new Date();
+          todayStart.setHours(0, 0, 0, 0);
+          const active = res.data.data.filter(w => new Date(w.date) >= todayStart && w.status !== 'Completed' && w.status !== 'Cancelled');
+          setHasLiveWebinars(active.length > 0);
+        }
+      } catch (err) {
+        if (isMounted) setHasLiveWebinars(false);
+      }
+    };
+    checkLiveWebinars();
+    return () => { isMounted = false; };
+  }, [location.pathname]);
 
   const handleLogout = () => {
     logout();
@@ -91,13 +112,17 @@ const Navbar = () => {
               }
             >
               <span>Webinars</span>
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-90"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
-              </span>
-              <span className="bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-tight animate-pulse shadow-xs">
-                LIVE
-              </span>
+              {hasLiveWebinars && (
+                <>
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-90"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
+                  </span>
+                  <span className="bg-red-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-tight animate-pulse shadow-xs">
+                    LIVE
+                  </span>
+                </>
+              )}
             </NavLink>
 
             {/* Seva Dropdown Parent */}
@@ -355,15 +380,19 @@ const Navbar = () => {
                   className={`text-xs font-bold uppercase tracking-wider py-2.5 px-2 rounded-xl hover:bg-cream-dark/30 hover:text-gold transition-colors flex items-center justify-between ${location.pathname === '/webinars' || location.pathname === '/webinar' || location.pathname === '/ancestral-healing-webinar' ? 'text-gold bg-gold/10' : 'text-charcoal'}`}
                 >
                   <span className="flex items-center gap-2">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-90"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
+                    {hasLiveWebinars && (
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-90"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600"></span>
+                      </span>
+                    )}
+                    <span>{hasLiveWebinars ? 'Live Webinars' : 'Webinars'}</span>
+                  </span>
+                  {hasLiveWebinars && (
+                    <span className="bg-red-600 text-white text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse shadow-xs">
+                      REGISTRATIONS LIVE
                     </span>
-                    <span>Live Webinars</span>
-                  </span>
-                  <span className="bg-red-600 text-white text-[8px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider animate-pulse shadow-xs">
-                    REGISTRATIONS LIVE
-                  </span>
+                  )}
                 </Link>
 
                 {/* Mobile Seva Accordion */}
