@@ -38,13 +38,15 @@ import holisticWellnessImg from '../assets/why_choose/holistic_wellness.jpg';
 import natureInspiredImg from '../assets/why_choose/nature_inspired_healing.jpg';
 import trustedByThousandsImg from '../assets/why_choose/trusted_by_thousands.jpg';
 import smallLearnersSeva from '../assets/small_learners_seva.jpg';
+import navratriBanner from '../assets/navratri_9_days_banner.jpg';
 
 const getImageUrl = (path) => {
   if (!path) return '';
+  if (typeof path === 'string' && path.includes('navratri')) return navratriBanner;
   if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
     return path;
   }
-  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+  const apiBase = import.meta.env.VITE_API_URL || '';
   return `${apiBase}${path}`;
 };
 

@@ -4,13 +4,15 @@ import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import EnrollProgramModal from '../components/EnrollProgramModal';
+import navratriBanner from '../assets/navratri_9_days_banner.jpg';
 
 const getImageUrl = (path) => {
   if (!path) return '';
+  if (typeof path === 'string' && path.includes('navratri')) return navratriBanner;
   if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
     return path;
   }
-  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const apiBase = import.meta.env.VITE_API_URL || '';
   return `${apiBase}${path}`;
 };
 
