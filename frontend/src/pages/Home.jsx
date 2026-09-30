@@ -11,6 +11,7 @@ import RegisterWorkshopModal from '../components/RegisterWorkshopModal';
 import RegisterWebinarModal from '../components/RegisterWebinarModal';
 import BookRetreatModal from '../components/BookRetreatModal';
 import BookSessionModal from '../components/BookSessionModal';
+import SacredGeometry3D from '../components/SacredGeometry3D';
 import waterfallBg from '../assets/waterfall_bg.jpg';
 import founderImg from '../assets/founder.jpg';
 import foodSeva from '../assets/food_seva.png';
@@ -451,79 +452,107 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
     <div className="flex flex-col min-h-screen">
 
       {/* 1. Hero Section */}
-      <section className="relative min-h-[500px] lg:h-screen lg:min-h-[620px] lg:max-h-[1080px] 2xl:min-h-[700px] flex flex-col justify-center items-center px-4 sm:px-6 md:px-12 lg:px-20 text-center overflow-hidden border-b border-cream-dark/30 bg-cream-light py-12 lg:py-0">
+      <section className="relative min-h-[600px] lg:min-h-[750px] 2xl:min-h-[850px] flex flex-col justify-center items-center px-4 sm:px-6 md:px-12 lg:px-16 text-center overflow-hidden border-b border-cream-dark/30 bg-cream-light py-10 lg:py-16">
         {/* Blurred & Softened Background Layer */}
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat pointer-events-none"
           style={{
             backgroundImage: `url(${waterfallBg})`,
-            filter: 'brightness(1.1)'
+            filter: 'brightness(1.08)'
           }}
         />
         {/* Soft Radial Contrast Overlay to enhance text readability without fading the bottom edges */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.7)_0%,rgba(255,255,255,0.1)_80%)] z-0" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.75)_0%,rgba(255,255,255,0.15)_85%)] z-0 pointer-events-none" />
 
-        <div className="flex flex-col items-center gap-3 sm:gap-4 relative z-10 w-full max-w-4xl 2xl:max-w-5xl 3xl:max-w-6xl mx-auto animate-fade-in lg:-translate-y-8 2xl:-translate-y-12">
+        {/* Hero Grid Container */}
+        <div className="relative z-10 w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center pt-2 pb-20 lg:pb-24">
 
-          {/* Flashy Live Webinar Announcement Flash Banner - Dynamic: only render when an active upcoming webinar exists */}
-          {(() => {
-            const todayStart = new Date();
-            todayStart.setHours(0, 0, 0, 0);
-            const activeWebinar = workshops.find(w => w.isWebinar && new Date(w.date) >= todayStart && w.status !== 'Completed' && w.status !== 'Cancelled');
-            if (!activeWebinar) return null;
+          {/* Left Column: Hero Text & CTAs */}
+          <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left gap-3.5 sm:gap-4 animate-fade-in">
 
-            return (
-              <div 
-                onClick={() => handleOpenWorkshop(activeWebinar)}
-                className="group cursor-pointer inline-flex items-center gap-2 sm:gap-2.5 px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full bg-white/95 hover:bg-white border-2 border-[#D4A017] shadow-[0_4px_25px_rgba(212,160,23,0.35)] hover:shadow-[0_8px_35px_rgba(212,160,23,0.5)] transition-all duration-300 transform hover:scale-[1.03] mb-1 select-none animate-pulse"
+            {/* Flashy Live Webinar Announcement Flash Banner - Dynamic: only render when an active upcoming webinar exists */}
+            {(() => {
+              const todayStart = new Date();
+              todayStart.setHours(0, 0, 0, 0);
+              const activeWebinar = workshops.find(w => w.isWebinar && new Date(w.date) >= todayStart && w.status !== 'Completed' && w.status !== 'Cancelled');
+              if (!activeWebinar) return null;
+
+              return (
+                <div 
+                  onClick={() => handleOpenWorkshop(activeWebinar)}
+                  className="group cursor-pointer inline-flex items-center gap-2 sm:gap-2.5 px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full bg-white/95 hover:bg-white border-2 border-[#D4A017] shadow-[0_4px_25px_rgba(212,160,23,0.35)] hover:shadow-[0_8px_35px_rgba(212,160,23,0.5)] transition-all duration-300 transform hover:scale-[1.03] mb-1 select-none animate-pulse"
+                >
+                  <span className="relative flex h-2.5 w-2.5 shrink-0">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-90"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-600"></span>
+                  </span>
+                  <span className="bg-red-600 text-white text-[9px] sm:text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs flex items-center gap-1">
+                    <Zap className="w-3 h-3 text-yellow-300 fill-yellow-300" />
+                    <span>REGISTRATIONS LIVE</span>
+                  </span>
+                  <span className="text-[11px] sm:text-xs font-bold text-charcoal-dark tracking-wide font-sans truncate max-w-[170px] sm:max-w-none">
+                    {activeWebinar.title}
+                  </span>
+                  <span className="text-[11px] sm:text-xs font-serif font-bold text-gold-dark flex items-center gap-1 group-hover:text-gold-darker">
+                    <span className="hidden sm:inline">•</span> ₹{activeWebinar.price} Pass <span className="group-hover:translate-x-1 transition-transform">→</span>
+                  </span>
+                </div>
+              );
+            })()}
+
+            <span className="font-cormorant text-xs sm:text-base 2xl:text-lg text-black font-bold tracking-wider uppercase">
+              Reclaim your peace. Reconnect with your light.
+            </span>
+
+            <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[44px] xl:text-5xl 2xl:text-6xl font-bold tracking-wide text-charcoal-dark leading-tight mt-1">
+              A Sanctuary for <br className="hidden sm:inline" />
+              <span className="text-gold drop-shadow-[0_1.5px_2px_rgba(31,29,26,0.4)] font-bold">Spiritual Awakening</span> <br className="hidden sm:inline" />
+              & Healing
+            </h1>
+
+            <p className="max-w-xl text-xs sm:text-sm 2xl:text-base text-charcoal-light leading-relaxed font-sans mt-0.5">
+              Embark on a profound journey of self-realization, emotional release, and energetic alignment. Experience custom angelic guidance, therapeutic sound baths, and subconscious healing in a secure, sacred environment.
+            </p>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start items-center w-full max-w-md mt-2 font-sans">
+              <Link
+                to="/services"
+                className="bg-sage hover:bg-sage-dark text-white text-xs 2xl:text-sm font-bold uppercase tracking-wider py-3.5 sm:py-4 px-7 sm:px-8 rounded-xl shadow-md transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center gap-2 group w-full sm:w-auto"
               >
-                <span className="relative flex h-2.5 w-2.5 shrink-0">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-90"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-600"></span>
-                </span>
-                <span className="bg-red-600 text-white text-[9px] sm:text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs flex items-center gap-1">
-                  <Zap className="w-3 h-3 text-yellow-300 fill-yellow-300" />
-                  <span>REGISTRATIONS LIVE</span>
-                </span>
-                <span className="text-[11px] sm:text-xs font-bold text-charcoal-dark tracking-wide font-sans truncate max-w-[170px] sm:max-w-none">
-                  {activeWebinar.title}
-                </span>
-                <span className="text-[11px] sm:text-xs font-serif font-bold text-gold-dark flex items-center gap-1 group-hover:text-gold-darker">
-                  <span className="hidden sm:inline">•</span> ₹{activeWebinar.price} Pass <span className="group-hover:translate-x-1 transition-transform">→</span>
-                </span>
-              </div>
-            );
-          })()}
+                <span>Explore Services</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-300" />
+              </Link>
+              <Link
+                to="/donate"
+                className="bg-white/80 backdrop-blur-xs hover:bg-cream-dark text-gold-dark border border-gold/45 text-xs 2xl:text-sm font-bold uppercase tracking-wider py-3.5 sm:py-4 px-7 sm:px-8 rounded-xl transition-all duration-300 transform hover:scale-[1.02] text-center w-full sm:w-auto shadow-xs"
+              >
+                Support Our NGO
+              </Link>
+            </div>
 
-          <span className="font-cormorant text-xs sm:text-base 2xl:text-lg text-black font-bold tracking-wider uppercase">
-            Reclaim your peace. Reconnect with your light.
-          </span>
+            {/* Micro Sacred Feature Tags */}
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 mt-3 text-[11px] text-charcoal-light font-sans font-medium">
+              <span className="flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-gold" /> Certified Sacred Modalities
+              </span>
+              <span className="hidden sm:inline text-cream-dark">•</span>
+              <span className="flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-sage-dark" /> 100% Confidential
+              </span>
+              <span className="hidden sm:inline text-cream-dark">•</span>
+              <span className="flex items-center gap-1.5">
+                <Heart className="w-3.5 h-3.5 text-red-500" /> 10,000+ Guided
+              </span>
+            </div>
 
-          <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl 2xl:text-6xl font-bold tracking-wide text-charcoal-dark leading-tight mt-1 sm:mt-2">
-            A Sanctuary for <br />
-            <span className="text-gold drop-shadow-[0_1.5px_2px_rgba(31,29,26,0.4)] font-bold">Spiritual Awakening</span> <br />
-            & Healing
-          </h1>
+          </div>
 
-          <p className="max-w-xl 2xl:max-w-2xl mx-auto text-xs sm:text-sm 2xl:text-base text-charcoal-light leading-relaxed font-sans mt-0.5">
-            Embark on a profound journey of self-realization, emotional release, and energetic alignment. Experience custom angelic guidance, therapeutic sound baths, and subconscious healing in a secure, sacred environment.
-          </p>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center w-full max-w-md mx-auto mt-3.5 font-sans">
-            <Link
-              to="/services"
-              className="bg-sage hover:bg-sage-dark text-white text-xs 2xl:text-sm font-bold uppercase tracking-wider py-3.5 sm:py-4 px-7 sm:px-8 rounded-xl shadow-md transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center gap-2 group w-full sm:w-auto"
-            >
-              <span>Explore Services</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-300" />
-            </Link>
-            <Link
-              to="/donate"
-              className="bg-cream-light hover:bg-cream-dark text-gold-dark border border-gold/45 text-xs 2xl:text-sm font-bold uppercase tracking-wider py-3.5 sm:py-4 px-7 sm:px-8 rounded-xl transition-all duration-300 transform hover:scale-[1.02] text-center w-full sm:w-auto"
-            >
-              Support Our NGO
-            </Link>
+          {/* Right Column: Interactive 3D Sacred Geometry Experience */}
+          <div className="lg:col-span-5 flex flex-col items-center justify-center relative w-full mt-4 lg:mt-0 animate-fade-in">
+            <div className="w-full max-w-[480px] bg-gradient-to-b from-white/70 via-white/50 to-white/30 backdrop-blur-md rounded-3xl p-3 sm:p-4 border border-white/80 shadow-[0_12px_40px_rgba(212,160,23,0.18)] hover:shadow-[0_16px_50px_rgba(212,160,23,0.28)] transition-all duration-500">
+              <SacredGeometry3D />
+            </div>
           </div>
 
         </div>
