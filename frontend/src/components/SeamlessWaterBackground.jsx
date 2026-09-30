@@ -20,17 +20,30 @@ const FRAGMENT_SHADER_SOURCE = `
   uniform vec2 uResolution;
   uniform vec2 uImageResolution;
 
-  // Calculate cover UV coordinates matching CSS object-fit: cover
+  // Calculate adaptive responsive cover UV coordinates matching optimal mobile & desktop framing
   vec2 getCoverUV(vec2 screenUV, vec2 screenRes, vec2 imgRes) {
     float screenAspect = screenRes.x / screenRes.y;
     float imgAspect = imgRes.x / imgRes.y;
     vec2 uv = screenUV;
+
     if (screenAspect > imgAspect) {
+      // Landscape Desktop
       float scale = imgAspect / screenAspect;
       uv.y = (screenUV.y - 0.5) * scale + 0.5;
     } else {
+      // Portrait Mobile / Tablet
       float scale = screenAspect / imgAspect;
-      uv.x = (screenUV.x - 0.5) * scale + 0.5;
+
+      // Adaptive focal positioning on mobile:
+      // On narrow mobile screens (aspect < 0.75), shift focal point toward the waterfall (x ≈ 0.58)
+      // so the majestic waterfall cascade, river rapids, and sunbeam atmosphere are fully framed
+      float focusX = mix(0.58, 0.50, smoothstep(0.40, 0.85, screenAspect));
+
+      // Keep focus within bounds
+      float halfSpan = 0.5 * scale;
+      float safeFocusX = clamp(focusX, halfSpan, 1.0 - halfSpan);
+
+      uv.x = (screenUV.x - 0.5) * scale + safeFocusX;
     }
     return uv;
   }
@@ -60,14 +73,12 @@ const FRAGMENT_SHADER_SOURCE = `
 
   // Pure Waterfall Water Cascade Mask (Exclusively targets the white water cascade)
   float getWaterCascadeMask(vec2 uv, vec4 pixelColor) {
-    // Spatial bounding box tightly around the vertical waterfall cascade
     float wfH = smoothstep(0.635, 0.675, uv.x) * (1.0 - smoothstep(0.785, 0.825, uv.x));
     float wfV = smoothstep(0.280, 0.330, uv.y) * (1.0 - smoothstep(0.650, 0.700, uv.y));
     float spatialBox = wfH * wfV;
 
     if (spatialBox <= 0.001) return 0.0;
 
-    // Pixel-color awareness: Water & foam are bright white/cyan (Luminance check)
     float luminance = dot(pixelColor.rgb, vec3(0.299, 0.587, 0.114));
     float isWaterColor = smoothstep(0.42, 0.60, luminance);
 
@@ -93,22 +104,18 @@ const FRAGMENT_SHADER_SOURCE = `
 
   // Enhanced Foliage & Leaf Mask (Clearly targets canopy, hanging branches, bushes, deck plants)
   float getFoliageMask(vec2 uv, vec4 pixelColor) {
-    // 1. Top-Left Canopy & Hanging Branches (x: 0.0 to 0.48, y: 0.0 to 0.40)
     float tlH = 1.0 - smoothstep(0.36, 0.50, uv.x);
     float tlV = 1.0 - smoothstep(0.26, 0.42, uv.y);
     float topCanopy = tlH * tlV;
 
-    // 2. Top-Right Canopy above waterfall (x: 0.60 to 1.0, y: 0.0 to 0.32)
     float trH = smoothstep(0.60, 0.72, uv.x);
     float trV = 1.0 - smoothstep(0.18, 0.32, uv.y);
     float topRightCanopy = trH * trV * 0.90;
 
-    // 3. Mid-Left Cliff Bushes (above big rocks) (x: 0.0 to 0.24, y: 0.22 to 0.48)
     float mlH = 1.0 - smoothstep(0.16, 0.26, uv.x);
     float mlV = smoothstep(0.22, 0.28, uv.y) * (1.0 - smoothstep(0.44, 0.50, uv.y));
     float midLeftBushes = mlH * mlV * 0.85;
 
-    // 4. Potted Green Plant on deck (x: 0.0 to 0.22, y: 0.64 to 0.86)
     float dpH = 1.0 - smoothstep(0.14, 0.24, uv.x);
     float dpV = smoothstep(0.64, 0.70, uv.y) * (1.0 - smoothstep(0.84, 0.90, uv.y));
     float deckPlant = dpH * dpV * 0.90;
@@ -116,14 +123,11 @@ const FRAGMENT_SHADER_SOURCE = `
     float spatialFoliage = clamp(topCanopy + topRightCanopy + midLeftBushes + deckPlant, 0.0, 1.0);
     if (spatialFoliage <= 0.001) return 0.0;
 
-    // Protect bright sun core from warping (x: ~0.18, y: ~0.16)
     float distToSun = length(uv - vec2(0.18, 0.16));
     float sunProt = smoothstep(0.08, 0.18, distToSun);
 
-    // Subtract rocks & deck wood
     float rockExclusion = getRockExclusion(uv);
 
-    // Color verification: Green or sunlit amber tones
     float greenDominance = pixelColor.g - max(pixelColor.r * 0.85, pixelColor.b * 0.9);
     float isGreenish = smoothstep(-0.02, 0.06, greenDominance);
     float hasGreenLuma = smoothstep(0.20, 0.60, pixelColor.g);
@@ -132,24 +136,16 @@ const FRAGMENT_SHADER_SOURCE = `
     return spatialFoliage * sunProt * leafFactor * (1.0 - rockExclusion);
   }
 
-  // Enhanced Natural Wind Breeze Sway for Leaves (Clear, graceful, vivid motion)
+  // Enhanced Natural Wind Breeze Sway for Leaves
   vec2 getLeafWindSway(vec2 uv, float time, float foliageMask) {
     if (foliageMask <= 0.002) return vec2(0.0);
 
-    // Spatial wind wave traveling diagonally across the tree canopy
     float windWave = uv.x * 4.2 + uv.y * 3.2 - time * 1.5;
-
-    // Main branch sway (clearly visible, graceful swinging back and forth)
     float branchSway = sin(windWave) * 0.0125 + cos(windWave * 0.65 + time * 0.5) * 0.0075;
-
-    // Dynamic leaflet fluttering (lively natural breeze vibration on leaves)
     float flutterX = sin(uv.x * 65.0 + uv.y * 45.0 + time * 3.8) * 0.0050;
     float flutterY = cos(uv.x * 50.0 - uv.y * 60.0 + time * 4.2) * 0.0035;
-
-    // Natural wind gust envelope (gentle rise and fall)
     float gust = 0.80 + 0.25 * sin(time * 0.55);
 
-    // Lateral sway + gentle vertical bounce
     return vec2(
       branchSway + flutterX,
       branchSway * 0.35 + flutterY
@@ -160,19 +156,17 @@ const FRAGMENT_SHADER_SOURCE = `
     vec2 baseUv = getCoverUV(vUv, uResolution, uImageResolution);
     baseUv = clamp(baseUv, 0.0, 1.0);
 
-    // Sample base pixel color
     vec4 baseColor = texture2D(uTexture, baseUv);
 
-    // 1. Water Cascade & Rapids Mask
+    // 1. Water Flow Animation
     float cascadeMask = getWaterCascadeMask(baseUv, baseColor);
     float rapidsMask = getRiverRapidsMask(baseUv, baseColor);
     float totalWaterMask = clamp(cascadeMask + rapidsMask, 0.0, 1.0);
 
-    // --- WATER FLOW ANIMATION ---
     if (totalWaterMask > 0.002) {
-      vec2 flowDir = vec2(-0.06, 0.98); // downward waterfall cascade
+      vec2 flowDir = vec2(-0.06, 0.98);
       if (rapidsMask > cascadeMask) {
-        flowDir = vec2(-0.85, 0.35); // river rapids downstream
+        flowDir = vec2(-0.85, 0.35);
       }
 
       float speed = 0.16;
@@ -209,14 +203,13 @@ const FRAGMENT_SHADER_SOURCE = `
       return;
     }
 
-    // --- LEAF & FOLIAGE BREEZE (ENHANCED, VIVID & NATURAL) ---
+    // 2. Leaf & Foliage Breeze
     float foliageMask = getFoliageMask(baseUv, baseColor);
     if (foliageMask > 0.002) {
       vec2 windOffset = getLeafWindSway(baseUv, uTime, foliageMask);
       vec2 foliageUv = clamp(baseUv + windOffset, 0.0, 1.0);
       vec4 foliageColor = texture2D(uTexture, foliageUv);
 
-      // Subtle sunlight glint as leaves catch morning rays in the wind
       float leafGlint = sin(baseUv.x * 40.0 + baseUv.y * 30.0 + uTime * 3.2) * 0.03 * foliageMask;
       foliageColor.rgb += vec3(leafGlint);
 
@@ -224,7 +217,7 @@ const FRAGMENT_SHADER_SOURCE = `
       return;
     }
 
-    // --- SOLID ROCKS, WOOD DECK, LANTERN, SKY (100% STATIC & ROCK-SOLID) ---
+    // 3. Static Rocks & Wood
     gl_FragColor = baseColor;
   }
 `;
@@ -340,11 +333,13 @@ const SeamlessWaterBackground = () => {
       if (!container || !canvas) return;
       const rect = container.getBoundingClientRect();
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const w = rect.width;
-      const h = rect.height;
+      const w = rect.width || window.innerWidth;
+      const h = rect.height || window.innerHeight;
 
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
+      if (w === 0 || h === 0) return;
+
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
       gl.viewport(0, 0, canvas.width, canvas.height);
 
       gl.useProgram(program);
@@ -354,6 +349,16 @@ const SeamlessWaterBackground = () => {
 
     handleResize();
     window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+
+    // ResizeObserver for rock-solid responsiveness on mobile address-bar changes
+    let resizeObserver = null;
+    if (window.ResizeObserver) {
+      resizeObserver = new ResizeObserver(() => {
+        handleResize();
+      });
+      resizeObserver.observe(container);
+    }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -382,6 +387,8 @@ const SeamlessWaterBackground = () => {
     return () => {
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('orientationchange', handleResize);
+      if (resizeObserver) resizeObserver.disconnect();
       observer.disconnect();
       gl.deleteProgram(program);
       gl.deleteShader(vertShader);
@@ -401,6 +408,7 @@ const SeamlessWaterBackground = () => {
       <canvas
         ref={canvasRef}
         className="w-full h-full block"
+        style={{ width: '100%', height: '100%', display: 'block' }}
       />
     </div>
   );
