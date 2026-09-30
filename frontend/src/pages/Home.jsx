@@ -11,6 +11,7 @@ import RegisterWorkshopModal from '../components/RegisterWorkshopModal';
 import RegisterWebinarModal from '../components/RegisterWebinarModal';
 import BookRetreatModal from '../components/BookRetreatModal';
 import BookSessionModal from '../components/BookSessionModal';
+import SeamlessWaterBackground from '../components/SeamlessWaterBackground';
 import waterfallBg from '../assets/waterfall_bg.jpg';
 import founderImg from '../assets/founder.jpg';
 import foodSeva from '../assets/food_seva.png';
@@ -452,16 +453,10 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
 
       {/* 1. Hero Section */}
       <section className="relative min-h-[500px] lg:h-screen lg:min-h-[620px] lg:max-h-[1080px] 2xl:min-h-[700px] flex flex-col justify-center items-center px-4 sm:px-6 md:px-12 lg:px-20 text-center overflow-hidden border-b border-cream-dark/30 bg-cream-light py-12 lg:py-0">
-        {/* Blurred & Softened Background Layer */}
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url(${waterfallBg})`,
-            filter: 'brightness(1.1)'
-          }}
-        />
+        {/* Living Seamless Cinemagraph Water Flow Background */}
+        <SeamlessWaterBackground />
         {/* Soft Radial Contrast Overlay to enhance text readability without fading the bottom edges */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.7)_0%,rgba(255,255,255,0.1)_80%)] z-0" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.7)_0%,rgba(255,255,255,0.1)_80%)] z-0 pointer-events-none" />
 
         <div className="flex flex-col items-center gap-3 sm:gap-4 relative z-10 w-full max-w-4xl 2xl:max-w-5xl 3xl:max-w-6xl mx-auto animate-fade-in lg:-translate-y-8 2xl:-translate-y-12">
 
