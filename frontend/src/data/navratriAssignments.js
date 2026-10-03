@@ -7,7 +7,7 @@ const navratriAssignments = [
     color: "Royal Yellow / Red",
     mantra: "Om Devi Shailaputryai Namah || ॐ देवी शैलपुत्र्यै नमः",
     duration: "25 minutes",
-    audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+    audioUrl: "https://drive.google.com/file/d/1-qyJyw7k9G_xUtRjfaFGhgmNe6m-p8Qh/preview",
     description: "Welcome to Day 1 of your Sacred Navratri Journey. Today we invoke Maa Shailaputri, the embodiment of foundational power, stability, and cosmic grounding. Just as the mountain stands unshakeable amidst storms, Shailaputri anchors your life force into the Earth, dissolving deep-rooted fears, anxieties, and scarcity mindset.",
     audioTheme: "Foundational Shakti Awakening, Root Chakra Alignment & Eliminating Instability",
     action: "1. Listen fully to today's 25-minute sacred audio book transmission.\n2. Chant the sacred mantra 'Om Devi Shailaputryai Namah' 11 or 108 times.\n3. Write down 3 deep fears you are offering to the Divine Mother to transmute into inner strength.\n4. Mark this audio session complete to unlock Day 2."
@@ -20,7 +20,7 @@ const navratriAssignments = [
     color: "Peacock Green",
     mantra: "Om Devi Brahmacharinyai Namah || ॐ देवी ब्रह्मचारिण्यै नमः",
     duration: "26 minutes",
-    audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+    audioUrl: "https://drive.google.com/file/d/1D18PIwiaB-XzY4wdbRnIbxx8UE6H5ykE/preview",
     description: "On Day 2, we attune to the sublime grace of Maa Brahmacharini. She represents unyielding penance, emotional purity, self-control, and radiant spiritual devotion. This audio track guides you to release emotional turbulence, overcome addictions to old habits, and channel your creative vital energy towards higher self-realization.",
     audioTheme: "Sacral Energy Healing, Willpower Activation & Emotional Equilibrium",
     action: "1. Immerse yourself in today's 26-minute audio contemplation.\n2. Practice 5 minutes of mindful breathwork while chanting 'Om Devi Brahmacharinyai Namah'.\n3. Journal 1 habit or distraction you commit to releasing during this Navratri.\n4. Mark this session complete to unlock Day 3."
@@ -33,7 +33,7 @@ const navratriAssignments = [
     color: "Grey / Silver / Gold",
     mantra: "Om Devi Chandraghantayai Namah || ॐ देवी चन्द्रघण्टायै नमः",
     duration: "24 minutes",
-    audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+    audioUrl: "https://drive.google.com/file/d/1o7Nor5XD5Qv_3OBL8Xh_6mdGHQT96Ear/preview",
     description: "Day 3 invokes the majestic Maa Chandraghanta, bearing a half-moon shaped like a temple bell on her forehead. The ringing sound of her bell dispels all negative energies, psychic attacks, and self-doubt. This session ignites your inner warrior, elevating your confidence and Solar Plexus fire to overcome any life hurdle.",
     audioTheme: "Dissolving Inner Conflict, Activating Solar Fire & Courageous Living",
     action: "1. Listen to today's audio transmission in a quiet, undisturbed space.\n2. Visualize golden-crimson light radiating from your navel center.\n3. Affirm aloud: 'I am protected, courageous, and divinely guided.'\n4. Mark complete to unlock Day 4."
@@ -46,7 +46,7 @@ const navratriAssignments = [
     color: "Luminous Orange",
     mantra: "Om Devi Kushmandayai Namah || ॐ देवी कूष्माण्डायै नमः",
     duration: "27 minutes",
-    audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+    audioUrl: "https://drive.google.com/file/d/1jlw6Qjxt1W_gA5dTr8yrox20sVF-dIGr/preview",
     description: "Day 4 connects you with Maa Kushmanda, whose radiant smile created the universe from cosmic darkness. She resides in the core of the Sun and bestows luminous vitality, radiant health, and boundless creative abundance. Open your Heart Chakra to receive the golden nectar of cosmic creation.",
     audioTheme: "Healing Grief, Expanding Joy & Manifesting Universal Abundance",
     action: "1. Listen to the 27-minute audio book on Cosmic Creation & Joy.\n2. Place both hands over your heart and breathe in emerald-golden light.\n3. Express gratitude for 5 blessings that brought light to your journey.\n4. Mark complete to unlock Day 5."
@@ -59,7 +59,7 @@ const navratriAssignments = [
     color: "Pure White",
     mantra: "Om Devi Skandamatayai Namah || ॐ देवी स्कन्दमात्रे नमः",
     duration: "23 minutes",
-    audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
+    audioUrl: "https://drive.google.com/file/d/1G-mdpOYj9-z_bPfcr5iPgySvG9J2te80/preview",
     description: "Day 5 honors Maa Skandamata, seated upon a lotus with infant Lord Skanda on her lap. She embodies unconditional maternal tenderness, protective shield, and clear communication of your soul's truth. Today's audio journey clears suppressed emotions, throat blockages, and heals the inner child.",
     audioTheme: "Inner Child Healing, Maternal Blessings & Authentic Self-Expression",
     action: "1. Listen to today's guided audiobook on Sacred Motherhood & Inner Child.\n2. Chant 'Om Devi Skandamatayai Namah' while visualizing soothing sky-blue light in your throat.\n3. Speak one heartfelt truth you have been hesitating to express.\n4. Mark complete to unlock Day 6."
@@ -72,7 +72,7 @@ const navratriAssignments = [
     color: "Fiery Red",
     mantra: "Om Devi Katyayanyai Namah || ॐ देवी कात्यायन्यै नमः",
     duration: "28 minutes",
-    audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3",
+    audioUrl: "https://drive.google.com/file/d/1Bi67ONVICL9yy0GJcJfKTAxcpgjVczEa/preview",
     description: "On Day 6, we invoke Maa Katyayani, born from the combined fiery effulgence of the Trinity to slay the demon Mahishasura. She is the destroyer of toxic patterns, false illusions, and relationship disharmony. Today's session awakens your Third Eye intuition and gives you laser-focused clarity.",
     audioTheme: "Slaying Subconscious Demons, Awakening Intuition & Resolving Karmic Blocks",
     action: "1. Listen to today's powerful audio transmission on Slaying Mahishasura within.\n2. Meditate with focus on the space between your eyebrows (Third Eye).\n3. Write down a major block you are triumphantly conquering with Maa's grace.\n4. Mark complete to unlock Day 7."

@@ -852,125 +852,173 @@ const ProgramDashboard = () => {
                     </div>
                   )}
                   
-                  {/* Dedicated Interactive Audio Book Player for Navratri & Audio Programs */}
+                  {/* Dedicated Interactive Audio/Video Book Player for Navratri & Audio Programs */}
                   {selectedAssignment.audioUrl && (
-                    <div className="bg-gradient-to-br from-[#FFFDF7] via-[#FFF9ED] to-[#FFF3DC] border-2 border-gold/40 p-5 md:p-6 rounded-3xl shadow-md flex flex-col gap-4 text-left relative overflow-hidden">
-                      <div className="flex items-center justify-between border-b border-gold/25 pb-3">
-                        <div className="flex items-center gap-2">
-                          <span className="p-2 rounded-xl bg-gold text-charcoal-dark shadow-sm">
-                            <Headphones className="w-5 h-5 animate-pulse" />
-                          </span>
-                          <div className="flex flex-col">
-                            <span className="text-[10px] font-bold text-gold-dark uppercase tracking-widest">
-                              {isNavratri ? 'Sacred Navratri Audiobook' : 'Audio Meditation Session'}
+                    selectedAssignment.audioUrl.includes('drive.google.com') ? (
+                      /* Google Drive Stream Player */
+                      <div className="bg-gradient-to-br from-[#FFFDF7] via-[#FFF9ED] to-[#FFF3DC] border-2 border-gold/40 p-4 md:p-5 rounded-3xl shadow-md flex flex-col gap-3.5 text-left relative overflow-hidden">
+                        <div className="flex items-center justify-between border-b border-gold/25 pb-3">
+                          <div className="flex items-center gap-2.5">
+                            <span className="p-2 rounded-xl bg-gold text-charcoal-dark shadow-sm">
+                              <Headphones className="w-5 h-5 animate-pulse" />
                             </span>
-                            <span className="font-serif text-sm font-bold text-charcoal-dark line-clamp-1">
-                              {selectedAssignment.title}
+                            <div className="flex flex-col">
+                              <span className="text-[10px] font-bold text-gold-dark uppercase tracking-widest flex items-center gap-1.5">
+                                {isNavratri ? 'Sacred Navratri Audiobook Stream' : 'Audio Meditation Stream'}
+                                <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                              </span>
+                              <span className="font-serif text-sm font-bold text-charcoal-dark line-clamp-1">
+                                {selectedAssignment.title}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-bold text-sage bg-sage/10 px-2.5 py-1 rounded-full border border-sage/25">
+                              {selectedAssignment.estimatedDuration || selectedAssignment.audioDuration || '25 mins'}
                             </span>
+                            <a
+                              href={selectedAssignment.audioUrl.replace('/preview', '/view')}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-1.5 text-charcoal-light hover:text-gold transition-colors bg-white/80 rounded-lg border border-cream-dark/50"
+                              title="Open in Drive"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5" />
+                            </a>
                           </div>
                         </div>
-                        <span className="text-[10px] font-bold text-sage bg-sage/10 px-2.5 py-1 rounded-full border border-sage/25">
-                          {selectedAssignment.estimatedDuration || selectedAssignment.audioDuration || '25 mins'}
-                        </span>
-                      </div>
 
-                      {/* Hidden HTML5 Audio Element */}
-                      <audio
-                        ref={audioRef}
-                        src={selectedAssignment.audioUrl}
-                        onTimeUpdate={handleAudioTimeUpdate}
-                        onLoadedMetadata={handleAudioLoadedMetadata}
-                        onEnded={() => setIsPlaying(false)}
-                      />
-
-                      {/* Audio Controls Bar */}
-                      <div className="flex flex-col gap-3 pt-1">
-                        {/* Seeker slider */}
-                        <div className="flex items-center gap-3 w-full">
-                          <span className="text-[10px] font-mono font-bold text-charcoal-light w-10 text-right">
-                            {formatAudioTime(currentTime)}
-                          </span>
-                          <input
-                            type="range"
-                            min="0"
-                            max={audioDuration || 100}
-                            value={currentTime}
-                            onChange={handleAudioSeek}
-                            className="flex-grow h-2 bg-cream-dark/60 rounded-lg appearance-none cursor-pointer accent-[#D4A017]"
+                        {/* Responsive Google Drive Embed Player */}
+                        <div className="w-full aspect-video rounded-2xl overflow-hidden border border-gold/30 shadow-inner bg-black relative">
+                          <iframe
+                            src={selectedAssignment.audioUrl}
+                            title={selectedAssignment.title}
+                            className="w-full h-full border-0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowFullScreen
                           />
-                          <span className="text-[10px] font-mono font-bold text-charcoal-light w-10">
-                            {formatAudioTime(audioDuration || (parseInt(selectedAssignment.estimatedDuration, 10) * 60) || 1500)}
+                        </div>
+                      </div>
+                    ) : (
+                      /* HTML5 Audio Seeker Player */
+                      <div className="bg-gradient-to-br from-[#FFFDF7] via-[#FFF9ED] to-[#FFF3DC] border-2 border-gold/40 p-5 md:p-6 rounded-3xl shadow-md flex flex-col gap-4 text-left relative overflow-hidden">
+                        <div className="flex items-center justify-between border-b border-gold/25 pb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="p-2 rounded-xl bg-gold text-charcoal-dark shadow-sm">
+                              <Headphones className="w-5 h-5 animate-pulse" />
+                            </span>
+                            <div className="flex flex-col">
+                              <span className="text-[10px] font-bold text-gold-dark uppercase tracking-widest">
+                                {isNavratri ? 'Sacred Navratri Audiobook' : 'Audio Meditation Session'}
+                              </span>
+                              <span className="font-serif text-sm font-bold text-charcoal-dark line-clamp-1">
+                                {selectedAssignment.title}
+                              </span>
+                            </div>
+                          </div>
+                          <span className="text-[10px] font-bold text-sage bg-sage/10 px-2.5 py-1 rounded-full border border-sage/25">
+                            {selectedAssignment.estimatedDuration || selectedAssignment.audioDuration || '25 mins'}
                           </span>
                         </div>
 
-                        {/* Player Buttons Row */}
-                        <div className="flex items-center justify-between flex-wrap gap-3 pt-2">
-                          {/* Left: Speed chips */}
-                          <div className="flex items-center gap-1">
-                            <span className="text-[9px] text-charcoal-light font-bold uppercase tracking-wider mr-1">Speed:</span>
-                            {[0.75, 1, 1.25, 1.5].map((rate) => (
+                        {/* Hidden HTML5 Audio Element */}
+                        <audio
+                          ref={audioRef}
+                          src={selectedAssignment.audioUrl}
+                          onTimeUpdate={handleAudioTimeUpdate}
+                          onLoadedMetadata={handleAudioLoadedMetadata}
+                          onEnded={() => setIsPlaying(false)}
+                        />
+
+                        {/* Audio Controls Bar */}
+                        <div className="flex flex-col gap-3 pt-1">
+                          {/* Seeker slider */}
+                          <div className="flex items-center gap-3 w-full">
+                            <span className="text-[10px] font-mono font-bold text-charcoal-light w-10 text-right">
+                              {formatAudioTime(currentTime)}
+                            </span>
+                            <input
+                              type="range"
+                              min="0"
+                              max={audioDuration || 100}
+                              value={currentTime}
+                              onChange={handleAudioSeek}
+                              className="flex-grow h-2 bg-cream-dark/60 rounded-lg appearance-none cursor-pointer accent-[#D4A017]"
+                            />
+                            <span className="text-[10px] font-mono font-bold text-charcoal-light w-10">
+                              {formatAudioTime(audioDuration || (parseInt(selectedAssignment.estimatedDuration, 10) * 60) || 1500)}
+                            </span>
+                          </div>
+
+                          {/* Player Buttons Row */}
+                          <div className="flex items-center justify-between flex-wrap gap-3 pt-2">
+                            {/* Left: Speed chips */}
+                            <div className="flex items-center gap-1">
+                              <span className="text-[9px] text-charcoal-light font-bold uppercase tracking-wider mr-1">Speed:</span>
+                              {[0.75, 1, 1.25, 1.5].map((rate) => (
+                                <button
+                                  key={rate}
+                                  type="button"
+                                  onClick={() => changePlaybackRate(rate)}
+                                  className={`text-[9px] font-bold px-2 py-0.5 rounded-md transition-all ${
+                                    playbackRate === rate 
+                                      ? 'bg-gold text-charcoal-dark font-extrabold shadow-xs' 
+                                      : 'bg-white/80 text-charcoal-light hover:text-charcoal border border-cream-dark/60'
+                                  }`}
+                                >
+                                  {rate}x
+                                </button>
+                              ))}
+                            </div>
+
+                            {/* Center: Play / Pause / Skip */}
+                            <div className="flex items-center gap-3">
                               <button
-                                key={rate}
                                 type="button"
-                                onClick={() => changePlaybackRate(rate)}
-                                className={`text-[9px] font-bold px-2 py-0.5 rounded-md transition-all ${
-                                  playbackRate === rate 
-                                    ? 'bg-gold text-charcoal-dark font-extrabold shadow-xs' 
-                                    : 'bg-white/80 text-charcoal-light hover:text-charcoal border border-cream-dark/60'
-                                }`}
+                                onClick={() => skipAudio(-15)}
+                                className="p-2 rounded-full bg-white hover:bg-cream border border-cream-dark/60 text-charcoal hover:text-gold transition-colors shadow-2xs"
+                                title="Skip back 15s"
                               >
-                                {rate}x
+                                <RotateCcw className="w-4 h-4" />
                               </button>
-                            ))}
-                          </div>
 
-                          {/* Center: Play / Pause / Skip */}
-                          <div className="flex items-center gap-3">
-                            <button
-                              type="button"
-                              onClick={() => skipAudio(-15)}
-                              className="p-2 rounded-full bg-white hover:bg-cream border border-cream-dark/60 text-charcoal hover:text-gold transition-colors shadow-2xs"
-                              title="Skip back 15s"
-                            >
-                              <RotateCcw className="w-4 h-4" />
-                            </button>
+                              <button
+                                type="button"
+                                onClick={togglePlayAudio}
+                                className="w-12 h-12 rounded-full bg-gold hover:bg-gold-dark text-charcoal-dark flex items-center justify-center transition-all duration-300 transform hover:scale-105 shadow-md border-2 border-white ring-2 ring-gold/40"
+                                title={isPlaying ? "Pause Audiobook" : "Play Audiobook"}
+                              >
+                                {isPlaying ? (
+                                  <Pause className="w-5 h-5 fill-charcoal-dark" />
+                                ) : (
+                                  <Play className="w-5 h-5 fill-charcoal-dark translate-x-0.5" />
+                                )}
+                              </button>
 
-                            <button
-                              type="button"
-                              onClick={togglePlayAudio}
-                              className="w-12 h-12 rounded-full bg-gold hover:bg-gold-dark text-charcoal-dark flex items-center justify-center transition-all duration-300 transform hover:scale-105 shadow-md border-2 border-white ring-2 ring-gold/40"
-                              title={isPlaying ? "Pause Audiobook" : "Play Audiobook"}
-                            >
-                              {isPlaying ? (
-                                <Pause className="w-5 h-5 fill-charcoal-dark" />
-                              ) : (
-                                <Play className="w-5 h-5 fill-charcoal-dark translate-x-0.5" />
-                              )}
-                            </button>
+                              <button
+                                type="button"
+                                onClick={() => skipAudio(15)}
+                                className="p-2 rounded-full bg-white hover:bg-cream border border-cream-dark/60 text-charcoal hover:text-gold transition-colors shadow-2xs"
+                                title="Skip forward 15s"
+                              >
+                                <RotateCw className="w-4 h-4" />
+                              </button>
+                            </div>
 
-                            <button
-                              type="button"
-                              onClick={() => skipAudio(15)}
-                              className="p-2 rounded-full bg-white hover:bg-cream border border-cream-dark/60 text-charcoal hover:text-gold transition-colors shadow-2xs"
-                              title="Skip forward 15s"
-                            >
-                              <RotateCw className="w-4 h-4" />
-                            </button>
-                          </div>
-
-                          {/* Right: Volume */}
-                          <div className="flex items-center gap-1.5">
-                            <button
-                              type="button"
-                              onClick={toggleAudioMute}
-                              className="p-1.5 rounded-lg bg-white/80 hover:bg-white text-charcoal border border-cream-dark/50"
-                            >
-                              {isMuted ? <VolumeX className="w-3.5 h-3.5 text-red-500" /> : <Volume2 className="w-3.5 h-3.5 text-gold-dark" />}
-                            </button>
+                            {/* Right: Volume */}
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                type="button"
+                                onClick={toggleAudioMute}
+                                className="p-1.5 rounded-lg bg-white/80 hover:bg-white text-charcoal border border-cream-dark/50"
+                              >
+                                {isMuted ? <VolumeX className="w-3.5 h-3.5 text-red-500" /> : <Volume2 className="w-3.5 h-3.5 text-gold-dark" />}
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
+                    )
                   )}
 
                   {/* Task Content / Description */}
