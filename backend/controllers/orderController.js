@@ -55,7 +55,11 @@ exports.createOrder = async (req, res, next) => {
       const options = {
         amount: Math.round(calculatedTotal * 100), // in paise
         currency: 'INR',
-        receipt: `receipt_order_${crypto.randomBytes(4).toString('hex')}`
+        receipt: `receipt_order_${crypto.randomBytes(4).toString('hex')}`,
+        notes: {
+          type: 'order',
+          userId: req.user?._id ? req.user._id.toString() : ''
+        }
       };
       
       const razorpayOrder = await razorpayInstance.orders.create(options);

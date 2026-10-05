@@ -17,7 +17,11 @@ const app = express();
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({
+  verify: (req, res, buf) => {
+    req.rawBody = buf;
+  }
+}));
 app.use(express.urlencoded({ extended: true }));
 
 // Morgan logger for requests
@@ -41,6 +45,7 @@ app.use('/api/community', require('./routes/communityRoutes'));
 app.use('/api/testimonials', require('./routes/testimonialRoutes'));
 app.use('/api/contacts', require('./routes/contactRoutes'));
 app.use('/api/webinars', require('./routes/webinarRoutes'));
+app.use('/api/webhooks', require('./routes/webhookRoutes'));
 
 // Basic health check endpoint
 app.get('/api/health', (req, res) => {

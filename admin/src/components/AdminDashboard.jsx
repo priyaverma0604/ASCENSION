@@ -76,6 +76,8 @@ const AdminDashboard = ({ user, onLogout }) => {
   const [programPrice, setProgramPrice] = useState('');
   const [programCapacity, setProgramCapacity] = useState('');
   const [programYoutubeUrl, setProgramYoutubeUrl] = useState('');
+  const [programZoomLink, setProgramZoomLink] = useState('');
+  const [programWhatsappLink, setProgramWhatsappLink] = useState('');
 
   const [postTitle, setPostTitle] = useState('');
   const [postContent, setPostContent] = useState('');
@@ -292,6 +294,8 @@ const AdminDashboard = ({ user, onLogout }) => {
     setProgramPrice('');
     setProgramCapacity('20');
     setProgramYoutubeUrl('');
+    setProgramZoomLink('');
+    setProgramWhatsappLink('');
 
     setPostTitle('');
     setPostContent('');
@@ -356,6 +360,8 @@ const AdminDashboard = ({ user, onLogout }) => {
       setProgramPrice(item.pricing);
       setProgramCapacity(item.enrollmentCapacity);
       setProgramYoutubeUrl(item.youtubeUrl || '');
+      setProgramZoomLink(item.zoomLink || '');
+      setProgramWhatsappLink(item.whatsappGroupLink || '');
     } else if (activeTab === 'community') {
       setPostTitle(item.title);
       setPostContent(item.content);
@@ -451,7 +457,9 @@ const AdminDashboard = ({ user, onLogout }) => {
           duration: programDuration,
           pricing: programPrice,
           enrollmentCapacity: programCapacity,
-          youtubeUrl: programYoutubeUrl
+          youtubeUrl: programYoutubeUrl,
+          zoomLink: programZoomLink,
+          whatsappGroupLink: programWhatsappLink
         };
       } else if (activeTab === 'community') {
         payload = {
@@ -2522,6 +2530,14 @@ const AdminDashboard = ({ user, onLogout }) => {
                       <div className="flex flex-col gap-1">
                         <label className="font-bold text-charcoal-light uppercase text-[10px]">YouTube Embed URL (Optional)</label>
                         <input type="text" placeholder="e.g. https://www.youtube.com/embed/..." value={programYoutubeUrl} onChange={(e) => setProgramYoutubeUrl(e.target.value)} className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none" />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="font-bold text-charcoal-light uppercase text-[10px]">WhatsApp Community Group Link</label>
+                        <input type="text" placeholder="e.g. https://chat.whatsapp.com/..." value={programWhatsappLink} onChange={(e) => setProgramWhatsappLink(e.target.value)} className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none" />
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="font-bold text-charcoal-light uppercase text-[10px]">Live Zoom Meeting Link (Optional)</label>
+                        <input type="text" placeholder="e.g. https://us06web.zoom.us/j/..." value={programZoomLink} onChange={(e) => setProgramZoomLink(e.target.value)} className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none" />
                       </div>
                     </>
                   )}

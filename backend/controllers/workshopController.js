@@ -563,7 +563,15 @@ exports.createWorkshopOrder = async (req, res, next) => {
       const options = {
         amount: Math.round(amount * 100), // paise
         currency: 'INR',
-        receipt: `rcpt_ws_${crypto.randomBytes(4).toString('hex')}`
+        receipt: `rcpt_ws_${crypto.randomBytes(4).toString('hex')}`,
+        notes: {
+          type: 'workshop',
+          workshopId: workshop._id.toString(),
+          workshopTitle: workshop.title,
+          name: name || '',
+          email: email || '',
+          phone: phone || ''
+        }
       };
       const order = await razorpayInstance.orders.create(options);
       orderResponseId = order.id;

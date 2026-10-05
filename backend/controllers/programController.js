@@ -81,7 +81,7 @@ exports.getProgramById = async (req, res, next) => {
 // @access  Private/Admin
 exports.createProgram = async (req, res, next) => {
   try {
-    const { title, description, duration, startDate, enrolledCount, sessions, pricing, enrollmentCapacity, youtubeUrl, originalPrice, sellingPrice, zoomLink } = req.body;
+    const { title, description, duration, startDate, enrolledCount, sessions, pricing, enrollmentCapacity, youtubeUrl, originalPrice, sellingPrice, zoomLink, whatsappGroupLink } = req.body;
 
     const finalSellingPrice = sellingPrice !== undefined ? Number(sellingPrice) : (pricing !== undefined ? Number(pricing) : 0);
     const finalOriginalPrice = originalPrice !== undefined ? Number(originalPrice) : finalSellingPrice;
@@ -107,6 +107,7 @@ exports.createProgram = async (req, res, next) => {
       originalPrice: finalOriginalPrice,
       sellingPrice: finalSellingPrice,
       zoomLink: zoomLink || '',
+      whatsappGroupLink: whatsappGroupLink || '',
       enrollmentCapacity,
       images,
       youtubeUrl
@@ -128,7 +129,7 @@ exports.updateProgram = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Program not found' });
     }
 
-    const { title, description, duration, startDate, enrolledCount, sessions, pricing, enrollmentCapacity, youtubeUrl, originalPrice, sellingPrice, zoomLink } = req.body;
+    const { title, description, duration, startDate, enrolledCount, sessions, pricing, enrollmentCapacity, youtubeUrl, originalPrice, sellingPrice, zoomLink, whatsappGroupLink } = req.body;
 
     program.title = title || program.title;
     program.description = description || program.description;
@@ -157,6 +158,10 @@ exports.updateProgram = async (req, res, next) => {
 
     if (zoomLink !== undefined) {
       program.zoomLink = zoomLink;
+    }
+
+    if (whatsappGroupLink !== undefined) {
+      program.whatsappGroupLink = whatsappGroupLink;
     }
     
     program.enrollmentCapacity = enrollmentCapacity !== undefined ? enrollmentCapacity : program.enrollmentCapacity;
@@ -232,7 +237,16 @@ exports.createEnrollmentOrder = async (req, res, next) => {
       const options = {
         amount: Math.round(amount * 100), // paise
         currency: 'INR',
-        receipt: `rcpt_prog_${crypto.randomBytes(4).toString('hex')}`
+        receipt: `rcpt_prog_${crypto.randomBytes(4).toString('hex')}`,
+        notes: {
+          type: 'program',
+          programId: program._id.toString(),
+          programTitle: program.title,
+          userId: userId ? userId.toString() : '',
+          name: req.user ? req.user.name : (req.body.name || ''),
+          email: req.user ? req.user.email : (req.body.email || ''),
+          phone: req.user ? req.user.phone : (req.body.phone || '')
+        }
       };
       const order = await razorpayInstance.orders.create(options);
       orderResponseId = order.id;
@@ -279,7 +293,14 @@ exports.verifyEnrollmentPayment = async (req, res, next) => {
     const userEmail = (req.user ? req.user.email : userDetails?.email) || '';
     const userName = (req.user ? req.user.name : userDetails?.name) || 'Devotee';
     const userPhone = (req.user ? req.user.phone : userDetails?.phone) || '';
-    const userId = req.user ? req.user._id : (userDetails?.userId || null);
+    let userId = req.user ? req.user._id : (userDetails?.userId || null);
+
+    if (!userId && userEmail) {
+      const existingUser = await User.findOne({ email: userEmail.toLowerCase() });
+      if (existingUser) {
+        userId = existingUser._id;
+      }
+    }
 
     if (isRazorpayConfigured) {
       if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
@@ -322,15 +343,53 @@ exports.verifyEnrollmentPayment = async (req, res, next) => {
 
     // Send confirmation email
     if (userEmail) {
+      const whatsappLink = program.whatsappGroupLink || '';
+      const isNavratri = program.title.toLowerCase().includes('navratri') || program._id.toString() === '6a4963f49e941f93f91f5ac5';
+      const greeting = isNavratri ? '🌺 Jai Mata Di 🌺' : '✨ Welcome to Ascension ✨';
+
+      let whatsappBlockHtml = '';
+      let whatsappBlockText = '';
+      if (whatsappLink) {
+        whatsappBlockText = `\n👉 Join Official WhatsApp Group: ${whatsappLink}\n`;
+        whatsappBlockHtml = `
+          <div style="text-align: center; margin: 25px 0;">
+            <a href="${whatsappLink}" style="background: #25D366; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; display: inline-block; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 14px;">
+              📱 Join Program WhatsApp Group
+            </a>
+          </div>
+        `;
+      }
+
       const emailOptions = {
         to: userEmail.toLowerCase(),
         subject: `Your Program Enrollment is Confirmed: ${program.title}`,
-        text: `Hello ${userName},\n\nThank you for enrolling.\n\nYour payment has been received and your enrollment for "${program.title}" is confirmed!\n\nYou can access your program content and zoom links directly inside your dashboard profile.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
-        html: `<p>Hello <strong>${userName}</strong>,</p>
-               <p>Thank you for enrolling.</p>
-               <p>Your payment has been received and your enrollment for <strong>${program.title}</strong> is confirmed!</p>
-               <p>You can access your program content and zoom links directly inside your dashboard profile.</p>
-               <p>Regards,<br/><strong>Ascension by Sonali Bhasin Kumar</strong></p>`
+        text: `${greeting}\n\nDear ${userName},\n\nThank you for enrolling in "${program.title}".\n\nYour payment has been received and your enrollment is confirmed!${whatsappBlockText}\n👉 Access Your Program Dashboard: https://ascension.ind.in/program/${program._id}/dashboard\n\nWith divine grace,\nAscension by Sonali Bhasin Kumar`,
+        html: `<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e0d5c1; border-radius: 12px; background: #fffcf7;">
+          <h2 style="color: #b8860b; text-align: center; margin-bottom: 5px;">${greeting}</h2>
+          <h3 style="color: #2c3e50; text-align: center; margin-top: 0;">Enrollment Confirmed</h3>
+          <p>Dear <strong>${userName}</strong>,</p>
+          <p>Thank you for embarking on this sacred journey with us. Your payment for <strong>${program.title}</strong> has been successfully received and your enrollment is confirmed!</p>
+          
+          <div style="background: #fdf6e7; padding: 15px; border-radius: 8px; border-left: 4px solid #b8860b; margin: 20px 0;">
+            <p style="margin: 0 0 8px 0;"><strong>Program:</strong> ${program.title}</p>
+            <p style="margin: 0 0 8px 0;"><strong>Payment Status:</strong> Paid (Instant Razorpay)</p>
+            <p style="margin: 0;"><strong>Reference ID:</strong> <code>${razorpay_payment_id || 'Online Payment'}</code></p>
+          </div>
+
+          ${whatsappBlockHtml}
+
+          <p style="text-align: center; margin-top: 15px;">
+            <a href="https://ascension.ind.in/program/${program._id}/dashboard" style="color: #b8860b; font-weight: bold; text-decoration: underline;">
+              🔗 Open Your Program Dashboard ↗
+            </a>
+          </p>
+
+          <hr style="border: none; border-top: 1px solid #e0d5c1; margin: 25px 0;" />
+          <p style="font-size: 12px; color: #7f8c8d; text-align: center;">
+            With gratitude & divine grace,<br/>
+            <strong>Ascension by Sonali Bhasin Kumar</strong>
+          </p>
+        </div>`
       };
       try {
         await sendEmail(emailOptions);
@@ -351,7 +410,7 @@ exports.verifyEnrollmentPayment = async (req, res, next) => {
 
 // @desc    Submit program manual UPI/QR enrollment request
 // @route   POST /api/programs/:id/enroll-qr
-// @access  Private
+// @access  Public (Optional auth)
 exports.enrollProgramQR = async (req, res, next) => {
   try {
     const program = await Program.findById(req.params.id);
@@ -359,13 +418,25 @@ exports.enrollProgramQR = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Program not found' });
     }
 
+    const userName = req.user ? req.user.name : (req.body.name || 'Devotee');
+    const userEmail = (req.user ? req.user.email : (req.body.email || '')).toLowerCase();
+    const userPhone = req.body.phone || req.user?.phone || '0000000000';
+    let userId = req.user ? req.user._id : null;
+
+    if (!userId && userEmail) {
+      const existingUser = await User.findOne({ email: userEmail });
+      if (existingUser) {
+        userId = existingUser._id;
+      }
+    }
+
     // Check if user is already enrolled
-    if (program.enrolledUsers.includes(req.user._id)) {
+    if (userId && program.enrolledUsers.includes(userId)) {
       return res.status(400).json({ success: false, message: 'You are already enrolled in this program' });
     }
 
     // Check capacity
-    if (program.enrolledUsers.length >= program.enrollmentCapacity) {
+    if (program.enrollmentCapacity && program.enrolledUsers.length >= program.enrollmentCapacity) {
       return res.status(400).json({ success: false, message: 'Program capacity has been reached' });
     }
 
@@ -386,21 +457,27 @@ exports.enrollProgramQR = async (req, res, next) => {
     }
 
     // Check if a registration already exists for this program + user combo that is pending
-    const existing = await ProgramRegistration.findOne({
+    const pendingQuery = {
       program: program._id,
-      user: req.user._id,
       paymentStatus: 'Pending'
-    });
+    };
+    if (userId) {
+      pendingQuery.$or = [{ user: userId }, { email: userEmail }];
+    } else if (userEmail) {
+      pendingQuery.email = userEmail;
+    }
+
+    const existing = await ProgramRegistration.findOne(pendingQuery);
     if (existing) {
       return res.status(400).json({ success: false, message: 'You already have a pending registration request for this program.' });
     }
 
     const registration = await ProgramRegistration.create({
       program: program._id,
-      user: req.user._id,
-      name: req.user.name,
-      email: req.user.email,
-      phone: req.body.phone || req.user.phone || '0000000000',
+      user: userId,
+      name: userName,
+      email: userEmail,
+      phone: userPhone,
       transactionId,
       paymentScreenshot
     });
@@ -449,23 +526,71 @@ exports.verifyProgramRegistration = async (req, res, next) => {
     await reg.save();
 
     if (status === 'Paid') {
+      let userId = reg.user;
+      if (!userId && reg.email) {
+        const foundUser = await User.findOne({ email: reg.email.toLowerCase() });
+        if (foundUser) {
+          userId = foundUser._id;
+          reg.user = foundUser._id;
+          await reg.save();
+        }
+      }
+
       // Add user to program's enrolledUsers array if not already present
       const program = await Program.findById(reg.program);
-      if (program && !program.enrolledUsers.includes(reg.user)) {
-        program.enrolledUsers.push(reg.user);
+      if (program && userId && !program.enrolledUsers.includes(userId)) {
+        program.enrolledUsers.push(userId);
         await program.save();
       }
 
       // Send program confirmation email
+      const whatsappLink = program?.whatsappGroupLink || '';
+      const isNavratri = reg.program?.title?.toLowerCase().includes('navratri') || reg.program?._id?.toString() === '6a4963f49e941f93f91f5ac5';
+      const greeting = isNavratri ? '🌺 Jai Mata Di 🌺' : '✨ Welcome to Ascension ✨';
+
+      let whatsappBlockHtml = '';
+      let whatsappBlockText = '';
+      if (whatsappLink) {
+        whatsappBlockText = `\n👉 Join Official WhatsApp Group: ${whatsappLink}\n`;
+        whatsappBlockHtml = `
+          <div style="text-align: center; margin: 25px 0;">
+            <a href="${whatsappLink}" style="background: #25D366; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; display: inline-block; box-shadow: 0 2px 4px rgba(0,0,0,0.1); font-size: 14px;">
+              📱 Join Program WhatsApp Group
+            </a>
+          </div>
+        `;
+      }
+
       const emailOptions = {
         to: reg.email,
         subject: `Your Program Enrollment is Confirmed: ${reg.program.title}`,
-        text: `Hello ${reg.name},\n\nThank you for enrolling.\n\nYour payment has been verified, and your enrollment for the program "${reg.program.title}" has been successfully confirmed.\n\nYou can access your program content and zoom links inside your dashboard profile.\n\nRegards,\nAscension by Sonali Bhasin Kumar`,
-        html: `<p>Hello <strong>${reg.name}</strong>,</p>
-               <p>Thank you for enrolling.</p>
-               <p>Your payment has been verified, and your enrollment for the program "<strong>${reg.program.title}</strong>" has been successfully confirmed.</p>
-               <p>You can access your program content and zoom links inside your dashboard profile.</p>
-               <p>Regards,<br/><strong>Ascension by Sonali Bhasin Kumar</strong></p>`
+        text: `${greeting}\n\nDear ${reg.name},\n\nThank you for enrolling in "${reg.program.title}".\n\nYour payment has been verified successfully!${whatsappBlockText}\n👉 Access Your Program Dashboard: https://ascension.ind.in/program/${reg.program._id}/dashboard\n\nWith divine grace,\nAscension by Sonali Bhasin Kumar`,
+        html: `<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e0d5c1; border-radius: 12px; background: #fffcf7;">
+          <h2 style="color: #b8860b; text-align: center; margin-bottom: 5px;">${greeting}</h2>
+          <h3 style="color: #2c3e50; text-align: center; margin-top: 0;">Enrollment Verified & Confirmed</h3>
+          <p>Dear <strong>${reg.name}</strong>,</p>
+          <p>Your payment has been verified, and your enrollment for <strong>${reg.program.title}</strong> is now active.</p>
+          
+          <div style="background: #fdf6e7; padding: 15px; border-radius: 8px; border-left: 4px solid #b8860b; margin: 20px 0;">
+            <p style="margin: 0 0 8px 0;"><strong>Program:</strong> ${reg.program.title}</p>
+            <p style="margin: 0 0 8px 0;"><strong>Payment Status:</strong> Verified (Paid)</p>
+            <p style="margin: 0;"><strong>Reference ID:</strong> <code>${reg.transactionId || 'Manual UPI Verified'}</code></p>
+          </div>
+
+          ${whatsappBlockHtml}
+
+          <p style="text-align: center; margin-top: 15px;">
+            <a href="https://ascension.ind.in/program/${reg.program._id}/dashboard" style="color: #b8860b; font-weight: bold; text-decoration: underline;">
+              🔗 Open Your Program Dashboard ↗
+            </a>
+          </p>
+
+          <hr style="border: none; border-top: 1px solid #e0d5c1; margin: 25px 0;" />
+          <p style="font-size: 12px; color: #7f8c8d; text-align: center;">
+            With gratitude & divine grace,<br/>
+            <strong>Ascension by Sonali Bhasin Kumar</strong>
+          </p>
+        </div>`
       };
 
       try {

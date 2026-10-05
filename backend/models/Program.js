@@ -46,6 +46,10 @@ const programSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  whatsappGroupLink: {
+    type: String,
+    default: ''
+  },
   images: [
     {
       type: String

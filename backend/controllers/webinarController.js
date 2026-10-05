@@ -467,7 +467,15 @@ exports.createWebinarOrder = async (req, res, next) => {
       const options = {
         amount: Math.round(amount * 100), // paise
         currency: 'INR',
-        receipt: `rcpt_wb_${crypto.randomBytes(4).toString('hex')}`
+        receipt: `rcpt_wb_${crypto.randomBytes(4).toString('hex')}`,
+        notes: {
+          type: 'webinar',
+          webinarId: webinar._id.toString(),
+          webinarTitle: webinar.title,
+          name: name || '',
+          email: email || '',
+          phone: phone || ''
+        }
       };
       const order = await razorpayInstance.orders.create(options);
       orderResponseId = order.id;

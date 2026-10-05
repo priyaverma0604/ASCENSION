@@ -183,7 +183,7 @@ const EnrollProgramModal = ({ program, onClose }) => {
   };
 
   const isAncestral = (program.title && program.title.toLowerCase().includes('ancestral')) || (program.name && program.name.toLowerCase().includes('ancestral'));
-  const whatsappLink = program.whatsappGroupLink || (isAncestral ? 'https://chat.whatsapp.com/J4nXj2mznEfLCj2YZd1v16' : '');
+  const whatsappLink = program.whatsappGroupLink || '';
   const videoLink = isAncestral ? 'https://youtu.be/jIs3IH-brtg' : (program.introVideoUrl || program.videoUrl || '');
 
   return (
