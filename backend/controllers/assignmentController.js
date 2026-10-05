@@ -398,8 +398,6 @@ exports.submitAssignment = async (req, res, next) => {
       });
     }
 
-    const isGratitudeProgram = program.title.toLowerCase().includes('gratitude') || program._id.toString() === '6a4963f49e941f93f91f5abf';
-
     let photoUrl = '';
     if (req.file) {
       photoUrl = isCloudinaryConfigured ? req.file.path : `/uploads/${req.file.filename}`;
