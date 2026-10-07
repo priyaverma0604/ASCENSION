@@ -114,6 +114,17 @@ const Footer = () => {
         </p>
         <div className="flex flex-col md:flex-row items-center justify-between text-[11px] text-sage/80 mt-2 gap-4">
           <p>© {new Date().getFullYear()} Ascension by Sonali Bhasin Kumar. All rights reserved.</p>
+          <p className="text-charcoal-light flex items-center gap-1 font-medium text-[11px]">
+            Developed with <span className="text-rose-500">❤️</span> by{' '}
+            <a 
+              href="https://www.linkedin.com/in/priya-verma-9668b4291/" 
+              target="_blank" 
+              rel="noreferrer" 
+              className="text-gold-dark hover:text-gold font-bold transition-colors underline decoration-gold/40 hover:decoration-gold"
+            >
+              Priya Verma
+            </a>
+          </p>
           <div className="flex gap-4 flex-wrap justify-center">
             <a href="https://www.instagram.com/ascension_sonalibhasinkumar/" target="_blank" rel="noreferrer" className="hover:text-gold transition-colors">Instagram</a>
             <a href="https://www.facebook.com/sonali.kumar.102" target="_blank" rel="noreferrer" className="hover:text-gold transition-colors">Facebook</a>
