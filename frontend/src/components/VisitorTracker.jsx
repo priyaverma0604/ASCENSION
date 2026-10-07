@@ -89,6 +89,14 @@ const VisitorTracker = () => {
     const currentPath = location.pathname + location.search;
     if (lastTrackedPath.current !== currentPath) {
       lastTrackedPath.current = currentPath;
+
+      // Track Meta Pixel SPA PageView if script is loaded
+      if (typeof window !== 'undefined' && typeof window.fbq === 'function') {
+        try {
+          window.fbq('track', 'PageView');
+        } catch (e) {}
+      }
+
       // Small timeout to allow document.title to update
       const timer = setTimeout(() => {
         sendTrackingPing(currentPath, document.title);

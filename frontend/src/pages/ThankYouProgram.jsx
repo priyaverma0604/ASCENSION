@@ -53,6 +53,21 @@ const ThankYouProgram = () => {
       }
     };
     fetchProgram();
+
+    // Fire Meta Pixel Purchase & Conversion event for Ads tracking
+    if (typeof window !== 'undefined' && typeof window.fbq === 'function') {
+      try {
+        window.fbq('track', 'Purchase', {
+          content_name: isNavratriRoute ? '9-Day Sacred Navratri Program' : 'Ascension Spiritual Program',
+          content_type: 'product',
+          currency: 'INR',
+          value: 999
+        });
+        window.fbq('track', 'CompleteRegistration', {
+          content_name: isNavratriRoute ? '9-Day Sacred Navratri Program' : 'Ascension Spiritual Program'
+        });
+      } catch (err) {}
+    }
   }, [activeProgramId]);
 
   const handleCopyLink = () => {
