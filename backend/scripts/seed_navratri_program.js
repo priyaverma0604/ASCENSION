@@ -11,8 +11,8 @@ const NAVRATRI_PROGRAM_ID = '6a4963f49e941f93f91f5ac5';
 const navratriProgramData = {
   _id: new mongoose.Types.ObjectId(NAVRATRI_PROGRAM_ID),
   title: "9-Day Sacred Navratri Audio Transformation",
-  description: "Embark on an auspicious 9-day spiritual healing journey honoring the 9 divine manifestations of Maa Durga (Navadurga). Each day unlocks a dedicated, high-vibrational spiritual audiobook and guided energetic transmission. Listen to each day's sacred audio sequentially to unlock subsequent days. Access remains valid for 10 days from your enrollment date.",
-  duration: "9 Days",
+  description: "Embark on an auspicious 9-day spiritual healing journey honoring the 9 divine manifestations of Maa Durga (Navadurga). Each day unlocks a dedicated, high-vibrational spiritual audiobook and guided energetic transmission. Listen to each day's sacred audio sequentially to unlock subsequent days. Access remains valid till 21 October.",
+  duration: "Till 21 October",
   startDate: "Navratri Special",
   pricing: 1555,
   originalPrice: 2999,

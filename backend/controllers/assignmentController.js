@@ -356,16 +356,20 @@ exports.submitAssignment = async (req, res, next) => {
       });
     }
 
-    // Check expiration: 10 days limit for Navratri Program, 35 days for Gratitude Program
+    // Check expiration: Valid till 21 October 2026 for Navratri Program, 35 days for Gratitude Program
     const isNavratriProgram = program.title.toLowerCase().includes('navratri') || program._id.toString() === '6a4963f49e941f93f91f5ac5';
     const isGratitudeProgram = program.title.toLowerCase().includes('gratitude') || program._id.toString() === '6a4963f49e941f93f91f5abf';
-    const maxAccessDays = isNavratriProgram ? 10 : (isGratitudeProgram ? 35 : 0);
 
-    if (maxAccessDays > 0) {
-      const startDate = progress.createdAt || new Date();
-      const expirationDate = new Date(startDate.getTime() + maxAccessDays * 24 * 60 * 60 * 1000);
+    if (isNavratriProgram) {
+      const expirationDate = new Date('2026-10-21T23:59:59+05:30');
       if (new Date() > expirationDate) {
-        return res.status(403).json({ success: false, message: `Your enrollment in this program has expired (maximum ${maxAccessDays} days access limit).` });
+        return res.status(403).json({ success: false, message: 'Your enrollment in the Navratri program was valid till 21 October and has expired.' });
+      }
+    } else if (isGratitudeProgram) {
+      const startDate = progress.createdAt || new Date();
+      const expirationDate = new Date(startDate.getTime() + 35 * 24 * 60 * 60 * 1000);
+      if (new Date() > expirationDate) {
+        return res.status(403).json({ success: false, message: 'Your enrollment in this program has expired (maximum 35 days access limit).' });
       }
     }
 

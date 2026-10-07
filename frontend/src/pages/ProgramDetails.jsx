@@ -122,6 +122,7 @@ const ProgramDetails = ({ autoProgram }) => {
   );
 
   const isAncestral = program.title && program.title.toLowerCase().includes('ancestral');
+  const isNavratri = program.title && program.title.toLowerCase().includes('navratri');
   const isComingSoon = ['guided meditations', '21 days mirror work for self love program', '21 days release work program'].includes(program.title.toLowerCase().trim());
   const effectivePrice = program.sellingPrice !== undefined ? program.sellingPrice : program.pricing;
   const originalPrice = program.originalPrice !== undefined ? program.originalPrice : effectivePrice;
@@ -234,14 +235,16 @@ const ProgramDetails = ({ autoProgram }) => {
                     <span>Starts {program.startDate || '24 September'}</span>
                   </span>
                 )}
-                <span className="text-[10px] text-charcoal-light flex items-center gap-1 font-medium bg-cream/70 py-1 px-2.5 rounded-full border border-cream-dark/40">
-                  <Users className="w-3 h-3 text-sage shrink-0" />
-                  <span>
-                    {program.enrolledCount !== undefined && program.enrolledCount > 0 
-                      ? program.enrolledCount 
-                      : (isAncestral ? 10 : (program.enrolledUsers?.length || 0))} / {program.enrollmentCapacity} Enrolled
+                {!isNavratri && program.enrollmentCapacity > 0 && (
+                  <span className="text-[10px] text-charcoal-light flex items-center gap-1 font-medium bg-cream/70 py-1 px-2.5 rounded-full border border-cream-dark/40">
+                    <Users className="w-3 h-3 text-sage shrink-0" />
+                    <span>
+                      {program.enrolledCount !== undefined && program.enrolledCount > 0 
+                        ? program.enrolledCount 
+                        : (isAncestral ? 10 : (program.enrolledUsers?.length || 0))} / {program.enrollmentCapacity} Enrolled
+                    </span>
                   </span>
-                </span>
+                )}
               </div>
 
               <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-charcoal-dark leading-snug">

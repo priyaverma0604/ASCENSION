@@ -298,12 +298,12 @@ const ProgramDashboard = () => {
   }
 
   const isAncestral = program.title && program.title.toLowerCase().includes('ancestral');
-  const isNavratri = program && (program.title.toLowerCase().includes('navratri') || program._id === '6a4963f49e941f93f91f5ac5' || program.duration === '9 Days');
+  const isNavratri = program && (program.title?.toLowerCase().includes('navratri') || program._id === '6a4963f49e941f93f91f5ac5' || (typeof program.duration === 'string' && program.duration.toLowerCase().includes('navratri')));
   const hasSessions = (program.sessions && program.sessions.length > 0) || isAncestral;
   const sessionsList = (program.sessions && program.sessions.length > 0) ? program.sessions : (isAncestral ? DEFAULT_ANCESTRAL_SESSIONS : []);
 
   // Compute progress percentage
-  const totalDays = program && program.duration ? (parseInt(program.duration, 10) || (isNavratri ? 9 : 30)) : (isNavratri ? 9 : 30);
+  const totalDays = isNavratri ? 9 : (program && program.duration && !isNaN(parseInt(program.duration, 10)) ? parseInt(program.duration, 10) : 30);
   const completedDaysCount = progress ? progress.submissions.length : 0;
   const progressPercent = Math.round((completedDaysCount / totalDays) * 100);
 
@@ -343,12 +343,20 @@ const ProgramDashboard = () => {
     return program.youtubeUrl || null;
   };
 
-  const maxProgramAccessDays = isNavratri ? 10 : (program && (program.title.toLowerCase().includes('gratitude') || program._id === '6a4963f49e941f93f91f5abf') ? 35 : 0);
+  const maxProgramAccessDays = isNavratri ? 14 : (program && (program.title.toLowerCase().includes('gratitude') || program._id === '6a4963f49e941f93f91f5abf') ? 35 : 0);
 
   const getRemainingDaysText = () => {
-    if (!progress || !progress.createdAt || maxProgramAccessDays === 0) return '';
-    const startDate = new Date(progress.createdAt);
-    const expirationDate = new Date(startDate.getTime() + maxProgramAccessDays * 24 * 60 * 60 * 1000);
+    if (!progress || !progress.createdAt) return '';
+    let expirationDate;
+    if (isNavratri) {
+      // Extended duration till 21 October 2026
+      expirationDate = new Date('2026-10-21T23:59:59+05:30');
+    } else if (maxProgramAccessDays > 0) {
+      const startDate = new Date(progress.createdAt);
+      expirationDate = new Date(startDate.getTime() + maxProgramAccessDays * 24 * 60 * 60 * 1000);
+    } else {
+      return '';
+    }
     const today = new Date();
     const diffTime = expirationDate - today;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -735,7 +743,7 @@ const ProgramDashboard = () => {
                     </span>
                   </div>
                   <span className="text-[10px] font-bold text-sage bg-sage/10 px-2.5 py-0.5 rounded-full border border-sage/20">
-                    10 Days Sacred Access
+                    Valid till 21 October
                   </span>
                 </div>
                 <div className="w-full rounded-2xl overflow-hidden border border-gold/30 shadow-sm relative group bg-black">
@@ -746,7 +754,7 @@ const ProgramDashboard = () => {
                   />
                 </div>
                 <p className="text-[11px] text-charcoal-light leading-relaxed">
-                  Welcome to the 9-Day Navratri Sacred Audio Transformation. Experience the divine transmissions of Maa Durga across 9 days. Each day unlocks sequentially upon completing the previous day's audiobook.
+                  Welcome to the 9-Day Navratri Sacred Audio Transformation. Experience the divine transmissions of Maa Durga across 9 days. Each day unlocks sequentially upon completing the previous day's audiobook. Access remains valid till 21 October.
                 </p>
               </div>
             ) : getWelcomeVideoUrl() ? (

@@ -968,7 +968,7 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                   {/* Primary Signature Bracelet Alignment Banner */}
                   {selectedZodiac.primaryBracelet && (() => {
                     const matchingProd = allProductsForCustomise.find(p => p.name?.toLowerCase() === selectedZodiac.primaryBracelet?.toLowerCase() || p.name?.toLowerCase().includes(selectedZodiac.primaryBracelet?.toLowerCase()));
-                    const braceletPrice = matchingProd?.pricing || 999;
+                    const braceletPrice = matchingProd?.pricing || 1999;
                     return (
                       <div className="p-4 rounded-2xl bg-gradient-to-r from-gold/15 via-cream/40 to-gold/10 border border-gold/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div className="flex flex-col gap-1">
@@ -1442,7 +1442,7 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                             </p>
                             <div className="flex items-center justify-between border-t border-cream-dark/35 pt-3 mt-auto">
                               <span className="font-serif font-bold text-gold-dark text-sm sm:text-base">
-                                ₹{product.pricing || (product.name && product.name.toLowerCase().includes('boat') ? 475 : 999)}
+                                ₹{product.pricing || (product.name && product.name.toLowerCase().includes('boat') ? 475 : (product.name && product.name.toLowerCase().includes('zodiac') ? 1999 : 999))}
                               </span>
                               
                               <button

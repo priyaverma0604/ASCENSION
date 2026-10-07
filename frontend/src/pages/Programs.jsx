@@ -96,6 +96,7 @@ const Programs = () => {
               );
 
               const isAncestral = program.title && program.title.toLowerCase().includes('ancestral');
+              const isNavratri = program.title && program.title.toLowerCase().includes('navratri');
 
               return (
                 <div 
@@ -137,14 +138,16 @@ const Programs = () => {
                               <span>Starts {program.startDate || '24 September'}</span>
                             </span>
                           )}
-                          <span className="text-[10px] text-charcoal-light flex items-center gap-1 font-medium bg-cream/70 py-1 px-2.5 rounded-full border border-cream-dark/40">
-                            <UserCheck className="w-3.5 h-3.5 text-sage shrink-0" />
-                            <span>
-                              {program.enrolledCount !== undefined && program.enrolledCount > 0 
-                                ? program.enrolledCount 
-                                : (isAncestral ? 10 : (program.enrolledUsers?.length || 0))} / {program.enrollmentCapacity} enrolled
+                          {!isNavratri && program.enrollmentCapacity > 0 && (
+                            <span className="text-[10px] text-charcoal-light flex items-center gap-1 font-medium bg-cream/70 py-1 px-2.5 rounded-full border border-cream-dark/40">
+                              <UserCheck className="w-3.5 h-3.5 text-sage shrink-0" />
+                              <span>
+                                {program.enrolledCount !== undefined && program.enrolledCount > 0 
+                                  ? program.enrolledCount 
+                                  : (isAncestral ? 10 : (program.enrolledUsers?.length || 0))} / {program.enrollmentCapacity} enrolled
+                              </span>
                             </span>
-                          </span>
+                          )}
                         </div>
 
                         {/* Quick Share / Copy Action */}
