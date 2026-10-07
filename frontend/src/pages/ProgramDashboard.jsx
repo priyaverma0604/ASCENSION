@@ -4,7 +4,7 @@ import {
   Lock, CheckCircle, UploadCloud, Image as ImageIcon, 
   ArrowRight, Sparkles, Compass, AlertCircle, Eye,
   Calendar, Clock, Video, MessageSquare, Star, ExternalLink, ShieldCheck, BookOpen, UserCheck,
-  Play, Pause, Volume2, VolumeX, RotateCcw, RotateCw, Headphones, Flame
+  Play, Pause, Volume2, VolumeX, RotateCcw, RotateCw, Headphones, Flame, MessageCircle
 } from 'lucide-react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
@@ -756,6 +756,28 @@ const ProgramDashboard = () => {
                 <p className="text-[11px] text-charcoal-light leading-relaxed">
                   Welcome to the 9-Day Navratri Sacred Audio Transformation. Experience the divine transmissions of Maa Durga across 9 days. Each day unlocks sequentially upon completing the previous day's audiobook. Access remains valid till 21 October.
                 </p>
+
+                {/* WhatsApp Community Group Banner */}
+                <div className="bg-[#25D366]/10 border border-[#25D366]/30 rounded-2xl p-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs mt-1">
+                  <div className="flex items-center gap-2.5 text-left">
+                    <div className="w-8 h-8 rounded-full bg-[#25D366] flex items-center justify-center text-white shrink-0 shadow-xs">
+                      <MessageCircle className="w-4 h-4 fill-white" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold text-[#128C7E]">Official Navratri WhatsApp Group</span>
+                      <span className="text-[10px] text-charcoal-light">Join the group for further updates, daily sacred chants & cohort discussions</span>
+                    </div>
+                  </div>
+                  <a
+                    href={program.whatsappGroupLink || 'https://chat.whatsapp.com/DT05P5k7uviAV0Yuw1ySb7'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full sm:w-auto bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold text-xs py-2 px-4 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-xs shrink-0 active:scale-98"
+                  >
+                    <MessageCircle className="w-3.5 h-3.5 fill-white" />
+                    <span>Join Group</span>
+                  </a>
+                </div>
               </div>
             ) : getWelcomeVideoUrl() ? (
               <div className="glass p-5 md:p-6 rounded-3xl border border-cream-dark/50 flex flex-col gap-4 text-left relative overflow-hidden">

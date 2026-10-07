@@ -343,8 +343,8 @@ exports.verifyEnrollmentPayment = async (req, res, next) => {
 
     // Send confirmation email
     if (userEmail) {
-      const whatsappLink = program.whatsappGroupLink || '';
-      const isNavratri = program.title.toLowerCase().includes('navratri') || program._id.toString() === '6a4963f49e941f93f91f5ac5';
+      const isNavratri = program.title?.toLowerCase().includes('navratri') || program._id?.toString() === '6a4963f49e941f93f91f5ac5';
+      const whatsappLink = program.whatsappGroupLink || (isNavratri ? 'https://chat.whatsapp.com/DT05P5k7uviAV0Yuw1ySb7' : '');
       const greeting = isNavratri ? '🌺 Jai Mata Di 🌺' : '✨ Welcome to Ascension ✨';
 
       let whatsappBlockHtml = '';
@@ -544,8 +544,8 @@ exports.verifyProgramRegistration = async (req, res, next) => {
       }
 
       // Send program confirmation email
-      const whatsappLink = program?.whatsappGroupLink || '';
       const isNavratri = reg.program?.title?.toLowerCase().includes('navratri') || reg.program?._id?.toString() === '6a4963f49e941f93f91f5ac5';
+      const whatsappLink = program?.whatsappGroupLink || (isNavratri ? 'https://chat.whatsapp.com/DT05P5k7uviAV0Yuw1ySb7' : '');
       const greeting = isNavratri ? '🌺 Jai Mata Di 🌺' : '✨ Welcome to Ascension ✨';
 
       let whatsappBlockHtml = '';

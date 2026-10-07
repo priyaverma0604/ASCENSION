@@ -183,7 +183,8 @@ const EnrollProgramModal = ({ program, onClose }) => {
   };
 
   const isAncestral = (program.title && program.title.toLowerCase().includes('ancestral')) || (program.name && program.name.toLowerCase().includes('ancestral'));
-  const whatsappLink = program.whatsappGroupLink || '';
+  const isNavratri = (program.title && program.title.toLowerCase().includes('navratri')) || program._id === '6a4963f49e941f93f91f5ac5';
+  const whatsappLink = program.whatsappGroupLink || (isNavratri ? 'https://chat.whatsapp.com/DT05P5k7uviAV0Yuw1ySb7' : (isAncestral ? 'https://chat.whatsapp.com/J4nXj2mznEfLCj2YZd1v16' : ''));
   const videoLink = isAncestral ? 'https://youtu.be/jIs3IH-brtg' : (program.introVideoUrl || program.videoUrl || '');
 
   return (
@@ -221,10 +222,12 @@ const EnrollProgramModal = ({ program, onClose }) => {
               <div className="w-full bg-[#25D366]/10 border border-[#25D366]/30 rounded-2xl p-4 flex flex-col items-center text-center gap-2.5 my-1">
                 <div className="flex items-center gap-1.5 text-[#128C7E] font-bold text-xs">
                   <MessageCircle className="w-4 h-4 text-[#25D366] fill-[#25D366]/20" />
-                  <span>Join Program WhatsApp Group</span>
+                  <span>Join {isNavratri ? 'Navratri' : 'Program'} WhatsApp Group</span>
                 </div>
                 <p className="text-[11px] text-charcoal-light leading-relaxed">
-                  Please join our official WhatsApp community group for live class links, reminders, and cohort updates.
+                  {isNavratri
+                    ? 'Please join our official Navratri WhatsApp group to connect with Sonali Ma\'am, receive daily audiobook alerts, sacred mantras, and cohort updates.'
+                    : 'Please join our official WhatsApp community group for live class links, reminders, and cohort updates.'}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-2 w-full mt-1">
                   <a

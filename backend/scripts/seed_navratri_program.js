@@ -20,6 +20,7 @@ const navratriProgramData = {
   enrollmentCapacity: 500,
   images: ["/uploads/navratri_9_days_banner.jpg"],
   youtubeUrl: "",
+  whatsappGroupLink: "https://chat.whatsapp.com/DT05P5k7uviAV0Yuw1ySb7",
   requiresAssignmentApproval: false
 };
 

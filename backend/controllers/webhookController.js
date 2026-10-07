@@ -102,7 +102,7 @@ exports.handleRazorpayWebhook = async (req, res) => {
           // Send confirmation email
           if (userEmail) {
             const isNavratri = program.title.toLowerCase().includes('navratri') || program._id.toString() === '6a4963f49e941f93f91f5ac5';
-            const whatsappLink = program.whatsappGroupLink || (isNavratri ? 'https://chat.whatsapp.com/J4nXj2mznEfLCj2YZd1v16' : '');
+            const whatsappLink = program.whatsappGroupLink || (isNavratri ? 'https://chat.whatsapp.com/DT05P5k7uviAV0Yuw1ySb7' : '');
 
             let extraHtml = '';
             if (whatsappLink) {
