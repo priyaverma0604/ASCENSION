@@ -30,11 +30,19 @@ exports.registerUser = async (req, res, next) => {
     const isFirstUser = (await User.countDocuments({})) === 0;
     const role = isFirstUser ? 'admin' : 'user';
 
+    const clientIp = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || req.ip || '';
+    const userAgent = req.headers['user-agent'] || '';
+
     const user = await User.create({
       name,
       email,
       password,
-      role
+      role,
+      lastLogin: new Date(),
+      lastActive: new Date(),
+      loginCount: 1,
+      ipAddress: clientIp.toString(),
+      userAgent
     });
 
     if (user) {
@@ -44,6 +52,7 @@ exports.registerUser = async (req, res, next) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        lastLogin: user.lastLogin,
         token: generateToken(user._id)
       });
     } else {
@@ -69,12 +78,23 @@ exports.loginUser = async (req, res, next) => {
     const user = await User.findOne({ email }).select('+password');
     
     if (user && (await user.matchPassword(password))) {
+      const clientIp = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || req.ip || '';
+      const userAgent = req.headers['user-agent'] || '';
+
+      user.lastLogin = new Date();
+      user.lastActive = new Date();
+      user.loginCount = (user.loginCount || 0) + 1;
+      user.ipAddress = clientIp.toString();
+      user.userAgent = userAgent;
+      await user.save({ validateBeforeSave: false });
+
       res.json({
         success: true,
         _id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
+        lastLogin: user.lastLogin,
         token: generateToken(user._id)
       });
     } else {
@@ -92,6 +112,9 @@ exports.getUserProfile = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id).populate('cart.product');
     if (user) {
+      // Update lastActive timestamp quietly
+      User.findByIdAndUpdate(req.user._id, { lastActive: new Date() }).exec().catch(() => {});
+
       res.json({
         success: true,
         _id: user._id,
@@ -99,7 +122,9 @@ exports.getUserProfile = async (req, res, next) => {
         email: user.email,
         role: user.role,
         cart: user.cart,
-        wishlist: user.wishlist
+        wishlist: user.wishlist,
+        lastLogin: user.lastLogin,
+        lastActive: user.lastActive
       });
     } else {
       res.status(404).json({ success: false, message: 'User not found' });

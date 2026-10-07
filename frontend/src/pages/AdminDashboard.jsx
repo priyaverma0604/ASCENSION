@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { 
   Compass, Eye, Edit2, Trash2, PlusCircle, CheckCircle, 
   X, RefreshCw, Layers, ShieldCheck, ShoppingBag, 
   Calendar, MapPin, DollarSign, MessageCircle, FileText, Smile,
-  Share2, Copy, Check, Sparkles
+  Share2, Copy, Check, Sparkles, Users, Activity, BarChart3, Globe,
+  Smartphone, Laptop, Tablet, Search, Shield, UserCheck, Radio, Clock,
+  ExternalLink, UserX, CheckCircle2, AlertCircle
 } from 'lucide-react';
 import axios from 'axios';
+import { AuthContext } from '../context/AuthContext';
 
 const getImageUrl = (path) => {
   if (!path || path === 'razorpay_online') return '';
@@ -20,11 +23,41 @@ const getImageUrl = (path) => {
   return `${apiBase}${cleanPath}`;
 };
 
+const formatTimeAgo = (date) => {
+  if (!date) return 'Never';
+  const diffMs = new Date() - new Date(date);
+  if (diffMs < 0) return 'Just now';
+  const seconds = Math.floor(diffMs / 1000);
+  if (seconds < 60) return 'Just now';
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 30) return `${days}d ago`;
+  return new Date(date).toLocaleDateString();
+};
+
 const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState('services');
+  const { user } = useContext(AuthContext) || {};
+  const [activeTab, setActiveTab] = useState('users');
   const [listData, setListData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [previewImage, setPreviewImage] = useState(null);
+
+  // User Management State
+  const [userStats, setUserStats] = useState(null);
+  const [userSearchQuery, setUserSearchQuery] = useState('');
+  const [userRoleFilter, setUserRoleFilter] = useState('all');
+  const [userStatusFilter, setUserStatusFilter] = useState('all');
+  const [selectedUserDetail, setSelectedUserDetail] = useState(null);
+  const [updatingUserRole, setUpdatingUserRole] = useState(false);
+
+  // Website Traffic Analytics State
+  const [analyticsSummary, setAnalyticsSummary] = useState(null);
+  const [recentVisits, setRecentVisits] = useState([]);
+  const [analyticsAutoRefresh, setAnalyticsAutoRefresh] = useState(false);
+  const [clearingLogs, setClearingLogs] = useState(false);
 
   // Form Modals
   const [showModal, setShowModal] = useState(false);
@@ -96,6 +129,8 @@ const AdminDashboard = () => {
   const [sendingRecommendation, setSendingRecommendation] = useState(false);
 
   const tabs = [
+    { id: 'users', label: 'Users & Activity', icon: <Users className="w-4 h-4" /> },
+    { id: 'analytics', label: 'Website Traffic', icon: <BarChart3 className="w-4 h-4" /> },
     { id: 'services', label: 'Services', icon: <Layers className="w-4 h-4" /> },
     { id: 'programs', label: 'Programs', icon: <ShieldCheck className="w-4 h-4" /> },
     { id: 'program-registrations', label: 'Program Enrollments', icon: <FileText className="w-4 h-4" /> },
@@ -116,10 +151,51 @@ const AdminDashboard = () => {
     fetchTabData();
   }, [activeTab]);
 
+  useEffect(() => {
+    let interval;
+    if (activeTab === 'analytics' && analyticsAutoRefresh) {
+      interval = setInterval(() => {
+        fetchTabData();
+      }, 15000);
+    }
+    return () => clearInterval(interval);
+  }, [activeTab, analyticsAutoRefresh]);
+
   const fetchTabData = async () => {
     setLoading(true);
     setListData([]);
     try {
+      if (activeTab === 'users') {
+        const [usersRes, statsRes] = await Promise.all([
+          axios.get('/api/users'),
+          axios.get('/api/users/stats')
+        ]);
+        if (usersRes.data.success) {
+          setListData(usersRes.data.data);
+        }
+        if (statsRes.data.success) {
+          setUserStats(statsRes.data.data);
+        }
+        setLoading(false);
+        return;
+      }
+
+      if (activeTab === 'analytics') {
+        const [summaryRes, recentRes] = await Promise.all([
+          axios.get('/api/analytics/summary'),
+          axios.get('/api/analytics/recent?limit=50')
+        ]);
+        if (summaryRes.data.success) {
+          setAnalyticsSummary(summaryRes.data.data);
+        }
+        if (recentRes.data.success) {
+          setRecentVisits(recentRes.data.data);
+          setListData(recentRes.data.data);
+        }
+        setLoading(false);
+        return;
+      }
+
       let endpoint = `/api/${activeTab}`;
       if (activeTab === 'community') endpoint = '/api/community';
       if (activeTab === 'webinar-registrations') endpoint = '/api/webinars/registrations';
@@ -137,10 +213,46 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleUpdateUserRole = async (userId, newRole) => {
+    if (!window.confirm(`Are you sure you want to change this user's role to ${newRole.toUpperCase()}?`)) return;
+    setUpdatingUserRole(true);
+    try {
+      const { data } = await axios.put(`/api/users/${userId}/role`, { role: newRole });
+      if (data.success) {
+        fetchTabData();
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to update user role');
+    } finally {
+      setUpdatingUserRole(false);
+    }
+  };
+
+  const handleClearAnalyticsLogs = async () => {
+    if (!window.confirm('Are you sure you want to clear all website visit logs? This will reset visitor history.')) return;
+    setClearingLogs(true);
+    try {
+      const { data } = await axios.delete('/api/analytics/clear');
+      if (data.success) {
+        fetchTabData();
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to clear logs');
+    } finally {
+      setClearingLogs(false);
+    }
+  };
+
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this item?')) return;
+    if (activeTab === 'users') {
+      if (!window.confirm('Are you sure you want to delete this user account? This cannot be undone.')) return;
+    } else {
+      if (!window.confirm('Are you sure you want to delete this item?')) return;
+    }
+
     try {
       let endpoint = `/api/${activeTab}/${id}`;
+      if (activeTab === 'users') endpoint = `/api/users/${id}`;
       if (activeTab === 'community') endpoint = `/api/community/${id}`;
       if (activeTab === 'webinar-registrations') endpoint = `/api/webinars/registrations/${id}`;
       if (activeTab === 'program-registrations') endpoint = `/api/programs/registrations/${id}`;
@@ -503,16 +615,40 @@ const AdminDashboard = () => {
           
           {/* Header toolbar */}
           <div className="flex justify-between items-center bg-cream/40 p-4 rounded-2xl border border-cream-dark/60">
-            <h3 className="font-serif text-lg font-bold text-charcoal-dark uppercase tracking-wider">
-              Manage {activeTab}
-            </h3>
-            <div className="flex gap-2">
+            <div>
+              <h3 className="font-serif text-lg font-bold text-charcoal-dark uppercase tracking-wider">
+                {activeTab === 'users' 
+                  ? 'Registered Users & Live Activity' 
+                  : activeTab === 'analytics' 
+                    ? 'Website Traffic & Visitor Analytics' 
+                    : `Manage ${activeTab}`}
+              </h3>
+              <p className="text-[11px] text-charcoal-light mt-0.5">
+                {activeTab === 'users' 
+                  ? 'Monitor registered user sessions, online presence, login frequency, and activity.' 
+                  : activeTab === 'analytics' 
+                    ? 'Track live visitors, pageviews, top visited content, and real-time site usage.' 
+                    : `Backoffice database records for ${activeTab}.`}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
               <button 
                 onClick={fetchTabData}
                 className="p-2 bg-cream-light border border-cream-dark hover:bg-cream rounded-xl text-charcoal transition-colors focus:outline-none"
+                title="Refresh Data"
               >
                 <RefreshCw className="w-4 h-4" />
               </button>
+              {activeTab === 'analytics' && (
+                <button
+                  onClick={handleClearAnalyticsLogs}
+                  disabled={clearingLogs}
+                  className="flex items-center gap-1.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-semibold py-2 px-3 rounded-xl text-xs uppercase tracking-wider shadow-sm transition-all"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Clear Logs</span>
+                </button>
+              )}
               {['services', 'programs', 'products', 'workshops', 'retreats', 'community', 'webinars'].includes(activeTab) && (
                 <button
                   onClick={handleOpenCreate}
@@ -525,46 +661,523 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* Table display */}
-          {loading ? (
-            <div className="shimmer h-80 rounded-2xl w-full"></div>
-          ) : listData.length > 0 ? (
-            <div className="glass rounded-2xl border border-cream-dark/50 overflow-x-auto shadow-sm">
-              <table className="w-full text-xs text-charcoal border-collapse">
-                <thead>
-                  <tr className="bg-cream-dark/40 border-b border-cream-dark uppercase text-[10px] tracking-wider font-bold">
-                    <th className="py-3 px-4 text-left">Details</th>
-                    <th className="py-3 px-4 text-left">Identities / Extras</th>
-                    <th className="py-3 px-4 text-left">Financials</th>
-                    <th className="py-3 px-4 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {listData.map((item) => (
-                    <tr key={item._id} className="border-b border-cream-dark/40 hover:bg-cream/20 transition-colors">
-                      {/* Column 1: Details / Customer Information */}
-                      <td className="py-3 px-4">
-                        <p className="font-bold text-charcoal-dark">
-                          {activeTab === 'orders' 
-                            ? (item.user?.name || item.shippingAddress?.name || 'Shop Customer')
-                            : activeTab === 'program-registrations' || activeTab === 'workshop-registrations' || activeTab === 'webinar-registrations'
-                              ? item.name
-                              : activeTab === 'donations'
-                                ? (item.name || 'Anonymous Donor')
-                                : (item.title || item.name || `Log ID: ${item._id.substring(0, 10)}`)}
-                        </p>
-                        <p className="text-[10px] text-charcoal-light line-clamp-1 max-w-sm mt-0.5">
-                          {activeTab === 'orders'
-                            ? `Email: ${item.user?.email || 'N/A'} | Phone: ${item.shippingAddress?.phone || 'N/A'}`
-                            : activeTab === 'program-registrations' || activeTab === 'workshop-registrations' || activeTab === 'webinar-registrations'
-                              ? `Email: ${item.email} | Phone: ${item.phone}`
-                              : activeTab === 'donations'
-                                ? `Email: ${item.email || 'N/A'} | Phone: ${item.phone || 'N/A'}`
-                                : activeTab === 'contacts'
-                                  ? `Email: ${item.email} | Phone: ${item.phone || 'N/A'}`
-                                  : item.description || item.shortDescription || item.reviewText || item.message || item.content || `Date: ${new Date(item.createdAt).toLocaleDateString()}`}
-                        </p>
-                      </td>
+          {/* USERS & ACTIVITY TAB */}
+          {activeTab === 'users' ? (
+            <div className="flex flex-col gap-6">
+              {/* User Metrics Summary */}
+              {userStats && (
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                  <div className="bg-white/85 border border-cream-dark/60 rounded-2xl p-4 shadow-sm flex flex-col">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-charcoal-light flex items-center gap-1.5">
+                      <Users className="w-3.5 h-3.5 text-sage" /> Total Registered
+                    </span>
+                    <span className="text-2xl font-serif font-bold text-charcoal-dark mt-1">{userStats.totalUsers}</span>
+                    <span className="text-[10px] text-charcoal-light mt-0.5">+{userStats.newThisMonth} in last 30d</span>
+                  </div>
+                  <div className="bg-emerald-50/90 border border-emerald-200/80 rounded-2xl p-4 shadow-sm flex flex-col relative overflow-hidden">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 flex items-center gap-1.5">
+                        <Radio className="w-3.5 h-3.5 text-emerald-600" /> Online Now
+                      </span>
+                      <span className="flex h-2.5 w-2.5 relative">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                      </span>
+                    </div>
+                    <span className="text-2xl font-serif font-bold text-emerald-900 mt-1">{userStats.onlineNow}</span>
+                    <span className="text-[10px] text-emerald-700 mt-0.5">Active in last 5 mins</span>
+                  </div>
+                  <div className="bg-white/85 border border-cream-dark/60 rounded-2xl p-4 shadow-sm flex flex-col">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-charcoal-light flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-sage" /> Active Today
+                    </span>
+                    <span className="text-2xl font-serif font-bold text-sage mt-1">{userStats.activeToday}</span>
+                    <span className="text-[10px] text-charcoal-light mt-0.5">Since midnight</span>
+                  </div>
+                  <div className="bg-white/85 border border-cream-dark/60 rounded-2xl p-4 shadow-sm flex flex-col">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-charcoal-light flex items-center gap-1.5">
+                      <Activity className="w-3.5 h-3.5 text-sage" /> Active (7 Days)
+                    </span>
+                    <span className="text-2xl font-serif font-bold text-charcoal-dark mt-1">{userStats.activeThisWeek}</span>
+                    <span className="text-[10px] text-charcoal-light mt-0.5">Logged in this week</span>
+                  </div>
+                  <div className="bg-white/85 border border-cream-dark/60 rounded-2xl p-4 shadow-sm flex flex-col">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-charcoal-light flex items-center gap-1.5">
+                      <Shield className="w-3.5 h-3.5 text-gold-dark" /> Admins
+                    </span>
+                    <span className="text-2xl font-serif font-bold text-gold-dark mt-1">{userStats.adminsCount}</span>
+                    <span className="text-[10px] text-charcoal-light mt-0.5">Backoffice staff</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Search and Filters Bar */}
+              <div className="flex flex-col sm:flex-row gap-3 items-center justify-between bg-cream/40 p-3.5 rounded-2xl border border-cream-dark/50">
+                <div className="relative w-full sm:w-80">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-charcoal-light" />
+                  <input 
+                    type="text"
+                    placeholder="Search by user name or email..."
+                    value={userSearchQuery}
+                    onChange={(e) => setUserSearchQuery(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 bg-cream-light border border-cream-dark rounded-xl text-xs focus:outline-none focus:border-sage"
+                  />
+                </div>
+                <div className="flex gap-2 w-full sm:w-auto">
+                  <select 
+                    value={userRoleFilter} 
+                    onChange={(e) => setUserRoleFilter(e.target.value)}
+                    className="bg-cream-light border border-cream-dark rounded-xl py-2 px-3 text-xs focus:outline-none"
+                  >
+                    <option value="all">All Roles</option>
+                    <option value="user">Users Only</option>
+                    <option value="admin">Admins Only</option>
+                  </select>
+                  <select 
+                    value={userStatusFilter} 
+                    onChange={(e) => setUserStatusFilter(e.target.value)}
+                    className="bg-cream-light border border-cream-dark rounded-xl py-2 px-3 text-xs focus:outline-none"
+                  >
+                    <option value="all">All Status</option>
+                    <option value="online">🟢 Online Now</option>
+                    <option value="offline">⚪ Offline</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Users Table */}
+              {loading ? (
+                <div className="shimmer h-80 rounded-2xl w-full"></div>
+              ) : (
+                <div className="glass rounded-2xl border border-cream-dark/50 overflow-x-auto shadow-sm">
+                  <table className="w-full text-xs text-charcoal border-collapse">
+                    <thead>
+                      <tr className="bg-cream-dark/40 border-b border-cream-dark uppercase text-[10px] tracking-wider font-bold">
+                        <th className="py-3 px-4 text-left">User Identity</th>
+                        <th className="py-3 px-4 text-left">Role & Access</th>
+                        <th className="py-3 px-4 text-left">Activity & Last Login</th>
+                        <th className="py-3 px-4 text-left">Engagement</th>
+                        <th className="py-3 px-4 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(listData || [])
+                        .filter(u => {
+                          const matchesSearch = !userSearchQuery || 
+                            u.name?.toLowerCase().includes(userSearchQuery.toLowerCase()) || 
+                            u.email?.toLowerCase().includes(userSearchQuery.toLowerCase());
+                          const matchesRole = userRoleFilter === 'all' || u.role === userRoleFilter;
+                          const matchesStatus = userStatusFilter === 'all' || 
+                            (userStatusFilter === 'online' && u.isOnline) || 
+                            (userStatusFilter === 'offline' && !u.isOnline);
+                          return matchesSearch && matchesRole && matchesStatus;
+                        })
+                        .map((u) => (
+                          <tr key={u._id} className="border-b border-cream-dark/40 hover:bg-cream/20 transition-colors">
+                            {/* Column 1: User Identity */}
+                            <td className="py-3 px-4">
+                              <div className="flex items-center gap-3">
+                                <div className="relative">
+                                  <div className="w-9 h-9 rounded-full bg-sage/20 text-sage-dark font-serif font-bold text-sm flex items-center justify-center border border-sage/30 uppercase">
+                                    {u.name ? u.name.charAt(0) : 'U'}
+                                  </div>
+                                  {u.isOnline ? (
+                                    <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full"></span>
+                                  ) : (
+                                    <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-charcoal-light/40 border-2 border-white rounded-full"></span>
+                                  )}
+                                </div>
+                                <div>
+                                  <p className="font-bold text-charcoal-dark flex items-center gap-1.5">
+                                    {u.name}
+                                    {u.isOnline && (
+                                      <span className="text-[9px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded-full border border-emerald-300">
+                                        Online
+                                      </span>
+                                    )}
+                                  </p>
+                                  <p className="text-[10px] text-charcoal-light">{u.email}</p>
+                                  <p className="text-[9px] text-charcoal-light/70 mt-0.5">Joined: {new Date(u.createdAt).toLocaleDateString()}</p>
+                                </div>
+                              </div>
+                            </td>
+
+                            {/* Column 2: Role */}
+                            <td className="py-3 px-4">
+                              <div className="flex flex-col gap-1">
+                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold uppercase w-fit ${
+                                  u.role === 'admin' 
+                                    ? 'bg-gold/15 text-gold-dark border border-gold/30' 
+                                    : 'bg-cream-dark text-charcoal-light border border-cream-dark/80'
+                                }`}>
+                                  {u.role === 'admin' ? <Shield className="w-3 h-3 text-gold-dark" /> : <UserCheck className="w-3 h-3 text-sage" />}
+                                  {u.role}
+                                </span>
+                                {u._id !== user?._id && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleUpdateUserRole(u._id, u.role === 'admin' ? 'user' : 'admin')}
+                                    disabled={updatingUserRole}
+                                    className="text-[9px] text-sage hover:underline font-bold text-left"
+                                  >
+                                    Make {u.role === 'admin' ? 'User' : 'Admin'} ⇄
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+
+                            {/* Column 3: Activity & Logins */}
+                            <td className="py-3 px-4">
+                              <div className="flex flex-col gap-0.5">
+                                <div className="flex items-center gap-1 text-[11px] font-medium text-charcoal-dark">
+                                  <Clock className="w-3 h-3 text-charcoal-light" />
+                                  <span>Last Active: <strong>{formatTimeAgo(u.lastActive)}</strong></span>
+                                </div>
+                                <span className="text-[10px] text-charcoal-light">
+                                  Last Login: {u.lastLogin ? new Date(u.lastLogin).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : 'Never recorded'}
+                                </span>
+                                <span className="text-[9px] text-charcoal-light font-medium mt-0.5">
+                                  Total Logins: <strong>{u.loginCount || 0}</strong>
+                                  {u.ipAddress && ` • IP: ${u.ipAddress}`}
+                                </span>
+                              </div>
+                            </td>
+
+                            {/* Column 4: Engagement */}
+                            <td className="py-3 px-4">
+                              <div className="flex flex-wrap gap-1 text-[10px]">
+                                <span className="bg-cream px-2 py-0.5 rounded border border-cream-dark text-charcoal-dark">
+                                  🛒 {u.ordersCount || 0} Orders
+                                </span>
+                                <span className="bg-cream px-2 py-0.5 rounded border border-cream-dark text-charcoal-dark">
+                                  🎓 {u.registrationsCount || 0} Enrolled
+                                </span>
+                                <span className="bg-cream px-2 py-0.5 rounded border border-cream-dark text-charcoal-dark">
+                                  ✍️ {u.submissionsCount || 0} Submissions
+                                </span>
+                              </div>
+                            </td>
+
+                            {/* Column 5: Actions */}
+                            <td className="py-3 px-4 text-right">
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  onClick={() => setSelectedUserDetail(u)}
+                                  className="p-1.5 hover:text-sage text-charcoal/60 hover:bg-cream rounded-lg transition-colors focus:outline-none"
+                                  title="View Full Profile & Activity"
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </button>
+                                {u._id !== user?._id && (
+                                  <button
+                                    onClick={() => handleDelete(u._id)}
+                                    className="p-1.5 hover:text-red-600 text-charcoal/60 hover:bg-red-50 rounded-lg transition-colors focus:outline-none"
+                                    title="Delete User"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          ) : activeTab === 'analytics' ? (
+            /* WEBSITE TRAFFIC ANALYTICS TAB */
+            <div className="flex flex-col gap-6">
+              {/* Realtime Live Pulse Banner */}
+              <div className="bg-gradient-to-r from-emerald-900 to-sage-dark text-white p-5 rounded-2xl shadow-md flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div className="flex items-center gap-3.5">
+                  <span className="flex h-4 w-4 relative">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-400"></span>
+                  </span>
+                  <div>
+                    <h4 className="font-bold text-sm tracking-wider uppercase flex items-center gap-2">
+                      Realtime Website Traffic Monitor
+                    </h4>
+                    <p className="text-xs text-white/80 mt-0.5">
+                      <strong>{analyticsSummary?.realtime?.activeVisitors || 0} active visitors</strong> browsing the site right now (including <strong>{analyticsSummary?.realtime?.activeUsers || 0} logged-in users</strong>).
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <label className="flex items-center gap-1.5 text-xs text-white/90 bg-white/10 px-3 py-1.5 rounded-xl border border-white/20 cursor-pointer">
+                    <input 
+                      type="checkbox" 
+                      checked={analyticsAutoRefresh} 
+                      onChange={(e) => setAnalyticsAutoRefresh(e.target.checked)}
+                      className="rounded text-sage"
+                    />
+                    <span>Auto-refresh (15s)</span>
+                  </label>
+                  <button 
+                    onClick={fetchTabData} 
+                    className="bg-white text-charcoal-dark hover:bg-cream font-bold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1 shadow-sm transition-all"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    <span>Refresh Now</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Metric Overview Cards Grid */}
+              {analyticsSummary && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Pageviews Card */}
+                  <div className="glass p-5 rounded-2xl border border-cream-dark/60 flex flex-col justify-between shadow-sm">
+                    <div className="flex items-center justify-between border-b border-cream-dark/50 pb-2 mb-3">
+                      <span className="font-bold text-xs uppercase tracking-wider text-charcoal-dark flex items-center gap-1.5">
+                        <Eye className="w-4 h-4 text-sage" /> Pageviews
+                      </span>
+                      <span className="text-[10px] bg-sage/15 text-sage font-bold px-2 py-0.5 rounded-full">All-Time: {analyticsSummary.pageviews?.total || 0}</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                      <div className="bg-cream/40 p-2.5 rounded-xl">
+                        <p className="text-[10px] text-charcoal-light uppercase font-bold">Today</p>
+                        <p className="text-lg font-bold text-charcoal-dark mt-0.5">{analyticsSummary.pageviews?.today || 0}</p>
+                      </div>
+                      <div className="bg-cream/40 p-2.5 rounded-xl">
+                        <p className="text-[10px] text-charcoal-light uppercase font-bold">7 Days</p>
+                        <p className="text-lg font-bold text-charcoal-dark mt-0.5">{analyticsSummary.pageviews?.week || 0}</p>
+                      </div>
+                      <div className="bg-cream/40 p-2.5 rounded-xl">
+                        <p className="text-[10px] text-charcoal-light uppercase font-bold">30 Days</p>
+                        <p className="text-lg font-bold text-charcoal-dark mt-0.5">{analyticsSummary.pageviews?.month || 0}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Unique Visitors Card */}
+                  <div className="glass p-5 rounded-2xl border border-cream-dark/60 flex flex-col justify-between shadow-sm">
+                    <div className="flex items-center justify-between border-b border-cream-dark/50 pb-2 mb-3">
+                      <span className="font-bold text-xs uppercase tracking-wider text-charcoal-dark flex items-center gap-1.5">
+                        <Globe className="w-4 h-4 text-gold-dark" /> Unique Visitors
+                      </span>
+                      <span className="text-[10px] bg-gold/15 text-gold-dark font-bold px-2 py-0.5 rounded-full">Total: {analyticsSummary.uniqueVisitors?.total || 0}</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                      <div className="bg-cream/40 p-2.5 rounded-xl">
+                        <p className="text-[10px] text-charcoal-light uppercase font-bold">Today</p>
+                        <p className="text-lg font-bold text-charcoal-dark mt-0.5">{analyticsSummary.uniqueVisitors?.today || 0}</p>
+                      </div>
+                      <div className="bg-cream/40 p-2.5 rounded-xl">
+                        <p className="text-[10px] text-charcoal-light uppercase font-bold">7 Days</p>
+                        <p className="text-lg font-bold text-charcoal-dark mt-0.5">{analyticsSummary.uniqueVisitors?.week || 0}</p>
+                      </div>
+                      <div className="bg-cream/40 p-2.5 rounded-xl">
+                        <p className="text-[10px] text-charcoal-light uppercase font-bold">30 Days</p>
+                        <p className="text-lg font-bold text-charcoal-dark mt-0.5">{analyticsSummary.uniqueVisitors?.month || 0}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Device Breakdown */}
+                  <div className="glass p-5 rounded-2xl border border-cream-dark/60 flex flex-col justify-between shadow-sm">
+                    <div className="flex items-center justify-between border-b border-cream-dark/50 pb-2 mb-3">
+                      <span className="font-bold text-xs uppercase tracking-wider text-charcoal-dark flex items-center gap-1.5">
+                        <Laptop className="w-4 h-4 text-charcoal" /> Devices (30 Days)
+                      </span>
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      {analyticsSummary.deviceBreakdown && analyticsSummary.deviceBreakdown.length > 0 ? (
+                        analyticsSummary.deviceBreakdown.map((d) => (
+                          <div key={d.device} className="flex items-center justify-between text-xs">
+                            <span className="flex items-center gap-1.5 text-charcoal-light font-medium">
+                              {d.device === 'Mobile' && <Smartphone className="w-3.5 h-3.5 text-sage" />}
+                              {d.device === 'Desktop' && <Laptop className="w-3.5 h-3.5 text-charcoal-dark" />}
+                              {d.device === 'Tablet' && <Tablet className="w-3.5 h-3.5 text-gold" />}
+                              {d.device}
+                            </span>
+                            <span className="font-bold text-charcoal-dark">{d.count} views</span>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-[11px] text-charcoal-light py-2 text-center">No device records yet</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Top Visited Pages */}
+              {analyticsSummary?.topPages && analyticsSummary.topPages.length > 0 && (
+                <div className="glass p-5 rounded-2xl border border-cream-dark/60 shadow-sm flex flex-col gap-3">
+                  <h4 className="font-serif font-bold text-sm text-charcoal-dark uppercase tracking-wider flex items-center gap-1.5">
+                    <BarChart3 className="w-4 h-4 text-sage" /> Top Visited Pages & Content
+                  </h4>
+                  <div className="flex flex-col gap-2">
+                    {analyticsSummary.topPages.map((page, idx) => {
+                      const maxViews = analyticsSummary.topPages[0]?.views || 1;
+                      const pct = Math.round((page.views / maxViews) * 100);
+                      return (
+                        <div key={page.pagePath} className="flex flex-col gap-1 text-xs">
+                          <div className="flex justify-between items-center">
+                            <span className="font-mono text-charcoal-dark font-medium flex items-center gap-1.5">
+                              <span className="text-[10px] text-charcoal-light font-bold">#{idx + 1}</span>
+                              {page.pagePath}
+                            </span>
+                            <span className="font-bold text-charcoal-dark">
+                              {page.views} views <span className="text-charcoal-light font-normal text-[10px]">({page.uniqueVisitors} unique)</span>
+                            </span>
+                          </div>
+                          <div className="w-full bg-cream-dark/40 h-2 rounded-full overflow-hidden">
+                            <div className="bg-sage h-full rounded-full transition-all duration-500" style={{ width: `${pct}%` }}></div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Live Stream of Recent Website Visits */}
+              <div className="flex flex-col gap-3">
+                <div className="flex justify-between items-center">
+                  <h4 className="font-serif font-bold text-sm text-charcoal-dark uppercase tracking-wider flex items-center gap-1.5">
+                    <Activity className="w-4 h-4 text-emerald-600" /> Live Visitor Stream (Last 50 Visits)
+                  </h4>
+                  <span className="text-[10px] text-charcoal-light">Showing newest first</span>
+                </div>
+
+                {loading ? (
+                  <div className="shimmer h-80 rounded-2xl w-full"></div>
+                ) : recentVisits.length > 0 ? (
+                  <div className="glass rounded-2xl border border-cream-dark/50 overflow-x-auto shadow-sm">
+                    <table className="w-full text-xs text-charcoal border-collapse">
+                      <thead>
+                        <tr className="bg-cream-dark/40 border-b border-cream-dark uppercase text-[10px] tracking-wider font-bold">
+                          <th className="py-3 px-4 text-left">Visitor Identity</th>
+                          <th className="py-3 px-4 text-left">Page Visited</th>
+                          <th className="py-3 px-4 text-left">Device & Browser</th>
+                          <th className="py-3 px-4 text-left">Time & Referrer</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {recentVisits.map((visit) => (
+                          <tr key={visit._id} className="border-b border-cream-dark/40 hover:bg-cream/20 transition-colors">
+                            {/* Column 1: Visitor Identity */}
+                            <td className="py-3 px-4">
+                              {visit.userId ? (
+                                <div className="flex items-center gap-2">
+                                  <div className="w-7 h-7 rounded-full bg-sage/20 text-sage-dark font-bold text-xs flex items-center justify-center border border-sage/30">
+                                    {visit.userId?.name?.charAt(0) || visit.userName?.charAt(0) || 'U'}
+                                  </div>
+                                  <div>
+                                    <p className="font-bold text-charcoal-dark flex items-center gap-1">
+                                      {visit.userId?.name || visit.userName || 'Registered User'}
+                                      <span className="text-[8px] bg-sage/20 text-sage font-bold px-1.5 py-0.2 rounded-full">User</span>
+                                    </p>
+                                    <p className="text-[10px] text-charcoal-light">{visit.userId?.email || visit.userEmail}</p>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-2">
+                                  <div className="w-7 h-7 rounded-full bg-cream-dark text-charcoal-light font-bold text-xs flex items-center justify-center border border-cream-dark/80">
+                                    <Globe className="w-3.5 h-3.5" />
+                                  </div>
+                                  <div>
+                                    <p className="font-bold text-charcoal-dark text-[11px]">Guest Visitor</p>
+                                    <p className="font-mono text-[9px] text-charcoal-light">ID: {visit.visitorId?.substring(0, 14)}...</p>
+                                  </div>
+                                </div>
+                              )}
+                            </td>
+
+                            {/* Column 2: Page Visited */}
+                            <td className="py-3 px-4">
+                              <p className="font-mono font-bold text-charcoal-dark text-[11px]">{visit.pagePath}</p>
+                              {visit.pageTitle && (
+                                <p className="text-[10px] text-charcoal-light line-clamp-1 max-w-xs">{visit.pageTitle}</p>
+                              )}
+                            </td>
+
+                            {/* Column 3: Device & Browser */}
+                            <td className="py-3 px-4">
+                              <div className="flex flex-col gap-0.5">
+                                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-charcoal-dark">
+                                  {visit.deviceType === 'Mobile' && <Smartphone className="w-3.5 h-3.5 text-sage" />}
+                                  {visit.deviceType === 'Desktop' && <Laptop className="w-3.5 h-3.5 text-charcoal" />}
+                                  {visit.deviceType === 'Tablet' && <Tablet className="w-3.5 h-3.5 text-gold" />}
+                                  {visit.deviceType || 'Desktop'}
+                                </span>
+                                {visit.ipAddress && (
+                                  <span className="font-mono text-[9px] text-charcoal-light">IP: {visit.ipAddress}</span>
+                                )}
+                              </div>
+                            </td>
+
+                            {/* Column 4: Time & Referrer */}
+                            <td className="py-3 px-4">
+                              <div className="flex flex-col gap-0.5">
+                                <span className="font-bold text-charcoal-dark text-[11px]">{formatTimeAgo(visit.timestamp)}</span>
+                                <span className="text-[9px] text-charcoal-light">
+                                  {new Date(visit.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                                </span>
+                                {visit.referrer && (
+                                  <span className="text-[9px] text-sage truncate max-w-xs" title={visit.referrer}>
+                                    via {visit.referrer}
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="py-16 text-center glass rounded-2xl">
+                    <p className="text-xs text-charcoal-light">No website visits recorded yet.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            /* DEFAULT TABLE FOR OTHER TABS */
+            loading ? (
+              <div className="shimmer h-80 rounded-2xl w-full"></div>
+            ) : listData.length > 0 ? (
+              <div className="glass rounded-2xl border border-cream-dark/50 overflow-x-auto shadow-sm">
+                <table className="w-full text-xs text-charcoal border-collapse">
+                  <thead>
+                    <tr className="bg-cream-dark/40 border-b border-cream-dark uppercase text-[10px] tracking-wider font-bold">
+                      <th className="py-3 px-4 text-left">Details</th>
+                      <th className="py-3 px-4 text-left">Identities / Extras</th>
+                      <th className="py-3 px-4 text-left">Financials</th>
+                      <th className="py-3 px-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {listData.map((item) => (
+                      <tr key={item._id} className="border-b border-cream-dark/40 hover:bg-cream/20 transition-colors">
+                        {/* Column 1: Details / Customer Information */}
+                        <td className="py-3 px-4">
+                          <p className="font-bold text-charcoal-dark">
+                            {activeTab === 'orders' 
+                              ? (item.user?.name || item.shippingAddress?.name || 'Shop Customer')
+                              : activeTab === 'program-registrations' || activeTab === 'workshop-registrations' || activeTab === 'webinar-registrations'
+                                ? item.name
+                                : activeTab === 'donations'
+                                  ? (item.name || 'Anonymous Donor')
+                                  : (item.title || item.name || `Log ID: ${item._id.substring(0, 10)}`)}
+                          </p>
+                          <p className="text-[10px] text-charcoal-light line-clamp-1 max-w-sm mt-0.5">
+                            {activeTab === 'orders'
+                              ? `Email: ${item.user?.email || 'N/A'} | Phone: ${item.shippingAddress?.phone || 'N/A'}`
+                              : activeTab === 'program-registrations' || activeTab === 'workshop-registrations' || activeTab === 'webinar-registrations'
+                                ? `Email: ${item.email} | Phone: ${item.phone}`
+                                : activeTab === 'donations'
+                                  ? `Email: ${item.email || 'N/A'} | Phone: ${item.phone || 'N/A'}`
+                                  : activeTab === 'contacts'
+                                    ? `Email: ${item.email} | Phone: ${item.phone || 'N/A'}`
+                                    : item.description || item.shortDescription || item.reviewText || item.message || item.content || `Date: ${new Date(item.createdAt).toLocaleDateString()}`}
+                          </p>
+                        </td>
 
                       {/* Column 2: Specific Details & Payment / Registration References */}
                       <td className="py-3 px-4">
@@ -912,7 +1525,7 @@ const AdminDashboard = () => {
             <div className="py-20 text-center glass rounded-2xl">
               <p className="text-xs text-charcoal-light">No records found inside this collection database.</p>
             </div>
-          )}
+          ))}
 
         </div>
 
@@ -2064,6 +2677,153 @@ const AdminDashboard = () => {
                 className="bg-charcoal text-white font-bold py-1.5 px-4 rounded-xl text-xs hover:bg-charcoal-dark transition-colors"
               >
                 Close Preview
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* User Full Profile & Activity Viewer Modal */}
+      {selectedUserDetail && (
+        <div className="fixed inset-0 z-50 bg-charcoal/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-xl w-full p-6 shadow-2xl flex flex-col gap-5 max-h-[90vh] overflow-y-auto text-left border border-cream-dark/60 animate-slide-up">
+            
+            {/* Modal Header */}
+            <div className="flex justify-between items-start border-b border-cream-dark pb-4">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-sage/20 text-sage-dark font-serif font-bold text-xl flex items-center justify-center border border-sage/30 uppercase shadow-inner">
+                  {selectedUserDetail.name ? selectedUserDetail.name.charAt(0) : 'U'}
+                </div>
+                <div>
+                  <h3 className="font-serif text-lg font-bold text-charcoal-dark flex items-center gap-2">
+                    {selectedUserDetail.name}
+                    {selectedUserDetail.isOnline ? (
+                      <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full border border-emerald-300">
+                        🟢 Online Now
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-bold text-charcoal-light bg-cream-dark px-2 py-0.5 rounded-full">
+                        ⚪ Offline
+                      </span>
+                    )}
+                  </h3>
+                  <p className="text-xs text-charcoal-light">{selectedUserDetail.email}</p>
+                </div>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setSelectedUserDetail(null)} 
+                className="p-1.5 text-charcoal/60 hover:text-charcoal rounded-xl hover:bg-cream transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Quick Metrics Grid */}
+            <div className="grid grid-cols-3 gap-3">
+              <div className="bg-cream/40 p-3 rounded-2xl border border-cream-dark/60 text-center">
+                <span className="text-[10px] text-charcoal-light uppercase font-bold">Orders Placed</span>
+                <p className="text-xl font-bold text-charcoal-dark mt-0.5">{selectedUserDetail.ordersCount || 0}</p>
+              </div>
+              <div className="bg-cream/40 p-3 rounded-2xl border border-cream-dark/60 text-center">
+                <span className="text-[10px] text-charcoal-light uppercase font-bold">Enrolled Programs</span>
+                <p className="text-xl font-bold text-charcoal-dark mt-0.5">{selectedUserDetail.registrationsCount || 0}</p>
+              </div>
+              <div className="bg-cream/40 p-3 rounded-2xl border border-cream-dark/60 text-center">
+                <span className="text-[10px] text-charcoal-light uppercase font-bold">Gratitude Tasks</span>
+                <p className="text-xl font-bold text-charcoal-dark mt-0.5">{selectedUserDetail.submissionsCount || 0}</p>
+              </div>
+            </div>
+
+            {/* Account & Activity Details */}
+            <div className="flex flex-col gap-2 bg-cream/20 p-4 rounded-2xl border border-cream-dark/50 text-xs">
+              <div className="flex justify-between py-1 border-b border-cream-dark/40">
+                <span className="text-charcoal-light font-medium">User ID:</span>
+                <span className="font-mono text-charcoal-dark font-bold select-all">{selectedUserDetail._id}</span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-cream-dark/40">
+                <span className="text-charcoal-light font-medium">Account Role:</span>
+                <span className={`font-bold uppercase text-[10px] px-2 py-0.5 rounded ${
+                  selectedUserDetail.role === 'admin' ? 'bg-gold/15 text-gold-dark' : 'bg-sage/15 text-sage-dark'
+                }`}>
+                  {selectedUserDetail.role}
+                </span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-cream-dark/40">
+                <span className="text-charcoal-light font-medium">Registered Date:</span>
+                <span className="text-charcoal-dark font-semibold">{new Date(selectedUserDetail.createdAt).toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-cream-dark/40">
+                <span className="text-charcoal-light font-medium">Last Login:</span>
+                <span className="text-charcoal-dark font-semibold">
+                  {selectedUserDetail.lastLogin ? new Date(selectedUserDetail.lastLogin).toLocaleString() : 'Never'}
+                </span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-cream-dark/40">
+                <span className="text-charcoal-light font-medium">Last Active Time:</span>
+                <span className="text-charcoal-dark font-semibold">
+                  {selectedUserDetail.lastActive ? `${new Date(selectedUserDetail.lastActive).toLocaleString()} (${formatTimeAgo(selectedUserDetail.lastActive)})` : 'Never'}
+                </span>
+              </div>
+              <div className="flex justify-between py-1 border-b border-cream-dark/40">
+                <span className="text-charcoal-light font-medium">Total Logins Recorded:</span>
+                <span className="text-charcoal-dark font-bold">{selectedUserDetail.loginCount || 0} times</span>
+              </div>
+              {selectedUserDetail.ipAddress && (
+                <div className="flex justify-between py-1 border-b border-cream-dark/40">
+                  <span className="text-charcoal-light font-medium">Last IP Address:</span>
+                  <span className="font-mono text-charcoal-dark">{selectedUserDetail.ipAddress}</span>
+                </div>
+              )}
+              {selectedUserDetail.userAgent && (
+                <div className="flex flex-col gap-1 py-1">
+                  <span className="text-charcoal-light font-medium">Device / User Agent:</span>
+                  <span className="font-mono text-[10px] text-charcoal-dark bg-white p-2 rounded-xl border border-cream-dark/60 break-all">
+                    {selectedUserDetail.userAgent}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Actions */}
+            <div className="flex items-center justify-between pt-2 border-t border-cream-dark text-xs">
+              {selectedUserDetail._id !== user?._id ? (
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await handleUpdateUserRole(
+                        selectedUserDetail._id, 
+                        selectedUserDetail.role === 'admin' ? 'user' : 'admin'
+                      );
+                      setSelectedUserDetail(null);
+                    }}
+                    disabled={updatingUserRole}
+                    className="bg-gold/20 hover:bg-gold/30 text-gold-dark font-bold px-3 py-2 rounded-xl transition-all text-xs"
+                  >
+                    Change to {selectedUserDetail.role === 'admin' ? 'User' : 'Admin'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      await handleDelete(selectedUserDetail._id);
+                      setSelectedUserDetail(null);
+                    }}
+                    className="bg-red-50 hover:bg-red-100 text-red-700 font-bold px-3 py-2 rounded-xl transition-all text-xs flex items-center gap-1"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Delete User</span>
+                  </button>
+                </div>
+              ) : (
+                <span className="text-[11px] text-gold-dark font-bold italic">Your Active Admin Session</span>
+              )}
+              <button 
+                type="button" 
+                onClick={() => setSelectedUserDetail(null)} 
+                className="bg-charcoal text-white font-bold py-2 px-4 rounded-xl text-xs hover:bg-charcoal-dark transition-colors ml-auto"
+              >
+                Close Window
               </button>
             </div>
           </div>

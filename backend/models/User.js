@@ -52,6 +52,26 @@ const userSchema = new mongoose.Schema({
     type: Date,
     select: false
   },
+  lastLogin: {
+    type: Date,
+    default: null
+  },
+  lastActive: {
+    type: Date,
+    default: null
+  },
+  loginCount: {
+    type: Number,
+    default: 0
+  },
+  ipAddress: {
+    type: String,
+    default: null
+  },
+  userAgent: {
+    type: String,
+    default: null
+  },
   createdAt: {
     type: Date,
     default: Date.now

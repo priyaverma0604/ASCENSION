@@ -46,6 +46,8 @@ app.use('/api/testimonials', require('./routes/testimonialRoutes'));
 app.use('/api/contacts', require('./routes/contactRoutes'));
 app.use('/api/webinars', require('./routes/webinarRoutes'));
 app.use('/api/webhooks', require('./routes/webhookRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
+app.use('/api/analytics', require('./routes/analyticsRoutes'));
 
 // Basic health check endpoint
 app.get('/api/health', (req, res) => {

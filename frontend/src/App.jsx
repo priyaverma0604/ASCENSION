@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import MobileBottomNav from './components/MobileBottomNav';
 import ScrollToTop from './components/ScrollToTop';
+import VisitorTracker from './components/VisitorTracker';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import waterfallBg from './assets/waterfall_bg.jpg';
@@ -41,6 +42,7 @@ function App() {
         <WishlistProvider>
           <Router>
             <ScrollToTop />
+            <VisitorTracker />
             <div className="flex flex-col min-h-screen bg-[#FFFDF7] text-charcoal relative">
               {/* Global Subtle Waterfall Watermark Background */}
               <div 
