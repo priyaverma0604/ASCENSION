@@ -25,7 +25,13 @@ exports.trackVisit = async (req, res, next) => {
       referrer,
       userId,
       userName,
-      userEmail
+      userEmail,
+      utmSource,
+      utmMedium,
+      utmCampaign,
+      utmContent,
+      utmTerm,
+      fbclid
     } = req.body;
 
     if (!pagePath || !visitorId) {
@@ -36,11 +42,20 @@ exports.trackVisit = async (req, res, next) => {
     const userAgent = req.headers['user-agent'] || '';
     const deviceType = getDeviceType(userAgent);
 
-    // Filter out common bot crawls from inflating stats if desired
+    // Filter out common bot crawls from inflating stats
     const isBot = /bot|googlebot|crawler|spider|robot|crawling/i.test(userAgent);
     if (isBot) {
       return res.json({ success: true, ignored: true });
     }
+
+    // Determine if traffic is originated from Meta (Facebook / Instagram Ads or organic)
+    const sourceStr = (utmSource || '').toLowerCase();
+    const refStr = (referrer || '').toLowerCase();
+    const isMetaTraffic = Boolean(
+      fbclid ||
+      /meta|facebook|fb|instagram|ig|threads/i.test(sourceStr) ||
+      /facebook\.com|instagram\.com|fb\.me|meta\.com/i.test(refStr)
+    );
 
     // Save the visit log
     await VisitLog.create({
@@ -51,6 +66,13 @@ exports.trackVisit = async (req, res, next) => {
       pagePath,
       pageTitle: pageTitle || '',
       referrer: referrer || '',
+      utmSource: utmSource || '',
+      utmMedium: utmMedium || '',
+      utmCampaign: utmCampaign || '',
+      utmContent: utmContent || '',
+      utmTerm: utmTerm || '',
+      fbclid: fbclid || '',
+      isMetaTraffic,
       userAgent,
       deviceType,
       ipAddress: clientIp.toString(),
@@ -95,28 +117,122 @@ exports.getAnalyticsSummary = async (req, res, next) => {
       weekPageviews,
       monthPageviews,
       realtimeActiveVisitors,
-      realtimeActiveUsers
+      realtimeActiveUsers,
+      totalMetaViews,
+      todayMetaViews,
+      weekMetaViews,
+      monthMetaViews
     ] = await Promise.all([
       VisitLog.countDocuments({}),
       VisitLog.countDocuments({ timestamp: { $gte: startOfToday } }),
       VisitLog.countDocuments({ timestamp: { $gte: sevenDaysAgo } }),
       VisitLog.countDocuments({ timestamp: { $gte: thirtyDaysAgo } }),
       VisitLog.distinct('visitorId', { timestamp: { $gte: fiveMinutesAgo } }),
-      VisitLog.distinct('userId', { timestamp: { $gte: fiveMinutesAgo }, userId: { $ne: null } })
+      VisitLog.distinct('userId', { timestamp: { $gte: fiveMinutesAgo }, userId: { $ne: null } }),
+      VisitLog.countDocuments({ isMetaTraffic: true }),
+      VisitLog.countDocuments({ isMetaTraffic: true, timestamp: { $gte: startOfToday } }),
+      VisitLog.countDocuments({ isMetaTraffic: true, timestamp: { $gte: sevenDaysAgo } }),
+      VisitLog.countDocuments({ isMetaTraffic: true, timestamp: { $gte: thirtyDaysAgo } })
     ]);
 
-    const [todayUnique, weekUnique, monthUnique, allTimeUnique] = await Promise.all([
+    const [todayUnique, weekUnique, monthUnique, allTimeUnique, metaUnique] = await Promise.all([
       VisitLog.distinct('visitorId', { timestamp: { $gte: startOfToday } }),
       VisitLog.distinct('visitorId', { timestamp: { $gte: sevenDaysAgo } }),
       VisitLog.distinct('visitorId', { timestamp: { $gte: thirtyDaysAgo } }),
-      VisitLog.distinct('visitorId', {})
+      VisitLog.distinct('visitorId', {}),
+      VisitLog.distinct('visitorId', { isMetaTraffic: true })
     ]);
 
     // Top Pages in the last 30 days
     const topPages = await VisitLog.aggregate([
       { $match: { timestamp: { $gte: thirtyDaysAgo } } },
-      { $group: { _id: '$pagePath', views: { $sum: 1 }, uniqueVisitors: { $addToSet: '$visitorId' } } },
-      { $project: { pagePath: '$_id', views: 1, uniqueVisitors: { $size: '$uniqueVisitors' }, _id: 0 } },
+      { $group: { 
+          _id: '$pagePath', 
+          views: { $sum: 1 }, 
+          uniqueVisitors: { $addToSet: '$visitorId' },
+          metaViews: { $sum: { $cond: ['$isMetaTraffic', 1, 0] } }
+      }},
+      { $project: { 
+          pagePath: '$_id', 
+          views: 1, 
+          uniqueVisitors: { $size: '$uniqueVisitors' },
+          metaViews: 1,
+          _id: 0 
+      }},
+      { $sort: { views: -1 } },
+      { $limit: 10 }
+    ]);
+
+    // Top Campaigns (UTM Campaign) in the last 30 days
+    const topCampaigns = await VisitLog.aggregate([
+      { $match: { 
+          timestamp: { $gte: thirtyDaysAgo },
+          $or: [
+            { utmCampaign: { $exists: true, $ne: '' } },
+            { isMetaTraffic: true }
+          ]
+      }},
+      { $group: {
+          _id: {
+            $cond: [
+              { $and: [{ $ne: ['$utmCampaign', ''] }, { $ne: ['$utmCampaign', null] }] },
+              '$utmCampaign',
+              'Meta General Traffic'
+            ]
+          },
+          views: { $sum: 1 },
+          uniqueVisitors: { $addToSet: '$visitorId' },
+          metaViews: { $sum: { $cond: ['$isMetaTraffic', 1, 0] } },
+          sources: { $addToSet: '$utmSource' }
+      }},
+      { $project: {
+          campaign: '$_id',
+          views: 1,
+          uniqueVisitors: { $size: '$uniqueVisitors' },
+          metaViews: 1,
+          sources: 1,
+          _id: 0
+      }},
+      { $sort: { views: -1 } },
+      { $limit: 10 }
+    ]);
+
+    // Source breakdown (UTM Sources / Direct / Meta / Referrals)
+    const sourceBreakdown = await VisitLog.aggregate([
+      { $match: { timestamp: { $gte: thirtyDaysAgo } } },
+      { $project: {
+          source: {
+            $cond: [
+              { $and: [{ $ne: ['$utmSource', ''] }, { $ne: ['$utmSource', null] }] },
+              '$utmSource',
+              {
+                $cond: [
+                  { $eq: ['$isMetaTraffic', true] },
+                  'Meta / Facebook',
+                  {
+                    $cond: [
+                      { $or: [{ $eq: ['$referrer', ''] }, { $eq: ['$referrer', null] }] },
+                      'Direct / Organic',
+                      'Referral'
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          visitorId: 1
+      }},
+      { $group: {
+          _id: '$source',
+          views: { $sum: 1 },
+          uniqueVisitors: { $addToSet: '$visitorId' }
+      }},
+      { $project: {
+          source: '$_id',
+          views: 1,
+          uniqueVisitors: { $size: '$uniqueVisitors' },
+          _id: 0
+      }},
       { $sort: { views: -1 } },
       { $limit: 10 }
     ]);
@@ -129,7 +245,7 @@ exports.getAnalyticsSummary = async (req, res, next) => {
       { $sort: { count: -1 } }
     ]);
 
-    // 14-Day Daily Traffic Trend
+    // 14-Day Daily Traffic Trend (with Meta Breakdown)
     const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
     fourteenDaysAgo.setHours(0, 0, 0, 0);
 
@@ -141,6 +257,7 @@ exports.getAnalyticsSummary = async (req, res, next) => {
             $dateToString: { format: '%Y-%m-%d', date: '$timestamp' }
           },
           views: { $sum: 1 },
+          metaViews: { $sum: { $cond: ['$isMetaTraffic', 1, 0] } },
           visitors: { $addToSet: '$visitorId' }
         }
       },
@@ -148,6 +265,7 @@ exports.getAnalyticsSummary = async (req, res, next) => {
         $project: {
           date: '$_id',
           views: 1,
+          metaViews: 1,
           uniqueVisitors: { $size: '$visitors' },
           _id: 0
         }
@@ -164,6 +282,13 @@ exports.getAnalyticsSummary = async (req, res, next) => {
           week: weekPageviews,
           month: monthPageviews
         },
+        metaViews: {
+          total: totalMetaViews,
+          today: todayMetaViews,
+          week: weekMetaViews,
+          month: monthMetaViews,
+          unique: metaUnique.length
+        },
         uniqueVisitors: {
           total: allTimeUnique.length,
           today: todayUnique.length,
@@ -175,6 +300,8 @@ exports.getAnalyticsSummary = async (req, res, next) => {
           activeUsers: realtimeActiveUsers.length
         },
         topPages,
+        topCampaigns,
+        sourceBreakdown,
         deviceBreakdown,
         dailyTrend
       }
@@ -190,7 +317,16 @@ exports.getAnalyticsSummary = async (req, res, next) => {
 exports.getRecentVisits = async (req, res, next) => {
   try {
     const limit = parseInt(req.query.limit, 10) || 50;
-    const visits = await VisitLog.find({})
+    const filter = {};
+
+    if (req.query.metaOnly === 'true') {
+      filter.isMetaTraffic = true;
+    }
+    if (req.query.campaign) {
+      filter.utmCampaign = req.query.campaign;
+    }
+
+    const visits = await VisitLog.find(filter)
       .populate('userId', 'name email role')
       .sort({ timestamp: -1 })
       .limit(limit)
@@ -217,3 +353,4 @@ exports.clearAnalytics = async (req, res, next) => {
     next(error);
   }
 };
+

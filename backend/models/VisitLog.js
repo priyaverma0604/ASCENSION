@@ -32,6 +32,36 @@ const visitLogSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  // UTM & Campaign / Meta tracking fields
+  utmSource: {
+    type: String,
+    default: ''
+  },
+  utmMedium: {
+    type: String,
+    default: ''
+  },
+  utmCampaign: {
+    type: String,
+    default: ''
+  },
+  utmContent: {
+    type: String,
+    default: ''
+  },
+  utmTerm: {
+    type: String,
+    default: ''
+  },
+  fbclid: {
+    type: String,
+    default: ''
+  },
+  isMetaTraffic: {
+    type: Boolean,
+    default: false,
+    index: true
+  },
   userAgent: {
     type: String,
     default: ''
@@ -53,7 +83,13 @@ const visitLogSchema = new mongoose.Schema({
   timestamps: true
 });
 
+// Compound indexes for analytics queries
+visitLogSchema.index({ isMetaTraffic: 1, timestamp: -1 });
+visitLogSchema.index({ utmCampaign: 1, timestamp: -1 });
+visitLogSchema.index({ utmSource: 1, timestamp: -1 });
+
 // Auto expire raw logs older than 90 days to keep DB performant and lightweight
 visitLogSchema.index({ timestamp: 1 }, { expireAfterSeconds: 90 * 24 * 60 * 60 });
 
 module.exports = mongoose.model('VisitLog', visitLogSchema);
+

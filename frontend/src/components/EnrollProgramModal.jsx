@@ -1,4 +1,5 @@
 import React, { useState, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   X, CheckCircle, Compass, UploadCloud, Smartphone, Video, ExternalLink, 
   MessageCircle, Copy, Check, CreditCard, ShieldCheck, Zap 
@@ -30,6 +31,7 @@ const getImageUrl = (path) => {
 };
 
 const EnrollProgramModal = ({ program, onClose }) => {
+  const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const [paymentMethod, setPaymentMethod] = useState('razorpay'); // 'razorpay' or 'upi_qr'
   const [loading, setLoading] = useState(false);
@@ -54,6 +56,18 @@ const EnrollProgramModal = ({ program, onClose }) => {
       setScreenshot(file);
       setScreenshotPreview(URL.createObjectURL(file));
     }
+  };
+
+  const isAncestral = (program.title && program.title.toLowerCase().includes('ancestral')) || (program.name && program.name.toLowerCase().includes('ancestral'));
+  const isNavratri = (program.title && program.title.toLowerCase().includes('navratri')) || program._id === '6a4963f49e941f93f91f5ac5';
+
+  const redirectToThankYou = (refId) => {
+    const targetUrl = isNavratri
+      ? `/thank-you/navratri?ref=${refId || ''}&name=${encodeURIComponent(name.trim() || 'Devotee')}&programId=${program._id}`
+      : `/thank-you?ref=${refId || ''}&name=${encodeURIComponent(name.trim() || 'Devotee')}&programId=${program._id}`;
+    
+    if (onClose) onClose();
+    navigate(targetUrl);
   };
 
   const handleRazorpayPayment = async () => {
@@ -86,6 +100,7 @@ const EnrollProgramModal = ({ program, onClose }) => {
       if (data.free) {
         setSuccess(true);
         setLoading(false);
+        redirectToThankYou('FREE_ENROLLMENT');
         return;
       }
 
@@ -123,6 +138,7 @@ const EnrollProgramModal = ({ program, onClose }) => {
             if (verifyRes.data.success) {
               setConfirmedPaymentId(response.razorpay_payment_id);
               setSuccess(true);
+              redirectToThankYou(response.razorpay_payment_id);
             }
           } catch (err) {
             alert(err.response?.data?.message || 'Enrollment payment verification failed');
@@ -174,6 +190,7 @@ const EnrollProgramModal = ({ program, onClose }) => {
       if (data.success) {
         setConfirmedPaymentId(transactionId.trim());
         setSuccess(true);
+        redirectToThankYou(transactionId.trim());
       }
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to submit enrollment request');
@@ -182,8 +199,6 @@ const EnrollProgramModal = ({ program, onClose }) => {
     }
   };
 
-  const isAncestral = (program.title && program.title.toLowerCase().includes('ancestral')) || (program.name && program.name.toLowerCase().includes('ancestral'));
-  const isNavratri = (program.title && program.title.toLowerCase().includes('navratri')) || program._id === '6a4963f49e941f93f91f5ac5';
   const whatsappLink = program.whatsappGroupLink || (isNavratri ? 'https://chat.whatsapp.com/DT05P5k7uviAV0Yuw1ySb7' : (isAncestral ? 'https://chat.whatsapp.com/J4nXj2mznEfLCj2YZd1v16' : ''));
   const videoLink = isAncestral ? 'https://youtu.be/jIs3IH-brtg' : (program.introVideoUrl || program.videoUrl || '');
 

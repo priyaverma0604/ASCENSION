@@ -29,6 +29,7 @@ import Profile from './pages/Profile';
 import AdminDashboard from './pages/AdminDashboard';
 import ProductDetails from './pages/ProductDetails';
 import ProgramDashboard from './pages/ProgramDashboard';
+import ThankYouProgram from './pages/ThankYouProgram';
 
 // Context Providers
 import { AuthProvider } from './context/AuthContext';
@@ -65,6 +66,9 @@ function App() {
                   <Route path="/programs/details/:id" element={<ProgramDetails />} />
                   <Route path="/ancestral-healing-program" element={<ProgramDetails autoProgram="ancestral-healing" />} />
                   <Route path="/ancestral-program" element={<ProgramDetails autoProgram="ancestral-healing" />} />
+                  <Route path="/thank-you/navratri" element={<ThankYouProgram />} />
+                  <Route path="/thank-you" element={<ThankYouProgram />} />
+                  <Route path="/thank-you/:id" element={<ThankYouProgram />} />
                   <Route path="/webinars" element={<Home scrollToWebinar={true} />} />
                   <Route path="/webinar" element={<Home scrollToWebinar={true} />} />
                   <Route path="/ancestral-healing-webinar" element={<Home scrollToWebinar={true} autoOpenAncestral={true} />} />

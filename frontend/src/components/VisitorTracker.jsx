@@ -17,6 +17,43 @@ const getVisitorId = () => {
   }
 };
 
+// Helper to parse and persist UTM and Meta campaign parameters
+const getCampaignParams = () => {
+  try {
+    const searchParams = new URLSearchParams(window.location.search);
+    const utmSource = searchParams.get('utm_source') || searchParams.get('source') || '';
+    const utmMedium = searchParams.get('utm_medium') || '';
+    const utmCampaign = searchParams.get('utm_campaign') || searchParams.get('campaign') || '';
+    const utmContent = searchParams.get('utm_content') || '';
+    const utmTerm = searchParams.get('utm_term') || '';
+    const fbclid = searchParams.get('fbclid') || '';
+
+    // If new UTM parameters exist in current URL, save to sessionStorage
+    if (utmSource || utmCampaign || fbclid) {
+      const campaignData = {
+        utmSource,
+        utmMedium,
+        utmCampaign,
+        utmContent,
+        utmTerm,
+        fbclid,
+        storedAt: Date.now()
+      };
+      sessionStorage.setItem('ascension_campaign_params', JSON.stringify(campaignData));
+      return campaignData;
+    }
+
+    // Otherwise, check if user arrived earlier in this session via a campaign
+    const stored = sessionStorage.getItem('ascension_campaign_params');
+    if (stored) {
+      return JSON.parse(stored);
+    }
+    return {};
+  } catch (e) {
+    return {};
+  }
+};
+
 const VisitorTracker = () => {
   const location = useLocation();
   const { user } = useContext(AuthContext) || {};
@@ -25,6 +62,8 @@ const VisitorTracker = () => {
   const sendTrackingPing = async (path, title) => {
     try {
       const visitorId = getVisitorId();
+      const campaign = getCampaignParams();
+
       await axios.post('/api/analytics/track', {
         visitorId,
         pagePath: path || window.location.pathname,
@@ -32,7 +71,13 @@ const VisitorTracker = () => {
         referrer: document.referrer || '',
         userId: user?._id || null,
         userName: user?.name || null,
-        userEmail: user?.email || null
+        userEmail: user?.email || null,
+        utmSource: campaign.utmSource || '',
+        utmMedium: campaign.utmMedium || '',
+        utmCampaign: campaign.utmCampaign || '',
+        utmContent: campaign.utmContent || '',
+        utmTerm: campaign.utmTerm || '',
+        fbclid: campaign.fbclid || ''
       });
     } catch (err) {
       // Silently fail without interrupting user experience
@@ -67,3 +112,4 @@ const VisitorTracker = () => {
 };
 
 export default VisitorTracker;
+

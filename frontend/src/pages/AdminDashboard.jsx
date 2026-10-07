@@ -927,7 +927,7 @@ const AdminDashboard = () => {
 
               {/* Metric Overview Cards Grid */}
               {analyticsSummary && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   {/* Pageviews Card */}
                   <div className="glass p-5 rounded-2xl border border-cream-dark/60 flex flex-col justify-between shadow-sm">
                     <div className="flex items-center justify-between border-b border-cream-dark/50 pb-2 mb-3">
@@ -937,17 +937,44 @@ const AdminDashboard = () => {
                       <span className="text-[10px] bg-sage/15 text-sage font-bold px-2 py-0.5 rounded-full">All-Time: {analyticsSummary.pageviews?.total || 0}</span>
                     </div>
                     <div className="grid grid-cols-3 gap-2 text-center">
-                      <div className="bg-cream/40 p-2.5 rounded-xl">
-                        <p className="text-[10px] text-charcoal-light uppercase font-bold">Today</p>
-                        <p className="text-lg font-bold text-charcoal-dark mt-0.5">{analyticsSummary.pageviews?.today || 0}</p>
+                      <div className="bg-cream/40 p-2 rounded-xl">
+                        <p className="text-[9px] text-charcoal-light uppercase font-bold">Today</p>
+                        <p className="text-base font-bold text-charcoal-dark mt-0.5">{analyticsSummary.pageviews?.today || 0}</p>
                       </div>
-                      <div className="bg-cream/40 p-2.5 rounded-xl">
-                        <p className="text-[10px] text-charcoal-light uppercase font-bold">7 Days</p>
-                        <p className="text-lg font-bold text-charcoal-dark mt-0.5">{analyticsSummary.pageviews?.week || 0}</p>
+                      <div className="bg-cream/40 p-2 rounded-xl">
+                        <p className="text-[9px] text-charcoal-light uppercase font-bold">7 Days</p>
+                        <p className="text-base font-bold text-charcoal-dark mt-0.5">{analyticsSummary.pageviews?.week || 0}</p>
                       </div>
-                      <div className="bg-cream/40 p-2.5 rounded-xl">
-                        <p className="text-[10px] text-charcoal-light uppercase font-bold">30 Days</p>
-                        <p className="text-lg font-bold text-charcoal-dark mt-0.5">{analyticsSummary.pageviews?.month || 0}</p>
+                      <div className="bg-cream/40 p-2 rounded-xl">
+                        <p className="text-[9px] text-charcoal-light uppercase font-bold">30 Days</p>
+                        <p className="text-base font-bold text-charcoal-dark mt-0.5">{analyticsSummary.pageviews?.month || 0}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Meta Views & Facebook Ads Card */}
+                  <div className="glass p-5 rounded-2xl border-2 border-purple-300/80 bg-gradient-to-br from-purple-50/40 via-white to-pink-50/30 flex flex-col justify-between shadow-sm">
+                    <div className="flex items-center justify-between border-b border-purple-200 pb-2 mb-3">
+                      <span className="font-bold text-xs uppercase tracking-wider text-purple-900 flex items-center gap-1.5">
+                        <span className="w-2.5 h-2.5 rounded-full bg-purple-600 animate-pulse"></span>
+                        🟣 Meta & Ads Views
+                      </span>
+                      <span className="text-[10px] bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-full border border-purple-300">
+                        {analyticsSummary.metaViews?.unique || 0} Unique
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                      <div className="bg-purple-100/60 p-2 rounded-xl border border-purple-200">
+                        <p className="text-[9px] text-purple-700 uppercase font-bold">Today</p>
+                        <p className="text-base font-bold text-purple-950 mt-0.5">{analyticsSummary.metaViews?.today || 0}</p>
+                      </div>
+                      <div className="bg-purple-100/60 p-2 rounded-xl border border-purple-200">
+                        <p className="text-[9px] text-purple-700 uppercase font-bold">7 Days</p>
+                        <p className="text-base font-bold text-purple-950 mt-0.5">{analyticsSummary.metaViews?.week || 0}</p>
+                      </div>
+                      <div className="bg-purple-100/60 p-2 rounded-xl border border-purple-200">
+                        <p className="text-[9px] text-purple-700 uppercase font-bold">Total</p>
+                        <p className="text-base font-bold text-purple-950 mt-0.5">{analyticsSummary.metaViews?.total || 0}</p>
                       </div>
                     </div>
                   </div>
@@ -961,17 +988,17 @@ const AdminDashboard = () => {
                       <span className="text-[10px] bg-gold/15 text-gold-dark font-bold px-2 py-0.5 rounded-full">Total: {analyticsSummary.uniqueVisitors?.total || 0}</span>
                     </div>
                     <div className="grid grid-cols-3 gap-2 text-center">
-                      <div className="bg-cream/40 p-2.5 rounded-xl">
-                        <p className="text-[10px] text-charcoal-light uppercase font-bold">Today</p>
-                        <p className="text-lg font-bold text-charcoal-dark mt-0.5">{analyticsSummary.uniqueVisitors?.today || 0}</p>
+                      <div className="bg-cream/40 p-2 rounded-xl">
+                        <p className="text-[9px] text-charcoal-light uppercase font-bold">Today</p>
+                        <p className="text-base font-bold text-charcoal-dark mt-0.5">{analyticsSummary.uniqueVisitors?.today || 0}</p>
                       </div>
-                      <div className="bg-cream/40 p-2.5 rounded-xl">
-                        <p className="text-[10px] text-charcoal-light uppercase font-bold">7 Days</p>
-                        <p className="text-lg font-bold text-charcoal-dark mt-0.5">{analyticsSummary.uniqueVisitors?.week || 0}</p>
+                      <div className="bg-cream/40 p-2 rounded-xl">
+                        <p className="text-[9px] text-charcoal-light uppercase font-bold">7 Days</p>
+                        <p className="text-base font-bold text-charcoal-dark mt-0.5">{analyticsSummary.uniqueVisitors?.week || 0}</p>
                       </div>
-                      <div className="bg-cream/40 p-2.5 rounded-xl">
-                        <p className="text-[10px] text-charcoal-light uppercase font-bold">30 Days</p>
-                        <p className="text-lg font-bold text-charcoal-dark mt-0.5">{analyticsSummary.uniqueVisitors?.month || 0}</p>
+                      <div className="bg-cream/40 p-2 rounded-xl">
+                        <p className="text-[9px] text-charcoal-light uppercase font-bold">30 Days</p>
+                        <p className="text-base font-bold text-charcoal-dark mt-0.5">{analyticsSummary.uniqueVisitors?.month || 0}</p>
                       </div>
                     </div>
                   </div>
@@ -983,7 +1010,7 @@ const AdminDashboard = () => {
                         <Laptop className="w-4 h-4 text-charcoal" /> Devices (30 Days)
                       </span>
                     </div>
-                    <div className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-1.5">
                       {analyticsSummary.deviceBreakdown && analyticsSummary.deviceBreakdown.length > 0 ? (
                         analyticsSummary.deviceBreakdown.map((d) => (
                           <div key={d.device} className="flex items-center justify-between text-xs">
@@ -1004,6 +1031,77 @@ const AdminDashboard = () => {
                 </div>
               )}
 
+              {/* Campaign Attribution & Traffic Source Breakdown Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {/* Top Campaigns Table */}
+                <div className="glass p-5 rounded-2xl border border-purple-200 shadow-sm flex flex-col gap-3">
+                  <div className="flex justify-between items-center border-b pb-2">
+                    <h4 className="font-serif font-bold text-sm text-charcoal-dark uppercase tracking-wider flex items-center gap-1.5">
+                      <span className="text-purple-600 font-sans">🎯</span> Top Campaigns & Meta Ads
+                    </h4>
+                    <span className="text-[10px] text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full font-bold">UTM Campaign</span>
+                  </div>
+
+                  {analyticsSummary?.topCampaigns && analyticsSummary.topCampaigns.length > 0 ? (
+                    <div className="flex flex-col gap-2 max-h-64 overflow-y-auto">
+                      {analyticsSummary.topCampaigns.map((camp, idx) => (
+                        <div key={idx} className="bg-cream/40 p-3 rounded-xl border border-cream-dark/50 flex flex-col gap-1 text-xs">
+                          <div className="flex justify-between items-center">
+                            <span className="font-bold text-charcoal-dark flex items-center gap-1.5">
+                              <span className="text-[10px] text-purple-700 bg-purple-100 px-1.5 py-0.2 rounded font-mono">#{idx + 1}</span>
+                              {camp.campaign}
+                            </span>
+                            <span className="font-bold text-purple-900 bg-purple-100 px-2 py-0.5 rounded-full text-[10px]">
+                              {camp.views} views ({camp.uniqueVisitors} unique)
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between text-[10px] text-charcoal-light mt-0.5">
+                            <span>Meta Traffic: <strong className="text-purple-800">{camp.metaViews || 0}</strong></span>
+                            {camp.sources && camp.sources.filter(Boolean).length > 0 && (
+                              <span className="truncate max-w-[200px]">Sources: {camp.sources.filter(Boolean).join(', ')}</span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-charcoal-light py-4 text-center">No campaign/UTM traffic recorded in the last 30 days. Add <code>?utm_campaign=navratri&utm_source=facebook</code> to your ad links.</p>
+                  )}
+                </div>
+
+                {/* Traffic Sources Breakdown */}
+                <div className="glass p-5 rounded-2xl border border-cream-dark/60 shadow-sm flex flex-col gap-3">
+                  <div className="flex justify-between items-center border-b pb-2">
+                    <h4 className="font-serif font-bold text-sm text-charcoal-dark uppercase tracking-wider flex items-center gap-1.5">
+                      <Globe className="w-4 h-4 text-gold-dark" /> Traffic Sources Breakdown
+                    </h4>
+                    <span className="text-[10px] text-charcoal-light">Last 30 Days</span>
+                  </div>
+
+                  {analyticsSummary?.sourceBreakdown && analyticsSummary.sourceBreakdown.length > 0 ? (
+                    <div className="flex flex-col gap-2 max-h-64 overflow-y-auto">
+                      {analyticsSummary.sourceBreakdown.map((src, idx) => (
+                        <div key={idx} className="flex justify-between items-center bg-cream/40 p-2.5 rounded-xl border border-cream-dark/40 text-xs">
+                          <span className="font-bold text-charcoal-dark flex items-center gap-1.5">
+                            {src.source.toLowerCase().includes('meta') || src.source.toLowerCase().includes('facebook') || src.source.toLowerCase().includes('instagram') ? (
+                              <span className="w-2 h-2 rounded-full bg-purple-600"></span>
+                            ) : (
+                              <span className="w-2 h-2 rounded-full bg-sage"></span>
+                            )}
+                            {src.source}
+                          </span>
+                          <span className="font-bold text-charcoal-dark">
+                            {src.views} views <span className="text-[10px] text-charcoal-light font-normal">({src.uniqueVisitors} unique)</span>
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-charcoal-light py-4 text-center">No source attribution data yet.</p>
+                  )}
+                </div>
+              </div>
+
               {/* Top Visited Pages */}
               {analyticsSummary?.topPages && analyticsSummary.topPages.length > 0 && (
                 <div className="glass p-5 rounded-2xl border border-cream-dark/60 shadow-sm flex flex-col gap-3">
@@ -1020,6 +1118,11 @@ const AdminDashboard = () => {
                             <span className="font-mono text-charcoal-dark font-medium flex items-center gap-1.5">
                               <span className="text-[10px] text-charcoal-light font-bold">#{idx + 1}</span>
                               {page.pagePath}
+                              {page.metaViews > 0 && (
+                                <span className="text-[9px] bg-purple-100 text-purple-800 font-bold px-1.5 py-0.2 rounded-full border border-purple-200">
+                                  🟣 {page.metaViews} Meta
+                                </span>
+                              )}
                             </span>
                             <span className="font-bold text-charcoal-dark">
                               {page.views} views <span className="text-charcoal-light font-normal text-[10px]">({page.uniqueVisitors} unique)</span>
@@ -1037,11 +1140,21 @@ const AdminDashboard = () => {
 
               {/* Live Stream of Recent Website Visits */}
               <div className="flex flex-col gap-3">
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                   <h4 className="font-serif font-bold text-sm text-charcoal-dark uppercase tracking-wider flex items-center gap-1.5">
                     <Activity className="w-4 h-4 text-emerald-600" /> Live Visitor Stream (Last 50 Visits)
                   </h4>
-                  <span className="text-[10px] text-charcoal-light">Showing newest first</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-charcoal-light">Showing newest first</span>
+                    <button
+                      type="button"
+                      onClick={handleClearAnalyticsLogs}
+                      disabled={clearingLogs}
+                      className="text-[10px] text-red-600 hover:text-red-800 hover:bg-red-50 px-2 py-1 rounded border border-red-200 transition-colors"
+                    >
+                      Clear Log History
+                    </button>
+                  </div>
                 </div>
 
                 {loading ? (
@@ -1053,6 +1166,7 @@ const AdminDashboard = () => {
                         <tr className="bg-cream-dark/40 border-b border-cream-dark uppercase text-[10px] tracking-wider font-bold">
                           <th className="py-3 px-4 text-left">Visitor Identity</th>
                           <th className="py-3 px-4 text-left">Page Visited</th>
+                          <th className="py-3 px-4 text-left">Campaign / Attribution</th>
                           <th className="py-3 px-4 text-left">Device & Browser</th>
                           <th className="py-3 px-4 text-left">Time & Referrer</th>
                         </tr>
@@ -1096,7 +1210,31 @@ const AdminDashboard = () => {
                               )}
                             </td>
 
-                            {/* Column 3: Device & Browser */}
+                            {/* Column 3: Campaign & Meta Attribution */}
+                            <td className="py-3 px-4">
+                              <div className="flex flex-col gap-1 items-start">
+                                {visit.isMetaTraffic && (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-purple-100 text-purple-800 border border-purple-300">
+                                    🟣 Meta / FB Traffic
+                                  </span>
+                                )}
+                                {visit.utmCampaign && (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                                    🎯 {visit.utmCampaign}
+                                  </span>
+                                )}
+                                {visit.utmSource && (
+                                  <span className="text-[9px] text-charcoal-light">
+                                    Source: <strong>{visit.utmSource}</strong>
+                                  </span>
+                                )}
+                                {!visit.isMetaTraffic && !visit.utmCampaign && !visit.utmSource && (
+                                  <span className="text-[9px] text-charcoal-light/60 italic">Direct / Organic</span>
+                                )}
+                              </div>
+                            </td>
+
+                            {/* Column 4: Device & Browser */}
                             <td className="py-3 px-4">
                               <div className="flex flex-col gap-0.5">
                                 <span className="inline-flex items-center gap-1 text-[10px] font-bold text-charcoal-dark">
@@ -1111,7 +1249,7 @@ const AdminDashboard = () => {
                               </div>
                             </td>
 
-                            {/* Column 4: Time & Referrer */}
+                            {/* Column 5: Time & Referrer */}
                             <td className="py-3 px-4">
                               <div className="flex flex-col gap-0.5">
                                 <span className="font-bold text-charcoal-dark text-[11px]">{formatTimeAgo(visit.timestamp)}</span>
