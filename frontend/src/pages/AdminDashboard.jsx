@@ -38,6 +38,185 @@ const formatTimeAgo = (date) => {
   return new Date(date).toLocaleDateString();
 };
 
+const INDEXABLE_PAGES = [
+  {
+    title: 'Homepage / Divine Ascension Hub',
+    path: '/',
+    url: 'https://ascension.ind.in/',
+    category: 'Core',
+    priority: '1.0 (Highest)',
+    changefreq: 'Daily',
+    description: 'Main landing gateway with spiritual master intro, services, aura photography & instant booking.',
+    targetKeywords: 'Spiritual Healing, Theta Healing, Sound Healing, Sonali Bhasin Kumar',
+    inSitemap: true,
+    status: 'Ready for Indexing'
+  },
+  {
+    title: 'Navratri 9-Day Sacred Program',
+    path: '/programs/6a4963f49e941f93f91f5ac5',
+    url: 'https://ascension.ind.in/programs/6a4963f49e941f93f91f5ac5',
+    category: 'Programs',
+    priority: '0.9 (High)',
+    changefreq: 'Daily',
+    description: '9-Day Divine Navratri Transformation, Daily Audiobooks of Maa Durga 9 Swaroop, sacred mantras & reflections.',
+    targetKeywords: '9 Days Navratri Sadhana, Maa Durga Audiobooks, Sacred Mantras, Navratri Online Program',
+    inSitemap: true,
+    status: 'Ready for Indexing'
+  },
+  {
+    title: 'All Programs & Courses Hub',
+    path: '/programs',
+    url: 'https://ascension.ind.in/programs',
+    category: 'Programs',
+    priority: '0.9 (High)',
+    changefreq: 'Weekly',
+    description: 'Complete catalog of guided spiritual programs, ancestral healing, gratitude mastery and meditation cohorts.',
+    targetKeywords: 'Ancestral Healing Course, Gratitude Mastery, Spiritual Online Workshops',
+    inSitemap: true,
+    status: 'Ready for Indexing'
+  },
+  {
+    title: 'Ancestral Healing Program Details',
+    path: '/ancestral-healing-program',
+    url: 'https://ascension.ind.in/ancestral-healing-program',
+    category: 'Programs',
+    priority: '0.9 (High)',
+    changefreq: 'Weekly',
+    description: 'Deep clearing of generational trauma, Pitrudosh Nivaran, bloodline healing and family karma transformation.',
+    targetKeywords: 'Pitrudosh Nivaran, Ancestral Trauma Healing, Generational Karma Release',
+    inSitemap: true,
+    status: 'Ready for Indexing'
+  },
+  {
+    title: 'Spiritual Services & Theta Sessions',
+    path: '/services',
+    url: 'https://ascension.ind.in/services',
+    category: 'Services',
+    priority: '0.8 (High)',
+    changefreq: 'Weekly',
+    description: '1-on-1 private spiritual sessions including Theta Healing, Sound Bath, Tarot, Chakra Balancing and Life Coaching.',
+    targetKeywords: 'Theta Healing Sessions, Sound Therapy Delhi, Spiritual Life Coach India',
+    inSitemap: true,
+    status: 'Ready for Indexing'
+  },
+  {
+    title: 'Spiritual Crystals & Energized Shop',
+    path: '/shop',
+    url: 'https://ascension.ind.in/shop',
+    category: 'Shop',
+    priority: '0.8 (High)',
+    changefreq: 'Daily',
+    description: '100% natural, energized healing crystals, Pyrite abundance stones, Selenite, healing oils, and bracelets.',
+    targetKeywords: 'Authentic Pyrite India, Selenite Crystal Lamps, Energized Healing Crystals',
+    inSitemap: true,
+    status: 'Ready for Indexing'
+  },
+  {
+    title: 'About Sonali Bhasin Kumar & Ascension',
+    path: '/about',
+    url: 'https://ascension.ind.in/about',
+    category: 'About',
+    priority: '0.8 (Medium)',
+    changefreq: 'Monthly',
+    description: 'Founder story, spiritual credentials, media features, mission, and philosophy of Ascension Healer.',
+    targetKeywords: 'Sonali Bhasin Kumar Bio, Spiritual Master Delhi, Healer Ascension',
+    inSitemap: true,
+    status: 'Ready for Indexing'
+  },
+  {
+    title: 'Sacred Community Forum & Feeds',
+    path: '/community',
+    url: 'https://ascension.ind.in/community',
+    category: 'Community',
+    priority: '0.7 (Medium)',
+    changefreq: 'Daily',
+    description: 'Global spiritual devotee forum, daily inspirational reflections, announcement board and collective prayers.',
+    targetKeywords: 'Spiritual Devotees Community, Daily Meditations, Spiritual Discussion Forum',
+    inSitemap: true,
+    status: 'Ready for Indexing'
+  },
+  {
+    title: 'Live Webinars & Masterclasses',
+    path: '/webinars',
+    url: 'https://ascension.ind.in/webinars',
+    category: 'Webinars',
+    priority: '0.7 (Medium)',
+    changefreq: 'Weekly',
+    description: 'Live interactive spiritual webinars, zoom meditations, full moon rituals, and masterclasses.',
+    targetKeywords: 'Spiritual Webinars Live, Zoom Meditation Classes India',
+    inSitemap: true,
+    status: 'Ready for Indexing'
+  },
+  {
+    title: 'Ancestral Healing Special Webinar',
+    path: '/ancestral-healing-webinar',
+    url: 'https://ascension.ind.in/ancestral-healing-webinar',
+    category: 'Webinars',
+    priority: '0.7 (Medium)',
+    changefreq: 'Weekly',
+    description: 'Live 90-min masterclass with Sonali Bhasin Kumar on uncovering family shadow patterns & karmic clearance.',
+    targetKeywords: 'Pitru Paksha Live Webinar, Ancestral Healing Workshop',
+    inSitemap: true,
+    status: 'Ready for Indexing'
+  },
+  {
+    title: 'NGO & Social Seva Projects',
+    path: '/ngo',
+    url: 'https://ascension.ind.in/ngo',
+    category: 'Seva',
+    priority: '0.7 (Medium)',
+    changefreq: 'Monthly',
+    description: 'Shiksha Kendra for underprivileged children, animal rescue, medical aid, and community food drives.',
+    targetKeywords: 'NGO Delhi NCR, Animal Welfare Seva, Free Child Education NGO',
+    inSitemap: true,
+    status: 'Ready for Indexing'
+  },
+  {
+    title: 'CSR Corporate Initiatives',
+    path: '/csr',
+    url: 'https://ascension.ind.in/csr',
+    category: 'Seva',
+    priority: '0.7 (Medium)',
+    changefreq: 'Monthly',
+    description: 'Corporate social responsibility partnerships, employee wellness, educational kits, and sustainable seva.',
+    targetKeywords: 'CSR Partnerships Delhi, Corporate Social Responsibility NGO India',
+    inSitemap: true,
+    status: 'Ready for Indexing'
+  },
+  {
+    title: 'Donate & Seva Contributions',
+    path: '/donate',
+    url: 'https://ascension.ind.in/donate',
+    category: 'Seva',
+    priority: '0.7 (Medium)',
+    changefreq: 'Monthly',
+    description: 'Direct contribution portal for daily Mahabhoj, Gau Seva, dog food drives, and child education support.',
+    targetKeywords: 'Donate for Food Seva, Gau Seva Donation, Support Underprivileged Children',
+    inSitemap: true,
+    status: 'Ready for Indexing'
+  },
+  {
+    title: 'Contact & Facial Aura Diagnosis',
+    path: '/contact',
+    url: 'https://ascension.ind.in/contact',
+    category: 'Contact',
+    priority: '0.7 (Medium)',
+    changefreq: 'Monthly',
+    description: 'Direct booking inquiries, selfie upload for facial aura analysis, and crystal consultation with Sonali.',
+    targetKeywords: 'Facial Aura Diagnosis, Contact Sonali Bhasin Kumar, Crystal Consultation',
+    inSitemap: true,
+    status: 'Ready for Indexing'
+  }
+];
+
+const EXCLUDED_PRIVATE_PAGES = [
+  { path: '/admin', reason: 'Admin Console & Backoffice (Protected for security)' },
+  { path: '/profile', reason: 'User Private Profile & Personal Orders' },
+  { path: '/programs/*/dashboard', reason: 'Private Student Course Area & Daily Audiobooks' },
+  { path: '/thank-you', reason: 'Order Success & WhatsApp Community Join Link' },
+  { path: '/reset-password', reason: 'Authentication & Password Reset Forms' }
+];
+
 const AdminDashboard = () => {
   const { user } = useContext(AuthContext) || {};
   const [activeTab, setActiveTab] = useState('users');
@@ -58,6 +237,11 @@ const AdminDashboard = () => {
   const [recentVisits, setRecentVisits] = useState([]);
   const [analyticsAutoRefresh, setAnalyticsAutoRefresh] = useState(false);
   const [clearingLogs, setClearingLogs] = useState(false);
+
+  // SEO & Google Indexing State
+  const [seoSearchQuery, setSeoSearchQuery] = useState('');
+  const [seoCategoryFilter, setSeoCategoryFilter] = useState('all');
+  const [copiedSeoUrl, setCopiedSeoUrl] = useState(null);
 
   // Form Modals
   const [showModal, setShowModal] = useState(false);
@@ -131,6 +315,7 @@ const AdminDashboard = () => {
   const tabs = [
     { id: 'users', label: 'Users & Activity', icon: <Users className="w-4 h-4" /> },
     { id: 'analytics', label: 'Website Traffic', icon: <BarChart3 className="w-4 h-4" /> },
+    { id: 'seo-indexing', label: 'SEO & Google Indexing', icon: <Globe className="w-4 h-4 text-emerald-600" /> },
     { id: 'services', label: 'Services', icon: <Layers className="w-4 h-4" /> },
     { id: 'programs', label: 'Programs', icon: <ShieldCheck className="w-4 h-4" /> },
     { id: 'program-registrations', label: 'Program Enrollments', icon: <FileText className="w-4 h-4" /> },
@@ -621,14 +806,18 @@ const AdminDashboard = () => {
                   ? 'Registered Users & Live Activity' 
                   : activeTab === 'analytics' 
                     ? 'Website Traffic & Visitor Analytics' 
-                    : `Manage ${activeTab}`}
+                    : activeTab === 'seo-indexing'
+                      ? 'SEO, Google Indexing & Sitemaps'
+                      : `Manage ${activeTab}`}
               </h3>
               <p className="text-[11px] text-charcoal-light mt-0.5">
                 {activeTab === 'users' 
                   ? 'Monitor registered user sessions, online presence, login frequency, and activity.' 
                   : activeTab === 'analytics' 
                     ? 'Track live visitors, pageviews, top visited content, and real-time site usage.' 
-                    : `Backoffice database records for ${activeTab}.`}
+                    : activeTab === 'seo-indexing'
+                      ? 'All public web pages configured for Google crawler indexing, live search status, and XML sitemaps.'
+                      : `Backoffice database records for ${activeTab}.`}
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -1274,6 +1463,287 @@ const AdminDashboard = () => {
                   </div>
                 )}
               </div>
+            </div>
+          ) : activeTab === 'seo-indexing' ? (
+            /* SEO & GOOGLE INDEXING MANAGEMENT TAB */
+            <div className="flex flex-col gap-6">
+              
+              {/* Hero Google Indexing Banner */}
+              <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 text-white p-5 sm:p-6 rounded-3xl shadow-md flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border border-blue-400/20">
+                <div className="flex items-start sm:items-center gap-3.5">
+                  <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center border border-white/20 shrink-0">
+                    <Globe className="w-6 h-6 text-blue-300" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-base tracking-wider uppercase flex items-center gap-2">
+                      Google Search Indexing & Sitemap Hub
+                      <span className="text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 px-2 py-0.5 rounded-full font-bold uppercase">
+                        Sitemap Active
+                      </span>
+                    </h4>
+                    <p className="text-xs text-white/80 mt-0.5">
+                      Manage all public URLs configured for Googlebot crawler indexing, XML sitemap sync, and search ranking.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <a 
+                    href="https://search.google.com/search-console" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="bg-white text-charcoal-dark hover:bg-cream font-bold px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow-sm transition-all"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-blue-600" />
+                    <span>Google Search Console ↗</span>
+                  </a>
+                  <a 
+                    href="https://www.google.com/search?q=site:ascension.ind.in" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="bg-blue-600/40 hover:bg-blue-600/60 text-white border border-blue-400/40 font-bold px-3.5 py-2 rounded-xl text-xs flex items-center gap-1.5 transition-all"
+                  >
+                    <Search className="w-3.5 h-3.5" />
+                    <span>Check Live in Google ↗</span>
+                  </a>
+                </div>
+              </div>
+
+              {/* Status Cards Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Card 1: Total Indexable Pages */}
+                <div className="glass p-5 rounded-2xl border border-cream-dark/60 flex flex-col justify-between shadow-sm">
+                  <div className="flex items-center justify-between border-b border-cream-dark/50 pb-2 mb-2">
+                    <span className="font-bold text-xs uppercase tracking-wider text-charcoal-dark flex items-center gap-1.5">
+                      <FileText className="w-4 h-4 text-sage" /> Indexable Pages
+                    </span>
+                    <span className="text-[10px] bg-sage/15 text-sage font-bold px-2 py-0.5 rounded-full">Public</span>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-charcoal-dark">{INDEXABLE_PAGES.length}</p>
+                    <p className="text-[10px] text-charcoal-light mt-0.5">High-priority URLs in sitemap</p>
+                  </div>
+                </div>
+
+                {/* Card 2: Live XML Sitemap */}
+                <div className="glass p-5 rounded-2xl border border-blue-200 bg-blue-50/20 flex flex-col justify-between shadow-sm">
+                  <div className="flex items-center justify-between border-b border-blue-200/60 pb-2 mb-2">
+                    <span className="font-bold text-xs uppercase tracking-wider text-blue-900 flex items-center gap-1.5">
+                      <Globe className="w-4 h-4 text-blue-600" /> XML Sitemap
+                    </span>
+                    <span className="text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full border border-blue-200">Live</span>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <a 
+                      href="https://ascension.ind.in/sitemap.xml" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="font-mono text-xs text-blue-700 font-bold hover:underline flex items-center gap-1 truncate"
+                    >
+                      /sitemap.xml ↗
+                    </a>
+                    <p className="text-[10px] text-charcoal-light">Standard 0.9 XML protocol</p>
+                  </div>
+                </div>
+
+                {/* Card 3: Robots.txt Rules */}
+                <div className="glass p-5 rounded-2xl border border-purple-200 bg-purple-50/20 flex flex-col justify-between shadow-sm">
+                  <div className="flex items-center justify-between border-b border-purple-200/60 pb-2 mb-2">
+                    <span className="font-bold text-xs uppercase tracking-wider text-purple-900 flex items-center gap-1.5">
+                      <ShieldCheck className="w-4 h-4 text-purple-600" /> Robots.txt
+                    </span>
+                    <span className="text-[10px] bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-full border border-purple-200">Active</span>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <a 
+                      href="https://ascension.ind.in/robots.txt" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="font-mono text-xs text-purple-700 font-bold hover:underline flex items-center gap-1 truncate"
+                    >
+                      /robots.txt ↗
+                    </a>
+                    <p className="text-[10px] text-charcoal-light">Guides Googlebot crawlers</p>
+                  </div>
+                </div>
+
+                {/* Card 4: Protected Private Pages */}
+                <div className="glass p-5 rounded-2xl border border-cream-dark/60 flex flex-col justify-between shadow-sm">
+                  <div className="flex items-center justify-between border-b border-cream-dark/50 pb-2 mb-2">
+                    <span className="font-bold text-xs uppercase tracking-wider text-charcoal-dark flex items-center gap-1.5">
+                      <Shield className="w-4 h-4 text-charcoal" /> Excluded Routes
+                    </span>
+                    <span className="text-[10px] bg-charcoal/10 text-charcoal font-bold px-2 py-0.5 rounded-full">Private</span>
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-charcoal-dark">{EXCLUDED_PRIVATE_PAGES.length}</p>
+                    <p className="text-[10px] text-charcoal-light mt-0.5">Admin & Auth paths protected</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Search and Filters Bar */}
+              <div className="flex flex-col sm:flex-row gap-3 items-center justify-between bg-cream/40 p-3.5 rounded-2xl border border-cream-dark/50">
+                <div className="relative w-full sm:w-80">
+                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-charcoal-light" />
+                  <input 
+                    type="text"
+                    placeholder="Search page title, URL or keyword..."
+                    value={seoSearchQuery}
+                    onChange={(e) => setSeoSearchQuery(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 bg-cream-light border border-cream-dark rounded-xl text-xs focus:outline-none focus:border-sage"
+                  />
+                </div>
+                <div className="flex gap-2 w-full sm:w-auto">
+                  <select 
+                    value={seoCategoryFilter} 
+                    onChange={(e) => setSeoCategoryFilter(e.target.value)}
+                    className="bg-cream-light border border-cream-dark rounded-xl py-2 px-3 text-xs focus:outline-none"
+                  >
+                    <option value="all">All Categories ({INDEXABLE_PAGES.length})</option>
+                    <option value="Core">Core Landing</option>
+                    <option value="Programs">Programs & Audiobooks</option>
+                    <option value="Services">Services & Sessions</option>
+                    <option value="Shop">Crystals & Shop</option>
+                    <option value="Webinars">Webinars</option>
+                    <option value="Seva">NGO & CSR Seva</option>
+                    <option value="About">About</option>
+                    <option value="Contact">Contact</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Indexable Pages Table */}
+              <div className="glass rounded-2xl border border-cream-dark/50 overflow-x-auto shadow-sm">
+                <table className="w-full text-xs text-charcoal border-collapse">
+                  <thead>
+                    <tr className="bg-cream-dark/40 border-b border-cream-dark uppercase text-[10px] tracking-wider font-bold">
+                      <th className="py-3 px-4 text-left">Page Name & Purpose</th>
+                      <th className="py-3 px-4 text-left">URL Path</th>
+                      <th className="py-3 px-4 text-left">Google Priority</th>
+                      <th className="py-3 px-4 text-left">Target Keywords</th>
+                      <th className="py-3 px-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {INDEXABLE_PAGES
+                      .filter(page => {
+                        const matchesSearch = !seoSearchQuery || 
+                          page.title.toLowerCase().includes(seoSearchQuery.toLowerCase()) || 
+                          page.path.toLowerCase().includes(seoSearchQuery.toLowerCase()) ||
+                          page.targetKeywords.toLowerCase().includes(seoSearchQuery.toLowerCase());
+                        const matchesCategory = seoCategoryFilter === 'all' || page.category === seoCategoryFilter;
+                        return matchesSearch && matchesCategory;
+                      })
+                      .map((page, idx) => (
+                        <tr key={idx} className="border-b border-cream-dark/40 hover:bg-cream/20 transition-colors">
+                          {/* Column 1: Title & Category */}
+                          <td className="py-3.5 px-4">
+                            <div className="flex flex-col gap-0.5">
+                              <div className="flex items-center gap-2">
+                                <span className="font-bold text-charcoal-dark text-xs">{page.title}</span>
+                                <span className="text-[9px] bg-cream-dark text-charcoal-light px-2 py-0.2 rounded-full font-bold uppercase">
+                                  {page.category}
+                                </span>
+                              </div>
+                              <p className="text-[10px] text-charcoal-light max-w-sm line-clamp-1">{page.description}</p>
+                            </div>
+                          </td>
+
+                          {/* Column 2: URL Path */}
+                          <td className="py-3.5 px-4">
+                            <div className="flex items-center gap-1.5 font-mono text-[11px] font-bold text-charcoal-dark">
+                              <span>{page.path}</span>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(page.url);
+                                  setCopiedSeoUrl(page.path);
+                                  setTimeout(() => setCopiedSeoUrl(null), 2000);
+                                }}
+                                className="p-1 hover:bg-cream rounded text-charcoal-light hover:text-charcoal transition-colors"
+                                title="Copy Full URL"
+                              >
+                                {copiedSeoUrl === page.path ? <Check className="w-3.5 h-3.5 text-sage" /> : <Copy className="w-3.5 h-3.5" />}
+                              </button>
+                            </div>
+                          </td>
+
+                          {/* Column 3: Priority & Frequency */}
+                          <td className="py-3.5 px-4">
+                            <div className="flex flex-col gap-0.5">
+                              <span className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded w-fit ${
+                                page.priority.includes('1.0') || page.priority.includes('0.9') 
+                                  ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' 
+                                  : 'bg-blue-50 text-blue-800 border border-blue-200'
+                              }`}>
+                                ★ {page.priority}
+                              </span>
+                              <span className="text-[9px] text-charcoal-light">Updates: {page.changefreq}</span>
+                            </div>
+                          </td>
+
+                          {/* Column 4: Target Keywords */}
+                          <td className="py-3.5 px-4">
+                            <p className="text-[10px] text-charcoal-light max-w-xs leading-relaxed">
+                              {page.targetKeywords}
+                            </p>
+                          </td>
+
+                          {/* Column 5: Actions */}
+                          <td className="py-3.5 px-4 text-right">
+                            <div className="flex items-center justify-end gap-1.5">
+                              <a
+                                href={`https://www.google.com/search?q=site:ascension.ind.in${page.path}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-1.5 hover:bg-blue-50 text-blue-700 border border-blue-200 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-colors"
+                                title="Check Index Status on Google"
+                              >
+                                <Search className="w-3 h-3" />
+                                <span>Google ↗</span>
+                              </a>
+                              <a
+                                href={page.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-1.5 hover:bg-cream text-charcoal/70 hover:text-charcoal rounded-lg transition-colors"
+                                title="Open Page in New Tab"
+                              >
+                                <ExternalLink className="w-4 h-4" />
+                              </a>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Excluded & Private Protected Pages Table */}
+              <div className="glass p-5 rounded-2xl border border-cream-dark/60 shadow-sm flex flex-col gap-3">
+                <div className="flex items-center justify-between border-b pb-2">
+                  <h4 className="font-serif font-bold text-sm text-charcoal-dark uppercase tracking-wider flex items-center gap-1.5">
+                    <Shield className="w-4 h-4 text-charcoal" /> Protected & Excluded URLs (Disallow in Robots.txt)
+                  </h4>
+                  <span className="text-[10px] bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-bold">
+                    Not Indexed by Search Engines
+                  </span>
+                </div>
+                <p className="text-xs text-charcoal-light leading-relaxed">
+                  These private routes are blocked in <code>robots.txt</code> to safeguard user confidentiality, account data, and paid member course dashboards from public Google search crawler indexing.
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
+                  {EXCLUDED_PRIVATE_PAGES.map((ex, idx) => (
+                    <div key={idx} className="bg-cream/40 p-3 rounded-xl border border-cream-dark/50 flex flex-col gap-1 text-xs">
+                      <span className="font-mono font-bold text-red-700">{ex.path}</span>
+                      <span className="text-[11px] text-charcoal-light">{ex.reason}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
             </div>
           ) : (
             /* DEFAULT TABLE FOR OTHER TABS */
