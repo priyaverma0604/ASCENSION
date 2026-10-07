@@ -4,7 +4,7 @@ const productCategories = [
   'Crystals', 'Lamps', 'Candles', 'Crystal Trees', 'Pendants', 
   'Bracelets', 'Healing Stones', 'Selenite Products', 'Trays', 
   'Decorative Pieces', 'Wax Melts', 'Bath Salts', 'Healing Oils',
-  'Healing Camphor', 'Wax Tablets', 'Sage Leaves'
+  'Healing Camphor', 'Wax Tablets', 'Sage Leaves', 'Energy Bottles', 'Water Bottles', 'Pyramids'
 ];
 
 const productSchema = new mongoose.Schema({

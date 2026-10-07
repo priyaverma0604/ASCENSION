@@ -1780,6 +1780,7 @@ const AdminDashboard = () => {
                         <div className="flex flex-col gap-1">
                           <label className="font-bold text-charcoal-light uppercase text-[10px]">Category</label>
                           <select value={productCategory} onChange={(e) => setProductCategory(e.target.value)} className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none">
+                            <option value="Energy Bottles">Energy Bottles</option>
                             <option value="Bath Salts">Bath Salts</option>
                             <option value="Healing Camphor">Healing Camphor</option>
                             <option value="Healing Oils">Healing Oils</option>
