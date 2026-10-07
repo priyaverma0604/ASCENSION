@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /profile
+Disallow: /programs/*/dashboard
+Disallow: /thank-you
+Disallow: /reset-password
+Disallow: /forgot-password
+
+Sitemap: https://ascension.ind.in/sitemap.xml
