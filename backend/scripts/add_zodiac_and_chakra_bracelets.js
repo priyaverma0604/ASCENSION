@@ -13,6 +13,7 @@ const productSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: { type: String, required: true },
   pricing: { type: Number, required: true },
+  originalPrice: { type: Number },
   category: { type: String, required: true },
   stock: { type: Number, default: 50 },
   images: [{ type: String }],
@@ -62,7 +63,8 @@ Cleanse regularly with sacred white sage smoke, camphor fumes, or Selenite plate
   {
     name: "Ascension Aries Zodiac Sign Crystal Bracelet",
     category: "Crystals",
-    pricing: 1999,
+    pricing: 1555,
+    originalPrice: 1999,
     stock: 50,
     images: ["/uploads/aries_zodiac_crystal_bracelet.png"],
     description: `Tagline: Courage • Passion • New Beginnings | Bolder • Brighter • Stronger You
@@ -92,7 +94,8 @@ Affirmation:
   {
     name: "Ascension Taurus Zodiac Sign Crystal Bracelet",
     category: "Crystals",
-    pricing: 1999,
+    pricing: 1555,
+    originalPrice: 1999,
     stock: 50,
     images: ["/uploads/taurus_zodiac_crystal_bracelet.png"],
     description: `Tagline: Strength • Stability • Abundance | Grounded • Peaceful • Prosperous
@@ -122,7 +125,8 @@ Affirmation:
   {
     name: "Ascension Gemini Zodiac Sign Crystal Bracelet",
     category: "Crystals",
-    pricing: 1999,
+    pricing: 1555,
+    originalPrice: 1999,
     stock: 50,
     images: ["/uploads/gemini_zodiac_crystal_bracelet.png"],
     description: `Tagline: Communication • Curiosity • Adaptability | Clear • Inspired • Expressive
@@ -151,7 +155,8 @@ Affirmation:
   {
     name: "Ascension Cancer Zodiac Sign Crystal Bracelet",
     category: "Crystals",
-    pricing: 1999,
+    pricing: 1555,
+    originalPrice: 1999,
     stock: 50,
     images: ["/uploads/cancer_zodiac_crystal_bracelet.png"],
     description: `Tagline: Emotional • Intuitive • Protective | Harmony • Heart Healing • Divine Flow
@@ -179,7 +184,8 @@ Affirmation:
   {
     name: "Ascension Leo Zodiac Sign Crystal Bracelet",
     category: "Crystals",
-    pricing: 1999,
+    pricing: 1555,
+    originalPrice: 1999,
     stock: 50,
     images: ["/uploads/leo_zodiac_crystal_bracelet.png"],
     description: `Tagline: Confidence • Creativity • Leadership | Radiance • Power • Solar Fire
@@ -207,7 +213,8 @@ Affirmation:
   {
     name: "Ascension Virgo Zodiac Sign Crystal Bracelet",
     category: "Crystals",
-    pricing: 1999,
+    pricing: 1555,
+    originalPrice: 1999,
     stock: 50,
     images: ["/uploads/virgo_zodiac_crystal_bracelet.png"],
     description: `Tagline: Practical • Analytical • Kind | Purity • Focus • Radiant Health
@@ -236,7 +243,8 @@ Affirmation:
   {
     name: "Ascension Libra Zodiac Sign Crystal Bracelet",
     category: "Crystals",
-    pricing: 1999,
+    pricing: 1555,
+    originalPrice: 1999,
     stock: 50,
     images: ["/uploads/libra_zodiac_crystal_bracelet.png"],
     description: `Tagline: Harmony • Balance • Love | Beauty • Serenity • Soul Connection
@@ -265,7 +273,8 @@ Affirmation:
   {
     name: "Ascension Scorpio Zodiac Sign Crystal Bracelet",
     category: "Crystals",
-    pricing: 1999,
+    pricing: 1555,
+    originalPrice: 1999,
     stock: 50,
     images: ["/uploads/scorpio_zodiac_crystal_bracelet.png"],
     description: `Tagline: Passionate • Intuitive • Transformative | Inner Power • Psychic Shield • Renewal
@@ -294,7 +303,8 @@ Affirmation:
   {
     name: "Ascension Sagittarius Zodiac Sign Crystal Bracelet",
     category: "Crystals",
-    pricing: 1999,
+    pricing: 1555,
+    originalPrice: 1999,
     stock: 50,
     images: ["/uploads/sagittarius_zodiac_crystal_bracelet.png"],
     description: `Tagline: Adventurous • Optimistic • Truth-Seeking | Wisdom • Expansion • Good Fortune
@@ -323,7 +333,8 @@ Affirmation:
   {
     name: "Ascension Capricorn Zodiac Sign Crystal Bracelet",
     category: "Crystals",
-    pricing: 1999,
+    pricing: 1555,
+    originalPrice: 1999,
     stock: 50,
     images: ["/uploads/capricorn_zodiac_crystal_bracelet.png"],
     description: `Tagline: Disciplined • Ambitious • Strong | Mastery • Resilience • Unshakable Success
@@ -352,7 +363,8 @@ Affirmation:
   {
     name: "Ascension Aquarius Zodiac Sign Crystal Bracelet",
     category: "Crystals",
-    pricing: 1999,
+    pricing: 1555,
+    originalPrice: 1999,
     stock: 50,
     images: ["/uploads/aquarius_zodiac_crystal_bracelet.png"],
     description: `Tagline: Innovative • Independent • Humanitarian | Vision • Cosmic Flow • Higher Intellect
@@ -381,7 +393,8 @@ Affirmation:
   {
     name: "Ascension Pisces Zodiac Sign Crystal Bracelet",
     category: "Crystals",
-    pricing: 1999,
+    pricing: 1555,
+    originalPrice: 1999,
     stock: 50,
     images: ["/uploads/pisces_zodiac_crystal_bracelet.png"],
     description: `Tagline: Intuitive • Compassionate • Creative | Mystic Dreams • Soul Serenity • Universal Love

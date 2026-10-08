@@ -34,9 +34,9 @@ async function updateZodiacBraceletPrices() {
           { name: { $regex: /zodiac.*bracelet/i } }
         ]
       },
-      { $set: { pricing: 1999 } }
+      { $set: { pricing: 1555, originalPrice: 1999 } }
     );
-    console.log(`Updated ${result.modifiedCount} Zodiac bracelet documents in MongoDB to ₹1999.`);
+    console.log(`Updated ${result.modifiedCount} Zodiac bracelet documents in MongoDB to Original: ₹1999, Discounted: ₹1555.`);
 
     // Verify in DB
     const updatedProducts = await Product.find({
@@ -46,7 +46,7 @@ async function updateZodiacBraceletPrices() {
       ]
     });
     console.log(`Verified ${updatedProducts.length} Zodiac bracelets in DB:`);
-    updatedProducts.forEach(p => console.log(` - ${p.name}: ₹${p.pricing}`));
+    updatedProducts.forEach(p => console.log(` - ${p.name}: Selling: ₹${p.pricing}, Original: ₹${p.originalPrice}`));
 
     // 2. Update extracted_products.json
     const jsonPath = path.join(__dirname, 'extracted_products.json');
@@ -56,12 +56,13 @@ async function updateZodiacBraceletPrices() {
       for (const p of currentList) {
         const isZodiacBracelet = zodiacNames.includes(p.name) || (p.name && /zodiac.*bracelet/i.test(p.name));
         if (isZodiacBracelet) {
-          p.pricing = 1999;
+          p.pricing = 1555;
+          p.originalPrice = 1999;
           jsonUpdatedCount++;
         }
       }
       fs.writeFileSync(jsonPath, JSON.stringify(currentList, null, 2));
-      console.log(`Successfully updated ${jsonUpdatedCount} zodiac bracelets in extracted_products.json to ₹1999.`);
+      console.log(`Successfully updated ${jsonUpdatedCount} zodiac bracelets in extracted_products.json to Original: ₹1999, Discounted: ₹1555.`);
     }
 
     process.exit(0);

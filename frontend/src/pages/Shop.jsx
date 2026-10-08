@@ -817,9 +817,33 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                           {product.description}
                         </p>
                         <div className="flex justify-between items-center border-t border-cream-dark/50 pt-2 sm:pt-3 mt-2 sm:mt-3 font-sans text-xs">
-                          <span className="font-serif font-bold text-gold-dark text-xs sm:text-sm">
-                            ₹{product.pricing || (product.name && product.name.toLowerCase().includes('boat') ? 475 : 375)}
-                          </span>
+                          {(() => {
+                            const isZodiac = product.name && product.name.toLowerCase().includes('zodiac');
+                            const isBoat = product.name && product.name.toLowerCase().includes('boat');
+                            const sellingPrice = product.pricing || (isBoat ? 475 : (isZodiac ? 1555 : 375));
+                            const origPrice = product.originalPrice || (isZodiac ? 1999 : null);
+                            const hasDisc = origPrice && Number(origPrice) > Number(sellingPrice);
+                            const discPct = hasDisc ? Math.round(((Number(origPrice) - Number(sellingPrice)) / Number(origPrice)) * 100) : 0;
+                            return (
+                              <div className="flex flex-col gap-0.5">
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <span className="font-serif font-bold text-gold-dark text-xs sm:text-sm">
+                                    ₹{sellingPrice}
+                                  </span>
+                                  {hasDisc && (
+                                    <>
+                                      <span className="font-serif text-[10px] text-charcoal-light line-through decoration-red-400">
+                                        ₹{origPrice}
+                                      </span>
+                                      <span className="text-[8px] font-bold uppercase text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded">
+                                        {discPct}% OFF
+                                      </span>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })()}
                           <button
                             onClick={() => {
                               if (product.name && product.name.toLowerCase().includes('boat')) {
@@ -968,7 +992,8 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                   {/* Primary Signature Bracelet Alignment Banner */}
                   {selectedZodiac.primaryBracelet && (() => {
                     const matchingProd = allProductsForCustomise.find(p => p.name?.toLowerCase() === selectedZodiac.primaryBracelet?.toLowerCase() || p.name?.toLowerCase().includes(selectedZodiac.primaryBracelet?.toLowerCase()));
-                    const braceletPrice = matchingProd?.pricing || 1999;
+                    const braceletPrice = matchingProd?.pricing || 1555;
+                    const braceletOrigPrice = matchingProd?.originalPrice || 1999;
                     return (
                       <div className="p-4 rounded-2xl bg-gradient-to-r from-gold/15 via-cream/40 to-gold/10 border border-gold/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div className="flex flex-col gap-1">
@@ -986,14 +1011,17 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                           onClick={() => {
                             if (matchingProd) {
                               addToCart(matchingProd);
-                              alert(`${matchingProd.name} (₹${matchingProd.pricing}) added to your cart!`);
+                              alert(`${matchingProd.name} (₹${matchingProd.pricing || 1555}) added to your cart!`);
                             } else {
                               alert(`${selectedZodiac.primaryBracelet} is in stock below!`);
                             }
                           }}
-                          className="bg-gold hover:bg-gold-dark text-charcoal-dark font-bold text-[10px] uppercase tracking-wider py-2 px-4 rounded-xl shadow-xs transition-colors shrink-0"
+                          className="bg-gold hover:bg-gold-dark text-charcoal-dark font-bold text-[10px] uppercase tracking-wider py-2 px-4 rounded-xl shadow-xs transition-colors shrink-0 flex items-center gap-1.5"
                         >
-                          Quick Add to Cart (₹{braceletPrice})
+                          <span>Quick Add to Cart (₹{braceletPrice})</span>
+                          {braceletOrigPrice > braceletPrice && (
+                            <span className="line-through text-charcoal/60 text-[9px] font-normal">₹{braceletOrigPrice}</span>
+                          )}
                         </button>
                       </div>
                     );
@@ -1441,9 +1469,31 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                               {product.description}
                             </p>
                             <div className="flex items-center justify-between border-t border-cream-dark/35 pt-3 mt-auto">
-                              <span className="font-serif font-bold text-gold-dark text-sm sm:text-base">
-                                ₹{product.pricing || (product.name && product.name.toLowerCase().includes('boat') ? 475 : (product.name && product.name.toLowerCase().includes('zodiac') ? 1999 : 999))}
-                              </span>
+                              {(() => {
+                                const isZodiac = product.name && product.name.toLowerCase().includes('zodiac');
+                                const isBoat = product.name && product.name.toLowerCase().includes('boat');
+                                const sellingPrice = product.pricing || (isBoat ? 475 : (isZodiac ? 1555 : 999));
+                                const origPrice = product.originalPrice || (isZodiac ? 1999 : null);
+                                const hasDisc = origPrice && Number(origPrice) > Number(sellingPrice);
+                                const discPct = hasDisc ? Math.round(((Number(origPrice) - Number(sellingPrice)) / Number(origPrice)) * 100) : 0;
+                                return (
+                                  <div className="flex items-center gap-1.5 flex-wrap">
+                                    <span className="font-serif font-bold text-gold-dark text-sm sm:text-base">
+                                      ₹{sellingPrice}
+                                    </span>
+                                    {hasDisc && (
+                                      <>
+                                        <span className="font-serif text-xs text-charcoal-light line-through decoration-red-400">
+                                          ₹{origPrice}
+                                        </span>
+                                        <span className="text-[9px] font-bold uppercase text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded">
+                                          {discPct}% OFF
+                                        </span>
+                                      </>
+                                    )}
+                                  </div>
+                                );
+                              })()}
                               
                               <button
                                 onClick={() => {

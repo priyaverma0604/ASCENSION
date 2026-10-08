@@ -154,7 +154,11 @@ const ProductDetails = () => {
   const [selectedSize, setSelectedSize] = useState('Small');
 
   const isBoatCandle = product?.name && product.name.toLowerCase().includes('boat');
-  const currentPrice = isBoatCandle ? (selectedSize === 'Big' ? 725 : 475) : (product?.pricing || 375);
+  const isZodiacBracelet = product?.name && product.name.toLowerCase().includes('zodiac');
+  const originalPrice = product?.originalPrice || (isZodiacBracelet ? 1999 : null);
+  const currentPrice = isBoatCandle ? (selectedSize === 'Big' ? 725 : 475) : (product?.pricing || (isZodiacBracelet ? 1555 : 375));
+  const hasDiscount = originalPrice && Number(originalPrice) > Number(currentPrice);
+  const discountPercent = hasDiscount ? Math.round(((Number(originalPrice) - Number(currentPrice)) / Number(originalPrice)) * 100) : 0;
 
   const handleQuantityChange = (type) => {
     if (type === 'inc') {
@@ -323,10 +327,20 @@ const ProductDetails = () => {
                 {product.name}
               </h1>
               
-              <div className="flex items-center gap-4 mt-2">
-                <span className="font-serif text-2xl font-bold text-gold-dark">
+              <div className="flex flex-wrap items-baseline gap-3 mt-2">
+                <span className="font-serif text-2xl md:text-3xl font-bold text-gold-dark">
                   ₹{currentPrice}
                 </span>
+                {hasDiscount && (
+                  <>
+                    <span className="font-serif text-base md:text-lg text-charcoal-light line-through decoration-red-400">
+                      ₹{originalPrice}
+                    </span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                      {discountPercent}% OFF
+                    </span>
+                  </>
+                )}
                 
                 <span className={`text-[9px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded border ${
                   isOutOfStock 

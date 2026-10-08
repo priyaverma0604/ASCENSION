@@ -21,6 +21,9 @@ const productSchema = new mongoose.Schema({
     type: Number,
     required: [true, 'Please specify pricing in INR']
   },
+  originalPrice: {
+    type: Number
+  },
   images: [
     {
       type: String
