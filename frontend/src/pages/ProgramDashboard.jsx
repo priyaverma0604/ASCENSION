@@ -9,6 +9,28 @@ import {
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import navratriBanner from '../assets/navratri_9_days_banner.jpg';
+import day1Img from '../assets/navratri/day1_shailaputri.jpg';
+import day2Img from '../assets/navratri/day2_brahmacharini.jpg';
+import day3Img from '../assets/navratri/day3_chandraghanta.jpg';
+import day4Img from '../assets/navratri/day4_kushmanda.jpg';
+import day5Img from '../assets/navratri/day5_skandamata.jpg';
+import day6Img from '../assets/navratri/day6_katyayani.jpg';
+import day7Img from '../assets/navratri/day7_kalaratri.jpg';
+import day8Img from '../assets/navratri/day8_mahagauri.jpg';
+import day9Img from '../assets/navratri/day9_siddhidatri.jpg';
+import navratriAssignments from '../data/navratriAssignments';
+
+const NAVRATRI_DAY_IMAGES = {
+  1: day1Img,
+  2: day2Img,
+  3: day3Img,
+  4: day4Img,
+  5: day5Img,
+  6: day6Img,
+  7: day7Img,
+  8: day8Img,
+  9: day9Img,
+};
 
 const getImageUrl = (path) => {
   if (!path) return '';
@@ -1147,24 +1169,31 @@ const ProgramDashboard = () => {
                           ? `Great work keeping up the practice. You have read and completed the prayer for Day ${selectedAssignment.dayNumber}!`
                           : `Great work keeping up the practice. You have completed the reflections and tasks for Day ${selectedAssignment.dayNumber}!`}
                       </p>
-                      {/* If they uploaded a photo, display it here */}
-                      {progress.submissions.find(s => s.day === selectedAssignment.dayNumber)?.photo && (
+                      {/* If they uploaded a photo, or in Navratri show the sacred day image */}
+                      {(progress.submissions.find(s => s.day === selectedAssignment.dayNumber)?.photo || (isNavratri && NAVRATRI_DAY_IMAGES[selectedAssignment.dayNumber])) && (
                         <div className="flex flex-col gap-2 mt-1">
-                          <span className="text-[9px] text-charcoal-light uppercase font-bold tracking-wider">Your Submitted Reflection Work:</span>
+                          <span className="text-[9px] text-charcoal-light uppercase font-bold tracking-wider">
+                            {progress.submissions.find(s => s.day === selectedAssignment.dayNumber)?.photo 
+                              ? "Your Submitted Reflection Work:" 
+                              : "Sacred Swaroop of Maa Durga for Today:"}
+                          </span>
                           <div 
-                            className="w-32 h-32 rounded-xl overflow-hidden border border-cream-dark/60 cursor-pointer relative group"
+                            className="w-32 h-32 rounded-xl overflow-hidden border border-cream-dark/60 cursor-pointer relative group shadow-sm bg-cream"
                             onClick={() => {
                               const p = progress.submissions.find(s => s.day === selectedAssignment.dayNumber);
-                              if (p) setLightboxImage({ url: getImageUrl(p.photo), title: `Day ${selectedAssignment.dayNumber} Reflection` });
+                              const targetImg = p?.photo ? getImageUrl(p.photo) : NAVRATRI_DAY_IMAGES[selectedAssignment.dayNumber];
+                              if (targetImg) setLightboxImage({ url: targetImg, title: selectedAssignment.title });
                             }}
                           >
                             <img 
-                              src={getImageUrl(progress.submissions.find(s => s.day === selectedAssignment.dayNumber).photo)} 
+                              src={progress.submissions.find(s => s.day === selectedAssignment.dayNumber)?.photo 
+                                ? getImageUrl(progress.submissions.find(s => s.day === selectedAssignment.dayNumber).photo) 
+                                : NAVRATRI_DAY_IMAGES[selectedAssignment.dayNumber]} 
                               alt="Day Submission" 
-                              className="w-full h-full object-cover" 
+                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
                             />
                             <div className="absolute inset-0 bg-charcoal/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                              <Eye className="w-5 h-5 text-white" />
+                              <Eye className="w-5 h-5 text-white drop-shadow" />
                             </div>
                           </div>
                         </div>
@@ -1187,32 +1216,68 @@ const ProgramDashboard = () => {
             {/* Submissions History Grid */}
             {progress && progress.submissions.length > 0 && (
               <div className="flex flex-col gap-4">
-                <h3 className="font-serif text-lg font-bold text-charcoal-dark uppercase tracking-wider text-left">
-                  My Completed Submissions
-                </h3>
+                <div className="flex items-center justify-between">
+                  <h3 className="font-serif text-lg font-bold text-charcoal-dark uppercase tracking-wider text-left">
+                    {isNavratri ? 'My Completed Sacred Days' : 'My Completed Submissions'}
+                  </h3>
+                  <span className="text-xs font-semibold text-gold bg-gold/10 px-2.5 py-1 rounded-full border border-gold/20">
+                    {progress.submissions.length} / {totalDays} Completed ✨
+                  </span>
+                </div>
+
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                  {progress.submissions.map((sub, idx) => (
-                    <div 
-                      key={idx}
-                      onClick={() => setLightboxImage({ url: getImageUrl(sub.photo), title: `Day ${sub.day} Submission` })}
-                      className="glass border border-cream-dark/50 rounded-2xl overflow-hidden cursor-pointer group hover:scale-[1.02] transition-all duration-300 text-left"
-                    >
-                      <div className="h-28 bg-cream relative overflow-hidden">
-                        <img 
-                          src={getImageUrl(sub.photo)} 
-                          alt={`Day ${sub.day}`} 
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-charcoal/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-200">
-                          <Eye className="w-5 h-5 text-white" />
+                  {progress.submissions.map((sub, idx) => {
+                    const navItem = isNavratri ? navratriAssignments.find(n => n.day === sub.day) : null;
+                    const navImage = isNavratri ? NAVRATRI_DAY_IMAGES[sub.day] : null;
+                    const displayImage = sub.photo ? getImageUrl(sub.photo) : (navImage || (program?.images?.[0] ? getImageUrl(program.images[0]) : null));
+                    const cardTitle = navItem ? navItem.goddess.split('(')[0].trim() : `Day ${sub.day}`;
+                    const cardTheme = navItem ? navItem.chakra : `Completed on ${new Date(sub.submittedAt).toLocaleDateString()}`;
+
+                    return (
+                      <div 
+                        key={idx}
+                        onClick={() => {
+                          if (displayImage) {
+                            setLightboxImage({ url: displayImage, title: `Day ${sub.day}: ${cardTitle}` });
+                          } else {
+                            fetchAssignmentDetails(sub.day);
+                          }
+                        }}
+                        className="glass border border-cream-dark/50 rounded-2xl overflow-hidden cursor-pointer group hover:scale-[1.03] hover:shadow-lg transition-all duration-300 text-left bg-white/80 flex flex-col"
+                      >
+                        <div className="h-28 bg-gradient-to-br from-amber-50 to-cream relative overflow-hidden flex items-center justify-center">
+                          {displayImage ? (
+                            <img 
+                              src={displayImage} 
+                              alt={`Day ${sub.day}`} 
+                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                            />
+                          ) : (
+                            <div className="flex flex-col items-center justify-center gap-1 p-2 text-center">
+                              <Sparkles className="w-5 h-5 text-gold animate-pulse" />
+                              <span className="text-[10px] font-bold text-charcoal-dark font-serif">Day {sub.day} Done</span>
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-charcoal/25 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-200">
+                            <Eye className="w-5 h-5 text-white drop-shadow" />
+                          </div>
+                          <div className="absolute top-1.5 left-1.5 bg-black/60 backdrop-blur-md px-1.5 py-0.5 rounded-md text-[9px] font-bold text-gold flex items-center gap-1">
+                            <span>Day {sub.day}</span>
+                          </div>
+                          <div className="absolute top-1.5 right-1.5 bg-sage/90 backdrop-blur-md p-1 rounded-full text-white">
+                            <CheckCircle className="w-3 h-3" />
+                          </div>
+                        </div>
+                        <div className="p-2.5 flex flex-col gap-0.5 flex-1 justify-between bg-white/40">
+                          <div>
+                            <span className="font-bold text-[11px] text-charcoal-dark line-clamp-1 group-hover:text-gold transition-colors">{cardTitle}</span>
+                            <span className="text-[9px] text-charcoal-light line-clamp-1">{cardTheme}</span>
+                          </div>
+                          <span className="text-[8px] text-charcoal-light/70 mt-1">{new Date(sub.submittedAt).toLocaleDateString()}</span>
                         </div>
                       </div>
-                      <div className="p-2.5 flex flex-col gap-0.5">
-                        <span className="font-bold text-[10px] text-charcoal-dark">Day {sub.day}</span>
-                        <span className="text-[8px] text-charcoal-light">{new Date(sub.submittedAt).toLocaleDateString()}</span>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}

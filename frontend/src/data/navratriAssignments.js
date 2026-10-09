@@ -8,6 +8,7 @@ const navratriAssignments = [
     mantra: "Om Devi Shailaputryai Namah || ॐ देवी शैलपुत्र्यै नमः",
     duration: "25 minutes",
     audioUrl: "https://drive.google.com/file/d/1-qyJyw7k9G_xUtRjfaFGhgmNe6m-p8Qh/preview",
+    image: "/uploads/day1_shailaputri.jpg",
     description: "Welcome to Day 1 of your Sacred Navratri Journey. Today we invoke Maa Shailaputri, the embodiment of foundational power, stability, and cosmic grounding. Just as the mountain stands unshakeable amidst storms, Shailaputri anchors your life force into the Earth, dissolving deep-rooted fears, anxieties, and scarcity mindset.",
     audioTheme: "Foundational Shakti Awakening, Root Chakra Alignment & Eliminating Instability",
     action: "1. Listen fully to today's 25-minute sacred audio book transmission.\n2. Chant the sacred mantra 'Om Devi Shailaputryai Namah' 11 or 108 times.\n3. Write down 3 deep fears you are offering to the Divine Mother to transmute into inner strength.\n4. Mark this audio session complete to unlock Day 2."
@@ -21,6 +22,7 @@ const navratriAssignments = [
     mantra: "Om Devi Brahmacharinyai Namah || ॐ देवी ब्रह्मचारिण्यै नमः",
     duration: "26 minutes",
     audioUrl: "https://drive.google.com/file/d/1D18PIwiaB-XzY4wdbRnIbxx8UE6H5ykE/preview",
+    image: "/uploads/day2_brahmacharini.jpg",
     description: "On Day 2, we attune to the sublime grace of Maa Brahmacharini. She represents unyielding penance, emotional purity, self-control, and radiant spiritual devotion. This audio track guides you to release emotional turbulence, overcome addictions to old habits, and channel your creative vital energy towards higher self-realization.",
     audioTheme: "Sacral Energy Healing, Willpower Activation & Emotional Equilibrium",
     action: "1. Immerse yourself in today's 26-minute audio contemplation.\n2. Practice 5 minutes of mindful breathwork while chanting 'Om Devi Brahmacharinyai Namah'.\n3. Journal 1 habit or distraction you commit to releasing during this Navratri.\n4. Mark this session complete to unlock Day 3."
@@ -34,6 +36,7 @@ const navratriAssignments = [
     mantra: "Om Devi Chandraghantayai Namah || ॐ देवी चन्द्रघण्टायै नमः",
     duration: "24 minutes",
     audioUrl: "https://drive.google.com/file/d/1o7Nor5XD5Qv_3OBL8Xh_6mdGHQT96Ear/preview",
+    image: "/uploads/day3_chandraghanta.jpg",
     description: "Day 3 invokes the majestic Maa Chandraghanta, bearing a half-moon shaped like a temple bell on her forehead. The ringing sound of her bell dispels all negative energies, psychic attacks, and self-doubt. This session ignites your inner warrior, elevating your confidence and Solar Plexus fire to overcome any life hurdle.",
     audioTheme: "Dissolving Inner Conflict, Activating Solar Fire & Courageous Living",
     action: "1. Listen to today's audio transmission in a quiet, undisturbed space.\n2. Visualize golden-crimson light radiating from your navel center.\n3. Affirm aloud: 'I am protected, courageous, and divinely guided.'\n4. Mark complete to unlock Day 4."
@@ -47,6 +50,7 @@ const navratriAssignments = [
     mantra: "Om Devi Kushmandayai Namah || ॐ देवी कूष्माण्डायै नमः",
     duration: "27 minutes",
     audioUrl: "https://drive.google.com/file/d/1jlw6Qjxt1W_gA5dTr8yrox20sVF-dIGr/preview",
+    image: "/uploads/day4_kushmanda.jpg",
     description: "Day 4 connects you with Maa Kushmanda, whose radiant smile created the universe from cosmic darkness. She resides in the core of the Sun and bestows luminous vitality, radiant health, and boundless creative abundance. Open your Heart Chakra to receive the golden nectar of cosmic creation.",
     audioTheme: "Healing Grief, Expanding Joy & Manifesting Universal Abundance",
     action: "1. Listen to the 27-minute audio book on Cosmic Creation & Joy.\n2. Place both hands over your heart and breathe in emerald-golden light.\n3. Express gratitude for 5 blessings that brought light to your journey.\n4. Mark complete to unlock Day 5."
@@ -60,6 +64,7 @@ const navratriAssignments = [
     mantra: "Om Devi Skandamatayai Namah || ॐ देवी स्कन्दमात्रे नमः",
     duration: "23 minutes",
     audioUrl: "https://drive.google.com/file/d/1G-mdpOYj9-z_bPfcr5iPgySvG9J2te80/preview",
+    image: "/uploads/day5_skandamata.jpg",
     description: "Day 5 honors Maa Skandamata, seated upon a lotus with infant Lord Skanda on her lap. She embodies unconditional maternal tenderness, protective shield, and clear communication of your soul's truth. Today's audio journey clears suppressed emotions, throat blockages, and heals the inner child.",
     audioTheme: "Inner Child Healing, Maternal Blessings & Authentic Self-Expression",
     action: "1. Listen to today's guided audiobook on Sacred Motherhood & Inner Child.\n2. Chant 'Om Devi Skandamatayai Namah' while visualizing soothing sky-blue light in your throat.\n3. Speak one heartfelt truth you have been hesitating to express.\n4. Mark complete to unlock Day 6."
@@ -73,6 +78,7 @@ const navratriAssignments = [
     mantra: "Om Devi Katyayanyai Namah || ॐ देवी कात्यायन्यै नमः",
     duration: "28 minutes",
     audioUrl: "https://drive.google.com/file/d/1Bi67ONVICL9yy0GJcJfKTAxcpgjVczEa/preview",
+    image: "/uploads/day6_katyayani.jpg",
     description: "On Day 6, we invoke Maa Katyayani, born from the combined fiery effulgence of the Trinity to slay the demon Mahishasura. She is the destroyer of toxic patterns, false illusions, and relationship disharmony. Today's session awakens your Third Eye intuition and gives you laser-focused clarity.",
     audioTheme: "Slaying Subconscious Demons, Awakening Intuition & Resolving Karmic Blocks",
     action: "1. Listen to today's powerful audio transmission on Slaying Mahishasura within.\n2. Meditate with focus on the space between your eyebrows (Third Eye).\n3. Write down a major block you are triumphantly conquering with Maa's grace.\n4. Mark complete to unlock Day 7."
@@ -86,6 +92,7 @@ const navratriAssignments = [
     mantra: "Om Devi Kalaratryai Namah || ॐ देवी कालरात्र्यै नमः",
     duration: "30 minutes",
     audioUrl: "https://drive.google.com/file/d/1KrK7A310nbMtRuUCceTss9yRhglmwbjZ/preview",
+    image: "/uploads/day7_kalaratri.jpg",
     description: "Day 7 is the sacred Night of Transformation. Maa Kalaratri, with her dark complexion and fearless gaze, destroys ignorance, darkness, and black magic. She takes away your deepest existential dread and guides you through the shadow to uncover indestructible soul light. Fear has no power over the devotee of Kalaratri.",
     audioTheme: "Shadow Transmutation, Releasing Generational Trauma & Total Fearlessness",
     action: "1. Listen to the 30-minute Shadow Work & Karmic Transmutation audio.\n2. Sit in quiet candlelight or darkness, welcoming the presence of divine protection.\n3. Release all attachments to past regrets and declare yourself spiritually reborn.\n4. Mark complete to unlock Day 8."
@@ -99,6 +106,7 @@ const navratriAssignments = [
     mantra: "Om Devi Mahagauryai Namah || ॐ देवी महागौर्यै नमः",
     duration: "27 minutes",
     audioUrl: "https://drive.google.com/file/d/1uim5Ki5bIu_mSpSzCuxtVr7N0wk53lkW/preview",
+    image: "/uploads/day8_mahagauri.jpg",
     description: "Day 8, the auspicious Durgashtami, celebrates Maa Mahagauri. Having performed severe penance, she is bathed in sacred Ganga waters by Lord Shiva, becoming blindingly luminous and pure. She instantly washes away all accumulated sins, guilt, and dense energetic residue, restoring your pristine divine radiance.",
     audioTheme: "Aura Cleansing, Washing Sins, Rejuvenation & Unconditional Peace",
     action: "1. Experience today's 27-minute Aura Bath & Purification audio transmission.\n2. Light a ghee lamp or candle and chant 'Om Devi Mahagauryai Namah'.\n3. Forgive yourself completely for past mistakes and accept your divine innocence.\n4. Mark complete to unlock the final Day 9."
@@ -112,6 +120,7 @@ const navratriAssignments = [
     mantra: "Om Devi Siddhidatryai Namah || ॐ देवी सिद्धिदात्र्यै नमः",
     duration: "32 minutes",
     audioUrl: "https://drive.google.com/file/d/1JANYMnlknUbiiShT_HZrbStAjFU80BGH/preview",
+    image: "/uploads/day9_siddhidatri.jpg",
     description: "On this culminative Day 9 (Mahanavami), we bow to Maa Siddhidatri. She bestows all 8 Siddhis (spiritual perfections) and cosmic realization. Lord Shiva attained his Ardhanarishvara form through her grace. Today's transmission completes your 9-day initiation, locking in divine protection, spiritual elevation, and eternal shakti blessings.",
     audioTheme: "Attaining Spiritual Fulfillment, Cosmic Synthesis & Supreme Blessings",
     action: "1. Listen to the final 32-minute Grand Audio Initiation of Maa Siddhidatri.\n2. Offer silent gratitude to Sonali Ma'am, the Divine Mother, and your own soul.\n3. Anchor your 9-day transformations by chanting 'Om Aim Hreem Kleem Chamundayai Vichche'.\n4. Mark this grand journey as completed!"
