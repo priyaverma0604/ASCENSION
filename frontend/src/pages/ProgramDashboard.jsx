@@ -1239,7 +1239,7 @@ const ProgramDashboard = () => {
                 <div className="flex flex-col items-center text-center gap-3 relative z-10 w-full">
                   <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gold/15 border border-gold/30 text-gold-dark text-xs font-bold uppercase tracking-widest">
                     <Sparkles className="w-4 h-4 animate-spin" style={{ animationDuration: '4s' }} />
-                    <span>{isNavratri ? 'Jai Mata Di • 9-Day Sadhana Complete' : 'Spiritual Journey Complete'}</span>
+                    <span>{isNavratri ? 'Jai Mata Di • 9-Day Sacred Sadhana Completed' : 'Spiritual Journey Completed'}</span>
                   </div>
 
                   <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-gold to-amber-300 text-white flex items-center justify-center shadow-lg shadow-gold/25 my-1">
@@ -1248,20 +1248,20 @@ const ProgramDashboard = () => {
 
                   <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-charcoal-dark max-w-2xl leading-tight">
                     {isNavratri 
-                      ? "Jai Maa Durga! Aapki 9-Divasiya Sacred Navratri Sadhana Safalta-Purvak Sampann Hui 🌺"
+                      ? "Jai Maa Durga! You Have Successfully Completed the 9-Day Sacred Navratri Sadhana 🌺"
                       : "Congratulations! Your Sacred Program is Complete 🎉"}
                   </h2>
 
                   <p className="text-sm sm:text-base text-charcoal max-w-2xl leading-relaxed font-sans mt-1">
                     {isNavratri
-                      ? "Maa Durga ke sabhi 9 divya swaroopo ka param kripa aashirwaad sadaiv aap par aur aapke parivaar par bana rahe. Aapne nishtha aur bhakti ke sath 9 dino ki is pavitra sadhana ko purna kiya hai."
+                      ? "May the divine grace and supreme blessings of the 9 sacred manifestations of Maa Durga bring peace, protection, and boundless abundance into your life. Thank you for dedicating yourself with sincere devotion to this sacred inner transformation."
                       : "You have shown immense dedication and consistency throughout this transformative journey. May this spiritual practice bring endless peace, abundance, and higher consciousness into your life."}
                   </p>
 
                   {/* Access reminder pill */}
                   <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-sage/10 border border-sage/25 text-sage-dark text-xs font-medium mt-1">
                     <CheckCircle className="w-4 h-4 text-sage" />
-                    <span>Aap <strong>21 October</strong> tak sabhi 9 days ke audiobooks aur mantras ko dobara stream/listen kar sakte hain.</span>
+                    <span>You have full access to stream and re-listen to all 9 audiobooks and sacred mantras until <strong>21 October</strong>.</span>
                   </div>
                 </div>
 
@@ -1269,10 +1269,10 @@ const ProgramDashboard = () => {
                 <div className="w-full relative z-10 mt-2 flex flex-col gap-4">
                   <div className="border-t border-gold/20 pt-6">
                     <h3 className="font-serif text-lg font-bold text-charcoal-dark text-center mb-1">
-                      🌸 Aage Humse Jude Rahe • Stay Connected with Ascension
+                      🌸 Stay Connected with Ascension & Sonali Bhasin Kumar
                     </h3>
                     <p className="text-xs text-charcoal-light text-center max-w-lg mx-auto mb-6">
-                      Sonali Bhasin Kumar aur hamari spiritual community ke sath aage ke sacred workshops, webinars aur healing satsangs mein jude rahe:
+                      Continue your spiritual journey and stay attuned to upcoming live workshops, interactive webinars, and healing satsangs:
                     </p>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1288,7 +1288,7 @@ const ProgramDashboard = () => {
                               Official WhatsApp Community
                             </h4>
                             <p className="text-[11px] text-charcoal-light mt-0.5 leading-relaxed">
-                              Daily affirmations, morning sadhana prompts, satsang notices, aur direct community guidance ke liye join karein.
+                              Receive daily affirmations, morning sadhana prompts, satsang notices, and direct guidance from Sonali Ma'am.
                             </p>
                           </div>
                         </div>
@@ -1314,7 +1314,7 @@ const ProgramDashboard = () => {
                               Upcoming Live Workshops & Webinars
                             </h4>
                             <p className="text-[11px] text-charcoal-light mt-0.5 leading-relaxed">
-                              Ancestral Healing, Theta Healing, Money Manifestation & energy transformation programs explore karein.
+                              Explore live interactive masterclasses on Ancestral Healing, Theta Healing, Money Manifestation, and Lion's Gate energy.
                             </p>
                           </div>
                         </div>
@@ -1335,10 +1335,10 @@ const ProgramDashboard = () => {
                           </div>
                           <div>
                             <h4 className="font-serif font-bold text-sm text-charcoal-dark group-hover:text-sage transition-colors">
-                              Personal Consultation & Healing
+                              Personal 1-on-1 Consultation & Healing
                             </h4>
                             <p className="text-[11px] text-charcoal-light mt-0.5 leading-relaxed">
-                              Sonali Ma'am ke sath 1-on-1 Tarot card reading, Chakra balancing & personal soul counseling session book karein.
+                              Book a private Tarot card reading, Chakra balancing, or personalized intuitive spiritual counseling session with Sonali Ma'am.
                             </p>
                           </div>
                         </div>
@@ -1359,10 +1359,10 @@ const ProgramDashboard = () => {
                           </div>
                           <div>
                             <h4 className="font-serif font-bold text-sm text-charcoal-dark group-hover:text-amber-800 transition-colors">
-                              Ascension Seva & Mahabhoj
+                              Ascension Sacred Seva & Mahabhoj
                             </h4>
                             <p className="text-[11px] text-charcoal-light mt-0.5 leading-relaxed">
-                              Gau seva, vidyarthi shiksha, aur zarooratmand bhojan seva mein participate karke punya karma accumulate karein.
+                              Participate in sacred cow feeding (Gau Seva), children's education, and community food seva to cultivate karmic grace.
                             </p>
                           </div>
                         </div>
