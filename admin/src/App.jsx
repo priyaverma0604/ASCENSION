@@ -3,6 +3,7 @@ import axios from 'axios';
 import logo from './assets/logo.png';
 import AdminDashboard from './components/AdminDashboard';
 import Login from './components/Login';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Configure Axios defaults
 axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
@@ -55,13 +56,15 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-cream-light">
-      {user ? (
-        <AdminDashboard user={user} onLogout={handleLogout} />
-      ) : (
-        <Login onLoginSuccess={(userData) => setUser(userData)} />
-      )}
-    </div>
+    <ErrorBoundary>
+      <div className="min-h-screen bg-cream-light">
+        {user ? (
+          <AdminDashboard user={user} onLogout={handleLogout} />
+        ) : (
+          <Login onLoginSuccess={(userData) => setUser(userData)} />
+        )}
+      </div>
+    </ErrorBoundary>
   );
 }
 

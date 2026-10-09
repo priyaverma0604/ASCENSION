@@ -25,17 +25,23 @@ const getImageUrl = (path) => {
 
 const formatTimeAgo = (date) => {
   if (!date) return 'Never';
-  const diffMs = new Date() - new Date(date);
-  if (diffMs < 0) return 'Just now';
-  const seconds = Math.floor(diffMs / 1000);
-  if (seconds < 60) return 'Just now';
-  const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 30) return `${days}d ago`;
-  return new Date(date).toLocaleDateString();
+  try {
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return 'Recently';
+    const diffMs = Date.now() - d.getTime();
+    if (diffMs < 0) return 'Just now';
+    const seconds = Math.floor(diffMs / 1000);
+    if (seconds < 60) return 'Just now';
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    if (days < 30) return `${days}d ago`;
+    return d.toLocaleDateString();
+  } catch (e) {
+    return 'Recently';
+  }
 };
 
 const INDEXABLE_PAGES = [
@@ -370,35 +376,37 @@ const AdminDashboard = ({ user, onLogout }) => {
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-    fetchTabData();
+    fetchTabData(false);
   }, [activeTab, gratitudeProgramId]);
 
   useEffect(() => {
     let interval;
     if (activeTab === 'analytics' && analyticsAutoRefresh) {
       interval = setInterval(() => {
-        fetchTabData();
+        fetchTabData(true); // background silent refresh without wiping UI
       }, 15000);
     }
     return () => clearInterval(interval);
   }, [activeTab, analyticsAutoRefresh]);
 
-  const fetchTabData = async () => {
-    setLoading(true);
-    setListData([]);
+  const fetchTabData = async (isBackground = false) => {
+    if (!isBackground) {
+      setLoading(true);
+      setListData([]);
+    }
     try {
       if (activeTab === 'users') {
         const [usersRes, statsRes] = await Promise.all([
           axios.get('/api/users'),
           axios.get('/api/users/stats')
         ]);
-        if (usersRes.data.success) {
-          setListData(usersRes.data.data);
+        if (usersRes?.data?.success) {
+          setListData(usersRes.data.data || []);
         }
-        if (statsRes.data.success) {
-          setUserStats(statsRes.data.data);
+        if (statsRes?.data?.success) {
+          setUserStats(statsRes.data.data || null);
         }
-        setLoading(false);
+        if (!isBackground) setLoading(false);
         return;
       }
 
@@ -407,14 +415,14 @@ const AdminDashboard = ({ user, onLogout }) => {
           axios.get('/api/analytics/summary'),
           axios.get('/api/analytics/recent?limit=50')
         ]);
-        if (summaryRes.data.success) {
-          setAnalyticsSummary(summaryRes.data.data);
+        if (summaryRes?.data?.success) {
+          setAnalyticsSummary(summaryRes.data.data || null);
         }
-        if (recentRes.data.success) {
-          setRecentVisits(recentRes.data.data);
-          setListData(recentRes.data.data);
+        if (recentRes?.data?.success) {
+          setRecentVisits(recentRes.data.data || []);
+          setListData(recentRes.data.data || []);
         }
-        setLoading(false);
+        if (!isBackground) setLoading(false);
         return;
       }
 
@@ -452,7 +460,9 @@ const AdminDashboard = ({ user, onLogout }) => {
     } catch (err) {
       console.error('Error fetching admin data:', err.message);
     } finally {
-      setLoading(false);
+      if (!isBackground) {
+        setLoading(false);
+      }
     }
   };
 
@@ -1284,7 +1294,7 @@ const AdminDashboard = ({ user, onLogout }) => {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <label className="flex items-center gap-1.5 text-xs text-white/90 bg-white/10 px-3 py-1.5 rounded-xl border border-white/20 cursor-pointer">
+                    <label className="flex items-center gap-1.5 text-xs text-white/90 bg-white/10 px-3 py-1.5 rounded-xl border border-white/20 cursor-pointer select-none">
                       <input 
                         type="checkbox" 
                         checked={analyticsAutoRefresh} 
@@ -1294,8 +1304,8 @@ const AdminDashboard = ({ user, onLogout }) => {
                       <span>Auto-refresh (15s)</span>
                     </label>
                     <button 
-                      onClick={fetchTabData} 
-                      className="bg-white text-charcoal-dark hover:bg-cream font-bold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1 shadow-sm transition-all"
+                      onClick={() => fetchTabData(false)} 
+                      className="bg-white text-charcoal-dark hover:bg-cream font-bold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1 shadow-sm transition-all active:scale-95"
                     >
                       <RefreshCw className="w-3.5 h-3.5" />
                       <span>Refresh Now</span>
@@ -1389,16 +1399,16 @@ const AdminDashboard = ({ user, onLogout }) => {
                         </span>
                       </div>
                       <div className="flex flex-col gap-1.5">
-                        {analyticsSummary.deviceBreakdown && analyticsSummary.deviceBreakdown.length > 0 ? (
-                          analyticsSummary.deviceBreakdown.map((d) => (
-                            <div key={d.device} className="flex items-center justify-between text-xs">
+                        {analyticsSummary.deviceBreakdown && Array.isArray(analyticsSummary.deviceBreakdown) && analyticsSummary.deviceBreakdown.length > 0 ? (
+                          analyticsSummary.deviceBreakdown.map((d, dIdx) => (
+                            <div key={d?.device || dIdx} className="flex items-center justify-between text-xs">
                               <span className="flex items-center gap-1.5 text-charcoal-light font-medium">
-                                {d.device === 'Mobile' && <Smartphone className="w-3.5 h-3.5 text-sage" />}
-                                {d.device === 'Desktop' && <Laptop className="w-3.5 h-3.5 text-charcoal-dark" />}
-                                {d.device === 'Tablet' && <Tablet className="w-3.5 h-3.5 text-gold" />}
-                                {d.device}
+                                {d?.device === 'Mobile' && <Smartphone className="w-3.5 h-3.5 text-sage" />}
+                                {d?.device === 'Desktop' && <Laptop className="w-3.5 h-3.5 text-charcoal-dark" />}
+                                {d?.device === 'Tablet' && <Tablet className="w-3.5 h-3.5 text-gold" />}
+                                {d?.device || 'Other'}
                               </span>
-                              <span className="font-bold text-charcoal-dark">{d.count} views</span>
+                              <span className="font-bold text-charcoal-dark">{d?.count || 0} views</span>
                             </div>
                           ))
                         ) : (
@@ -1420,22 +1430,22 @@ const AdminDashboard = ({ user, onLogout }) => {
                       <span className="text-[10px] text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full font-bold">UTM Campaign</span>
                     </div>
 
-                    {analyticsSummary?.topCampaigns && analyticsSummary.topCampaigns.length > 0 ? (
+                    {analyticsSummary?.topCampaigns && Array.isArray(analyticsSummary.topCampaigns) && analyticsSummary.topCampaigns.length > 0 ? (
                       <div className="flex flex-col gap-2 max-h-64 overflow-y-auto">
                         {analyticsSummary.topCampaigns.map((camp, idx) => (
                           <div key={idx} className="bg-cream/40 p-3 rounded-xl border border-cream-dark/50 flex flex-col gap-1 text-xs">
                             <div className="flex justify-between items-center">
                               <span className="font-bold text-charcoal-dark flex items-center gap-1.5">
                                 <span className="text-[10px] text-purple-700 bg-purple-100 px-1.5 py-0.2 rounded font-mono">#{idx + 1}</span>
-                                {camp.campaign}
+                                {camp?.campaign || 'General Campaign'}
                               </span>
                               <span className="font-bold text-purple-900 bg-purple-100 px-2 py-0.5 rounded-full text-[10px]">
-                                {camp.views} views ({camp.uniqueVisitors} unique)
+                                {camp?.views || 0} views ({camp?.uniqueVisitors || 0} unique)
                               </span>
                             </div>
                             <div className="flex items-center justify-between text-[10px] text-charcoal-light mt-0.5">
-                              <span>Meta Traffic: <strong className="text-purple-800">{camp.metaViews || 0}</strong></span>
-                              {camp.sources && camp.sources.filter(Boolean).length > 0 && (
+                              <span>Meta Traffic: <strong className="text-purple-800">{camp?.metaViews || 0}</strong></span>
+                              {Array.isArray(camp?.sources) && camp.sources.filter(Boolean).length > 0 && (
                                 <span className="truncate max-w-[200px]">Sources: {camp.sources.filter(Boolean).join(', ')}</span>
                               )}
                             </div>
@@ -1456,23 +1466,28 @@ const AdminDashboard = ({ user, onLogout }) => {
                       <span className="text-[10px] text-charcoal-light">Last 30 Days</span>
                     </div>
 
-                    {analyticsSummary?.sourceBreakdown && analyticsSummary.sourceBreakdown.length > 0 ? (
+                    {analyticsSummary?.sourceBreakdown && Array.isArray(analyticsSummary.sourceBreakdown) && analyticsSummary.sourceBreakdown.length > 0 ? (
                       <div className="flex flex-col gap-2 max-h-64 overflow-y-auto">
-                        {analyticsSummary.sourceBreakdown.map((src, idx) => (
-                          <div key={idx} className="flex justify-between items-center bg-cream/40 p-2.5 rounded-xl border border-cream-dark/40 text-xs">
-                            <span className="font-bold text-charcoal-dark flex items-center gap-1.5">
-                              {src.source.toLowerCase().includes('meta') || src.source.toLowerCase().includes('facebook') || src.source.toLowerCase().includes('instagram') ? (
-                                <span className="w-2 h-2 rounded-full bg-purple-600"></span>
-                              ) : (
-                                <span className="w-2 h-2 rounded-full bg-sage"></span>
-                              )}
-                              {src.source}
-                            </span>
-                            <span className="font-bold text-charcoal-dark">
-                              {src.views} views <span className="text-[10px] text-charcoal-light font-normal">({src.uniqueVisitors} unique)</span>
-                            </span>
-                          </div>
-                        ))}
+                        {analyticsSummary.sourceBreakdown.map((src, idx) => {
+                          const sourceName = src?.source ? String(src.source) : 'Direct / Organic';
+                          const lower = sourceName.toLowerCase();
+                          const isMeta = lower.includes('meta') || lower.includes('facebook') || lower.includes('instagram');
+                          return (
+                            <div key={idx} className="flex justify-between items-center bg-cream/40 p-2.5 rounded-xl border border-cream-dark/40 text-xs">
+                              <span className="font-bold text-charcoal-dark flex items-center gap-1.5">
+                                {isMeta ? (
+                                  <span className="w-2 h-2 rounded-full bg-purple-600 shrink-0"></span>
+                                ) : (
+                                  <span className="w-2 h-2 rounded-full bg-sage shrink-0"></span>
+                                )}
+                                <span className="truncate max-w-[200px]">{sourceName}</span>
+                              </span>
+                              <span className="font-bold text-charcoal-dark shrink-0">
+                                {src?.views || 0} views <span className="text-[10px] text-charcoal-light font-normal">({src?.uniqueVisitors || 0} unique)</span>
+                              </span>
+                            </div>
+                          );
+                        })}
                       </div>
                     ) : (
                       <p className="text-xs text-charcoal-light py-4 text-center">No source attribution data yet.</p>
@@ -1481,29 +1496,31 @@ const AdminDashboard = ({ user, onLogout }) => {
                 </div>
 
                 {/* Top Visited Pages */}
-                {analyticsSummary?.topPages && analyticsSummary.topPages.length > 0 && (
+                {analyticsSummary?.topPages && Array.isArray(analyticsSummary.topPages) && analyticsSummary.topPages.length > 0 && (
                   <div className="glass p-5 rounded-2xl border border-cream-dark/60 shadow-sm flex flex-col gap-3">
                     <h4 className="font-serif font-bold text-sm text-charcoal-dark uppercase tracking-wider flex items-center gap-1.5">
                       <BarChart3 className="w-4 h-4 text-sage" /> Top Visited Pages & Content
                     </h4>
                     <div className="flex flex-col gap-2">
                       {analyticsSummary.topPages.map((page, idx) => {
-                        const maxViews = analyticsSummary.topPages[0]?.views || 1;
-                        const pct = Math.round((page.views / maxViews) * 100);
+                        const maxViews = Math.max(analyticsSummary.topPages[0]?.views || 1, 1);
+                        const pViews = page?.views || 0;
+                        const pct = Math.min(Math.round((pViews / maxViews) * 100), 100);
+                        const pathStr = page?.pagePath ? String(page.pagePath) : '/';
                         return (
-                          <div key={page.pagePath} className="flex flex-col gap-1 text-xs">
+                          <div key={pathStr || idx} className="flex flex-col gap-1 text-xs">
                             <div className="flex justify-between items-center">
                               <span className="font-mono text-charcoal-dark font-medium flex items-center gap-1.5">
                                 <span className="text-[10px] text-charcoal-light font-bold">#{idx + 1}</span>
-                                {page.pagePath}
-                                {page.metaViews > 0 && (
+                                <span className="truncate max-w-xs">{pathStr}</span>
+                                {(page?.metaViews || 0) > 0 && (
                                   <span className="text-[9px] bg-purple-100 text-purple-800 font-bold px-1.5 py-0.2 rounded-full border border-purple-200">
                                     🟣 {page.metaViews} Meta
                                   </span>
                                 )}
                               </span>
                               <span className="font-bold text-charcoal-dark">
-                                {page.views} views <span className="text-charcoal-light font-normal text-[10px]">({page.uniqueVisitors} unique)</span>
+                                {pViews} views <span className="text-charcoal-light font-normal text-[10px]">({page?.uniqueVisitors || 0} unique)</span>
                               </span>
                             </div>
                             <div className="w-full bg-cream-dark/40 h-2 rounded-full overflow-hidden">
@@ -1535,9 +1552,9 @@ const AdminDashboard = ({ user, onLogout }) => {
                     </div>
                   </div>
 
-                  {loading ? (
+                  {loading && recentVisits.length === 0 ? (
                     <div className="shimmer h-80 rounded-2xl w-full"></div>
-                  ) : recentVisits.length > 0 ? (
+                  ) : recentVisits && recentVisits.length > 0 ? (
                     <div className="glass rounded-2xl border border-cream-dark/50 overflow-x-auto shadow-sm">
                       <table className="w-full text-xs text-charcoal border-collapse">
                         <thead>
@@ -1550,99 +1567,121 @@ const AdminDashboard = ({ user, onLogout }) => {
                           </tr>
                         </thead>
                         <tbody>
-                          {recentVisits.map((visit) => (
-                            <tr key={visit._id} className="border-b border-cream-dark/40 hover:bg-cream/20 transition-colors">
-                              {/* Column 1: Visitor Identity */}
-                              <td className="py-3 px-4">
-                                {visit.userId ? (
-                                  <div className="flex items-center gap-2">
-                                    <div className="w-7 h-7 rounded-full bg-sage/20 text-sage-dark font-bold text-xs flex items-center justify-center border border-sage/30">
-                                      {visit.userId?.name?.charAt(0) || visit.userName?.charAt(0) || 'U'}
+                          {recentVisits.map((visit, vIdx) => {
+                            if (!visit) return null;
+                            const visitorIdStr = visit?.visitorId ? String(visit.visitorId) : 'guest';
+                            const userName = visit?.userId?.name || visit?.userName || 'Registered User';
+                            const userInitial = userName.charAt(0).toUpperCase() || 'U';
+                            const userEmail = visit?.userId?.email || visit?.userEmail || '';
+                            const pagePath = visit?.pagePath || '/';
+                            const pageTitle = visit?.pageTitle || '';
+                            const deviceType = visit?.deviceType || 'Desktop';
+                            
+                            let timeDisplay = '';
+                            try {
+                              if (visit?.timestamp) {
+                                timeDisplay = new Date(visit.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                              }
+                            } catch (e) {
+                              timeDisplay = '';
+                            }
+
+                            return (
+                              <tr key={visit?._id || vIdx} className="border-b border-cream-dark/40 hover:bg-cream/20 transition-colors">
+                                {/* Column 1: Visitor Identity */}
+                                <td className="py-3 px-4">
+                                  {visit?.userId ? (
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-7 h-7 rounded-full bg-sage/20 text-sage-dark font-bold text-xs flex items-center justify-center border border-sage/30 shrink-0">
+                                        {userInitial}
+                                      </div>
+                                      <div>
+                                        <p className="font-bold text-charcoal-dark flex items-center gap-1">
+                                          {userName}
+                                          <span className="text-[8px] bg-sage/20 text-sage font-bold px-1.5 py-0.2 rounded-full">User</span>
+                                        </p>
+                                        <p className="text-[10px] text-charcoal-light">{userEmail}</p>
+                                      </div>
                                     </div>
-                                    <div>
-                                      <p className="font-bold text-charcoal-dark flex items-center gap-1">
-                                        {visit.userId?.name || visit.userName || 'Registered User'}
-                                        <span className="text-[8px] bg-sage/20 text-sage font-bold px-1.5 py-0.2 rounded-full">User</span>
-                                      </p>
-                                      <p className="text-[10px] text-charcoal-light">{visit.userId?.email || visit.userEmail}</p>
+                                  ) : (
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-7 h-7 rounded-full bg-cream-dark text-charcoal-light font-bold text-xs flex items-center justify-center border border-cream-dark/80 shrink-0">
+                                        <Globe className="w-3.5 h-3.5" />
+                                      </div>
+                                      <div>
+                                        <p className="font-bold text-charcoal-dark text-[11px]">Guest Visitor</p>
+                                        <p className="font-mono text-[9px] text-charcoal-light">ID: {visitorIdStr.substring(0, 14)}...</p>
+                                      </div>
                                     </div>
+                                  )}
+                                </td>
+
+                                {/* Column 2: Page Visited */}
+                                <td className="py-3 px-4">
+                                  <p className="font-mono font-bold text-charcoal-dark text-[11px]">{pagePath}</p>
+                                  {pageTitle && (
+                                    <p className="text-[10px] text-charcoal-light line-clamp-1 max-w-xs">{pageTitle}</p>
+                                  )}
+                                </td>
+
+                                {/* Column 3: Campaign & Meta Attribution */}
+                                <td className="py-3 px-4">
+                                  <div className="flex flex-col gap-1 items-start">
+                                    {visit?.isMetaTraffic && (
+                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-purple-100 text-purple-800 border border-purple-300">
+                                        🟣 Meta / FB Traffic
+                                      </span>
+                                    )}
+                                    {visit?.utmCampaign && (
+                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                                        🎯 {visit.utmCampaign}
+                                      </span>
+                                    )}
+                                    {visit?.utmSource && (
+                                      <span className="text-[9px] text-charcoal-light">
+                                        Source: <strong>{visit.utmSource}</strong>
+                                      </span>
+                                    )}
+                                    {!visit?.isMetaTraffic && !visit?.utmCampaign && !visit?.utmSource && (
+                                      <span className="text-[9px] text-charcoal-light/60 italic">Direct / Organic</span>
+                                    )}
                                   </div>
-                                ) : (
-                                  <div className="flex items-center gap-2">
-                                    <div className="w-7 h-7 rounded-full bg-cream-dark text-charcoal-light font-bold text-xs flex items-center justify-center border border-cream-dark/80">
-                                      <Globe className="w-3.5 h-3.5" />
-                                    </div>
-                                    <div>
-                                      <p className="font-bold text-charcoal-dark text-[11px]">Guest Visitor</p>
-                                      <p className="font-mono text-[9px] text-charcoal-light">ID: {visit.visitorId?.substring(0, 14)}...</p>
-                                    </div>
+                                </td>
+
+                                {/* Column 4: Device & Browser */}
+                                <td className="py-3 px-4">
+                                  <div className="flex flex-col gap-0.5">
+                                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-charcoal-dark">
+                                      {deviceType === 'Mobile' && <Smartphone className="w-3 h-3 text-sage" />}
+                                      {deviceType === 'Desktop' && <Laptop className="w-3 h-3 text-charcoal" />}
+                                      {deviceType === 'Tablet' && <Tablet className="w-3 h-3 text-gold" />}
+                                      {deviceType}
+                                    </span>
+                                    {visit?.ipAddress && (
+                                      <span className="font-mono text-[9px] text-charcoal-light">IP: {visit.ipAddress}</span>
+                                    )}
                                   </div>
-                                )}
-                              </td>
+                                </td>
 
-                              {/* Column 2: Page Visited */}
-                              <td className="py-3 px-4">
-                                <p className="font-mono font-bold text-charcoal-dark text-[11px]">{visit.pagePath}</p>
-                                {visit.pageTitle && (
-                                  <p className="text-[10px] text-charcoal-light line-clamp-1 max-w-xs">{visit.pageTitle}</p>
-                                )}
-                              </td>
-
-                              {/* Column 3: Campaign & Meta Attribution */}
-                              <td className="py-3 px-4">
-                                <div className="flex flex-col gap-1 items-start">
-                                  {visit.isMetaTraffic && (
-                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-purple-100 text-purple-800 border border-purple-300">
-                                      🟣 Meta / FB Traffic
-                                    </span>
-                                  )}
-                                  {visit.utmCampaign && (
-                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-800 border border-amber-300">
-                                      🎯 {visit.utmCampaign}
-                                    </span>
-                                  )}
-                                  {visit.utmSource && (
-                                    <span className="text-[9px] text-charcoal-light">
-                                      Source: <strong>{visit.utmSource}</strong>
-                                    </span>
-                                  )}
-                                  {!visit.isMetaTraffic && !visit.utmCampaign && !visit.utmSource && (
-                                    <span className="text-[9px] text-charcoal-light/60 italic">Direct / Organic</span>
-                                  )}
-                                </div>
-                              </td>
-
-                              {/* Column 4: Device & Browser */}
-                              <td className="py-3 px-4">
-                                <div className="flex flex-col gap-0.5">
-                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-charcoal-dark">
-                                    {visit.deviceType === 'Mobile' && <Smartphone className="w-3 h-3 text-sage" />}
-                                    {visit.deviceType === 'Desktop' && <Laptop className="w-3 h-3 text-charcoal" />}
-                                    {visit.deviceType === 'Tablet' && <Tablet className="w-3 h-3 text-gold" />}
-                                    {visit.deviceType || 'Desktop'}
-                                  </span>
-                                  {visit.ipAddress && (
-                                    <span className="font-mono text-[9px] text-charcoal-light">IP: {visit.ipAddress}</span>
-                                  )}
-                                </div>
-                              </td>
-
-                              {/* Column 5: Time & Referrer */}
-                              <td className="py-3 px-4">
-                                <div className="flex flex-col gap-0.5">
-                                  <span className="font-bold text-charcoal-dark text-[11px]">{formatTimeAgo(visit.timestamp)}</span>
-                                  <span className="text-[9px] text-charcoal-light">
-                                    {new Date(visit.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                                  </span>
-                                  {visit.referrer && (
-                                    <span className="text-[9px] text-sage truncate max-w-xs" title={visit.referrer}>
-                                      via {visit.referrer}
-                                    </span>
-                                  )}
-                                </div>
-                              </td>
-                            </tr>
-                          ))}
+                                {/* Column 5: Time & Referrer */}
+                                <td className="py-3 px-4">
+                                  <div className="flex flex-col gap-0.5">
+                                    <span className="font-bold text-charcoal-dark text-[11px]">{formatTimeAgo(visit?.timestamp)}</span>
+                                    {timeDisplay && (
+                                      <span className="text-[9px] text-charcoal-light">
+                                        {timeDisplay}
+                                      </span>
+                                    )}
+                                    {visit?.referrer && (
+                                      <span className="text-[9px] text-sage truncate max-w-xs" title={visit.referrer}>
+                                        via {visit.referrer}
+                                      </span>
+                                    )}
+                                  </div>
+                                </td>
+                              </tr>
+                            );
+                          })}
                         </tbody>
                       </table>
                     </div>

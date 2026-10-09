@@ -228,7 +228,7 @@ exports.getAnalyticsSummary = async (req, res, next) => {
           uniqueVisitors: { $addToSet: '$visitorId' }
       }},
       { $project: {
-          source: '$_id',
+          source: { $ifNull: ['$_id', 'Direct / Organic'] },
           views: 1,
           uniqueVisitors: { $size: '$uniqueVisitors' },
           _id: 0
