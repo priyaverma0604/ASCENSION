@@ -4,7 +4,8 @@ import {
   Lock, CheckCircle, UploadCloud, Image as ImageIcon, 
   ArrowRight, Sparkles, Compass, AlertCircle, Eye,
   Calendar, Clock, Video, MessageSquare, Star, ExternalLink, ShieldCheck, BookOpen, UserCheck,
-  Play, Pause, Volume2, VolumeX, RotateCcw, RotateCw, Headphones, Flame, MessageCircle
+  Play, Pause, Volume2, VolumeX, RotateCcw, RotateCw, Headphones, Flame, MessageCircle,
+  Award, Heart
 } from 'lucide-react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
@@ -328,6 +329,7 @@ const ProgramDashboard = () => {
   const totalDays = isNavratri ? 9 : (program && program.duration && !isNaN(parseInt(program.duration, 10)) ? parseInt(program.duration, 10) : 30);
   const completedDaysCount = progress ? progress.submissions.length : 0;
   const progressPercent = Math.round((completedDaysCount / totalDays) * 100);
+  const isAllCompleted = (progress && progress.completed) || (completedDaysCount >= totalDays && totalDays > 0);
 
   const isPendingApproval = progress?.currentSubmission && progress.currentSubmission.status === 'pending';
   const isRejected = progress?.currentSubmission && progress.currentSubmission.status === 'rejected';
@@ -853,6 +855,29 @@ const ProgramDashboard = () => {
               /* Current day assignment information */
               <div className="glass p-6 md:p-8 rounded-3xl border border-cream-dark/50 flex flex-col gap-6 text-left relative overflow-hidden">
                 
+                {/* Completed Program Notice Bar when reviewing past day */}
+                {isAllCompleted && (
+                  <div className="bg-gradient-to-r from-amber-50 via-[#FFFDF7] to-amber-50 border border-gold/40 rounded-2xl p-3.5 px-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-left shadow-xs">
+                    <div className="flex items-center gap-2.5">
+                      <Award className="w-5 h-5 text-gold shrink-0" />
+                      <div>
+                        <span className="font-serif font-bold text-xs text-charcoal-dark block">
+                          {isNavratri ? '9-Day Navratri Sadhana Completed! 🌺' : 'Program Completed! ✨'}
+                        </span>
+                        <span className="text-[10px] text-charcoal-light">
+                          You are currently reviewing Day {selectedAssignment.dayNumber}. Click below to view the completion celebration hub.
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setSelectedAssignment(null)}
+                      className="text-[11px] font-bold text-gold-dark hover:text-charcoal bg-gold/15 hover:bg-gold/25 py-1.5 px-3 rounded-xl transition-colors border border-gold/30 shrink-0"
+                    >
+                      View Completion Hub →
+                    </button>
+                  </div>
+                )}
+
                 {/* Active Day Ribbon */}
                 <div className="flex items-center justify-between border-b border-cream-dark/60 pb-4">
                   <div className="flex items-center gap-3">
@@ -1202,6 +1227,175 @@ const ProgramDashboard = () => {
                   </div>
                 ) : null}
 
+              </div>
+            ) : isAllCompleted ? (
+              /* Grand Auspicious Program Completion & Stay Connected Hub */
+              <div className="glass p-6 sm:p-10 rounded-3xl text-center flex flex-col items-center justify-center gap-6 border-2 border-gold/40 bg-gradient-to-br from-amber-50/95 via-[#FFFBF2] to-cream/80 shadow-md relative overflow-hidden text-left">
+                {/* Decorative background glow */}
+                <div className="absolute -top-24 -right-24 w-64 h-64 bg-gold/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-sage/10 rounded-full blur-3xl pointer-events-none" />
+
+                {/* Header Badge */}
+                <div className="flex flex-col items-center text-center gap-3 relative z-10 w-full">
+                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gold/15 border border-gold/30 text-gold-dark text-xs font-bold uppercase tracking-widest">
+                    <Sparkles className="w-4 h-4 animate-spin" style={{ animationDuration: '4s' }} />
+                    <span>{isNavratri ? 'Jai Mata Di • 9-Day Sadhana Complete' : 'Spiritual Journey Complete'}</span>
+                  </div>
+
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-gold to-amber-300 text-white flex items-center justify-center shadow-lg shadow-gold/25 my-1">
+                    <Award className="w-8 h-8" />
+                  </div>
+
+                  <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-charcoal-dark max-w-2xl leading-tight">
+                    {isNavratri 
+                      ? "Jai Maa Durga! Aapki 9-Divasiya Sacred Navratri Sadhana Safalta-Purvak Sampann Hui 🌺"
+                      : "Congratulations! Your Sacred Program is Complete 🎉"}
+                  </h2>
+
+                  <p className="text-sm sm:text-base text-charcoal max-w-2xl leading-relaxed font-sans mt-1">
+                    {isNavratri
+                      ? "Maa Durga ke sabhi 9 divya swaroopo ka param kripa aashirwaad sadaiv aap par aur aapke parivaar par bana rahe. Aapne nishtha aur bhakti ke sath 9 dino ki is pavitra sadhana ko purna kiya hai."
+                      : "You have shown immense dedication and consistency throughout this transformative journey. May this spiritual practice bring endless peace, abundance, and higher consciousness into your life."}
+                  </p>
+
+                  {/* Access reminder pill */}
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-sage/10 border border-sage/25 text-sage-dark text-xs font-medium mt-1">
+                    <CheckCircle className="w-4 h-4 text-sage" />
+                    <span>Aap <strong>21 October</strong> tak sabhi 9 days ke audiobooks aur mantras ko dobara stream/listen kar sakte hain.</span>
+                  </div>
+                </div>
+
+                {/* Next Steps & Stay Connected Hub */}
+                <div className="w-full relative z-10 mt-2 flex flex-col gap-4">
+                  <div className="border-t border-gold/20 pt-6">
+                    <h3 className="font-serif text-lg font-bold text-charcoal-dark text-center mb-1">
+                      🌸 Aage Humse Jude Rahe • Stay Connected with Ascension
+                    </h3>
+                    <p className="text-xs text-charcoal-light text-center max-w-lg mx-auto mb-6">
+                      Sonali Bhasin Kumar aur hamari spiritual community ke sath aage ke sacred workshops, webinars aur healing satsangs mein jude rahe:
+                    </p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      
+                      {/* Card 1: WhatsApp Community */}
+                      <div className="glass bg-white/70 border border-cream-dark/60 hover:border-[#128C7E]/40 p-4 rounded-2xl flex flex-col justify-between gap-3 transition-all duration-300 hover:shadow-md group text-left">
+                        <div className="flex items-start gap-3">
+                          <div className="p-2.5 rounded-xl bg-[#128C7E]/10 text-[#128C7E] shrink-0">
+                            <MessageCircle className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <h4 className="font-serif font-bold text-sm text-charcoal-dark group-hover:text-[#128C7E] transition-colors">
+                              Official WhatsApp Community
+                            </h4>
+                            <p className="text-[11px] text-charcoal-light mt-0.5 leading-relaxed">
+                              Daily affirmations, morning sadhana prompts, satsang notices, aur direct community guidance ke liye join karein.
+                            </p>
+                          </div>
+                        </div>
+                        <a
+                          href="https://chat.whatsapp.com/DT05P5k7uviAV0Yuw1ySb7"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center gap-1.5 text-xs font-bold text-white bg-[#128C7E] hover:bg-[#0e7064] py-2 px-4 rounded-xl transition-colors shadow-sm"
+                        >
+                          <span>Join WhatsApp Community</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                      </div>
+
+                      {/* Card 2: Upcoming Workshops & Webinars */}
+                      <div className="glass bg-white/70 border border-cream-dark/60 hover:border-gold/50 p-4 rounded-2xl flex flex-col justify-between gap-3 transition-all duration-300 hover:shadow-md group text-left">
+                        <div className="flex items-start gap-3">
+                          <div className="p-2.5 rounded-xl bg-gold/15 text-gold-dark shrink-0">
+                            <Video className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <h4 className="font-serif font-bold text-sm text-charcoal-dark group-hover:text-gold transition-colors">
+                              Upcoming Live Workshops & Webinars
+                            </h4>
+                            <p className="text-[11px] text-charcoal-light mt-0.5 leading-relaxed">
+                              Ancestral Healing, Theta Healing, Money Manifestation & energy transformation programs explore karein.
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => navigate('/webinars')}
+                          className="inline-flex items-center justify-center gap-1.5 text-xs font-bold text-charcoal-dark bg-cream-dark hover:bg-gold hover:text-white py-2 px-4 rounded-xl transition-colors shadow-sm"
+                        >
+                          <span>Explore Workshops</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      {/* Card 3: 1-on-1 Consultation */}
+                      <div className="glass bg-white/70 border border-cream-dark/60 hover:border-sage/50 p-4 rounded-2xl flex flex-col justify-between gap-3 transition-all duration-300 hover:shadow-md group text-left">
+                        <div className="flex items-start gap-3">
+                          <div className="p-2.5 rounded-xl bg-sage/15 text-sage-dark shrink-0">
+                            <Sparkles className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <h4 className="font-serif font-bold text-sm text-charcoal-dark group-hover:text-sage transition-colors">
+                              Personal Consultation & Healing
+                            </h4>
+                            <p className="text-[11px] text-charcoal-light mt-0.5 leading-relaxed">
+                              Sonali Ma'am ke sath 1-on-1 Tarot card reading, Chakra balancing & personal soul counseling session book karein.
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => navigate('/services')}
+                          className="inline-flex items-center justify-center gap-1.5 text-xs font-bold text-white bg-sage hover:bg-sage-dark py-2 px-4 rounded-xl transition-colors shadow-sm"
+                        >
+                          <span>Book Consultation</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      {/* Card 4: Sacred Seva & Anushthan */}
+                      <div className="glass bg-white/70 border border-cream-dark/60 hover:border-gold/50 p-4 rounded-2xl flex flex-col justify-between gap-3 transition-all duration-300 hover:shadow-md group text-left">
+                        <div className="flex items-start gap-3">
+                          <div className="p-2.5 rounded-xl bg-amber-100 text-amber-800 shrink-0">
+                            <Heart className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <h4 className="font-serif font-bold text-sm text-charcoal-dark group-hover:text-amber-800 transition-colors">
+                              Ascension Seva & Mahabhoj
+                            </h4>
+                            <p className="text-[11px] text-charcoal-light mt-0.5 leading-relaxed">
+                              Gau seva, vidyarthi shiksha, aur zarooratmand bhojan seva mein participate karke punya karma accumulate karein.
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => navigate('/donation')}
+                          className="inline-flex items-center justify-center gap-1.5 text-xs font-bold text-charcoal-dark bg-amber-100 hover:bg-amber-200 py-2 px-4 rounded-xl transition-colors shadow-sm"
+                        >
+                          <span>Join Sacred Seva</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                    </div>
+                  </div>
+
+                  {/* Revisit Days Button */}
+                  <div className="flex flex-wrap items-center justify-center gap-3 pt-4 border-t border-gold/15">
+                    <button
+                      onClick={() => fetchAssignmentDetails(1)}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-cream-dark text-charcoal text-xs font-bold hover:bg-cream transition-all shadow-sm"
+                    >
+                      <Headphones className="w-4 h-4 text-gold" />
+                      <span>Re-listen Day 1: Maa Shailaputri</span>
+                    </button>
+                    <button
+                      onClick={() => fetchAssignmentDetails(totalDays)}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-cream-dark text-charcoal text-xs font-bold hover:bg-cream transition-all shadow-sm"
+                    >
+                      <Headphones className="w-4 h-4 text-gold" />
+                      <span>Re-listen Day {totalDays}: {isNavratri ? 'Maa Siddhidatri' : 'Final Day'}</span>
+                    </button>
+                  </div>
+                </div>
               </div>
             ) : (
               <div className="glass p-8 rounded-3xl text-center flex flex-col items-center justify-center gap-4 py-16 border border-cream-dark/50">
