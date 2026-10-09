@@ -748,74 +748,64 @@ const ProgramDashboard = () => {
           </div>
         </div>
 
-        {/* Dashboard Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          {/* LEFT: Active Assignment Card */}
-          <div className="lg:col-span-2 flex flex-col gap-6">
-
-            {/* Navratri Sacred Static Banner Card OR Other Program Intro Video */}
+        {/* Main Content Area */}
+        {isAllCompleted && !selectedAssignment ? (
+          /* ========================================================================= */
+          /* FULL WIDTH COMPLETION EXPERIENCE (When all days completed & no day open) */
+          /* ========================================================================= */
+          <div className="flex flex-col gap-8 w-full">
+            
+            {/* Top Hero Banner & WhatsApp Community Card */}
             {isNavratri ? (
-              <div className="glass p-4 md:p-5 rounded-3xl border-2 border-gold/40 flex flex-col gap-3 text-left relative overflow-hidden bg-gradient-to-br from-[#FFFDF7] via-[#FFF9ED] to-[#FFF3DC] shadow-md">
-                <div className="flex items-center justify-between border-b border-gold/30 pb-2.5">
+              <div className="glass p-5 md:p-6 rounded-3xl border-2 border-gold/40 flex flex-col md:flex-row items-center gap-6 text-left relative overflow-hidden bg-gradient-to-br from-[#FFFDF7] via-[#FFF9ED] to-[#FFF3DC] shadow-md w-full">
+                <div className="w-full md:w-1/2 rounded-2xl overflow-hidden border border-gold/30 shadow-sm relative group bg-black shrink-0">
+                  <img 
+                    src={getImageUrl('/uploads/navratri_9_days_banner.jpg')} 
+                    alt="9 Days Navratri Sacred Program" 
+                    className="w-full h-auto max-h-[360px] object-cover mx-auto transition-transform duration-500 group-hover:scale-[1.02]"
+                  />
+                </div>
+                <div className="w-full md:w-1/2 flex flex-col gap-3.5">
                   <div className="flex items-center gap-2">
                     <span className="bg-gold text-charcoal-dark font-black py-1 px-3 rounded-full text-[9px] uppercase tracking-wider flex items-center gap-1 shadow-xs">
                       <Sparkles className="w-3 h-3 animate-pulse fill-charcoal-dark" /> 9 Days Navratri
                     </span>
-                    <span className="font-serif text-sm font-bold text-charcoal-dark">
-                      Sacred Navdurga Audio Journey
+                    <span className="text-[10px] font-bold text-sage bg-sage/10 px-2.5 py-0.5 rounded-full border border-sage/20">
+                      Valid till 21 October
                     </span>
                   </div>
-                  <span className="text-[10px] font-bold text-sage bg-sage/10 px-2.5 py-0.5 rounded-full border border-sage/20">
-                    Valid till 21 October
-                  </span>
-                </div>
-                <div className="w-full rounded-2xl overflow-hidden border border-gold/30 shadow-sm relative group bg-black">
-                  <img 
-                    src={getImageUrl('/uploads/navratri_9_days_banner.jpg')} 
-                    alt="9 Days Navratri Sacred Program" 
-                    className="w-full h-auto max-h-[460px] object-contain mx-auto transition-transform duration-500 group-hover:scale-[1.01]"
-                  />
-                </div>
-                <p className="text-[11px] text-charcoal-light leading-relaxed">
-                  Welcome to the 9-Day Navratri Sacred Audio Transformation. Experience the divine transmissions of Maa Durga across 9 days. Each day unlocks sequentially upon completing the previous day's audiobook. Access remains valid till 21 October.
-                </p>
-
-                {/* WhatsApp Community Group Banner */}
-                <div className="bg-[#25D366]/10 border border-[#25D366]/30 rounded-2xl p-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs mt-1">
-                  <div className="flex items-center gap-2.5 text-left">
-                    <div className="w-8 h-8 rounded-full bg-[#25D366] flex items-center justify-center text-white shrink-0 shadow-xs">
+                  <h2 className="font-serif text-xl sm:text-2xl font-bold text-charcoal-dark">
+                    Sacred Navdurga Audio Transformation Journey
+                  </h2>
+                  <p className="text-xs sm:text-sm text-charcoal-light leading-relaxed">
+                    Welcome to the 9-Day Navratri Sacred Audio Transformation. Experience the divine transmissions of Maa Durga across 9 days. Access remains valid till 21 October.
+                  </p>
+                  {/* WhatsApp Community Group Banner */}
+                  <div className="bg-[#25D366]/10 border border-[#25D366]/30 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs mt-1">
+                    <div className="flex items-center gap-3 text-left">
+                      <div className="w-10 h-10 rounded-full bg-[#25D366] flex items-center justify-center text-white shrink-0 shadow-xs">
+                        <MessageCircle className="w-5 h-5 fill-white" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-xs font-bold text-[#128C7E]">Official Navratri WhatsApp Group</span>
+                        <span className="text-[10px] text-charcoal-light">Join for daily sacred chants, satsang alerts & cohort updates</span>
+                      </div>
+                    </div>
+                    <a
+                      href={program.whatsappGroupLink || 'https://chat.whatsapp.com/DT05P5k7uviAV0Yuw1ySb7'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full sm:w-auto bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold text-xs py-2.5 px-5 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-xs shrink-0 active:scale-98"
+                    >
                       <MessageCircle className="w-4 h-4 fill-white" />
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-xs font-bold text-[#128C7E]">Official Navratri WhatsApp Group</span>
-                      <span className="text-[10px] text-charcoal-light">Join the group for further updates, daily sacred chants & cohort discussions</span>
-                    </div>
+                      <span>Join Group</span>
+                    </a>
                   </div>
-                  <a
-                    href={program.whatsappGroupLink || 'https://chat.whatsapp.com/DT05P5k7uviAV0Yuw1ySb7'}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full sm:w-auto bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold text-xs py-2 px-4 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-xs shrink-0 active:scale-98"
-                  >
-                    <MessageCircle className="w-3.5 h-3.5 fill-white" />
-                    <span>Join Group</span>
-                  </a>
                 </div>
               </div>
             ) : getWelcomeVideoUrl() ? (
-              <div className="glass p-5 md:p-6 rounded-3xl border border-cream-dark/50 flex flex-col gap-4 text-left relative overflow-hidden">
-                <div className="flex items-center justify-between border-b border-cream-dark/60 pb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="bg-gold/10 text-gold-dark font-bold py-1 px-3 rounded-full text-[9px] uppercase tracking-wider flex items-center gap-1">
-                      <Sparkles className="w-3 h-3 animate-pulse" /> Welcome Video
-                    </span>
-                    <span className="font-serif text-sm font-bold text-charcoal-dark">
-                      Introduction to {program.title}
-                    </span>
-                  </div>
-                </div>
-                <div className="w-full aspect-video rounded-2xl overflow-hidden border border-cream-dark/40 shadow-sm bg-black">
+              <div className="glass p-5 md:p-6 rounded-3xl border border-cream-dark/50 flex flex-col md:flex-row gap-6 text-left relative overflow-hidden w-full">
+                <div className="w-full md:w-1/2 aspect-video rounded-2xl overflow-hidden border border-cream-dark/40 shadow-sm bg-black">
                   <iframe 
                     src={getWelcomeVideoUrl()} 
                     title={`Introduction to ${program.title}`}
@@ -824,602 +814,268 @@ const ProgramDashboard = () => {
                     allowFullScreen
                   />
                 </div>
-                <p className="text-[11px] text-charcoal-light leading-relaxed">
-                  Before you begin your practice, watch this welcome video from Sonali Bhasin to understand the power of this journey and how to get the most out of it!
-                </p>
+                <div className="w-full md:w-1/2 flex flex-col justify-center gap-3">
+                  <div className="flex items-center gap-2">
+                    <span className="bg-gold/10 text-gold-dark font-bold py-1 px-3 rounded-full text-[9px] uppercase tracking-wider flex items-center gap-1">
+                      <Sparkles className="w-3 h-3 animate-pulse" /> Welcome Video
+                    </span>
+                  </div>
+                  <h3 className="font-serif text-xl font-bold text-charcoal-dark">
+                    Introduction to {program.title}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-charcoal-light leading-relaxed">
+                    A special introductory message from Sonali Bhasin Kumar to celebrate your dedication to this transformative journey!
+                  </p>
+                </div>
               </div>
             ) : null}
-            
-            {isCompleted ? (
-              /* Success / Completed state */
-              <div className="glass p-8 rounded-3xl border-2 border-gold/30 text-center flex flex-col items-center justify-center gap-5 py-16 bg-gold/5 relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-4 opacity-10">
-                  <Sparkles className="w-48 h-48 text-gold" />
+
+            {/* Grand Auspicious Program Completion & Stay Connected Hub */}
+            <div className="glass p-6 sm:p-10 md:p-12 rounded-3xl text-center flex flex-col items-center justify-center gap-6 border-2 border-gold/40 bg-gradient-to-br from-amber-50/95 via-[#FFFBF2] to-cream/80 shadow-md relative overflow-hidden text-left w-full">
+              {/* Decorative background glow */}
+              <div className="absolute -top-24 -right-24 w-80 h-80 bg-gold/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-sage/10 rounded-full blur-3xl pointer-events-none" />
+
+              {/* Header Badge */}
+              <div className="flex flex-col items-center text-center gap-3 relative z-10 w-full">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gold/15 border border-gold/30 text-gold-dark text-xs font-bold uppercase tracking-widest">
+                  <Sparkles className="w-4 h-4 animate-spin" style={{ animationDuration: '4s' }} />
+                  <span>{isNavratri ? 'Jai Mata Di • 9-Day Sacred Sadhana Completed' : 'Spiritual Journey Completed'}</span>
                 </div>
-                <div className="bg-gold-light/25 p-4 rounded-full text-gold">
-                  <Sparkles className="w-10 h-10" />
+
+                <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-gold to-amber-300 text-white flex items-center justify-center shadow-lg shadow-gold/25 my-1">
+                  <Award className="w-8 h-8" />
                 </div>
-                <h3 className="font-serif text-2xl font-bold text-charcoal-dark">Congratulations, {user?.name}!</h3>
-                <p className="text-xs text-charcoal-light max-w-md leading-relaxed">
-                  🎉 Congratulations! You have successfully completed the {program.title}.<br/><br/>
-                  One beautiful spiritual journey completed ❤️
+
+                <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-charcoal-dark max-w-3xl leading-tight">
+                  {isNavratri 
+                    ? "Jai Maa Durga! You Have Successfully Completed the 9-Day Sacred Navratri Sadhana 🌸"
+                    : "Congratulations! Your Sacred Program is Complete 🎉"}
+                </h2>
+
+                <p className="text-sm sm:text-base text-charcoal max-w-3xl leading-relaxed font-sans mt-1">
+                  {isNavratri
+                    ? "May the divine grace and supreme blessings of the 9 sacred manifestations of Maa Durga bring peace, protection, and boundless abundance into your life. Thank you for dedicating yourself with sincere devotion to this sacred inner transformation."
+                    : "You have shown immense dedication and consistency throughout this transformative journey. May this spiritual practice bring endless peace, abundance, and higher consciousness into your life."}
                 </p>
-                <button
-                  onClick={() => navigate('/profile')}
-                  className="bg-gold hover:bg-gold-dark text-charcoal-dark font-bold py-3 px-8 rounded-xl text-xs uppercase tracking-wider transition-all duration-300 border border-gold-dark/20 shadow-md"
-                >
-                  Return to Profile Dashboard
-                </button>
+
+                {/* Access reminder pill */}
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-sage/10 border border-sage/25 text-sage-dark text-xs sm:text-sm font-medium mt-1">
+                  <CheckCircle className="w-4 h-4 text-sage shrink-0" />
+                  <span>You have full access to stream and re-listen to all 9 audiobooks and sacred mantras until <strong>21 October</strong>.</span>
+                </div>
               </div>
-            ) : selectedAssignment ? (
-              /* Current day assignment information */
-              <div className="glass p-6 md:p-8 rounded-3xl border border-cream-dark/50 flex flex-col gap-6 text-left relative overflow-hidden">
-                
-                {/* Completed Program Notice Bar when reviewing past day */}
-                {isAllCompleted && (
-                  <div className="bg-gradient-to-r from-amber-50 via-[#FFFDF7] to-amber-50 border border-gold/40 rounded-2xl p-3.5 px-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-left shadow-xs">
-                    <div className="flex items-center gap-2.5">
-                      <Award className="w-5 h-5 text-gold shrink-0" />
+
+              {/* Next Steps & Stay Connected Hub (4 Cards) */}
+              <div className="w-full relative z-10 mt-2 flex flex-col gap-4 border-t border-gold/20 pt-8">
+                <div className="text-center max-w-2xl mx-auto mb-2">
+                  <h3 className="font-serif text-xl sm:text-2xl font-bold text-charcoal-dark mb-1">
+                    🌸 Stay Connected with Ascension & Sonali Bhasin Kumar
+                  </h3>
+                  <p className="text-xs sm:text-sm text-charcoal-light">
+                    Continue your spiritual journey and stay attuned to upcoming live workshops, interactive webinars, and healing satsangs:
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 w-full">
+                  
+                  {/* Card 1: WhatsApp Community */}
+                  <div className="glass bg-white/80 border border-cream-dark/60 hover:border-[#128C7E]/40 p-5 rounded-2xl flex flex-col justify-between gap-4 transition-all duration-300 hover:shadow-lg group text-left">
+                    <div className="flex items-start gap-3">
+                      <div className="p-3 rounded-xl bg-[#128C7E]/10 text-[#128C7E] shrink-0">
+                        <MessageCircle className="w-6 h-6" />
+                      </div>
                       <div>
-                        <span className="font-serif font-bold text-xs text-charcoal-dark block">
-                          {isNavratri ? '9-Day Navratri Sadhana Completed! 🌺' : 'Program Completed! ✨'}
-                        </span>
-                        <span className="text-[10px] text-charcoal-light">
-                          You are currently reviewing Day {selectedAssignment.dayNumber}. Click below to view the completion celebration hub.
-                        </span>
+                        <h4 className="font-serif font-bold text-sm text-charcoal-dark group-hover:text-[#128C7E] transition-colors">
+                          Official WhatsApp Community
+                        </h4>
+                        <p className="text-xs text-charcoal-light mt-1 leading-relaxed">
+                          Receive daily affirmations, morning sadhana prompts, satsang notices, and direct guidance from Sonali Ma'am.
+                        </p>
+                      </div>
+                    </div>
+                    <a
+                      href="https://chat.whatsapp.com/DT05P5k7uviAV0Yuw1ySb7"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-1.5 text-xs font-bold text-white bg-[#128C7E] hover:bg-[#0e7064] py-2.5 px-4 rounded-xl transition-colors shadow-sm w-full"
+                    >
+                      <span>Join Community</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+
+                  {/* Card 2: Upcoming Workshops & Webinars */}
+                  <div className="glass bg-white/80 border border-cream-dark/60 hover:border-gold/50 p-5 rounded-2xl flex flex-col justify-between gap-4 transition-all duration-300 hover:shadow-lg group text-left">
+                    <div className="flex items-start gap-3">
+                      <div className="p-3 rounded-xl bg-gold/15 text-gold-dark shrink-0">
+                        <Video className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h4 className="font-serif font-bold text-sm text-charcoal-dark group-hover:text-gold transition-colors">
+                          Live Workshops & Webinars
+                        </h4>
+                        <p className="text-xs text-charcoal-light mt-1 leading-relaxed">
+                          Explore live interactive masterclasses on Ancestral Healing, Theta Healing, and Money Manifestation.
+                        </p>
                       </div>
                     </div>
                     <button
-                      onClick={() => setSelectedAssignment(null)}
-                      className="text-[11px] font-bold text-gold-dark hover:text-charcoal bg-gold/15 hover:bg-gold/25 py-1.5 px-3 rounded-xl transition-colors border border-gold/30 shrink-0"
+                      onClick={() => navigate('/webinars')}
+                      className="inline-flex items-center justify-center gap-1.5 text-xs font-bold text-charcoal-dark bg-cream-dark hover:bg-gold hover:text-white py-2.5 px-4 rounded-xl transition-colors shadow-sm w-full"
                     >
-                      View Completion Hub →
+                      <span>Explore Workshops</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
-                )}
 
-                {/* Active Day Ribbon */}
-                <div className="flex items-center justify-between border-b border-cream-dark/60 pb-4">
-                  <div className="flex items-center gap-3">
-                    <span className={`font-bold py-1 px-3.5 rounded-full text-[10px] uppercase tracking-wider ${
-                      isSelectedActive 
-                        ? 'bg-gold/10 text-gold-dark'
-                        : isSelectedCompleted
-                          ? 'bg-sage/10 text-sage'
-                          : 'bg-charcoal/5 text-charcoal'
-                    }`}>
-                      {isSelectedActive ? 'Active Task' : isSelectedCompleted ? 'Completed Task' : 'Task'}
-                    </span>
-                    <span className="font-serif text-base font-bold text-charcoal-dark">
-                      Day {selectedAssignment.dayNumber}
-                    </span>
+                  {/* Card 3: 1-on-1 Consultation */}
+                  <div className="glass bg-white/80 border border-cream-dark/60 hover:border-sage/50 p-5 rounded-2xl flex flex-col justify-between gap-4 transition-all duration-300 hover:shadow-lg group text-left">
+                    <div className="flex items-start gap-3">
+                      <div className="p-3 rounded-xl bg-sage/15 text-sage-dark shrink-0">
+                        <Sparkles className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h4 className="font-serif font-bold text-sm text-charcoal-dark group-hover:text-sage transition-colors">
+                          Personal Consultation & Healing
+                        </h4>
+                        <p className="text-xs text-charcoal-light mt-1 leading-relaxed">
+                          Book a private Tarot reading, Chakra balancing, or personal spiritual counseling session with Sonali Ma'am.
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => navigate('/services')}
+                      className="inline-flex items-center justify-center gap-1.5 text-xs font-bold text-white bg-sage hover:bg-sage-dark py-2.5 px-4 rounded-xl transition-colors shadow-sm w-full"
+                    >
+                      <span>Book Consultation</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-                  <span className="text-[10px] text-charcoal-light flex items-center gap-1 font-semibold">
-                    <Compass className="w-4 h-4 text-sage animate-spin-slow" />
-                    {isSelectedCompleted ? 'Completed' : 'Pending Completion'}
-                  </span>
-                </div>
 
-                <div className="flex flex-col gap-4">
+                  {/* Card 4: Sacred Seva & Mahabhoj */}
+                  <div className="glass bg-white/80 border border-cream-dark/60 hover:border-gold/50 p-5 rounded-2xl flex flex-col justify-between gap-4 transition-all duration-300 hover:shadow-lg group text-left">
+                    <div className="flex items-start gap-3">
+                      <div className="p-3 rounded-xl bg-amber-100 text-amber-800 shrink-0">
+                        <Heart className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h4 className="font-serif font-bold text-sm text-charcoal-dark group-hover:text-amber-800 transition-colors">
+                          Sacred Seva & Mahabhoj
+                        </h4>
+                        <p className="text-xs text-charcoal-light mt-1 leading-relaxed">
+                          Participate in sacred cow feeding (Gau Seva), children's education, and community food seva to cultivate karmic grace.
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => navigate('/donation')}
+                      className="inline-flex items-center justify-center gap-1.5 text-xs font-bold text-charcoal-dark bg-amber-100 hover:bg-amber-200 py-2.5 px-4 rounded-xl transition-colors shadow-sm w-full"
+                    >
+                      <span>Join Sacred Seva</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+            {/* Sacred Audiobooks Stream & Revisit Grid (All 9 Days) */}
+            <div className="flex flex-col gap-4 w-full text-left">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-cream-dark/60 pb-3">
+                <div>
                   <h3 className="font-serif text-xl font-bold text-charcoal-dark flex items-center gap-2">
-                    {selectedAssignment.title}
+                    <Headphones className="w-5 h-5 text-gold" />
+                    <span>{isNavratri ? 'Re-listen to the 9 Sacred Navratri Audiobooks' : 'Revisit Daily Audio & Teachings'}</span>
                   </h3>
-
-                  {selectedAssignment.estimatedDuration && (
-                    <div className="flex items-center gap-1.5 text-xs text-sage font-semibold uppercase tracking-wider">
-                      <span>Estimated Time: {selectedAssignment.estimatedDuration}</span>
-                    </div>
-                  )}
-
-                  {selectedAssignment.image && (
-                    <div className="w-full max-h-80 rounded-2xl overflow-hidden border border-cream-dark/40 mb-2 bg-cream-light flex items-center justify-center">
-                      <img src={getImageUrl(selectedAssignment.image)} alt={selectedAssignment.title} className="max-w-full max-h-80 object-contain" />
-                    </div>
-                  )}
-
-                  {getEmbedVideoUrl(selectedAssignment.content) && (
-                    <div className="w-full aspect-video rounded-xl overflow-hidden border border-cream-dark/45 shadow-sm mb-4 bg-black">
-                      <iframe 
-                        src={getEmbedVideoUrl(selectedAssignment.content)}
-                        title={selectedAssignment.title}
-                        className="w-full h-full border-0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                        allowFullScreen
-                      />
-                    </div>
-                  )}
-                  
-                  {/* Dedicated Interactive Audio/Video Book Player for Navratri & Audio Programs */}
-                  {selectedAssignment.audioUrl && (
-                    selectedAssignment.audioUrl.includes('drive.google.com') ? (
-                      /* Google Drive Stream Player */
-                      <div className="bg-gradient-to-br from-[#FFFDF7] via-[#FFF9ED] to-[#FFF3DC] border-2 border-gold/40 p-4 md:p-5 rounded-3xl shadow-md flex flex-col gap-3.5 text-left relative overflow-hidden">
-                        <div className="flex items-center justify-between border-b border-gold/25 pb-3">
-                          <div className="flex items-center gap-2.5">
-                            <span className="p-2 rounded-xl bg-gold text-charcoal-dark shadow-sm">
-                              <Headphones className="w-5 h-5 animate-pulse" />
-                            </span>
-                            <div className="flex flex-col">
-                              <span className="text-[10px] font-bold text-gold-dark uppercase tracking-widest flex items-center gap-1.5">
-                                {isNavratri ? 'Sacred Navratri Audiobook Stream' : 'Audio Meditation Stream'}
-                                <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                              </span>
-                              <span className="font-serif text-sm font-bold text-charcoal-dark line-clamp-1">
-                                {selectedAssignment.title}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-bold text-sage bg-sage/10 px-2.5 py-1 rounded-full border border-sage/25">
-                              {selectedAssignment.estimatedDuration || selectedAssignment.audioDuration || '25 mins'}
-                            </span>
-                            <a
-                              href={selectedAssignment.audioUrl.replace('/preview', '/view')}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="p-1.5 text-charcoal-light hover:text-gold transition-colors bg-white/80 rounded-lg border border-cream-dark/50"
-                              title="Open in Drive"
-                            >
-                              <ExternalLink className="w-3.5 h-3.5" />
-                            </a>
-                          </div>
-                        </div>
-
-                        {/* Responsive Google Drive Embed Player */}
-                        <div className="w-full aspect-video rounded-2xl overflow-hidden border border-gold/30 shadow-inner bg-black relative">
-                          <iframe
-                            src={selectedAssignment.audioUrl}
-                            title={selectedAssignment.title}
-                            className="w-full h-full border-0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            allowFullScreen
-                          />
-                        </div>
-                      </div>
-                    ) : (
-                      /* HTML5 Audio Seeker Player */
-                      <div className="bg-gradient-to-br from-[#FFFDF7] via-[#FFF9ED] to-[#FFF3DC] border-2 border-gold/40 p-5 md:p-6 rounded-3xl shadow-md flex flex-col gap-4 text-left relative overflow-hidden">
-                        <div className="flex items-center justify-between border-b border-gold/25 pb-3">
-                          <div className="flex items-center gap-2">
-                            <span className="p-2 rounded-xl bg-gold text-charcoal-dark shadow-sm">
-                              <Headphones className="w-5 h-5 animate-pulse" />
-                            </span>
-                            <div className="flex flex-col">
-                              <span className="text-[10px] font-bold text-gold-dark uppercase tracking-widest">
-                                {isNavratri ? 'Sacred Navratri Audiobook' : 'Audio Meditation Session'}
-                              </span>
-                              <span className="font-serif text-sm font-bold text-charcoal-dark line-clamp-1">
-                                {selectedAssignment.title}
-                              </span>
-                            </div>
-                          </div>
-                          <span className="text-[10px] font-bold text-sage bg-sage/10 px-2.5 py-1 rounded-full border border-sage/25">
-                            {selectedAssignment.estimatedDuration || selectedAssignment.audioDuration || '25 mins'}
-                          </span>
-                        </div>
-
-                        {/* Hidden HTML5 Audio Element */}
-                        <audio
-                          ref={audioRef}
-                          src={selectedAssignment.audioUrl}
-                          onTimeUpdate={handleAudioTimeUpdate}
-                          onLoadedMetadata={handleAudioLoadedMetadata}
-                          onEnded={() => setIsPlaying(false)}
-                        />
-
-                        {/* Audio Controls Bar */}
-                        <div className="flex flex-col gap-3 pt-1">
-                          {/* Seeker slider */}
-                          <div className="flex items-center gap-3 w-full">
-                            <span className="text-[10px] font-mono font-bold text-charcoal-light w-10 text-right">
-                              {formatAudioTime(currentTime)}
-                            </span>
-                            <input
-                              type="range"
-                              min="0"
-                              max={audioDuration || 100}
-                              value={currentTime}
-                              onChange={handleAudioSeek}
-                              className="flex-grow h-2 bg-cream-dark/60 rounded-lg appearance-none cursor-pointer accent-[#D4A017]"
-                            />
-                            <span className="text-[10px] font-mono font-bold text-charcoal-light w-10">
-                              {formatAudioTime(audioDuration || (parseInt(selectedAssignment.estimatedDuration, 10) * 60) || 1500)}
-                            </span>
-                          </div>
-
-                          {/* Player Buttons Row */}
-                          <div className="flex items-center justify-between flex-wrap gap-3 pt-2">
-                            {/* Left: Speed chips */}
-                            <div className="flex items-center gap-1">
-                              <span className="text-[9px] text-charcoal-light font-bold uppercase tracking-wider mr-1">Speed:</span>
-                              {[0.75, 1, 1.25, 1.5].map((rate) => (
-                                <button
-                                  key={rate}
-                                  type="button"
-                                  onClick={() => changePlaybackRate(rate)}
-                                  className={`text-[9px] font-bold px-2 py-0.5 rounded-md transition-all ${
-                                    playbackRate === rate 
-                                      ? 'bg-gold text-charcoal-dark font-extrabold shadow-xs' 
-                                      : 'bg-white/80 text-charcoal-light hover:text-charcoal border border-cream-dark/60'
-                                  }`}
-                                >
-                                  {rate}x
-                                </button>
-                              ))}
-                            </div>
-
-                            {/* Center: Play / Pause / Skip */}
-                            <div className="flex items-center gap-3">
-                              <button
-                                type="button"
-                                onClick={() => skipAudio(-15)}
-                                className="p-2 rounded-full bg-white hover:bg-cream border border-cream-dark/60 text-charcoal hover:text-gold transition-colors shadow-2xs"
-                                title="Skip back 15s"
-                              >
-                                <RotateCcw className="w-4 h-4" />
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={togglePlayAudio}
-                                className="w-12 h-12 rounded-full bg-gold hover:bg-gold-dark text-charcoal-dark flex items-center justify-center transition-all duration-300 transform hover:scale-105 shadow-md border-2 border-white ring-2 ring-gold/40"
-                                title={isPlaying ? "Pause Audiobook" : "Play Audiobook"}
-                              >
-                                {isPlaying ? (
-                                  <Pause className="w-5 h-5 fill-charcoal-dark" />
-                                ) : (
-                                  <Play className="w-5 h-5 fill-charcoal-dark translate-x-0.5" />
-                                )}
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() => skipAudio(15)}
-                                className="p-2 rounded-full bg-white hover:bg-cream border border-cream-dark/60 text-charcoal hover:text-gold transition-colors shadow-2xs"
-                                title="Skip forward 15s"
-                              >
-                                <RotateCw className="w-4 h-4" />
-                              </button>
-                            </div>
-
-                            {/* Right: Volume */}
-                            <div className="flex items-center gap-1.5">
-                              <button
-                                type="button"
-                                onClick={toggleAudioMute}
-                                className="p-1.5 rounded-lg bg-white/80 hover:bg-white text-charcoal border border-cream-dark/50"
-                              >
-                                {isMuted ? <VolumeX className="w-3.5 h-3.5 text-red-500" /> : <Volume2 className="w-3.5 h-3.5 text-gold-dark" />}
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  )}
-
-                  {/* Task Content / Description */}
-                  <div className="bg-cream/40 border border-cream-dark/40 p-5 rounded-xl leading-relaxed">
-                    <div className="text-xs text-charcoal text-justify whitespace-pre-wrap font-medium">
-                      {selectedAssignment.content}
-                    </div>
-                  </div>
+                  <p className="text-xs text-charcoal-light">
+                    Click any day below to open the dedicated audio player and listen to the sacred transmissions.
+                  </p>
                 </div>
+                <span className="text-xs font-bold text-sage bg-sage/10 px-3 py-1 rounded-full border border-sage/20 self-start sm:self-auto">
+                  {completedDaysCount} / {totalDays} Completed ✨
+                </span>
+              </div>
 
-                {/* Upload Form / Completion Status (Show if the selected day is the active day and we haven't completed the program) */}
-                {isSelectedActive ? (
-                  <form onSubmit={handleUploadSubmit} className="border-t border-cream-dark/65 pt-6 flex flex-col gap-4">
-                    {!isPhotoRequired ? (
-                      <>
-                        <h4 className="text-[10px] text-charcoal-dark font-bold uppercase tracking-wider">Practice Progress</h4>
-                        <p className="text-[11px] text-charcoal-light leading-relaxed">
-                          Click below once you have completed today's practice session to mark this day as complete and unlock the next day!
-                        </p>
-                      </>
-                    ) : (
-                      <>
-                        <h4 className="text-[10px] text-charcoal-dark font-bold uppercase tracking-wider">Complete Assignment</h4>
-                        <p className="text-[11px] text-charcoal-light leading-relaxed">
-                          Read the instructions above. Once you complete the task, select and upload a photo of your work, then click complete to immediately unlock the next day!
-                        </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {assignments.map((assignment) => {
+                  const dayNum = assignment.dayNumber;
+                  const navItem = isNavratri ? navratriAssignments.find(n => n.day === dayNum) : null;
+                  const navImage = isNavratri ? NAVRATRI_DAY_IMAGES[dayNum] : null;
+                  const displayImage = navImage || (program?.images?.[0] ? getImageUrl(program.images[0]) : null);
+                  const goddessName = navItem ? navItem.goddess.split('(')[0].trim() : `Day ${dayNum}`;
+                  const theme = navItem ? navItem.chakra : (assignment.estimatedDuration || 'Daily Practice');
 
-                        <div className="flex flex-col md:flex-row gap-4 items-center">
-                          {/* File chooser */}
-                          <label className="w-full md:flex-1 flex flex-col items-center justify-center border-2 border-dashed border-cream-dark/60 rounded-xl py-6 px-4 bg-cream-light hover:bg-cream cursor-pointer transition-colors duration-200">
-                            <UploadCloud className="w-7 h-7 text-sage mb-2" />
-                            <span className="text-xs font-bold text-charcoal-dark">
-                              {selectedFile ? 'Change Photo' : 'Select Photo from Device'}
-                            </span>
-                            <span className="text-[9px] text-charcoal-light mt-1">
-                              {selectedFile ? selectedFile.name : 'PNG, JPG, JPEG or WEBP (Max 5MB)'}
-                            </span>
-                            <input 
-                              type="file"
-                              accept="image/*"
-                              onChange={handleFileChange}
-                              className="hidden"
-                            />
-                          </label>
-
-                          {/* Preview box */}
-                          {previewUrl && (
-                            <div className="w-32 h-32 rounded-xl overflow-hidden border border-cream-dark shrink-0 relative group">
-                              <img src={previewUrl} alt="Journal entry preview" className="w-full h-full object-cover" />
-                              <div className="absolute inset-0 bg-charcoal/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity pointer-events-none">
-                                <span className="text-[9px] text-white font-bold uppercase">Ready</span>
-                              </div>
+                  return (
+                    <div
+                      key={dayNum}
+                      className="glass border border-cream-dark/70 hover:border-gold/60 rounded-2xl p-4 flex gap-3.5 items-center justify-between transition-all duration-300 hover:shadow-md bg-white/80 group"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div 
+                          onClick={() => {
+                            if (displayImage) setLightboxImage({ url: displayImage, title: `Day ${dayNum}: ${goddessName}` });
+                          }}
+                          className="w-14 h-14 rounded-xl overflow-hidden shrink-0 border border-gold/30 bg-cream relative cursor-pointer group/img shadow-xs"
+                          title="Click to zoom image"
+                        >
+                          {displayImage ? (
+                            <img src={displayImage} alt={`Day ${dayNum}`} className="w-full h-full object-cover transition-transform duration-300 group-hover/img:scale-110" />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center bg-gold/10 text-gold font-bold text-xs">
+                              D{dayNum}
                             </div>
                           )}
+                          <div className="absolute inset-0 bg-black/20 opacity-0 group-hover/img:opacity-100 flex items-center justify-center transition-opacity">
+                            <Eye className="w-4 h-4 text-white" />
+                          </div>
                         </div>
-                      </>
-                    )}
 
-                    <button
-                      type="submit"
-                      disabled={uploading || (isPhotoRequired && !selectedFile)}
-                      className={`w-full font-bold uppercase tracking-wider py-3.5 rounded-xl transition-all duration-300 text-xs shadow-sm flex items-center justify-center gap-1.5 font-sans mt-2 ${
-                        uploading || (isPhotoRequired && !selectedFile)
-                          ? 'bg-charcoal-light/10 text-charcoal-light/40 cursor-not-allowed' 
-                          : 'bg-sage hover:bg-sage-dark text-white'
-                      }`}
-                    >
-                      {uploading ? (
-                        <>
-                          <Compass className="w-4 h-4 animate-spin text-white" />
-                          <span>Saving Progress...</span>
-                        </>
-                      ) : (
-                        <>
-                          <span>
-                            {isNavratri
-                              ? "Mark Audio Session as Complete & Unlock Next Day"
-                              : isPrayerProgram 
-                                ? "Mark as Read & Unlock Next Day" 
-                                : "Complete Assignment & Unlock Next Day"}
+                        <div className="flex flex-col min-w-0 text-left">
+                          <div className="flex items-center gap-1.5 mb-0.5">
+                            <span className="text-[10px] font-bold text-gold-dark bg-gold/15 px-2 py-0.5 rounded-md uppercase tracking-wider">
+                              Day {dayNum}
+                            </span>
+                            <span className="text-[9px] font-bold text-sage bg-sage/10 px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                              <CheckCircle className="w-2.5 h-2.5" /> Done
+                            </span>
+                          </div>
+                          <h4 className="font-serif font-bold text-sm text-charcoal-dark line-clamp-1 group-hover:text-gold transition-colors">
+                            {goddessName}
+                          </h4>
+                          <span className="text-[10px] text-charcoal-light line-clamp-1">
+                            {theme}
                           </span>
-                          <ArrowRight className="w-4 h-4" />
-                        </>
-                      )}
-                    </button>
-                  </form>
-                ) : isSelectedCompleted ? (
-                  <div className="border-t border-cream-dark/65 pt-6 flex flex-col gap-4">
-                    <div className="bg-sage/10 border border-sage/30 p-5 rounded-2xl flex flex-col gap-3 text-left">
-                      <div className="flex items-center gap-2 text-sage-dark font-bold text-xs uppercase tracking-wider">
-                        <CheckCircle className="w-5 h-5 text-sage" />
-                        <span>Day Completed!</span>
-                      </div>
-                      <p className="text-xs text-charcoal-light leading-relaxed">
-                        {isPrayerProgram 
-                          ? `Great work keeping up the practice. You have read and completed the prayer for Day ${selectedAssignment.dayNumber}!`
-                          : `Great work keeping up the practice. You have completed the reflections and tasks for Day ${selectedAssignment.dayNumber}!`}
-                      </p>
-                      {/* If they uploaded a photo, or in Navratri show the sacred day image */}
-                      {(progress.submissions.find(s => s.day === selectedAssignment.dayNumber)?.photo || (isNavratri && NAVRATRI_DAY_IMAGES[selectedAssignment.dayNumber])) && (
-                        <div className="flex flex-col gap-2 mt-1">
-                          <span className="text-[9px] text-charcoal-light uppercase font-bold tracking-wider">
-                            {progress.submissions.find(s => s.day === selectedAssignment.dayNumber)?.photo 
-                              ? "Your Submitted Reflection Work:" 
-                              : "Sacred Swaroop of Maa Durga for Today:"}
-                          </span>
-                          <div 
-                            className="w-32 h-32 rounded-xl overflow-hidden border border-cream-dark/60 cursor-pointer relative group shadow-sm bg-cream"
-                            onClick={() => {
-                              const p = progress.submissions.find(s => s.day === selectedAssignment.dayNumber);
-                              const targetImg = p?.photo ? getImageUrl(p.photo) : NAVRATRI_DAY_IMAGES[selectedAssignment.dayNumber];
-                              if (targetImg) setLightboxImage({ url: targetImg, title: selectedAssignment.title });
-                            }}
-                          >
-                            <img 
-                              src={progress.submissions.find(s => s.day === selectedAssignment.dayNumber)?.photo 
-                                ? getImageUrl(progress.submissions.find(s => s.day === selectedAssignment.dayNumber).photo) 
-                                : NAVRATRI_DAY_IMAGES[selectedAssignment.dayNumber]} 
-                              alt="Day Submission" 
-                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
-                            />
-                            <div className="absolute inset-0 bg-charcoal/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                              <Eye className="w-5 h-5 text-white drop-shadow" />
-                            </div>
-                          </div>
                         </div>
-                      )}
+                      </div>
+
+                      <button
+                        onClick={() => fetchAssignmentDetails(dayNum)}
+                        className="bg-cream hover:bg-gold text-charcoal hover:text-charcoal-dark font-bold text-xs py-2 px-3 rounded-xl border border-cream-dark transition-all flex items-center gap-1.5 shrink-0 shadow-xs active:scale-95"
+                      >
+                        <Headphones className="w-3.5 h-3.5 text-gold-dark" />
+                        <span>Listen</span>
+                      </button>
                     </div>
-                  </div>
-                ) : null}
-
+                  );
+                })}
               </div>
-            ) : isAllCompleted ? (
-              /* Grand Auspicious Program Completion & Stay Connected Hub */
-              <div className="glass p-6 sm:p-10 rounded-3xl text-center flex flex-col items-center justify-center gap-6 border-2 border-gold/40 bg-gradient-to-br from-amber-50/95 via-[#FFFBF2] to-cream/80 shadow-md relative overflow-hidden text-left">
-                {/* Decorative background glow */}
-                <div className="absolute -top-24 -right-24 w-64 h-64 bg-gold/10 rounded-full blur-3xl pointer-events-none" />
-                <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-sage/10 rounded-full blur-3xl pointer-events-none" />
+            </div>
 
-                {/* Header Badge */}
-                <div className="flex flex-col items-center text-center gap-3 relative z-10 w-full">
-                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gold/15 border border-gold/30 text-gold-dark text-xs font-bold uppercase tracking-widest">
-                    <Sparkles className="w-4 h-4 animate-spin" style={{ animationDuration: '4s' }} />
-                    <span>{isNavratri ? 'Jai Mata Di • 9-Day Sacred Sadhana Completed' : 'Spiritual Journey Completed'}</span>
-                  </div>
-
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-gold to-amber-300 text-white flex items-center justify-center shadow-lg shadow-gold/25 my-1">
-                    <Award className="w-8 h-8" />
-                  </div>
-
-                  <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-charcoal-dark max-w-2xl leading-tight">
-                    {isNavratri 
-                      ? "Jai Maa Durga! You Have Successfully Completed the 9-Day Sacred Navratri Sadhana 🌺"
-                      : "Congratulations! Your Sacred Program is Complete 🎉"}
-                  </h2>
-
-                  <p className="text-sm sm:text-base text-charcoal max-w-2xl leading-relaxed font-sans mt-1">
-                    {isNavratri
-                      ? "May the divine grace and supreme blessings of the 9 sacred manifestations of Maa Durga bring peace, protection, and boundless abundance into your life. Thank you for dedicating yourself with sincere devotion to this sacred inner transformation."
-                      : "You have shown immense dedication and consistency throughout this transformative journey. May this spiritual practice bring endless peace, abundance, and higher consciousness into your life."}
-                  </p>
-
-                  {/* Access reminder pill */}
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-sage/10 border border-sage/25 text-sage-dark text-xs font-medium mt-1">
-                    <CheckCircle className="w-4 h-4 text-sage" />
-                    <span>You have full access to stream and re-listen to all 9 audiobooks and sacred mantras until <strong>21 October</strong>.</span>
-                  </div>
-                </div>
-
-                {/* Next Steps & Stay Connected Hub */}
-                <div className="w-full relative z-10 mt-2 flex flex-col gap-4">
-                  <div className="border-t border-gold/20 pt-6">
-                    <h3 className="font-serif text-lg font-bold text-charcoal-dark text-center mb-1">
-                      🌸 Stay Connected with Ascension & Sonali Bhasin Kumar
-                    </h3>
-                    <p className="text-xs text-charcoal-light text-center max-w-lg mx-auto mb-6">
-                      Continue your spiritual journey and stay attuned to upcoming live workshops, interactive webinars, and healing satsangs:
-                    </p>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      
-                      {/* Card 1: WhatsApp Community */}
-                      <div className="glass bg-white/70 border border-cream-dark/60 hover:border-[#128C7E]/40 p-4 rounded-2xl flex flex-col justify-between gap-3 transition-all duration-300 hover:shadow-md group text-left">
-                        <div className="flex items-start gap-3">
-                          <div className="p-2.5 rounded-xl bg-[#128C7E]/10 text-[#128C7E] shrink-0">
-                            <MessageCircle className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <h4 className="font-serif font-bold text-sm text-charcoal-dark group-hover:text-[#128C7E] transition-colors">
-                              Official WhatsApp Community
-                            </h4>
-                            <p className="text-[11px] text-charcoal-light mt-0.5 leading-relaxed">
-                              Receive daily affirmations, morning sadhana prompts, satsang notices, and direct guidance from Sonali Ma'am.
-                            </p>
-                          </div>
-                        </div>
-                        <a
-                          href="https://chat.whatsapp.com/DT05P5k7uviAV0Yuw1ySb7"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center gap-1.5 text-xs font-bold text-white bg-[#128C7E] hover:bg-[#0e7064] py-2 px-4 rounded-xl transition-colors shadow-sm"
-                        >
-                          <span>Join WhatsApp Community</span>
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </a>
-                      </div>
-
-                      {/* Card 2: Upcoming Workshops & Webinars */}
-                      <div className="glass bg-white/70 border border-cream-dark/60 hover:border-gold/50 p-4 rounded-2xl flex flex-col justify-between gap-3 transition-all duration-300 hover:shadow-md group text-left">
-                        <div className="flex items-start gap-3">
-                          <div className="p-2.5 rounded-xl bg-gold/15 text-gold-dark shrink-0">
-                            <Video className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <h4 className="font-serif font-bold text-sm text-charcoal-dark group-hover:text-gold transition-colors">
-                              Upcoming Live Workshops & Webinars
-                            </h4>
-                            <p className="text-[11px] text-charcoal-light mt-0.5 leading-relaxed">
-                              Explore live interactive masterclasses on Ancestral Healing, Theta Healing, Money Manifestation, and Lion's Gate energy.
-                            </p>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => navigate('/webinars')}
-                          className="inline-flex items-center justify-center gap-1.5 text-xs font-bold text-charcoal-dark bg-cream-dark hover:bg-gold hover:text-white py-2 px-4 rounded-xl transition-colors shadow-sm"
-                        >
-                          <span>Explore Workshops</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-
-                      {/* Card 3: 1-on-1 Consultation */}
-                      <div className="glass bg-white/70 border border-cream-dark/60 hover:border-sage/50 p-4 rounded-2xl flex flex-col justify-between gap-3 transition-all duration-300 hover:shadow-md group text-left">
-                        <div className="flex items-start gap-3">
-                          <div className="p-2.5 rounded-xl bg-sage/15 text-sage-dark shrink-0">
-                            <Sparkles className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <h4 className="font-serif font-bold text-sm text-charcoal-dark group-hover:text-sage transition-colors">
-                              Personal 1-on-1 Consultation & Healing
-                            </h4>
-                            <p className="text-[11px] text-charcoal-light mt-0.5 leading-relaxed">
-                              Book a private Tarot card reading, Chakra balancing, or personalized intuitive spiritual counseling session with Sonali Ma'am.
-                            </p>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => navigate('/services')}
-                          className="inline-flex items-center justify-center gap-1.5 text-xs font-bold text-white bg-sage hover:bg-sage-dark py-2 px-4 rounded-xl transition-colors shadow-sm"
-                        >
-                          <span>Book Consultation</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-
-                      {/* Card 4: Sacred Seva & Anushthan */}
-                      <div className="glass bg-white/70 border border-cream-dark/60 hover:border-gold/50 p-4 rounded-2xl flex flex-col justify-between gap-3 transition-all duration-300 hover:shadow-md group text-left">
-                        <div className="flex items-start gap-3">
-                          <div className="p-2.5 rounded-xl bg-amber-100 text-amber-800 shrink-0">
-                            <Heart className="w-5 h-5" />
-                          </div>
-                          <div>
-                            <h4 className="font-serif font-bold text-sm text-charcoal-dark group-hover:text-amber-800 transition-colors">
-                              Ascension Sacred Seva & Mahabhoj
-                            </h4>
-                            <p className="text-[11px] text-charcoal-light mt-0.5 leading-relaxed">
-                              Participate in sacred cow feeding (Gau Seva), children's education, and community food seva to cultivate karmic grace.
-                            </p>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => navigate('/donation')}
-                          className="inline-flex items-center justify-center gap-1.5 text-xs font-bold text-charcoal-dark bg-amber-100 hover:bg-amber-200 py-2 px-4 rounded-xl transition-colors shadow-sm"
-                        >
-                          <span>Join Sacred Seva</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-
-                    </div>
-                  </div>
-
-                  {/* Revisit Days Button */}
-                  <div className="flex flex-wrap items-center justify-center gap-3 pt-4 border-t border-gold/15">
-                    <button
-                      onClick={() => fetchAssignmentDetails(1)}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-cream-dark text-charcoal text-xs font-bold hover:bg-cream transition-all shadow-sm"
-                    >
-                      <Headphones className="w-4 h-4 text-gold" />
-                      <span>Re-listen Day 1: Maa Shailaputri</span>
-                    </button>
-                    <button
-                      onClick={() => fetchAssignmentDetails(totalDays)}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-cream-dark text-charcoal text-xs font-bold hover:bg-cream transition-all shadow-sm"
-                    >
-                      <Headphones className="w-4 h-4 text-gold" />
-                      <span>Re-listen Day {totalDays}: {isNavratri ? 'Maa Siddhidatri' : 'Final Day'}</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="glass p-8 rounded-3xl text-center flex flex-col items-center justify-center gap-4 py-16 border border-cream-dark/50">
-                <AlertCircle className="w-10 h-10 text-sage" />
-                <h3 className="font-serif text-lg font-bold text-charcoal-dark">This assignment is not available yet.</h3>
-                <p className="text-xs text-charcoal-light max-w-sm">
-                  Please check back soon. The program coordinator is publishing the next days' materials!
-                </p>
-              </div>
-            )}
-
-            {/* Submissions History Grid */}
+            {/* Submissions / Artwork Gallery */}
             {progress && progress.submissions.length > 0 && (
-              <div className="flex flex-col gap-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-serif text-lg font-bold text-charcoal-dark uppercase tracking-wider text-left">
-                    {isNavratri ? 'My Completed Sacred Days' : 'My Completed Submissions'}
+              <div className="flex flex-col gap-4 w-full text-left">
+                <div className="flex items-center justify-between border-b border-cream-dark/60 pb-3">
+                  <h3 className="font-serif text-lg font-bold text-charcoal-dark uppercase tracking-wider">
+                    {isNavratri ? 'My Completed Sacred Days Gallery' : 'My Completed Submissions'}
                   </h3>
                   <span className="text-xs font-semibold text-gold bg-gold/10 px-2.5 py-1 rounded-full border border-gold/20">
                     {progress.submissions.length} / {totalDays} Completed ✨
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
                   {progress.submissions.map((sub, idx) => {
                     const navItem = isNavratri ? navratriAssignments.find(n => n.day === sub.day) : null;
                     const navImage = isNavratri ? NAVRATRI_DAY_IMAGES[sub.day] : null;
@@ -1439,7 +1095,7 @@ const ProgramDashboard = () => {
                         }}
                         className="glass border border-cream-dark/50 rounded-2xl overflow-hidden cursor-pointer group hover:scale-[1.03] hover:shadow-lg transition-all duration-300 text-left bg-white/80 flex flex-col"
                       >
-                        <div className="h-28 bg-gradient-to-br from-amber-50 to-cream relative overflow-hidden flex items-center justify-center">
+                        <div className="h-32 bg-gradient-to-br from-amber-50 to-cream relative overflow-hidden flex items-center justify-center">
                           {displayImage ? (
                             <img 
                               src={displayImage} 
@@ -1477,91 +1133,658 @@ const ProgramDashboard = () => {
             )}
 
           </div>
-
-          {/* RIGHT: locked/unlocked 30-day index tracker */}
-          <div className="flex flex-col gap-4">
-            <h3 className="font-serif text-lg font-bold text-charcoal-dark uppercase tracking-wider text-left">
-              Program Calendar
-            </h3>
+        ) : (
+          /* ========================================================================= */
+          /* 2-COLUMN DASHBOARD GRID (For Active Day Listening & In-Progress Programs) */
+          /* ========================================================================= */
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
-            <div className="glass border border-cream-dark/50 rounded-3xl p-4 max-h-[70vh] overflow-y-auto flex flex-col gap-2.5">
-              {assignments.map((assignment) => {
-                const dayNum = assignment.dayNumber;
-                const isDayCompleted = assignment.isCompleted;
-                const isDayActive = dayNum === currentDayNum && !isCompleted;
-                const isDayLocked = assignment.isLocked;
+            {/* LEFT: Active Assignment Card */}
+            <div className="lg:col-span-2 flex flex-col gap-6">
 
-                let stateClasses = "";
-                let icon = null;
-
-                if (isDayCompleted) {
-                  stateClasses = "bg-sage/5 border-sage/20 text-sage hover:bg-sage/10";
-                  icon = <CheckCircle className="w-4 h-4 text-sage shrink-0" />;
-                } else if (isDayActive) {
-                  if (isPendingApproval) {
-                    stateClasses = "bg-gold/5 border-gold/20 text-gold-dark font-medium";
-                    icon = <Compass className="w-4 h-4 text-gold-dark shrink-0 animate-pulse" />;
-                  } else if (isRejected) {
-                    stateClasses = "bg-red-500/5 border-red-500/20 text-red-600 font-medium";
-                    icon = <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />;
-                  } else {
-                    stateClasses = "bg-gold/10 border-gold/40 text-gold-dark font-bold animate-pulse";
-                    icon = <Compass className="w-4 h-4 text-gold-dark shrink-0 animate-pulse" />;
-                  }
-                } else {
-                  // Locked
-                  stateClasses = "opacity-55 border-cream-dark bg-cream-light/30 cursor-not-allowed select-none text-charcoal-light";
-                  icon = <Lock className="w-3.5 h-3.5 text-charcoal-light shrink-0" />;
-                }
-
-                const isSelected = selectedAssignment && selectedAssignment.dayNumber === dayNum;
-                const activeClickableClass = !isDayLocked ? "cursor-pointer hover:shadow-sm" : "";
-                const selectedClass = isSelected ? "ring-2 ring-sage/55 border-sage/60 font-bold" : "";
-
-                return (
-                  <div 
-                    key={dayNum}
-                    onClick={() => {
-                      if (!isDayLocked) {
-                        fetchAssignmentDetails(dayNum);
-                      }
-                    }}
-                    className={`border p-3 rounded-xl flex items-center justify-between gap-3 text-xs transition-all ${stateClasses} ${activeClickableClass} ${selectedClass}`}
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      {icon}
-                      <span className="font-serif font-bold text-[11px]">Day {dayNum}</span>
-                      <span className="text-[10px] line-clamp-1 text-left font-medium">
-                        {assignment.title.replace(`Gratitude Task Day ${dayNum}`, '').replace(`Gratitude Day ${dayNum}`, '').replace(`Day ${dayNum}`, '').replace(': ', '') || 'Daily Practice'}
+              {/* Completed Program Back Notice Bar when reviewing past day */}
+              {isAllCompleted && selectedAssignment && (
+                <div className="bg-gradient-to-r from-amber-50 via-[#FFFDF7] to-amber-50 border border-gold/40 rounded-2xl p-3.5 px-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-left shadow-xs">
+                  <div className="flex items-center gap-2.5">
+                    <Award className="w-5 h-5 text-gold shrink-0" />
+                    <div>
+                      <span className="font-serif font-bold text-xs text-charcoal-dark block">
+                        {isNavratri ? '9-Day Navratri Sadhana Completed! 🌺' : 'Program Completed! ✨'}
+                      </span>
+                      <span className="text-[10px] text-charcoal-light">
+                        You are currently listening to Day {selectedAssignment.dayNumber}: {selectedAssignment.title}.
                       </span>
                     </div>
-                    {isDayCompleted && (
-                      <span className="text-[8px] bg-sage/10 text-sage font-bold uppercase tracking-wider py-0.5 px-1.5 rounded">
-                        Done
+                  </div>
+                  <button
+                    onClick={() => setSelectedAssignment(null)}
+                    className="text-[11px] font-bold text-charcoal-dark hover:text-black bg-gold/20 hover:bg-gold/30 py-1.5 px-3.5 rounded-xl transition-all border border-gold/40 shrink-0 flex items-center gap-1"
+                  >
+                    <span>← Back to Completion Hub</span>
+                  </button>
+                </div>
+              )}
+
+              {/* Navratri Sacred Static Banner Card OR Other Program Intro Video (When not completed yet) */}
+              {!isAllCompleted && (
+                isNavratri ? (
+                  <div className="glass p-4 md:p-5 rounded-3xl border-2 border-gold/40 flex flex-col gap-3 text-left relative overflow-hidden bg-gradient-to-br from-[#FFFDF7] via-[#FFF9ED] to-[#FFF3DC] shadow-md">
+                    <div className="flex items-center justify-between border-b border-gold/30 pb-2.5">
+                      <div className="flex items-center gap-2">
+                        <span className="bg-gold text-charcoal-dark font-black py-1 px-3 rounded-full text-[9px] uppercase tracking-wider flex items-center gap-1 shadow-xs">
+                          <Sparkles className="w-3 h-3 animate-pulse fill-charcoal-dark" /> 9 Days Navratri
+                        </span>
+                        <span className="font-serif text-sm font-bold text-charcoal-dark">
+                          Sacred Navdurga Audio Journey
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-bold text-sage bg-sage/10 px-2.5 py-0.5 rounded-full border border-sage/20">
+                        Valid till 21 October
                       </span>
-                    )}
-                    {isDayActive && (
-                      <span className={`text-[8px] font-bold uppercase tracking-wider py-0.5 px-1.5 rounded ${
-                        isPendingApproval 
+                    </div>
+                    <div className="w-full rounded-2xl overflow-hidden border border-gold/30 shadow-sm relative group bg-black">
+                      <img 
+                        src={getImageUrl('/uploads/navratri_9_days_banner.jpg')} 
+                        alt="9 Days Navratri Sacred Program" 
+                        className="w-full h-auto max-h-[460px] object-contain mx-auto transition-transform duration-500 group-hover:scale-[1.01]"
+                      />
+                    </div>
+                    <p className="text-[11px] text-charcoal-light leading-relaxed">
+                      Welcome to the 9-Day Navratri Sacred Audio Transformation. Experience the divine transmissions of Maa Durga across 9 days. Each day unlocks sequentially upon completing the previous day's audiobook. Access remains valid till 21 October.
+                    </p>
+
+                    {/* WhatsApp Community Group Banner */}
+                    <div className="bg-[#25D366]/10 border border-[#25D366]/30 rounded-2xl p-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs mt-1">
+                      <div className="flex items-center gap-2.5 text-left">
+                        <div className="w-8 h-8 rounded-full bg-[#25D366] flex items-center justify-center text-white shrink-0 shadow-xs">
+                          <MessageCircle className="w-4 h-4 fill-white" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-xs font-bold text-[#128C7E]">Official Navratri WhatsApp Group</span>
+                          <span className="text-[10px] text-charcoal-light">Join the group for further updates, daily sacred chants & cohort discussions</span>
+                        </div>
+                      </div>
+                      <a
+                        href={program.whatsappGroupLink || 'https://chat.whatsapp.com/DT05P5k7uviAV0Yuw1ySb7'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full sm:w-auto bg-[#25D366] hover:bg-[#1EBE5D] text-white font-bold text-xs py-2 px-4 rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-xs shrink-0 active:scale-98"
+                      >
+                        <MessageCircle className="w-3.5 h-3.5 fill-white" />
+                        <span>Join Group</span>
+                      </a>
+                    </div>
+                  </div>
+                ) : getWelcomeVideoUrl() ? (
+                  <div className="glass p-5 md:p-6 rounded-3xl border border-cream-dark/50 flex flex-col gap-4 text-left relative overflow-hidden">
+                    <div className="flex items-center justify-between border-b border-cream-dark/60 pb-3">
+                      <div className="flex items-center gap-2">
+                        <span className="bg-gold/10 text-gold-dark font-bold py-1 px-3 rounded-full text-[9px] uppercase tracking-wider flex items-center gap-1">
+                          <Sparkles className="w-3 h-3 animate-pulse" /> Welcome Video
+                        </span>
+                        <span className="font-serif text-sm font-bold text-charcoal-dark">
+                          Introduction to {program.title}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="w-full aspect-video rounded-2xl overflow-hidden border border-cream-dark/40 shadow-sm bg-black">
+                      <iframe 
+                        src={getWelcomeVideoUrl()} 
+                        title={`Introduction to ${program.title}`}
+                        className="w-full h-full border-0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                        allowFullScreen
+                      />
+                    </div>
+                    <p className="text-[11px] text-charcoal-light leading-relaxed">
+                      Before you begin your practice, watch this welcome video from Sonali Bhasin to understand the power of this journey and how to get the most out of it!
+                    </p>
+                  </div>
+                ) : null
+              )}
+              
+              {selectedAssignment ? (
+                /* Current day assignment information */
+                <div className="glass p-6 md:p-8 rounded-3xl border border-cream-dark/50 flex flex-col gap-6 text-left relative overflow-hidden">
+                  
+                  {/* Active Day Ribbon */}
+                  <div className="flex items-center justify-between border-b border-cream-dark/60 pb-4">
+                    <div className="flex items-center gap-3">
+                      <span className={`font-bold py-1 px-3.5 rounded-full text-[10px] uppercase tracking-wider ${
+                        isSelectedActive 
                           ? 'bg-gold/10 text-gold-dark'
-                          : isRejected
-                            ? 'bg-red-500/10 text-red-600'
-                            : 'bg-gold/20 text-gold-dark'
+                          : isSelectedCompleted
+                            ? 'bg-sage/10 text-sage'
+                            : 'bg-charcoal/5 text-charcoal'
                       }`}>
-                        {isPendingApproval ? 'Reviewing' : isRejected ? 'Rejected' : 'Active'}
+                        {isSelectedActive ? 'Active Task' : isSelectedCompleted ? 'Completed Task' : 'Task'}
                       </span>
+                      <span className="font-serif text-base font-bold text-charcoal-dark">
+                        Day {selectedAssignment.dayNumber}
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-charcoal-light flex items-center gap-1 font-semibold">
+                      <Compass className="w-4 h-4 text-sage animate-spin-slow" />
+                      {isSelectedCompleted ? 'Completed' : 'Pending Completion'}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-4">
+                    <h3 className="font-serif text-xl font-bold text-charcoal-dark flex items-center gap-2">
+                      {selectedAssignment.title}
+                    </h3>
+
+                    {selectedAssignment.estimatedDuration && (
+                      <div className="flex items-center gap-1.5 text-xs text-sage font-semibold uppercase tracking-wider">
+                        <span>Estimated Time: {selectedAssignment.estimatedDuration}</span>
+                      </div>
+                    )}
+
+                    {selectedAssignment.image && (
+                      <div className="w-full max-h-80 rounded-2xl overflow-hidden border border-cream-dark/40 mb-2 bg-cream-light flex items-center justify-center">
+                        <img src={getImageUrl(selectedAssignment.image)} alt={selectedAssignment.title} className="max-w-full max-h-80 object-contain" />
+                      </div>
+                    )}
+
+                    {getEmbedVideoUrl(selectedAssignment.content) && (
+                      <div className="w-full aspect-video rounded-xl overflow-hidden border border-cream-dark/45 shadow-sm mb-4 bg-black">
+                        <iframe 
+                          src={getEmbedVideoUrl(selectedAssignment.content)}
+                          title={selectedAssignment.title}
+                          className="w-full h-full border-0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                          allowFullScreen
+                        />
+                      </div>
+                    )}
+                    
+                    {/* Dedicated Interactive Audio/Video Book Player for Navratri & Audio Programs */}
+                    {selectedAssignment.audioUrl && (
+                      selectedAssignment.audioUrl.includes('drive.google.com') ? (
+                        /* Google Drive Stream Player */
+                        <div className="bg-gradient-to-br from-[#FFFDF7] via-[#FFF9ED] to-[#FFF3DC] border-2 border-gold/40 p-4 md:p-5 rounded-3xl shadow-md flex flex-col gap-3.5 text-left relative overflow-hidden">
+                          <div className="flex items-center justify-between border-b border-gold/25 pb-3">
+                            <div className="flex items-center gap-2.5">
+                              <span className="p-2 rounded-xl bg-gold text-charcoal-dark shadow-sm">
+                                <Headphones className="w-5 h-5 animate-pulse" />
+                              </span>
+                              <div className="flex flex-col">
+                                <span className="text-[10px] font-bold text-gold-dark uppercase tracking-widest flex items-center gap-1.5">
+                                  {isNavratri ? 'Sacred Navratri Audiobook Stream' : 'Audio Meditation Stream'}
+                                  <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                </span>
+                                <span className="font-serif text-sm font-bold text-charcoal-dark line-clamp-1">
+                                  {selectedAssignment.title}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] font-bold text-sage bg-sage/10 px-2.5 py-1 rounded-full border border-sage/25">
+                                {selectedAssignment.estimatedDuration || selectedAssignment.audioDuration || '25 mins'}
+                              </span>
+                              <a
+                                href={selectedAssignment.audioUrl.replace('/preview', '/view')}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-1.5 text-charcoal-light hover:text-gold transition-colors bg-white/80 rounded-lg border border-cream-dark/50"
+                                title="Open in Drive"
+                              >
+                                <ExternalLink className="w-3.5 h-3.5" />
+                              </a>
+                            </div>
+                          </div>
+
+                          {/* Responsive Google Drive Embed Player */}
+                          <div className="w-full aspect-video rounded-2xl overflow-hidden border border-gold/30 shadow-inner bg-black relative">
+                            <iframe
+                              src={selectedAssignment.audioUrl}
+                              title={selectedAssignment.title}
+                              className="w-full h-full border-0"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                              allowFullScreen
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        /* HTML5 Audio Seeker Player */
+                        <div className="bg-gradient-to-br from-[#FFFDF7] via-[#FFF9ED] to-[#FFF3DC] border-2 border-gold/40 p-5 md:p-6 rounded-3xl shadow-md flex flex-col gap-4 text-left relative overflow-hidden">
+                          <div className="flex items-center justify-between border-b border-gold/25 pb-3">
+                            <div className="flex items-center gap-2">
+                              <span className="p-2 rounded-xl bg-gold text-charcoal-dark shadow-sm">
+                                <Headphones className="w-5 h-5 animate-pulse" />
+                              </span>
+                              <div className="flex flex-col">
+                                <span className="text-[10px] font-bold text-gold-dark uppercase tracking-widest">
+                                  {isNavratri ? 'Sacred Navratri Audiobook' : 'Audio Meditation Session'}
+                                </span>
+                                <span className="font-serif text-sm font-bold text-charcoal-dark line-clamp-1">
+                                  {selectedAssignment.title}
+                                </span>
+                              </div>
+                            </div>
+                            <span className="text-[10px] font-bold text-sage bg-sage/10 px-2.5 py-1 rounded-full border border-sage/25">
+                              {selectedAssignment.estimatedDuration || selectedAssignment.audioDuration || '25 mins'}
+                            </span>
+                          </div>
+
+                          {/* Hidden HTML5 Audio Element */}
+                          <audio
+                            ref={audioRef}
+                            src={selectedAssignment.audioUrl}
+                            onTimeUpdate={handleAudioTimeUpdate}
+                            onLoadedMetadata={handleAudioLoadedMetadata}
+                            onEnded={() => setIsPlaying(false)}
+                          />
+
+                          {/* Audio Controls Bar */}
+                          <div className="flex flex-col gap-3 pt-1">
+                            {/* Seeker slider */}
+                            <div className="flex items-center gap-3 w-full">
+                              <span className="text-[10px] font-mono font-bold text-charcoal-light w-10 text-right">
+                                {formatAudioTime(currentTime)}
+                              </span>
+                              <input
+                                type="range"
+                                min="0"
+                                max={audioDuration || 100}
+                                value={currentTime}
+                                onChange={handleAudioSeek}
+                                className="flex-grow h-2 bg-cream-dark/60 rounded-lg appearance-none cursor-pointer accent-[#D4A017]"
+                              />
+                              <span className="text-[10px] font-mono font-bold text-charcoal-light w-10">
+                                {formatAudioTime(audioDuration || (parseInt(selectedAssignment.estimatedDuration, 10) * 60) || 1500)}
+                              </span>
+                            </div>
+
+                            {/* Player Buttons Row */}
+                            <div className="flex items-center justify-between flex-wrap gap-3 pt-2">
+                              {/* Left: Speed chips */}
+                              <div className="flex items-center gap-1">
+                                <span className="text-[9px] text-charcoal-light font-bold uppercase tracking-wider mr-1">Speed:</span>
+                                {[0.75, 1, 1.25, 1.5].map((rate) => (
+                                  <button
+                                    key={rate}
+                                    type="button"
+                                    onClick={() => changePlaybackRate(rate)}
+                                    className={`text-[9px] font-bold px-2 py-0.5 rounded-md transition-all ${
+                                      playbackRate === rate 
+                                        ? 'bg-gold text-charcoal-dark font-extrabold shadow-xs' 
+                                        : 'bg-white/80 text-charcoal-light hover:text-charcoal border border-cream-dark/60'
+                                    }`}
+                                  >
+                                    {rate}x
+                                  </button>
+                                ))}
+                              </div>
+
+                              {/* Center: Play/Pause/Skip */}
+                              <div className="flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => skipAudio(-10)}
+                                  className="p-2 rounded-full bg-cream-dark/50 hover:bg-cream-dark text-charcoal transition-colors"
+                                  title="Rewind 10s"
+                                >
+                                  <RotateCcw className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={toggleAudioPlay}
+                                  className="p-3 rounded-full bg-gold hover:bg-gold-dark text-charcoal-dark font-bold transition-transform active:scale-95 shadow-md"
+                                  title={isPlaying ? "Pause" : "Play"}
+                                >
+                                  {isPlaying ? (
+                                    <Pause className="w-5 h-5 fill-charcoal-dark" />
+                                  ) : (
+                                    <Play className="w-5 h-5 fill-charcoal-dark ml-0.5" />
+                                  )}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => skipAudio(10)}
+                                  className="p-2 rounded-full bg-cream-dark/50 hover:bg-cream-dark text-charcoal transition-colors"
+                                  title="Forward 10s"
+                                >
+                                  <RotateCw className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+
+                              {/* Right: Mute/Volume */}
+                              <div className="flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={toggleAudioMute}
+                                  className="p-2 text-charcoal-light hover:text-charcoal transition-colors"
+                                >
+                                  {isMuted ? (
+                                    <VolumeX className="w-4 h-4 text-red-500" />
+                                  ) : (
+                                    <Volume2 className="w-4 h-4" />
+                                  )}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    )}
+
+                    <div className="prose prose-sm text-charcoal leading-relaxed text-left whitespace-pre-wrap font-sans mt-2">
+                      {selectedAssignment.content}
+                    </div>
+
+                    {selectedAssignment.reflectionPrompts && selectedAssignment.reflectionPrompts.length > 0 && (
+                      <div className="glass p-5 rounded-2xl border border-cream-dark/60 bg-cream/30 text-left mt-2 flex flex-col gap-2">
+                        <span className="font-serif text-sm font-bold text-charcoal-dark flex items-center gap-1.5">
+                          <CheckCircle className="w-4 h-4 text-sage" /> Reflection Prompts
+                        </span>
+                        <ul className="list-disc pl-5 text-xs text-charcoal space-y-1.5">
+                          {selectedAssignment.reflectionPrompts.map((prompt, idx) => (
+                            <li key={idx}>{prompt}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {selectedAssignment.resources && selectedAssignment.resources.length > 0 && (
+                      <div className="flex flex-col gap-2 mt-2 text-left">
+                        <span className="text-xs font-bold text-charcoal-light uppercase tracking-wider">Resources</span>
+                        <div className="flex flex-wrap gap-2">
+                          {selectedAssignment.resources.map((res, idx) => (
+                            <a 
+                              key={idx} 
+                              href={res.url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-xs bg-cream hover:bg-cream-dark border border-cream-dark px-3 py-1.5 rounded-lg text-charcoal font-medium transition-all"
+                            >
+                              🔗 {res.title || 'Resource Link'}
+                            </a>
+                          ))}
+                        </div>
+                      </div>
                     )}
                   </div>
-                );
-              })}
+
+                  {/* SUBMISSION FORM OR STATUS (When current day is active) */}
+                  {isSelectedActive && !isAllCompleted && (
+                    <div className="border-t border-cream-dark/60 pt-6 flex flex-col gap-4">
+                      {isPendingApproval ? (
+                        <div className="bg-gold/10 border border-gold/30 rounded-2xl p-5 flex items-center gap-4 text-left">
+                          <Compass className="w-8 h-8 text-gold animate-spin-slow shrink-0" />
+                          <div className="flex flex-col">
+                            <h4 className="font-serif font-bold text-charcoal-dark text-sm">Submission Under Review</h4>
+                            <p className="text-xs text-charcoal-light">
+                              Your assignment response has been uploaded! Our team is reviewing it. The next day unlocks once verified.
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <form onSubmit={handleAssignmentSubmit} className="flex flex-col gap-4 text-left">
+                          <div className="flex flex-col gap-1">
+                            <h4 className="font-serif font-bold text-charcoal-dark text-base">
+                              {isAudioProgram ? 'Complete Audio Practice & Submit Reflection' : 'Submit Day Reflection / Photo'}
+                            </h4>
+                            <p className="text-xs text-charcoal-light">
+                              {isAudioProgram 
+                                ? "Listen to today's sacred audiobook transmission and optionally upload your sadhana setup or reflection photo to complete this day." 
+                                : "Upload a photo or write your journal reflection to submit today's task."}
+                            </p>
+                          </div>
+
+                          {isPhotoRequired && (
+                            <div className="flex flex-col gap-2">
+                              <label className="text-xs font-bold text-charcoal-light uppercase tracking-wider">
+                                Photo Proof / Journal Photo {isPhotoRequired ? '(Required)' : '(Optional)'}
+                              </label>
+                              <div className="border-2 border-dashed border-cream-dark rounded-2xl p-6 text-center hover:border-gold transition-all cursor-pointer relative bg-cream-light/30">
+                                <input 
+                                  type="file" 
+                                  accept="image/*" 
+                                  onChange={handleFileSelect} 
+                                  className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" 
+                                />
+                                {previewUrl ? (
+                                  <div className="flex flex-col items-center gap-2">
+                                    <img src={previewUrl} alt="Preview" className="h-40 object-cover rounded-xl shadow-md border border-cream-dark" />
+                                    <span className="text-[11px] text-sage font-bold">Photo selected! Click Submit below.</span>
+                                  </div>
+                                ) : (
+                                  <div className="flex flex-col items-center gap-2 text-charcoal-light">
+                                    <Camera className="w-8 h-8 text-gold" />
+                                    <span className="text-xs font-semibold">Click to browse or take a photo</span>
+                                    <span className="text-[10px] opacity-70">Supports JPG, PNG (Max 10MB)</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          <button
+                            type="submit"
+                            disabled={uploading}
+                            className="bg-gold hover:bg-gold-dark text-charcoal-dark font-bold py-3.5 px-8 rounded-xl transition-all duration-300 text-xs uppercase tracking-wider shadow-md hover:shadow-lg disabled:opacity-50 mt-2 flex items-center justify-center gap-2 active:scale-98"
+                          >
+                            {uploading ? (
+                              <>
+                                <Sparkles className="w-4 h-4 animate-spin" />
+                                <span>Submitting...</span>
+                              </>
+                            ) : (
+                              <>
+                                <CheckCircle className="w-4 h-4" />
+                                <span>{isAudioProgram ? 'Complete & Mark Day Finished' : 'Submit Day Reflection'}</span>
+                              </>
+                            )}
+                          </button>
+                        </form>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Display completed day reflection/photo if reviewing completed day */}
+                  {isSelectedCompleted && (
+                    <div className="border-t border-cream-dark/60 pt-5 flex flex-col gap-3">
+                      <div className="flex items-center gap-2 text-sage text-xs font-bold uppercase tracking-wider">
+                        <CheckCircle className="w-4 h-4" />
+                        <span>Completed on {new Date(progress.submissions.find(s => s.day === selectedAssignment.dayNumber)?.submittedAt || Date.now()).toLocaleDateString()}</span>
+                      </div>
+                      {(progress.submissions.find(s => s.day === selectedAssignment.dayNumber)?.photo || (isNavratri && NAVRATRI_DAY_IMAGES[selectedAssignment.dayNumber])) && (
+                        <div className="flex flex-col gap-1.5">
+                          <span className="text-[10px] text-charcoal-light font-bold uppercase tracking-wider">
+                            {progress.submissions.find(s => s.day === selectedAssignment.dayNumber)?.photo ? 'Submitted Photo Proof' : 'Sacred Swaroop Artwork'}
+                          </span>
+                          <div 
+                            className="w-36 h-36 rounded-xl overflow-hidden border border-cream-dark shadow-sm bg-cream relative cursor-pointer group"
+                            onClick={() => {
+                              const targetImg = progress.submissions.find(s => s.day === selectedAssignment.dayNumber)?.photo 
+                                ? getImageUrl(progress.submissions.find(s => s.day === selectedAssignment.dayNumber).photo) 
+                                : NAVRATRI_DAY_IMAGES[selectedAssignment.dayNumber];
+                              if (targetImg) setLightboxImage({ url: targetImg, title: selectedAssignment.title });
+                            }}
+                          >
+                            <img 
+                              src={progress.submissions.find(s => s.day === selectedAssignment.dayNumber)?.photo 
+                                ? getImageUrl(progress.submissions.find(s => s.day === selectedAssignment.dayNumber).photo) 
+                                : NAVRATRI_DAY_IMAGES[selectedAssignment.dayNumber]} 
+                              alt="Day Submission" 
+                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
+                            />
+                            <div className="absolute inset-0 bg-charcoal/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                              <Eye className="w-5 h-5 text-white drop-shadow" />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                </div>
+              ) : (
+                <div className="glass p-8 rounded-3xl text-center flex flex-col items-center justify-center gap-4 py-16 border border-cream-dark/50">
+                  <AlertCircle className="w-10 h-10 text-sage" />
+                  <h3 className="font-serif text-lg font-bold text-charcoal-dark">This assignment is not available yet.</h3>
+                  <p className="text-xs text-charcoal-light max-w-sm">
+                    Please check back soon. The program coordinator is publishing the next days' materials!
+                  </p>
+                </div>
+              )}
+
+              {/* Submissions History Grid */}
+              {progress && progress.submissions.length > 0 && (
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-serif text-lg font-bold text-charcoal-dark uppercase tracking-wider text-left">
+                      {isNavratri ? 'My Completed Sacred Days' : 'My Completed Submissions'}
+                    </h3>
+                    <span className="text-xs font-semibold text-gold bg-gold/10 px-2.5 py-1 rounded-full border border-gold/20">
+                      {progress.submissions.length} / {totalDays} Completed ✨
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    {progress.submissions.map((sub, idx) => {
+                      const navItem = isNavratri ? navratriAssignments.find(n => n.day === sub.day) : null;
+                      const navImage = isNavratri ? NAVRATRI_DAY_IMAGES[sub.day] : null;
+                      const displayImage = sub.photo ? getImageUrl(sub.photo) : (navImage || (program?.images?.[0] ? getImageUrl(program.images[0]) : null));
+                      const cardTitle = navItem ? navItem.goddess.split('(')[0].trim() : `Day ${sub.day}`;
+                      const cardTheme = navItem ? navItem.chakra : `Completed on ${new Date(sub.submittedAt).toLocaleDateString()}`;
+
+                      return (
+                        <div 
+                          key={idx}
+                          onClick={() => {
+                            if (displayImage) {
+                              setLightboxImage({ url: displayImage, title: `Day ${sub.day}: ${cardTitle}` });
+                            } else {
+                              fetchAssignmentDetails(sub.day);
+                            }
+                          }}
+                          className="glass border border-cream-dark/50 rounded-2xl overflow-hidden cursor-pointer group hover:scale-[1.03] hover:shadow-lg transition-all duration-300 text-left bg-white/80 flex flex-col"
+                        >
+                          <div className="h-28 bg-gradient-to-br from-amber-50 to-cream relative overflow-hidden flex items-center justify-center">
+                            {displayImage ? (
+                              <img 
+                                src={displayImage} 
+                                alt={`Day ${sub.day}`} 
+                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                              />
+                            ) : (
+                              <div className="flex flex-col items-center justify-center gap-1 p-2 text-center">
+                                <Sparkles className="w-5 h-5 text-gold animate-pulse" />
+                                <span className="text-[10px] font-bold text-charcoal-dark font-serif">Day {sub.day} Done</span>
+                              </div>
+                            )}
+                            <div className="absolute inset-0 bg-charcoal/25 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-200">
+                              <Eye className="w-5 h-5 text-white drop-shadow" />
+                            </div>
+                            <div className="absolute top-1.5 left-1.5 bg-black/60 backdrop-blur-md px-1.5 py-0.5 rounded-md text-[9px] font-bold text-gold flex items-center gap-1">
+                              <span>Day {sub.day}</span>
+                            </div>
+                            <div className="absolute top-1.5 right-1.5 bg-sage/90 backdrop-blur-md p-1 rounded-full text-white">
+                              <CheckCircle className="w-3 h-3" />
+                            </div>
+                          </div>
+                          <div className="p-2.5 flex flex-col gap-0.5 flex-1 justify-between bg-white/40">
+                            <div>
+                              <span className="font-bold text-[11px] text-charcoal-dark line-clamp-1 group-hover:text-gold transition-colors">{cardTitle}</span>
+                              <span className="text-[9px] text-charcoal-light line-clamp-1">{cardTheme}</span>
+                            </div>
+                            <span className="text-[8px] text-charcoal-light/70 mt-1">{new Date(sub.submittedAt).toLocaleDateString()}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
             </div>
+
+            {/* RIGHT: locked/unlocked 30-day index tracker */}
+            <div className="flex flex-col gap-4">
+              <h3 className="font-serif text-lg font-bold text-charcoal-dark uppercase tracking-wider text-left">
+                Program Calendar
+              </h3>
+              
+              <div className="glass border border-cream-dark/50 rounded-3xl p-4 max-h-[70vh] overflow-y-auto flex flex-col gap-2.5">
+                {assignments.map((assignment) => {
+                  const dayNum = assignment.dayNumber;
+                  const isDayCompleted = assignment.isCompleted;
+                  const isDayActive = dayNum === currentDayNum && !isCompleted;
+                  const isDayLocked = assignment.isLocked;
+
+                  let stateClasses = "";
+                  let icon = null;
+
+                  if (isDayCompleted) {
+                    stateClasses = "bg-sage/5 border-sage/20 text-sage hover:bg-sage/10";
+                    icon = <CheckCircle className="w-4 h-4 text-sage shrink-0" />;
+                  } else if (isDayActive) {
+                    if (isPendingApproval) {
+                      stateClasses = "bg-gold/5 border-gold/20 text-gold-dark font-medium";
+                      icon = <Compass className="w-4 h-4 text-gold-dark shrink-0 animate-pulse" />;
+                    } else if (isRejected) {
+                      stateClasses = "bg-red-500/5 border-red-500/20 text-red-600 font-medium";
+                      icon = <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />;
+                    } else {
+                      stateClasses = "bg-gold/10 border-gold/40 text-gold-dark font-bold animate-pulse";
+                      icon = <Compass className="w-4 h-4 text-gold-dark shrink-0 animate-pulse" />;
+                    }
+                  } else {
+                    // Locked
+                    stateClasses = "opacity-55 border-cream-dark bg-cream-light/30 cursor-not-allowed select-none text-charcoal-light";
+                    icon = <Lock className="w-3.5 h-3.5 text-charcoal-light shrink-0" />;
+                  }
+
+                  const isSelected = selectedAssignment && selectedAssignment.dayNumber === dayNum;
+                  const activeClickableClass = !isDayLocked ? "cursor-pointer hover:shadow-sm" : "";
+                  const selectedClass = isSelected ? "ring-2 ring-sage/55 border-sage/60 font-bold" : "";
+
+                  return (
+                    <div 
+                      key={dayNum}
+                      onClick={() => {
+                        if (!isDayLocked) {
+                          fetchAssignmentDetails(dayNum);
+                        }
+                      }}
+                      className={`border p-3 rounded-xl flex items-center justify-between gap-3 text-xs transition-all ${stateClasses} ${activeClickableClass} ${selectedClass}`}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        {icon}
+                        <span className="font-serif font-bold text-[11px]">Day {dayNum}</span>
+                        <span className="text-[10px] line-clamp-1 text-left font-medium">
+                          {assignment.title.replace(`Gratitude Task Day ${dayNum}`, '').replace(`Gratitude Day ${dayNum}`, '').replace(`Day ${dayNum}`, '').replace(': ', '') || 'Daily Practice'}
+                        </span>
+                      </div>
+                      {isDayCompleted && (
+                        <span className="text-[8px] bg-sage/10 text-sage font-bold uppercase tracking-wider py-0.5 px-1.5 rounded">
+                          Done
+                        </span>
+                      )}
+                      {isDayActive && (
+                        <span className={`text-[8px] font-bold uppercase tracking-wider py-0.5 px-1.5 rounded ${
+                          isPendingApproval 
+                            ? 'bg-gold/10 text-gold-dark'
+                            : isRejected
+                              ? 'bg-red-500/10 text-red-600'
+                              : 'bg-gold/20 text-gold-dark'
+                        }`}>
+                          {isPendingApproval ? 'Reviewing' : isRejected ? 'Rejected' : 'Active'}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
           </div>
-
-        </div>
-
+        )}
       </div>
 
-      {/* LIGHTBOX MODAL */}
+            {/* LIGHTBOX MODAL */}
       {lightboxImage && (
         <div 
           className="fixed inset-0 z-50 bg-charcoal/80 backdrop-blur-sm flex items-center justify-center p-4 cursor-pointer"
