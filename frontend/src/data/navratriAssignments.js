@@ -85,7 +85,7 @@ const navratriAssignments = [
     color: "Deep Royal Blue / Dark Indigo",
     mantra: "Om Devi Kalaratryai Namah || ॐ देवी कालरात्र्यै नमः",
     duration: "30 minutes",
-    audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3",
+    audioUrl: "https://drive.google.com/file/d/1KrK7A310nbMtRuUCceTss9yRhglmwbjZ/preview",
     description: "Day 7 is the sacred Night of Transformation. Maa Kalaratri, with her dark complexion and fearless gaze, destroys ignorance, darkness, and black magic. She takes away your deepest existential dread and guides you through the shadow to uncover indestructible soul light. Fear has no power over the devotee of Kalaratri.",
     audioTheme: "Shadow Transmutation, Releasing Generational Trauma & Total Fearlessness",
     action: "1. Listen to the 30-minute Shadow Work & Karmic Transmutation audio.\n2. Sit in quiet candlelight or darkness, welcoming the presence of divine protection.\n3. Release all attachments to past regrets and declare yourself spiritually reborn.\n4. Mark complete to unlock Day 8."
@@ -98,7 +98,7 @@ const navratriAssignments = [
     color: "Pink / Pearlescent White",
     mantra: "Om Devi Mahagauryai Namah || ॐ देवी महागौर्यै नमः",
     duration: "27 minutes",
-    audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3",
+    audioUrl: "https://drive.google.com/file/d/1uim5Ki5bIu_mSpSzCuxtVr7N0wk53lkW/preview",
     description: "Day 8, the auspicious Durgashtami, celebrates Maa Mahagauri. Having performed severe penance, she is bathed in sacred Ganga waters by Lord Shiva, becoming blindingly luminous and pure. She instantly washes away all accumulated sins, guilt, and dense energetic residue, restoring your pristine divine radiance.",
     audioTheme: "Aura Cleansing, Washing Sins, Rejuvenation & Unconditional Peace",
     action: "1. Experience today's 27-minute Aura Bath & Purification audio transmission.\n2. Light a ghee lamp or candle and chant 'Om Devi Mahagauryai Namah'.\n3. Forgive yourself completely for past mistakes and accept your divine innocence.\n4. Mark complete to unlock the final Day 9."
@@ -111,7 +111,7 @@ const navratriAssignments = [
     color: "Purple / Golden Violet",
     mantra: "Om Devi Siddhidatryai Namah || ॐ देवी सिद्धिदात्र्यै नमः",
     duration: "32 minutes",
-    audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-9.mp3",
+    audioUrl: "https://drive.google.com/file/d/1JANYMnlknUbiiShT_HZrbStAjFU80BGH/preview",
     description: "On this culminative Day 9 (Mahanavami), we bow to Maa Siddhidatri. She bestows all 8 Siddhis (spiritual perfections) and cosmic realization. Lord Shiva attained his Ardhanarishvara form through her grace. Today's transmission completes your 9-day initiation, locking in divine protection, spiritual elevation, and eternal shakti blessings.",
     audioTheme: "Attaining Spiritual Fulfillment, Cosmic Synthesis & Supreme Blessings",
     action: "1. Listen to the final 32-minute Grand Audio Initiation of Maa Siddhidatri.\n2. Offer silent gratitude to Sonali Ma'am, the Divine Mother, and your own soul.\n3. Anchor your 9-day transformations by chanting 'Om Aim Hreem Kleem Chamundayai Vichche'.\n4. Mark this grand journey as completed!"

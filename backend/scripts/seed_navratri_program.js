@@ -53,28 +53,29 @@ async function seedNavratri() {
     fs.writeFileSync(tempFile, fileContent);
     const navratriAssignments = require(tempFile);
 
-    // 3. Clear existing assignments for this program
-    await Assignment.deleteMany({ program: program._id });
-    console.log('Cleared existing assignments for Navratri Program.');
-
-    // 4. Insert 9 Daily Audio Assignments
-    const docs = navratriAssignments.map(item => {
+    // 3. Upsert 9 Daily Audio Assignments
+    for (const item of navratriAssignments) {
       const content = `Goddess: ${item.goddess}\nChakra Center: ${item.chakra}\nSacred Color: ${item.color}\nDivine Mantra: ${item.mantra}\n\nAudio Theme: ${item.audioTheme}\n\n${item.description}\n\nPractice & Reflection:\n${item.action}`;
-      return {
-        program: program._id,
-        dayNumber: item.day,
-        title: item.title,
-        content: content,
-        estimatedDuration: item.duration,
-        audioUrl: item.audioUrl,
-        audioDuration: item.duration,
-        image: '',
-        status: 'Active'
-      };
-    });
+      
+      await Assignment.findOneAndUpdate(
+        { program: program._id, dayNumber: item.day },
+        {
+          program: program._id,
+          dayNumber: item.day,
+          title: item.title,
+          content: content,
+          estimatedDuration: item.duration,
+          audioUrl: item.audioUrl,
+          audioDuration: item.duration,
+          image: '',
+          status: 'Active'
+        },
+        { upsert: true, new: true }
+      );
+      console.log(`Upserted Day ${item.day}: ${item.title} -> Audio: ${item.audioUrl}`);
+    }
 
-    await Assignment.insertMany(docs);
-    console.log(`Successfully seeded ${docs.length} Navratri Audio Book assignments!`);
+    console.log(`Successfully updated all ${navratriAssignments.length} Navratri Audio Book assignments!`);
 
     // Clean up temporary file
     if (fs.existsSync(tempFile)) {
