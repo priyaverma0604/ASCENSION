@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { Search, ShoppingBag, Heart, Trash2, Plus, Minus, CreditCard, Compass, ChevronRight, User, CheckCircle, AlertTriangle, UploadCloud, Smartphone, ShieldCheck, Zap, Camera, RefreshCw, X, Sparkles, Image as ImageIcon, Check } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Trash2, Plus, Minus, CreditCard, Compass, ChevronRight, User, CheckCircle, AlertTriangle, UploadCloud, Smartphone, ShieldCheck, Zap, Camera, RefreshCw, X, Sparkles, Image as ImageIcon, Check, Landmark, Copy } from 'lucide-react';
 import axios from 'axios';
 import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
@@ -87,6 +87,8 @@ const Shop = () => {
   const [transactionId, setTransactionId] = useState('');
   const [screenshot, setScreenshot] = useState(null);
   const [screenshotPreview, setScreenshotPreview] = useState('');
+  const [copiedUpi, setCopiedUpi] = useState(false);
+  const [manualPayType, setManualPayType] = useState('bank'); // 'bank' or 'qr'
 
   const categories = [
     'All', 'Energy Bottles', 'Crystals', 'Pyramids', 'Bath Salts', 'Healing Camphor', 'Healing Oils', 'Candles', 'Wax Tablets', 'Sage Leaves'
@@ -1736,39 +1738,57 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                         <button
                           type="button"
                           onClick={() => setCheckoutPaymentMethod('razorpay')}
-                          className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                          className={`flex-1 py-2 px-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                             checkoutPaymentMethod === 'razorpay'
                               ? 'bg-sage text-white shadow-xs'
                               : 'text-charcoal hover:bg-cream-light'
                           }`}
                         >
                           <Zap className="w-3.5 h-3.5" />
-                          <span>Instant Razorpay</span>
+                          <span>Instant Online (Bank / UPI)</span>
                         </button>
                         <button
                           type="button"
                           onClick={() => setCheckoutPaymentMethod('upi_qr')}
-                          className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                          className={`flex-1 py-2 px-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                             checkoutPaymentMethod === 'upi_qr'
                               ? 'bg-sage text-white shadow-xs'
                               : 'text-charcoal hover:bg-cream-light'
                           }`}
                         >
-                          <CreditCard className="w-3.5 h-3.5" />
-                          <span>Manual UPI QR</span>
+                          <Landmark className="w-3.5 h-3.5" />
+                          <span>Direct Bank / QR Transfer</span>
                         </button>
                       </div>
 
                       {checkoutPaymentMethod === 'razorpay' ? (
                         /* Online Razorpay Flow */
                         <div className="flex flex-col gap-3 mt-1">
-                          <div className="bg-cream-light/60 border border-cream-dark/60 p-3.5 rounded-xl flex flex-col gap-2">
+                          <div className="bg-cream-light/60 border border-cream-dark/60 p-3.5 rounded-xl flex flex-col gap-2.5">
                             <div className="flex items-center gap-2 text-sage font-bold text-xs">
                               <ShieldCheck className="w-4 h-4 text-sage" />
                               <span>Razorpay Secure Online Payment</span>
                             </div>
+
+                            <div className="grid grid-cols-2 gap-2 text-[10px] text-charcoal">
+                              <div className="bg-white/80 border border-cream-dark/60 rounded-lg p-2 flex items-center gap-2">
+                                <Landmark className="w-4 h-4 text-sage shrink-0" />
+                                <div>
+                                  <p className="font-bold text-[10px] text-charcoal-dark">Direct Bank NetBanking</p>
+                                  <p className="text-[9px] text-charcoal-light">SBI, HDFC, ICICI, Axis & 50+ Banks</p>
+                                </div>
+                              </div>
+                              <div className="bg-white/80 border border-cream-dark/60 rounded-lg p-2 flex items-center gap-2">
+                                <Smartphone className="w-4 h-4 text-sage shrink-0" />
+                                <div>
+                                  <p className="font-bold text-[10px] text-charcoal-dark">Direct Bank UPI</p>
+                                  <p className="text-[9px] text-charcoal-light">GPay, PhonePe, Paytm, BHIM</p>
+                                </div>
+                              </div>
+                            </div>
+
                             <p className="text-[11px] text-charcoal-light leading-relaxed">
-                              Pay instantly via UPI (GPay, PhonePe, Paytm), Cards, Netbanking, or Wallets. Your order will be placed and confirmed immediately!
+                              Pay instantly via Direct Bank NetBanking, UPI (GPay, PhonePe, Paytm), Cards, or Wallets. Your order will be confirmed immediately!
                             </p>
                           </div>
 
@@ -1779,37 +1799,109 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                             className="w-full bg-gold hover:bg-gold-dark text-charcoal-dark border border-gold-dark/20 font-bold py-3 rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center gap-2 mt-1 uppercase tracking-wider text-[10px]"
                           >
                             {checkoutLoading ? <Compass className="w-4 h-4 animate-spin text-charcoal-dark" /> : <Zap className="w-4 h-4" />}
-                            <span>{checkoutLoading ? 'Opening Gateway...' : `Pay ₹${getCartTotal()} Online`}</span>
+                            <span>{checkoutLoading ? 'Opening Gateway...' : `Pay ₹${getCartTotal()} via Bank / UPI`}</span>
                           </button>
                         </div>
                       ) : (
-                        /* Manual UPI QR Flow */
+                        /* Bank Transfer & UPI Manual Form */
                         <form onSubmit={handleCheckoutSubmit} className="flex flex-col gap-3">
-                          <div className="bg-cream/60 border border-cream-dark/60 p-3 rounded-xl flex gap-3 text-charcoal-light font-sans leading-relaxed text-left mt-1">
-                            <Smartphone className="w-4 h-4 text-gold-dark shrink-0 mt-0.5" />
-                            <div>
-                              <p className="font-bold uppercase tracking-wider text-[8px] text-charcoal-dark">Scan & Pay via UPI</p>
-                              <p className="text-[9px] mt-0.5">
-                                Scan the QR below or pay using UPI ID: <strong className="text-charcoal-dark">sonalibhasinkumar@ptaxis</strong>. 
-                                Upload the receipt screenshot and transaction ID to submit order.
+                          {/* Sub-toggle between Direct Bank Details and UPI QR */}
+                          <div className="flex bg-cream/70 rounded-lg p-0.5 border border-cream-dark/50 gap-1 text-[11px] mt-1">
+                            <button
+                              type="button"
+                              onClick={() => setManualPayType('bank')}
+                              className={`flex-1 py-1.5 px-2 rounded-md font-bold transition-all flex items-center justify-center gap-1.5 ${
+                                manualPayType === 'bank'
+                                  ? 'bg-white text-sage-dark shadow-xs border border-cream-dark/40'
+                                  : 'text-charcoal-light hover:text-charcoal'
+                              }`}
+                            >
+                              <Landmark className="w-3.5 h-3.5" />
+                              <span>Direct Bank Details</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setManualPayType('qr')}
+                              className={`flex-1 py-1.5 px-2 rounded-md font-bold transition-all flex items-center justify-center gap-1.5 ${
+                                manualPayType === 'qr'
+                                  ? 'bg-white text-sage-dark shadow-xs border border-cream-dark/40'
+                                  : 'text-charcoal-light hover:text-charcoal'
+                              }`}
+                            >
+                              <Smartphone className="w-3.5 h-3.5" />
+                              <span>Scan UPI QR Code</span>
+                            </button>
+                          </div>
+
+                          {manualPayType === 'bank' ? (
+                            <div className="bg-cream-light/70 border border-cream-dark/60 p-3 rounded-xl flex flex-col gap-2 text-xs">
+                              <div className="flex items-center justify-between border-b border-cream-dark/40 pb-1.5">
+                                <span className="text-[10px] uppercase font-bold text-charcoal-light">Beneficiary Name</span>
+                                <strong className="text-charcoal-dark">Sonali Bhasin Kumar</strong>
+                              </div>
+                              <div className="flex items-center justify-between border-b border-cream-dark/40 pb-1.5">
+                                <span className="text-[10px] uppercase font-bold text-charcoal-light">Bank Name</span>
+                                <strong className="text-charcoal-dark font-semibold">Axis Bank</strong>
+                              </div>
+                              <div className="flex items-center justify-between bg-white/80 p-2 rounded-lg border border-cream-dark/40">
+                                <div>
+                                  <span className="text-[9px] uppercase font-bold text-charcoal-light block">Direct Axis Bank UPI ID</span>
+                                  <strong className="font-mono text-gold-dark select-all text-xs">sonalibhasinkumar@ptaxis</strong>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    navigator.clipboard.writeText('sonalibhasinkumar@ptaxis');
+                                    setCopiedUpi(true);
+                                    setTimeout(() => setCopiedUpi(false), 2000);
+                                  }}
+                                  className="bg-cream hover:bg-cream-dark border border-cream-dark text-charcoal-dark text-[10px] font-bold py-1 px-2.5 rounded-lg flex items-center gap-1 transition-all"
+                                >
+                                  {copiedUpi ? <Check className="w-3 h-3 text-sage" /> : <Copy className="w-3 h-3" />}
+                                  <span>{copiedUpi ? 'Copied' : 'Copy'}</span>
+                                </button>
+                              </div>
+                              <div className="flex justify-between items-center pt-1 border-t border-cream-dark/40">
+                                <span className="text-charcoal-light text-[10px]">Order Total:</span>
+                                <strong className="font-serif text-sm text-gold-dark">₹{getCartTotal()}</strong>
+                              </div>
+                              <p className="text-[10px] text-charcoal-light leading-relaxed">
+                                Transfer directly using your Bank App (Axis Mobile, SBI YONO, HDFC, iMobile, etc.) or any UPI app to this Axis Bank ID. Then enter your 12-digit UTR/Reference ID below.
                               </p>
                             </div>
-                          </div>
-
-                          <div className="flex justify-center py-2 bg-white/40 rounded-xl border border-cream-dark/40 max-w-[150px] mx-auto">
-                            <img 
-                              src={getImageUrl('/uploads/default_upi_qr.jpg')} 
-                              alt="Payment QR Code" 
-                              className="w-32 h-32 object-contain"
-                            />
-                          </div>
+                          ) : (
+                            <div className="flex flex-col items-center gap-2">
+                              <div className="flex justify-center py-2 bg-white/40 rounded-xl border border-cream-dark/40 max-w-[150px] mx-auto">
+                                <img 
+                                  src={getImageUrl('/uploads/default_upi_qr.jpg')} 
+                                  alt="Payment QR Code" 
+                                  className="w-32 h-32 object-contain"
+                                />
+                              </div>
+                              <div className="flex items-center justify-between w-full max-w-[240px] bg-white/80 px-2.5 py-1.5 rounded-lg border border-cream-dark/40 text-xs">
+                                <span className="font-mono text-gold-dark text-[11px] truncate">sonalibhasinkumar@ptaxis</span>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    navigator.clipboard.writeText('sonalibhasinkumar@ptaxis');
+                                    setCopiedUpi(true);
+                                    setTimeout(() => setCopiedUpi(false), 2000);
+                                  }}
+                                  className="text-[10px] font-bold text-charcoal hover:text-gold-dark ml-2 shrink-0 flex items-center gap-1"
+                                >
+                                  {copiedUpi ? <Check className="w-3 h-3 text-sage" /> : <Copy className="w-3 h-3" />}
+                                  <span>{copiedUpi ? 'Copied' : 'Copy'}</span>
+                                </button>
+                              </div>
+                            </div>
+                          )}
 
                           <div className="flex flex-col gap-1">
-                            <label className="text-[10px] font-bold text-charcoal-light uppercase">Transaction Reference ID</label>
+                            <label className="text-[10px] font-bold text-charcoal-light uppercase">Bank UTR / Transaction Reference ID</label>
                             <input
                               type="text"
                               required
-                              placeholder="Enter 12-digit transaction ID"
+                              placeholder="Enter 12-digit bank UTR or transaction ID"
                               value={transactionId}
                               onChange={(e) => setTransactionId(e.target.value)}
                               className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all"
@@ -1817,7 +1909,7 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                           </div>
 
                           <div className="flex flex-col gap-1">
-                            <label className="text-[10px] font-bold text-charcoal-light uppercase">Upload Payment Screenshot</label>
+                            <label className="text-[10px] font-bold text-charcoal-light uppercase">Upload Transfer Receipt Screenshot</label>
                             <div className="flex items-center gap-3">
                               <label className="flex-1 flex flex-col items-center justify-center border border-dashed border-cream-dark/60 rounded-xl py-2 px-3 bg-cream-light hover:bg-cream cursor-pointer transition-colors duration-200">
                                 <UploadCloud className="w-4 h-4 text-gold-dark mb-1" />
@@ -1825,9 +1917,9 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                                   {screenshot ? screenshot.name : 'Choose receipt image'}
                                 </span>
                                 <input 
-                                  type="file"
+                                  type="file" 
                                   required
-                                  accept="image/*"
+                                  accept="image/*" 
                                   onChange={(e) => {
                                     const file = e.target.files[0];
                                     if (file) {
@@ -1835,7 +1927,7 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                                       setScreenshotPreview(URL.createObjectURL(file));
                                     }
                                   }}
-                                  className="hidden"
+                                  className="hidden" 
                                 />
                               </label>
                               {screenshotPreview && (
@@ -1852,7 +1944,7 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                             className="w-full bg-gold hover:bg-gold-dark text-charcoal-dark border border-gold-dark/20 font-bold py-3 rounded-xl transition-all duration-300 shadow-sm flex items-center justify-center gap-2 mt-2 uppercase tracking-wider text-[10px]"
                           >
                             {checkoutLoading && <Compass className="w-4 h-4 animate-spin text-charcoal-dark" />}
-                            <span>{checkoutLoading ? 'Submitting...' : 'Submit Order Receipt'}</span>
+                            <span>{checkoutLoading ? 'Submitting...' : 'Submit Bank Verification'}</span>
                           </button>
                         </form>
                       )}

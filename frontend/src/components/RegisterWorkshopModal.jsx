@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { 
   X, CheckCircle, Compass, AlertTriangle, UploadCloud, CreditCard, MessageCircle, 
   Video, ExternalLink, Copy, Check, Calendar, Clock, Sparkles, User, CheckCircle2,
-  ShieldCheck, Zap
+  ShieldCheck, Zap, Landmark, Smartphone
 } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
@@ -46,6 +46,7 @@ const RegisterWorkshopModal = ({ workshop, onClose }) => {
   const [copiedWhatsapp, setCopiedWhatsapp] = useState(false);
   const [copiedVideo, setCopiedVideo] = useState(false);
   const [copiedUpi, setCopiedUpi] = useState(false);
+  const [manualPayType, setManualPayType] = useState('bank'); // 'bank' or 'qr'
 
   const handleInfoSubmit = (e) => {
     e.preventDefault();
@@ -437,26 +438,26 @@ const RegisterWorkshopModal = ({ workshop, onClose }) => {
                 <button
                   type="button"
                   onClick={() => setPaymentMethod('razorpay')}
-                  className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                  className={`flex-1 py-2 px-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                     paymentMethod === 'razorpay'
                       ? 'bg-sage text-white shadow-xs'
                       : 'text-charcoal hover:bg-cream-light'
                   }`}
                 >
                   <Zap className="w-3.5 h-3.5" />
-                  <span>Instant Razorpay</span>
+                  <span>Instant Online (Bank / UPI)</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setPaymentMethod('upi_qr')}
-                  className={`flex-1 py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                  className={`flex-1 py-2 px-2.5 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                     paymentMethod === 'upi_qr'
                       ? 'bg-sage text-white shadow-xs'
                       : 'text-charcoal hover:bg-cream-light'
                   }`}
                 >
-                  <CreditCard className="w-3.5 h-3.5" />
-                  <span>Manual UPI QR</span>
+                  <Landmark className="w-3.5 h-3.5" />
+                  <span>Direct Bank / QR Transfer</span>
                 </button>
               </div>
 
@@ -466,10 +467,28 @@ const RegisterWorkshopModal = ({ workshop, onClose }) => {
                   <div className="bg-cream-light/60 border border-cream-dark/60 p-4 rounded-xl flex flex-col gap-2.5 text-charcoal">
                     <div className="flex items-center gap-2 text-sage font-bold text-xs">
                       <ShieldCheck className="w-4 h-4 text-sage" />
-                      <span>Razorpay Instant Registration Gateway</span>
+                      <span>Instant Registration Gateway</span>
                     </div>
+
+                    <div className="grid grid-cols-2 gap-2 text-[10px] text-charcoal">
+                      <div className="bg-white/80 border border-cream-dark/60 rounded-lg p-2 flex items-center gap-2">
+                        <Landmark className="w-4 h-4 text-sage shrink-0" />
+                        <div>
+                          <p className="font-bold text-[10px] text-charcoal-dark">Direct Bank NetBanking</p>
+                          <p className="text-[9px] text-charcoal-light">SBI, HDFC, ICICI, Axis & 50+ Banks</p>
+                        </div>
+                      </div>
+                      <div className="bg-white/80 border border-cream-dark/60 rounded-lg p-2 flex items-center gap-2">
+                        <Smartphone className="w-4 h-4 text-sage shrink-0" />
+                        <div>
+                          <p className="font-bold text-[10px] text-charcoal-dark">Direct Bank UPI</p>
+                          <p className="text-[9px] text-charcoal-light">GPay, PhonePe, Paytm, BHIM</p>
+                        </div>
+                      </div>
+                    </div>
+
                     <p className="text-[11px] text-charcoal-light leading-relaxed">
-                      Pay instantly with UPI (Google Pay, PhonePe, Paytm), Cards, Netbanking, or Wallets. Your registration is confirmed immediately!
+                      Pay instantly with Direct Bank NetBanking, UPI (Google Pay, PhonePe, Paytm), Cards, or Wallets. Your registration is confirmed immediately!
                     </p>
                     <div className="flex justify-between items-center border-t border-cream-dark/40 pt-2 text-xs font-semibold">
                       <span>Payable Amount:</span>
@@ -492,64 +511,123 @@ const RegisterWorkshopModal = ({ workshop, onClose }) => {
                       className="w-2/3 bg-gold hover:bg-gold-dark text-charcoal-dark font-bold py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 border border-gold-dark/20 text-xs"
                     >
                       {loading ? <Compass className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
-                      <span>{loading ? 'Opening Gateway...' : `Pay ₹${workshop.pricing || workshop.price} Online`}</span>
+                      <span>{loading ? 'Opening Gateway...' : `Pay ₹${workshop.pricing || workshop.price} via Bank / UPI`}</span>
                     </button>
                   </div>
                 </div>
               ) : (
-                /* UPI Manual Payment Form */
+                /* Bank Transfer & UPI Manual Form */
                 <form onSubmit={handlePaymentSubmit} className="flex flex-col gap-4 font-sans text-xs">
-                  {/* QR and Instruction */}
-                  <div className="bg-white/60 p-4 rounded-2xl border border-cream-dark flex flex-col items-center gap-3">
-                    <span className="text-[10px] font-bold text-charcoal-light uppercase tracking-wider">Scan & Pay via UPI</span>
-                    <div className="w-44 h-44 bg-cream rounded-xl border border-cream-dark/80 p-2 overflow-hidden flex items-center justify-center">
-                      <img
-                        src={getImageUrl('/uploads/default_upi_qr.jpg')}
-                        alt="Workshop Payment QR"
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                    
-                    <div className="flex justify-between items-center bg-cream/70 p-2.5 px-3.5 rounded-xl border border-cream-dark/60 w-full text-xs">
-                      <div className="flex flex-col text-left">
-                        <span className="text-[9px] text-charcoal-light font-bold uppercase tracking-wider">Payee UPI ID</span>
-                        <strong className="select-all text-gold-dark font-mono text-xs mt-0.5">sonalibhasinkumar@ptaxis</strong>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          navigator.clipboard.writeText('sonalibhasinkumar@ptaxis');
-                          setCopiedUpi(true);
-                          setTimeout(() => setCopiedUpi(false), 2000);
-                        }}
-                        className="bg-white hover:bg-cream border border-cream-dark text-charcoal-dark font-medium py-1.5 px-2.5 rounded-lg text-[10px] flex items-center gap-1 transition-all shadow-xs"
-                      >
-                        {copiedUpi ? <Check className="w-3 h-3 text-sage" /> : <Copy className="w-3 h-3 text-charcoal-light" />}
-                        <span>{copiedUpi ? 'Copied' : 'Copy UPI'}</span>
-                      </button>
-                    </div>
-                    <div className="bg-lavender-light/40 border border-lavender p-3 rounded-xl flex gap-2 text-left text-[10px]">
-                      <AlertTriangle className="w-4.5 h-4.5 text-lavender-dark shrink-0 mt-0.5" />
-                      <span className="leading-relaxed text-charcoal-light">
-                        Scan the QR code above. Enter the 12-digit transaction ID and upload the receipt screenshot below.
-                      </span>
-                    </div>
+                  {/* Sub-toggle between Direct Bank Details and UPI QR */}
+                  <div className="flex bg-cream/70 rounded-lg p-0.5 border border-cream-dark/50 gap-1 text-[11px]">
+                    <button
+                      type="button"
+                      onClick={() => setManualPayType('bank')}
+                      className={`flex-1 py-1.5 px-2 rounded-md font-bold transition-all flex items-center justify-center gap-1.5 ${
+                        manualPayType === 'bank'
+                          ? 'bg-white text-sage-dark shadow-xs border border-cream-dark/40'
+                          : 'text-charcoal-light hover:text-charcoal'
+                      }`}
+                    >
+                      <Landmark className="w-3.5 h-3.5" />
+                      <span>Direct Bank Details</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setManualPayType('qr')}
+                      className={`flex-1 py-1.5 px-2 rounded-md font-bold transition-all flex items-center justify-center gap-1.5 ${
+                        manualPayType === 'qr'
+                          ? 'bg-white text-sage-dark shadow-xs border border-cream-dark/40'
+                          : 'text-charcoal-light hover:text-charcoal'
+                      }`}
+                    >
+                      <Smartphone className="w-3.5 h-3.5" />
+                      <span>Scan UPI QR Code</span>
+                    </button>
                   </div>
 
+                  {manualPayType === 'bank' ? (
+                    <div className="bg-cream-light/70 border border-cream-dark/60 p-3 rounded-xl flex flex-col gap-2 text-xs">
+                      <div className="flex items-center justify-between border-b border-cream-dark/40 pb-1.5">
+                        <span className="text-[10px] uppercase font-bold text-charcoal-light">Beneficiary Name</span>
+                        <strong className="text-charcoal-dark">Sonali Bhasin Kumar</strong>
+                      </div>
+                      <div className="flex items-center justify-between border-b border-cream-dark/40 pb-1.5">
+                        <span className="text-[10px] uppercase font-bold text-charcoal-light">Bank Name</span>
+                        <strong className="text-charcoal-dark font-semibold">Axis Bank</strong>
+                      </div>
+                      <div className="flex items-center justify-between bg-white/80 p-2 rounded-lg border border-cream-dark/40">
+                        <div>
+                          <span className="text-[9px] uppercase font-bold text-charcoal-light block">Direct Axis Bank UPI ID</span>
+                          <strong className="font-mono text-gold-dark select-all text-xs">sonalibhasinkumar@ptaxis</strong>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText('sonalibhasinkumar@ptaxis');
+                            setCopiedUpi(true);
+                            setTimeout(() => setCopiedUpi(false), 2000);
+                          }}
+                          className="bg-cream hover:bg-cream-dark border border-cream-dark text-charcoal-dark text-[10px] font-bold py-1 px-2.5 rounded-lg flex items-center gap-1 transition-all"
+                        >
+                          {copiedUpi ? <Check className="w-3 h-3 text-sage" /> : <Copy className="w-3 h-3" />}
+                          <span>{copiedUpi ? 'Copied' : 'Copy'}</span>
+                        </button>
+                      </div>
+                      <div className="flex justify-between items-center pt-1 border-t border-cream-dark/40">
+                        <span className="text-charcoal-light text-[10px]">Payable Total:</span>
+                        <strong className="font-serif text-sm text-gold-dark">₹{workshop.pricing || workshop.price}</strong>
+                      </div>
+                      <p className="text-[10px] text-charcoal-light leading-relaxed">
+                        Transfer directly using your Bank App (Axis Mobile, SBI YONO, HDFC, iMobile, etc.) or any UPI app to this Axis Bank ID. Then enter your 12-digit UTR/Reference ID below.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="bg-white/60 p-4 rounded-2xl border border-cream-dark flex flex-col items-center gap-3">
+                      <span className="text-[10px] font-bold text-charcoal-light uppercase tracking-wider">Scan & Pay via UPI</span>
+                      <div className="w-44 h-44 bg-cream rounded-xl border border-cream-dark/80 p-2 overflow-hidden flex items-center justify-center">
+                        <img
+                          src={getImageUrl('/uploads/default_upi_qr.jpg')}
+                          alt="Workshop Payment QR"
+                          className="w-full h-full object-contain"
+                        />
+                      </div>
+                      
+                      <div className="flex justify-between items-center bg-cream/70 p-2.5 px-3.5 rounded-xl border border-cream-dark/60 w-full text-xs">
+                        <div className="flex flex-col text-left">
+                          <span className="text-[9px] text-charcoal-light font-bold uppercase tracking-wider">Payee UPI ID</span>
+                          <strong className="select-all text-gold-dark font-mono text-xs mt-0.5">sonalibhasinkumar@ptaxis</strong>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText('sonalibhasinkumar@ptaxis');
+                            setCopiedUpi(true);
+                            setTimeout(() => setCopiedUpi(false), 2000);
+                          }}
+                          className="bg-white hover:bg-cream border border-cream-dark text-charcoal-dark font-medium py-1.5 px-2.5 rounded-lg text-[10px] flex items-center gap-1 transition-all shadow-xs"
+                        >
+                          {copiedUpi ? <Check className="w-3 h-3 text-sage" /> : <Copy className="w-3 h-3 text-charcoal-light" />}
+                          <span>{copiedUpi ? 'Copied' : 'Copy UPI'}</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="flex flex-col gap-1.5 text-left">
-                    <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">UPI Transaction ID</label>
+                    <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">Bank UTR / Transaction Reference ID</label>
                     <input
                       type="text"
                       required
                       value={transactionId}
                       onChange={(e) => setTransactionId(e.target.value)}
-                      placeholder="Enter 12-digit UPI reference number"
+                      placeholder="Enter 12-digit bank UTR or reference number"
                       className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none focus:border-gold transition-colors text-xs"
                     />
                   </div>
 
                   <div className="flex flex-col gap-1.5 text-left">
-                    <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">Upload Receipt Screenshot</label>
+                    <label className="font-bold text-charcoal-light uppercase tracking-wider text-[9px]">Upload Transfer Receipt Screenshot</label>
                     <div className="border border-dashed border-cream-dark/80 rounded-xl p-3 bg-cream-light/30 flex flex-col items-center gap-1 text-center cursor-pointer hover:bg-cream-light/60 transition-colors relative">
                       <input
                         type="file"
