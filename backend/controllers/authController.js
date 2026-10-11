@@ -10,6 +10,33 @@ const generateToken = (id) => {
   });
 };
 
+// Helper to auto-link any existing paid program registrations to the user account
+const syncUserPaidEnrollments = async (userId, userEmail) => {
+  if (!userId || !userEmail) return;
+  try {
+    const ProgramRegistration = require('../models/ProgramRegistration');
+    const Program = require('../models/Program');
+    const paidRegs = await ProgramRegistration.find({
+      email: userEmail.toLowerCase().trim(),
+      paymentStatus: 'Paid'
+    });
+    for (const reg of paidRegs) {
+      if (!reg.user || reg.user.toString() !== userId.toString()) {
+        reg.user = userId;
+        await reg.save();
+      }
+      const progId = reg.program?._id || reg.program;
+      const prog = await Program.findById(progId);
+      if (prog && !prog.enrolledUsers.some(u => (u?._id || u).toString() === userId.toString())) {
+        prog.enrolledUsers.push(userId);
+        await prog.save();
+      }
+    }
+  } catch (err) {
+    console.error('Error auto-syncing paid enrollments:', err.message);
+  }
+};
+
 // @desc    Register a new user
 // @route   POST /api/auth/register
 // @access  Public
@@ -46,6 +73,8 @@ exports.registerUser = async (req, res, next) => {
     });
 
     if (user) {
+      await syncUserPaidEnrollments(user._id, user.email);
+
       res.status(201).json({
         success: true,
         _id: user._id,
@@ -88,6 +117,8 @@ exports.loginUser = async (req, res, next) => {
       user.userAgent = userAgent;
       await user.save({ validateBeforeSave: false });
 
+      await syncUserPaidEnrollments(user._id, user.email);
+
       res.json({
         success: true,
         _id: user._id,
@@ -112,8 +143,9 @@ exports.getUserProfile = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id).populate('cart.product');
     if (user) {
-      // Update lastActive timestamp quietly
+      // Update lastActive timestamp quietly & sync enrollments
       User.findByIdAndUpdate(req.user._id, { lastActive: new Date() }).exec().catch(() => {});
+      syncUserPaidEnrollments(user._id, user.email).catch(() => {});
 
       res.json({
         success: true,

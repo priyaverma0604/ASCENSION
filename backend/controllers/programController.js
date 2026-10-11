@@ -537,8 +537,9 @@ exports.verifyProgramRegistration = async (req, res, next) => {
       }
 
       // Add user to program's enrolledUsers array if not already present
-      const program = await Program.findById(reg.program);
-      if (program && userId && !program.enrolledUsers.includes(userId)) {
+      const progId = reg.program?._id || reg.program;
+      const program = await Program.findById(progId);
+      if (program && userId && !program.enrolledUsers.some(u => (u?._id || u).toString() === userId.toString())) {
         program.enrolledUsers.push(userId);
         await program.save();
       }
@@ -807,4 +808,61 @@ exports.getAllProgramProgress = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Get all programs enrolled by the currently logged-in user
+// @route   GET /api/programs/my-enrolled
+// @access  Private
+exports.getMyEnrolledPrograms = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    const userEmail = (req.user.email || '').toLowerCase().trim();
+
+    // 1. Find all paid registrations for this user by userId OR email
+    const paidRegistrations = await ProgramRegistration.find({
+      paymentStatus: 'Paid',
+      $or: [
+        { user: userId },
+        ...(userEmail ? [{ email: userEmail }] : [])
+      ]
+    }).populate('program');
+
+    // 2. Identify all program IDs from paid registrations and auto-heal enrollment
+    const programIdsFromRegistrations = [];
+    for (const reg of paidRegistrations) {
+      if (reg.program) {
+        const progId = reg.program._id || reg.program;
+        programIdsFromRegistrations.push(progId);
+
+        // Ensure user is linked to registration
+        if (!reg.user || reg.user.toString() !== userId.toString()) {
+          reg.user = userId;
+          await reg.save();
+        }
+
+        const progDoc = await Program.findById(progId);
+        if (progDoc && !progDoc.enrolledUsers.some(u => (u?._id || u).toString() === userId.toString())) {
+          progDoc.enrolledUsers.push(userId);
+          await progDoc.save();
+        }
+      }
+    }
+
+    // 3. Find all programs where user is in enrolledUsers OR has paid registration
+    const programs = await Program.find({
+      $or: [
+        { enrolledUsers: userId },
+        { _id: { $in: programIdsFromRegistrations } }
+      ]
+    }).sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      count: programs.length,
+      data: programs
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 

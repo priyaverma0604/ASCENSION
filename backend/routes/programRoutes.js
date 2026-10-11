@@ -14,7 +14,8 @@ const {
   deleteProgramRegistration,
   getProgramProgress,
   submitProgramProgressDay,
-  getAllProgramProgress
+  getAllProgramProgress,
+  getMyEnrolledPrograms
 } = require('../controllers/programController');
 
 const {
@@ -38,6 +39,9 @@ const upload = require('../middleware/upload');
 router.get('/registrations', protect, admin, getProgramRegistrations);
 router.post('/registrations/:regId/verify', protect, admin, verifyProgramRegistration);
 router.delete('/registrations/:regId', protect, admin, deleteProgramRegistration);
+
+// Get programs enrolled by logged-in user (Must be defined before /:id)
+router.get('/my-enrolled', protect, getMyEnrolledPrograms);
 
 router.route('/')
   .get(getPrograms)

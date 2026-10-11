@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Compass, User, Mail, Lock, ShieldCheck, CheckCircle, Clock } from 'lucide-react';
+import { Compass, User, Mail, Lock, ShieldCheck, CheckCircle, Clock, Video, MessageCircle, Sparkles, ArrowRight } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -29,14 +29,27 @@ const Profile = () => {
 
   const fetchEnrolledPrograms = async () => {
     try {
-      const { data } = await axios.get('/api/programs');
-      if (data.success) {
-        // Filter programs where user ID is in enrolledUsers
-        const enrolled = data.data.filter(prog => 
-          prog.enrolledUsers.some(u => u._id === user._id)
-        );
-        setMyPrograms(enrolled);
+      let enrolled = [];
+      try {
+        const { data: myData } = await axios.get('/api/programs/my-enrolled');
+        if (myData && myData.success && Array.isArray(myData.data)) {
+          enrolled = myData.data;
+        }
+      } catch (endpointErr) {
+        // Fallback to /api/programs
+        const { data } = await axios.get('/api/programs');
+        if (data && data.success && Array.isArray(data.data)) {
+          const currentUserId = (user?._id || user?.id)?.toString();
+          enrolled = data.data.filter(prog => {
+            if (!prog.enrolledUsers || !Array.isArray(prog.enrolledUsers)) return false;
+            return prog.enrolledUsers.some(u => {
+              const uId = (u?._id || u)?.toString();
+              return uId === currentUserId;
+            });
+          });
+        }
       }
+      setMyPrograms(enrolled);
     } catch (err) {
       console.error('Error fetching enrolled programs:', err.message);
     } finally {
@@ -194,27 +207,41 @@ const Profile = () => {
                         </div>
                       )}
                     </div>
-                    {prog.title.toLowerCase().includes('gratitude') ? (
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 shrink-0">
+                      {prog.whatsappGroupLink && (
+                        <a
+                          href={prog.whatsappGroupLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-[#25D366] hover:bg-[#1ebe5d] text-white font-bold py-2 px-3 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 uppercase tracking-wider text-[10px] font-sans"
+                          title="Join WhatsApp Group"
+                        >
+                          <MessageCircle className="w-3.5 h-3.5" />
+                          <span>WhatsApp</span>
+                        </a>
+                      )}
+
+                      {prog.zoomLink && (
+                        <a
+                          href={prog.zoomLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="bg-gold hover:bg-gold-dark text-charcoal-dark font-bold py-2 px-3.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 uppercase tracking-wider text-[10px] font-sans border border-gold-dark/20"
+                        >
+                          <Video className="w-3.5 h-3.5" />
+                          <span>Join Live</span>
+                        </a>
+                      )}
+
                       <button
                         onClick={() => navigate(`/programs/${prog._id}/dashboard`)}
-                        className="bg-sage hover:bg-sage-dark text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-sm shrink-0 flex items-center gap-1 uppercase tracking-wider text-[10px] font-sans border border-sage-dark/10"
+                        className="bg-sage hover:bg-sage-dark text-white font-bold py-2.5 px-4 rounded-xl transition-all shadow-sm flex items-center justify-center gap-1.5 uppercase tracking-wider text-[10px] font-sans border border-sage-dark/10"
                       >
-                        <span>View Tasks</span>
+                        <Sparkles className="w-3.5 h-3.5 text-gold" />
+                        <span>Go to Dashboard</span>
+                        <ArrowRight className="w-3 h-3" />
                       </button>
-                    ) : prog.zoomLink ? (
-                      <a
-                        href={prog.zoomLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="bg-gold hover:bg-gold-dark text-charcoal-dark font-bold py-2.5 px-4 rounded-xl transition-all shadow-sm shrink-0 flex items-center gap-1.5 uppercase tracking-wider text-[10px] font-sans border border-gold-dark/20"
-                      >
-                        <span>Join Live</span>
-                      </a>
-                    ) : (
-                      <span className="bg-sage/10 p-2 rounded-full inline-block shrink-0 text-sage">
-                        <ShieldCheck className="w-5 h-5" />
-                      </span>
-                    )}
+                    </div>
                   </div>
                 ))}
               </div>
