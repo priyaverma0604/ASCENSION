@@ -5,7 +5,7 @@ import {
   ArrowRight, Sparkles, Compass, AlertCircle, Eye,
   Calendar, Clock, Video, MessageSquare, Star, ExternalLink, ShieldCheck, BookOpen, UserCheck,
   Play, Pause, Volume2, VolumeX, RotateCcw, RotateCw, Headphones, Flame, MessageCircle,
-  Award, Heart
+  Award, Heart, Camera
 } from 'lucide-react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
@@ -110,6 +110,7 @@ const ProgramDashboard = () => {
       });
     }
   };
+  const toggleAudioPlay = togglePlayAudio;
 
   const handleAudioTimeUpdate = () => {
     if (audioRef.current) {
@@ -171,7 +172,7 @@ const ProgramDashboard = () => {
 
       // Fetch program info
       const programRes = await axios.get(`/api/programs/${id}`);
-      if (programRes.data.success) {
+      if (programRes.data?.success) {
         const progData = programRes.data.data;
         setProgram(progData);
         
@@ -185,24 +186,49 @@ const ProgramDashboard = () => {
 
       // Fetch user progress
       const progressRes = await axios.get(`/api/programs/${id}/progress`);
-      if (progressRes.data.success) {
+      if (progressRes.data?.success) {
         setProgress(progressRes.data.data);
       }
 
       // Fetch assignments list (user view - locks/completed flags)
+      let fetchedAssignments = [];
       const assignmentsRes = await axios.get(`/api/programs/${id}/assignments`);
-      if (assignmentsRes.data.success) {
-        setAssignments(assignmentsRes.data.data);
+      if (assignmentsRes.data?.success) {
+        fetchedAssignments = assignmentsRes.data.data || [];
+        setAssignments(fetchedAssignments);
       }
 
       // Fetch details of active day assignment
-      const activeRes = await axios.get(`/api/programs/${id}/assignments/current`);
-      if (activeRes.data.success && activeRes.data.data) {
-        setActiveAssignment(activeRes.data.data);
-        setSelectedAssignment(activeRes.data.data);
-      } else {
+      try {
+        const activeRes = await axios.get(`/api/programs/${id}/assignments/current`);
+        if (activeRes.data?.success && activeRes.data.data) {
+          setActiveAssignment(activeRes.data.data);
+          setSelectedAssignment(activeRes.data.data);
+        } else {
+          setActiveAssignment(null);
+          // Fallback to first available unlocked day or day 1 if current assignment not found
+          if (fetchedAssignments.length > 0) {
+            const defaultAssign = fetchedAssignments.find(a => !a.isLocked) || fetchedAssignments[0];
+            try {
+              const defaultDetailRes = await axios.get(`/api/programs/${id}/assignments/day/${defaultAssign.dayNumber}`);
+              if (defaultDetailRes.data?.success && defaultDetailRes.data.data) {
+                setSelectedAssignment(defaultDetailRes.data.data);
+              } else {
+                setSelectedAssignment(defaultAssign);
+              }
+            } catch (fallbackErr) {
+              setSelectedAssignment(defaultAssign);
+            }
+          } else {
+            setSelectedAssignment(null);
+          }
+        }
+      } catch (err) {
+        console.warn('Could not fetch active day assignment:', err);
         setActiveAssignment(null);
-        setSelectedAssignment(null);
+        if (fetchedAssignments.length > 0) {
+          setSelectedAssignment(fetchedAssignments[0]);
+        }
       }
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
@@ -215,7 +241,7 @@ const ProgramDashboard = () => {
   const fetchAssignmentDetails = async (dayNum) => {
     try {
       const res = await axios.get(`/api/programs/${id}/assignments/day/${dayNum}`);
-      if (res.data.success) {
+      if (res.data?.success) {
         setSelectedAssignment(res.data.data);
       }
     } catch (err) {
@@ -234,11 +260,12 @@ const ProgramDashboard = () => {
       setPreviewUrl(URL.createObjectURL(file));
     }
   };
+  const handleFileSelect = handleFileChange;
 
   const handleUploadSubmit = async (e) => {
     e.preventDefault();
 
-    const isPhotoRequired = program && (program.title.toLowerCase().includes('gratitude') || program._id === '6a4963f49e941f93f91f5abf');
+    const isPhotoRequired = program && (program.title?.toLowerCase().includes('gratitude') || program._id === '6a4963f49e941f93f91f5abf');
 
     if (isPhotoRequired && !selectedFile) {
       alert('Please select a photo of your work to upload.');
@@ -275,6 +302,7 @@ const ProgramDashboard = () => {
       setUploading(false);
     }
   };
+  const handleAssignmentSubmit = handleUploadSubmit;
 
   if (loading) {
     return (
@@ -1004,8 +1032,8 @@ const ProgramDashboard = () => {
                   const navItem = isNavratri ? navratriAssignments.find(n => n.day === dayNum) : null;
                   const navImage = isNavratri ? NAVRATRI_DAY_IMAGES[dayNum] : null;
                   const displayImage = navImage || (program?.images?.[0] ? getImageUrl(program.images[0]) : null);
-                  const goddessName = navItem ? navItem.goddess.split('(')[0].trim() : `Day ${dayNum}`;
-                  const theme = navItem ? navItem.chakra : (assignment.estimatedDuration || 'Daily Practice');
+                  const goddessName = navItem?.goddess ? navItem.goddess.split('(')[0].trim() : (assignment?.title || `Day ${dayNum}`);
+                  const theme = navItem?.chakra || (assignment?.estimatedDuration || 'Daily Practice');
 
                   return (
                     <div
@@ -1080,8 +1108,8 @@ const ProgramDashboard = () => {
                     const navItem = isNavratri ? navratriAssignments.find(n => n.day === sub.day) : null;
                     const navImage = isNavratri ? NAVRATRI_DAY_IMAGES[sub.day] : null;
                     const displayImage = sub.photo ? getImageUrl(sub.photo) : (navImage || (program?.images?.[0] ? getImageUrl(program.images[0]) : null));
-                    const cardTitle = navItem ? navItem.goddess.split('(')[0].trim() : `Day ${sub.day}`;
-                    const cardTheme = navItem ? navItem.chakra : `Completed on ${new Date(sub.submittedAt).toLocaleDateString()}`;
+                    const cardTitle = navItem?.goddess ? navItem.goddess.split('(')[0].trim() : `Day ${sub.day}`;
+                    const cardTheme = navItem?.chakra || (sub.submittedAt ? `Completed on ${new Date(sub.submittedAt).toLocaleDateString()}` : 'Completed');
 
                     return (
                       <div 
@@ -1583,41 +1611,43 @@ const ProgramDashboard = () => {
                   )}
 
                   {/* Display completed day reflection/photo if reviewing completed day */}
-                  {isSelectedCompleted && (
-                    <div className="border-t border-cream-dark/60 pt-5 flex flex-col gap-3">
-                      <div className="flex items-center gap-2 text-sage text-xs font-bold uppercase tracking-wider">
-                        <CheckCircle className="w-4 h-4" />
-                        <span>Completed on {new Date(progress.submissions.find(s => s.day === selectedAssignment.dayNumber)?.submittedAt || Date.now()).toLocaleDateString()}</span>
-                      </div>
-                      {(progress.submissions.find(s => s.day === selectedAssignment.dayNumber)?.photo || (isNavratri && NAVRATRI_DAY_IMAGES[selectedAssignment.dayNumber])) && (
-                        <div className="flex flex-col gap-1.5">
-                          <span className="text-[10px] text-charcoal-light font-bold uppercase tracking-wider">
-                            {progress.submissions.find(s => s.day === selectedAssignment.dayNumber)?.photo ? 'Submitted Photo Proof' : 'Sacred Swaroop Artwork'}
-                          </span>
-                          <div 
-                            className="w-36 h-36 rounded-xl overflow-hidden border border-cream-dark shadow-sm bg-cream relative cursor-pointer group"
-                            onClick={() => {
-                              const targetImg = progress.submissions.find(s => s.day === selectedAssignment.dayNumber)?.photo 
-                                ? getImageUrl(progress.submissions.find(s => s.day === selectedAssignment.dayNumber).photo) 
-                                : NAVRATRI_DAY_IMAGES[selectedAssignment.dayNumber];
-                              if (targetImg) setLightboxImage({ url: targetImg, title: selectedAssignment.title });
-                            }}
-                          >
-                            <img 
-                              src={progress.submissions.find(s => s.day === selectedAssignment.dayNumber)?.photo 
-                                ? getImageUrl(progress.submissions.find(s => s.day === selectedAssignment.dayNumber).photo) 
-                                : NAVRATRI_DAY_IMAGES[selectedAssignment.dayNumber]} 
-                              alt="Day Submission" 
-                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
-                            />
-                            <div className="absolute inset-0 bg-charcoal/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                              <Eye className="w-5 h-5 text-white drop-shadow" />
+                  {isSelectedCompleted && (() => {
+                    const matchedSub = progress?.submissions?.find(s => s.day === selectedAssignment?.dayNumber);
+                    const subPhoto = matchedSub?.photo ? getImageUrl(matchedSub.photo) : null;
+                    const navImage = (isNavratri && selectedAssignment?.dayNumber) ? NAVRATRI_DAY_IMAGES[selectedAssignment.dayNumber] : null;
+                    const targetImage = subPhoto || navImage;
+
+                    return (
+                      <div className="border-t border-cream-dark/60 pt-5 flex flex-col gap-3">
+                        <div className="flex items-center gap-2 text-sage text-xs font-bold uppercase tracking-wider">
+                          <CheckCircle className="w-4 h-4" />
+                          <span>Completed on {new Date(matchedSub?.submittedAt || Date.now()).toLocaleDateString()}</span>
+                        </div>
+                        {targetImage && (
+                          <div className="flex flex-col gap-1.5">
+                            <span className="text-[10px] text-charcoal-light font-bold uppercase tracking-wider">
+                              {subPhoto ? 'Submitted Photo Proof' : 'Sacred Swaroop Artwork'}
+                            </span>
+                            <div 
+                              className="w-36 h-36 rounded-xl overflow-hidden border border-cream-dark shadow-sm bg-cream relative cursor-pointer group"
+                              onClick={() => {
+                                setLightboxImage({ url: targetImage, title: selectedAssignment?.title || 'Completed Day' });
+                              }}
+                            >
+                              <img 
+                                src={targetImage} 
+                                alt="Day Submission" 
+                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" 
+                              />
+                              <div className="absolute inset-0 bg-charcoal/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                <Eye className="w-5 h-5 text-white drop-shadow" />
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
+                        )}
+                      </div>
+                    );
+                  })()}
 
                 </div>
               ) : (
@@ -1647,8 +1677,8 @@ const ProgramDashboard = () => {
                       const navItem = isNavratri ? navratriAssignments.find(n => n.day === sub.day) : null;
                       const navImage = isNavratri ? NAVRATRI_DAY_IMAGES[sub.day] : null;
                       const displayImage = sub.photo ? getImageUrl(sub.photo) : (navImage || (program?.images?.[0] ? getImageUrl(program.images[0]) : null));
-                      const cardTitle = navItem ? navItem.goddess.split('(')[0].trim() : `Day ${sub.day}`;
-                      const cardTheme = navItem ? navItem.chakra : `Completed on ${new Date(sub.submittedAt).toLocaleDateString()}`;
+                      const cardTitle = navItem?.goddess ? navItem.goddess.split('(')[0].trim() : `Day ${sub.day}`;
+                      const cardTheme = navItem?.chakra || (sub.submittedAt ? `Completed on ${new Date(sub.submittedAt).toLocaleDateString()}` : 'Completed');
 
                       return (
                         <div 
@@ -1755,7 +1785,7 @@ const ProgramDashboard = () => {
                         {icon}
                         <span className="font-serif font-bold text-[11px]">Day {dayNum}</span>
                         <span className="text-[10px] line-clamp-1 text-left font-medium">
-                          {assignment.title.replace(`Gratitude Task Day ${dayNum}`, '').replace(`Gratitude Day ${dayNum}`, '').replace(`Day ${dayNum}`, '').replace(': ', '') || 'Daily Practice'}
+                          {(assignment?.title || '').replace(`Gratitude Task Day ${dayNum}`, '').replace(`Gratitude Day ${dayNum}`, '').replace(`Day ${dayNum}`, '').replace(': ', '') || 'Daily Practice'}
                         </span>
                       </div>
                       {isDayCompleted && (

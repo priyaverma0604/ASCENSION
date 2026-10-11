@@ -30,6 +30,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import ProductDetails from './pages/ProductDetails';
 import ProgramDashboard from './pages/ProgramDashboard';
 import ThankYouProgram from './pages/ThankYouProgram';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Context Providers
 import { AuthProvider } from './context/AuthContext';
@@ -55,56 +56,66 @@ function App() {
               
               {/* Content Panel with mobile bottom safe padding */}
               <main className="flex-grow pb-16 lg:pb-0">
-                <Routes>
-                  {/* Public routes */}
-                  <Route path="/" element={<Home />} />
-                  <Route path="/about" element={<About />} />
-                  <Route path="/services" element={<Services />} />
-                  <Route path="/programs" element={<Programs />} />
-                  <Route path="/program/:id" element={<ProgramDetails />} />
-                  <Route path="/programs/:id" element={<ProgramDetails />} />
-                  <Route path="/programs/details/:id" element={<ProgramDetails />} />
-                  <Route path="/ancestral-healing-program" element={<ProgramDetails autoProgram="ancestral-healing" />} />
-                  <Route path="/ancestral-program" element={<ProgramDetails autoProgram="ancestral-healing" />} />
-                  <Route path="/thank-you/navratri" element={<ThankYouProgram />} />
-                  <Route path="/thank-you" element={<ThankYouProgram />} />
-                  <Route path="/thank-you/:id" element={<ThankYouProgram />} />
-                  <Route path="/webinars" element={<Home scrollToWebinar={true} />} />
-                  <Route path="/webinar" element={<Home scrollToWebinar={true} />} />
-                  <Route path="/ancestral-healing-webinar" element={<Home scrollToWebinar={true} autoOpenAncestral={true} />} />
-                  <Route path="/ancestral-webinar" element={<Home scrollToWebinar={true} autoOpenAncestral={true} />} />
-                  <Route path="/webinar/ancestral-healing" element={<Home scrollToWebinar={true} autoOpenAncestral={true} />} />
-                  <Route path="/webinars/ancestral-healing" element={<Home scrollToWebinar={true} autoOpenAncestral={true} />} />
-                  <Route path="/shop" element={<Shop />} />
-                  <Route path="/product/:id" element={<ProductDetails />} />
-                  <Route path="/community" element={<Community />} />
-                  <Route path="/ngo" element={<NGO />} />
-                  <Route path="/donate" element={<Donation />} />
-                  <Route path="/contact" element={<Contact />} />
-                   <Route path="/csr" element={<CSR />} />
-                  <Route path="/login" element={<Login />} />
-                  <Route path="/register" element={<Register />} />
-                  <Route path="/forgot-password" element={<ForgotPassword />} />
-                  <Route path="/reset-password" element={<ForgotPassword />} />
+                <ErrorBoundary>
+                  <Routes>
+                    {/* Public routes */}
+                    <Route path="/" element={<Home />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/services" element={<Services />} />
+                    <Route path="/programs" element={<Programs />} />
+                    <Route path="/program/:id" element={<ProgramDetails />} />
+                    <Route path="/programs/:id" element={<ProgramDetails />} />
+                    <Route path="/programs/details/:id" element={<ProgramDetails />} />
+                    <Route path="/ancestral-healing-program" element={<ProgramDetails autoProgram="ancestral-healing" />} />
+                    <Route path="/ancestral-program" element={<ProgramDetails autoProgram="ancestral-healing" />} />
+                    <Route path="/thank-you/navratri" element={<ThankYouProgram />} />
+                    <Route path="/thank-you" element={<ThankYouProgram />} />
+                    <Route path="/thank-you/:id" element={<ThankYouProgram />} />
+                    <Route path="/webinars" element={<Home scrollToWebinar={true} />} />
+                    <Route path="/webinar" element={<Home scrollToWebinar={true} />} />
+                    <Route path="/ancestral-healing-webinar" element={<Home scrollToWebinar={true} autoOpenAncestral={true} />} />
+                    <Route path="/ancestral-webinar" element={<Home scrollToWebinar={true} autoOpenAncestral={true} />} />
+                    <Route path="/webinar/ancestral-healing" element={<Home scrollToWebinar={true} autoOpenAncestral={true} />} />
+                    <Route path="/webinars/ancestral-healing" element={<Home scrollToWebinar={true} autoOpenAncestral={true} />} />
+                    <Route path="/shop" element={<Shop />} />
+                    <Route path="/product/:id" element={<ProductDetails />} />
+                    <Route path="/community" element={<Community />} />
+                    <Route path="/ngo" element={<NGO />} />
+                    <Route path="/donate" element={<Donation />} />
+                    <Route path="/contact" element={<Contact />} />
+                     <Route path="/csr" element={<CSR />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/register" element={<Register />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                    <Route path="/reset-password" element={<ForgotPassword />} />
 
-                  {/* Private User Route */}
-                  <Route 
-                    path="/profile" 
-                    element={
-                      <ProtectedRoute>
-                        <Profile />
-                      </ProtectedRoute>
-                    } 
-                  />
+                    {/* Private User Route */}
+                    <Route 
+                      path="/profile" 
+                      element={
+                        <ProtectedRoute>
+                          <Profile />
+                        </ProtectedRoute>
+                      } 
+                    />
 
-                  <Route 
-                    path="/programs/:id/dashboard" 
-                    element={
-                      <ProtectedRoute>
-                        <ProgramDashboard />
-                      </ProtectedRoute>
-                    } 
-                  />
+                    {/* Program Dashboard Routes (supports both /program/:id and /programs/:id) */}
+                    <Route 
+                      path="/programs/:id/dashboard" 
+                      element={
+                        <ProtectedRoute>
+                          <ProgramDashboard />
+                        </ProtectedRoute>
+                      } 
+                    />
+                    <Route 
+                      path="/program/:id/dashboard" 
+                      element={
+                        <ProtectedRoute>
+                          <ProgramDashboard />
+                        </ProtectedRoute>
+                      } 
+                    />
 
                   {/* Secure Admin Route */}
                   <Route 
@@ -119,7 +130,8 @@ function App() {
                   {/* Fallback redirect */}
                   <Route path="*" element={<Home />} />
                 </Routes>
-              </main>
+              </ErrorBoundary>
+            </main>
 
               {/* Floating Heartbeat Donate Button - adjusted for mobile bottom navigation */}
               <Link 

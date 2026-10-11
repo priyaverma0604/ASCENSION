@@ -309,11 +309,18 @@ exports.getCurrentAssignment = async (req, res, next) => {
     const progress = await UserProgramProgress.findOne({ user: req.user._id, program: program._id });
     const currentDayNum = progress ? progress.currentDay : 1;
 
-    const assignment = await Assignment.findOne({
+    let assignment = await Assignment.findOne({
       program: program._id,
       dayNumber: currentDayNum,
       status: 'Active'
     });
+
+    if (!assignment && progress && (progress.completed || progress.submissions.length > 0)) {
+      assignment = await Assignment.findOne({
+        program: program._id,
+        status: 'Active'
+      }).sort({ dayNumber: -1 });
+    }
 
     if (!assignment) {
       return res.json({ success: false, code: 'ASSIGNMENT_NOT_FOUND', message: 'This assignment is not available yet. Please check back soon.' });
@@ -493,7 +500,8 @@ exports.getAssignmentByDayNum = async (req, res, next) => {
     // Security verification: check if this day is unlocked for the user
     const progress = await UserProgramProgress.findOne({ user: req.user._id, program: program._id });
     const currentDay = progress ? progress.currentDay : 1;
-    if (dayNumber > currentDay) {
+    const isCompleted = progress && (progress.completed || progress.submissions?.length >= (program.duration ? parseInt(program.duration, 10) : 9));
+    if (!isCompleted && dayNumber > currentDay) {
       return res.status(403).json({ success: false, message: 'This assignment is locked.' });
     }
 

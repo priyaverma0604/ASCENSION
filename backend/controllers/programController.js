@@ -698,6 +698,12 @@ exports.getProgramProgress = async (req, res, next) => {
       }
     }
 
+    const totalProgDays = isNavratriProgram ? 9 : (program.duration && !isNaN(parseInt(program.duration, 10)) ? parseInt(program.duration, 10) : 30);
+    if (!progress.completed && progress.submissions && progress.submissions.length >= totalProgDays) {
+      progress.completed = true;
+      await progress.save();
+    }
+
     const AssignmentSubmission = require('../models/AssignmentSubmission');
     const currentSubmission = await AssignmentSubmission.findOne({
       user: req.user._id,
