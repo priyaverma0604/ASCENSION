@@ -117,8 +117,11 @@ const ProgramDetails = ({ autoProgram }) => {
   }
 
   const isUserEnrolled = user && program.enrolledUsers && (
-    program.enrolledUsers.includes(user._id) || 
-    program.enrolledUsers.some(eu => eu === user._id || (eu && eu._id === user._id))
+    program.enrolledUsers.some(eu => {
+      const enrolledId = (eu && eu._id ? eu._id : eu)?.toString();
+      const currentUserId = (user._id || user.id)?.toString();
+      return enrolledId === currentUserId;
+    })
   );
 
   const isAncestral = program.title && program.title.toLowerCase().includes('ancestral');

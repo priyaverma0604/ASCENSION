@@ -265,15 +265,53 @@ exports.getAssignmentsUser = async (req, res, next) => {
     }
 
     let progress = await UserProgramProgress.findOne({ user: req.user._id, program: program._id });
-    const currentDay = progress ? progress.currentDay : 1;
+    
+    // Check India Standard Time (IST) calendar date
+    const getISTDate = (d) => new Date(d).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+    const todayIST = getISTDate(new Date());
+
+    const isNavratriProgram = program.title.toLowerCase().includes('navratri') || program._id.toString() === '6a4963f49e941f93f91f5ac5';
+    const totalProgramDays = isNavratriProgram ? 9 : (program.duration && !isNaN(parseInt(program.duration, 10)) ? parseInt(program.duration, 10) : 30);
+    const isProgramCompleted = progress && (progress.completed || (progress.submissions && progress.submissions.length >= totalProgramDays));
+
+    let hasCompletedToday = false;
+    let lastCompletedDay = 0;
+    if (progress && progress.submissions && progress.submissions.length > 0) {
+      const sortedSubs = [...progress.submissions].sort((a, b) => a.day - b.day);
+      const lastSub = sortedSubs[sortedSubs.length - 1];
+      lastCompletedDay = lastSub.day;
+      if (progress.submissions.some(s => s.submittedAt && getISTDate(s.submittedAt) === todayIST)) {
+        hasCompletedToday = true;
+      }
+    }
 
     // Fetch active assignments
     const assignments = await Assignment.find({ program: program._id, status: 'Active' }).sort('dayNumber');
 
     // Return assignments list indicating locked status
     const data = assignments.map(assign => {
-      const isLocked = assign.dayNumber > currentDay;
       const isCompleted = progress ? progress.submissions.some(sub => sub.day === assign.dayNumber) : false;
+      let isLocked = false;
+      let unlocksTomorrow = false;
+
+      if (isProgramCompleted) {
+        isLocked = false;
+      } else if (isCompleted) {
+        isLocked = false; // Always allow re-listening to completed days
+      } else {
+        // Not completed yet
+        if (isNavratriProgram && hasCompletedToday) {
+          // Navratri rule: 1 audiobook per calendar day! If already completed today, next day unlocks tomorrow
+          isLocked = true;
+          if (assign.dayNumber === lastCompletedDay + 1) {
+            unlocksTomorrow = true;
+          }
+        } else {
+          // If hasn't completed today, next sequential day is unlocked
+          isLocked = assign.dayNumber > lastCompletedDay + 1;
+        }
+      }
+
       return {
         _id: assign._id,
         dayNumber: assign.dayNumber,
@@ -282,11 +320,18 @@ exports.getAssignmentsUser = async (req, res, next) => {
         audioUrl: assign.audioUrl || '',
         audioDuration: assign.audioDuration || assign.estimatedDuration || '',
         isLocked,
-        isCompleted
+        isCompleted,
+        unlocksTomorrow
       };
     });
 
-    res.json({ success: true, data });
+    res.json({
+      success: true,
+      hasCompletedToday,
+      lastCompletedDay,
+      nextUnlockDay: lastCompletedDay + 1,
+      data
+    });
   } catch (error) {
     next(error);
   }
@@ -307,15 +352,41 @@ exports.getCurrentAssignment = async (req, res, next) => {
     }
 
     const progress = await UserProgramProgress.findOne({ user: req.user._id, program: program._id });
-    const currentDayNum = progress ? progress.currentDay : 1;
+    const isNavratriProgram = program.title.toLowerCase().includes('navratri') || program._id.toString() === '6a4963f49e941f93f91f5ac5';
+    const totalProgramDays = isNavratriProgram ? 9 : (program.duration && !isNaN(parseInt(program.duration, 10)) ? parseInt(program.duration, 10) : 30);
+    const isProgramCompleted = progress && (progress.completed || (progress.submissions && progress.submissions.length >= totalProgramDays));
+
+    const getISTDate = (d) => new Date(d).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+    const todayIST = getISTDate(new Date());
+
+    let hasCompletedToday = false;
+    let lastCompletedDay = 0;
+    if (progress && progress.submissions && progress.submissions.length > 0) {
+      const sortedSubs = [...progress.submissions].sort((a, b) => a.day - b.day);
+      const lastSub = sortedSubs[sortedSubs.length - 1];
+      lastCompletedDay = lastSub.day;
+      if (progress.submissions.some(s => s.submittedAt && getISTDate(s.submittedAt) === todayIST)) {
+        hasCompletedToday = true;
+      }
+    }
+
+    let targetDayNum;
+    if (isProgramCompleted) {
+      targetDayNum = lastCompletedDay || 1;
+    } else if (isNavratriProgram && hasCompletedToday) {
+      // Completed today's sadhana: load today's completed day so user can re-listen
+      targetDayNum = lastCompletedDay;
+    } else {
+      targetDayNum = lastCompletedDay + 1;
+    }
 
     let assignment = await Assignment.findOne({
       program: program._id,
-      dayNumber: currentDayNum,
+      dayNumber: targetDayNum,
       status: 'Active'
     });
 
-    if (!assignment && progress && (progress.completed || progress.submissions.length > 0)) {
+    if (!assignment) {
       assignment = await Assignment.findOne({
         program: program._id,
         status: 'Active'
@@ -326,7 +397,12 @@ exports.getCurrentAssignment = async (req, res, next) => {
       return res.json({ success: false, code: 'ASSIGNMENT_NOT_FOUND', message: 'This assignment is not available yet. Please check back soon.' });
     }
 
-    res.json({ success: true, data: assignment });
+    const assignmentObj = assignment.toObject();
+    assignmentObj.hasCompletedToday = hasCompletedToday;
+    assignmentObj.unlocksTomorrow = hasCompletedToday && !isProgramCompleted;
+    assignmentObj.nextDayNumber = lastCompletedDay + 1;
+
+    res.json({ success: true, data: assignmentObj });
   } catch (error) {
     next(error);
   }
@@ -384,6 +460,20 @@ exports.submitAssignment = async (req, res, next) => {
 
     if (progress.completed) {
       return res.status(400).json({ success: false, message: `You have already completed this ${totalProgramDays}-day program!` });
+    }
+
+    // Navratri rule check: Only 1 audiobook per calendar day in IST allowed!
+    const getISTDate = (d) => new Date(d).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+    const todayIST = getISTDate(new Date());
+
+    if (isNavratriProgram && progress.submissions && progress.submissions.length > 0) {
+      const alreadySubmittedToday = progress.submissions.some(s => s.submittedAt && getISTDate(s.submittedAt) === todayIST);
+      if (alreadySubmittedToday) {
+        return res.status(400).json({
+          success: false,
+          message: `Only 1 audiobook per day is allowed during Navratri! Day ${assignment.dayNumber + 1} will unlock tomorrow. Jai Mata Di! 🌸`
+        });
+      }
     }
 
     // Backend Security: Verify that the submitted assignment day matches the user's progress day
@@ -496,13 +586,36 @@ exports.getAssignmentByDayNum = async (req, res, next) => {
     }
 
     const dayNumber = Number(req.params.dayNumber);
+    const isNavratriProgram = program.title.toLowerCase().includes('navratri') || program._id.toString() === '6a4963f49e941f93f91f5ac5';
+    const totalProgramDays = isNavratriProgram ? 9 : (program.duration && !isNaN(parseInt(program.duration, 10)) ? parseInt(program.duration, 10) : 30);
 
     // Security verification: check if this day is unlocked for the user
     const progress = await UserProgramProgress.findOne({ user: req.user._id, program: program._id });
-    const currentDay = progress ? progress.currentDay : 1;
-    const isCompleted = progress && (progress.completed || progress.submissions?.length >= (program.duration ? parseInt(program.duration, 10) : 9));
-    if (!isCompleted && dayNumber > currentDay) {
-      return res.status(403).json({ success: false, message: 'This assignment is locked.' });
+    const isCompleted = progress && (progress.completed || progress.submissions?.length >= totalProgramDays);
+    const hasAlreadyDoneDay = progress && progress.submissions?.some(s => s.day === dayNumber);
+
+    if (!isCompleted && !hasAlreadyDoneDay) {
+      const getISTDate = (d) => new Date(d).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+      const todayIST = getISTDate(new Date());
+
+      let hasCompletedToday = false;
+      let lastCompletedDay = 0;
+      if (progress && progress.submissions && progress.submissions.length > 0) {
+        const sortedSubs = [...progress.submissions].sort((a, b) => a.day - b.day);
+        lastCompletedDay = sortedSubs[sortedSubs.length - 1].day;
+        hasCompletedToday = progress.submissions.some(s => s.submittedAt && getISTDate(s.submittedAt) === todayIST);
+      }
+
+      if (isNavratriProgram && hasCompletedToday && dayNumber > lastCompletedDay) {
+        return res.status(403).json({
+          success: false,
+          message: `Day ${dayNumber} unlocks tomorrow! Please re-listen to today's completed sadhana.`
+        });
+      }
+
+      if (dayNumber > (lastCompletedDay + 1)) {
+        return res.status(403).json({ success: false, message: 'This assignment is locked.' });
+      }
     }
 
     const assignment = await Assignment.findOne({ program: program._id, dayNumber, status: 'Active' });

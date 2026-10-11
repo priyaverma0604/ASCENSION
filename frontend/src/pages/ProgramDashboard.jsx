@@ -1078,13 +1078,31 @@ const ProgramDashboard = () => {
                         </div>
                       </div>
 
-                      <button
-                        onClick={() => fetchAssignmentDetails(dayNum)}
-                        className="bg-cream hover:bg-gold text-charcoal hover:text-charcoal-dark font-bold text-xs py-2 px-3 rounded-xl border border-cream-dark transition-all flex items-center gap-1.5 shrink-0 shadow-xs active:scale-95"
-                      >
-                        <Headphones className="w-3.5 h-3.5 text-gold-dark" />
-                        <span>Listen</span>
-                      </button>
+                      {assignment.isLocked ? (
+                        assignment.unlocksTomorrow ? (
+                          <button
+                            onClick={() => alert(`Day ${dayNum} unlocks tomorrow! Only 1 sacred audiobook is unlocked per day during Navratri.`)}
+                            className="bg-amber-50 hover:bg-amber-100 text-gold-dark font-bold text-xs py-2 px-2.5 rounded-xl border border-gold/40 transition-all flex items-center gap-1 shrink-0 shadow-xs"
+                            title="Unlocks tomorrow"
+                          >
+                            <Lock className="w-3.5 h-3.5 text-gold-dark" />
+                            <span>Tomorrow</span>
+                          </button>
+                        ) : (
+                          <div className="bg-cream/40 text-charcoal-light font-bold text-xs py-2 px-2.5 rounded-xl border border-cream-dark transition-all flex items-center gap-1 shrink-0 opacity-60 select-none">
+                            <Lock className="w-3.5 h-3.5 text-charcoal-light" />
+                            <span>Locked</span>
+                          </div>
+                        )
+                      ) : (
+                        <button
+                          onClick={() => fetchAssignmentDetails(dayNum)}
+                          className="bg-cream hover:bg-gold text-charcoal hover:text-charcoal-dark font-bold text-xs py-2 px-3 rounded-xl border border-cream-dark transition-all flex items-center gap-1.5 shrink-0 shadow-xs active:scale-95"
+                        >
+                          <Headphones className="w-3.5 h-3.5 text-gold-dark" />
+                          <span>Listen</span>
+                        </button>
+                      )}
                     </div>
                   );
                 })}
@@ -1296,6 +1314,29 @@ const ProgramDashboard = () => {
                       {isSelectedCompleted ? 'Completed' : 'Pending Completion'}
                     </span>
                   </div>
+
+                  {/* Today's Sacred Sadhana Completed Banner */}
+                  {selectedAssignment.unlocksTomorrow && (
+                    <div className="bg-gradient-to-r from-amber-500/10 via-gold/20 to-amber-500/10 border-2 border-gold/40 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-left shadow-xs">
+                      <div className="flex items-center gap-3">
+                        <span className="p-2.5 rounded-full bg-gold text-charcoal-dark shadow-sm shrink-0">
+                          <Sparkles className="w-5 h-5 animate-pulse" />
+                        </span>
+                        <div className="flex flex-col">
+                          <span className="font-serif font-bold text-sm text-charcoal-dark">
+                            🌸 Today's Sacred Sadhana Completed! Day {selectedAssignment.nextDayNumber || (selectedAssignment.dayNumber + 1)} Unlocks Tomorrow
+                          </span>
+                          <span className="text-xs text-charcoal-light">
+                            Only 1 sacred audiobook is unlocked per day during Navratri. You have unlimited access to re-listen to today's transmission below.
+                          </span>
+                        </div>
+                      </div>
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gold/30 text-charcoal-dark font-bold text-xs shrink-0">
+                        <Clock className="w-3.5 h-3.5 text-gold-dark" />
+                        <span>Next Day: Tomorrow 12:00 AM IST</span>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="flex flex-col gap-4">
                     <h3 className="font-serif text-xl font-bold text-charcoal-dark flex items-center gap-2">
@@ -1761,6 +1802,9 @@ const ProgramDashboard = () => {
                       stateClasses = "bg-gold/10 border-gold/40 text-gold-dark font-bold animate-pulse";
                       icon = <Compass className="w-4 h-4 text-gold-dark shrink-0 animate-pulse" />;
                     }
+                  } else if (assignment.unlocksTomorrow) {
+                    stateClasses = "bg-amber-50/70 border-gold/40 text-charcoal-dark cursor-pointer hover:border-gold hover:bg-amber-50";
+                    icon = <Lock className="w-3.5 h-3.5 text-gold-dark shrink-0" />;
                   } else {
                     // Locked
                     stateClasses = "opacity-55 border-cream-dark bg-cream-light/30 cursor-not-allowed select-none text-charcoal-light";
@@ -1768,14 +1812,16 @@ const ProgramDashboard = () => {
                   }
 
                   const isSelected = selectedAssignment && selectedAssignment.dayNumber === dayNum;
-                  const activeClickableClass = !isDayLocked ? "cursor-pointer hover:shadow-sm" : "";
+                  const activeClickableClass = !isDayLocked || assignment.unlocksTomorrow ? "cursor-pointer hover:shadow-sm" : "";
                   const selectedClass = isSelected ? "ring-2 ring-sage/55 border-sage/60 font-bold" : "";
 
                   return (
                     <div 
                       key={dayNum}
                       onClick={() => {
-                        if (!isDayLocked) {
+                        if (assignment.unlocksTomorrow && !isDayCompleted) {
+                          alert(`Day ${dayNum} unlocks tomorrow! Only 1 sacred audiobook is unlocked per day during Navratri.`);
+                        } else if (!isDayLocked) {
                           fetchAssignmentDetails(dayNum);
                         }
                       }}
@@ -1791,6 +1837,11 @@ const ProgramDashboard = () => {
                       {isDayCompleted && (
                         <span className="text-[8px] bg-sage/10 text-sage font-bold uppercase tracking-wider py-0.5 px-1.5 rounded">
                           Done
+                        </span>
+                      )}
+                      {assignment.unlocksTomorrow && !isDayCompleted && (
+                        <span className="text-[8px] bg-gold/15 text-gold-dark font-extrabold uppercase tracking-wider py-0.5 px-1.5 rounded border border-gold/30">
+                          Tomorrow
                         </span>
                       )}
                       {isDayActive && (
