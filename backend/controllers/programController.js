@@ -871,4 +871,87 @@ exports.getMyEnrolledPrograms = async (req, res, next) => {
   }
 };
 
+// @desc    Submit feedback/review for a program
+// @route   POST /api/programs/:id/feedback
+// @access  Private
+exports.submitProgramFeedback = async (req, res, next) => {
+  try {
+    const { rating, reviewText } = req.body;
+    const programId = req.params.id;
+
+    if (!reviewText || !reviewText.trim()) {
+      return res.status(400).json({ success: false, message: 'Please provide your review/feedback thoughts.' });
+    }
+
+    const program = await Program.findById(programId);
+    if (!program) {
+      return res.status(404).json({ success: false, message: 'Program not found' });
+    }
+
+    const Testimonial = require('../models/Testimonial');
+
+    // Check if user already submitted feedback for this program
+    let testimonial = await Testimonial.findOne({
+      user: req.user._id,
+      program: program._id
+    });
+
+    const parsedRating = rating ? Math.min(5, Math.max(1, Number(rating))) : 5;
+
+    if (testimonial) {
+      // Update existing review
+      testimonial.rating = parsedRating;
+      testimonial.reviewText = reviewText.trim();
+      testimonial.programTitle = program.title;
+      testimonial.name = req.user.name || testimonial.name;
+      testimonial.email = req.user.email || testimonial.email;
+      testimonial.image = req.user.avatar || testimonial.image || '';
+      testimonial.designation = `Participant: ${program.title}`;
+      await testimonial.save();
+    } else {
+      // Create new review
+      testimonial = await Testimonial.create({
+        user: req.user._id,
+        name: req.user.name || 'Blessed Seeker',
+        email: req.user.email || '',
+        image: req.user.avatar || '',
+        rating: parsedRating,
+        reviewText: reviewText.trim(),
+        isFeatured: true,
+        designation: `Participant: ${program.title}`,
+        program: program._id,
+        programTitle: program.title
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Thank you! Your feedback and blessed review have been recorded successfully.',
+      data: testimonial
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get current logged-in user's feedback for a program
+// @route   GET /api/programs/:id/my-feedback
+// @access  Private
+exports.getMyProgramFeedback = async (req, res, next) => {
+  try {
+    const Testimonial = require('../models/Testimonial');
+    const testimonial = await Testimonial.findOne({
+      user: req.user._id,
+      program: req.params.id
+    });
+
+    res.json({
+      success: true,
+      data: testimonial || null
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 

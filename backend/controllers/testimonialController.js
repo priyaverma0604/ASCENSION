@@ -13,12 +13,15 @@ const getImagePath = (req) => {
   return '';
 };
 
-// @desc    Get all testimonials (Public)
+// @desc    Get all testimonials (Public / Admin)
 // @route   GET /api/testimonials
 // @access  Public
 exports.getTestimonials = async (req, res, next) => {
   try {
-    const testimonials = await Testimonial.find({}).sort({ createdAt: -1 });
+    const testimonials = await Testimonial.find({})
+      .populate('user', 'name email avatar')
+      .populate('program', 'title')
+      .sort({ createdAt: -1 });
     res.json({ success: true, count: testimonials.length, data: testimonials });
   } catch (error) {
     next(error);
@@ -27,26 +30,34 @@ exports.getTestimonials = async (req, res, next) => {
 
 // @desc    Create a testimonial (Public or user logged-in)
 // @route   POST /api/testimonials
-// @access  Public
+// @access  Public / Authenticated
 exports.createTestimonial = async (req, res, next) => {
   try {
-    const { name, rating, reviewText, isFeatured } = req.body;
+    const { name, rating, reviewText, isFeatured, email, designation, program, programTitle } = req.body;
 
-    if (!name || !reviewText) {
+    const userName = name || req.user?.name;
+    const userEmail = email || req.user?.email || '';
+
+    if (!userName || !reviewText) {
       return res.status(400).json({ success: false, message: 'Please provide name and review text' });
     }
 
-    const image = getImagePath(req) || req.body.image || '';
+    const image = getImagePath(req) || req.body.image || (req.user?.avatar || '');
 
     const testimonial = await Testimonial.create({
-      name,
-      rating: rating || 5,
-      reviewText,
-      isFeatured: isFeatured === 'true' || isFeatured === true,
+      user: req.user?._id || null,
+      name: userName,
+      email: userEmail,
+      rating: rating ? Number(rating) : 5,
+      reviewText: reviewText.trim(),
+      isFeatured: isFeatured !== undefined ? (isFeatured === 'true' || isFeatured === true) : true,
+      designation: designation || (programTitle ? `Participant: ${programTitle}` : 'Blessed Seeker'),
+      program: program || null,
+      programTitle: programTitle || '',
       image
     });
 
-    res.status(201).json({ success: true, data: testimonial });
+    res.status(201).json({ success: true, message: 'Thank you for your blessed review!', data: testimonial });
   } catch (error) {
     next(error);
   }

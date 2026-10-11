@@ -78,6 +78,14 @@ const ProgramDashboard = () => {
   // Lightbox modal state
   const [lightboxImage, setLightboxImage] = useState(null);
 
+  // Program Feedback / Review State
+  const [userFeedback, setUserFeedback] = useState(null);
+  const [feedbackRating, setFeedbackRating] = useState(5);
+  const [feedbackHoverRating, setFeedbackHoverRating] = useState(0);
+  const [feedbackText, setFeedbackText] = useState('');
+  const [submittingFeedback, setSubmittingFeedback] = useState(false);
+  const [isEditingFeedback, setIsEditingFeedback] = useState(false);
+
   // Audio Player State
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -230,11 +238,47 @@ const ProgramDashboard = () => {
           setSelectedAssignment(fetchedAssignments[0]);
         }
       }
+
+      // Fetch user's review/feedback if already submitted
+      try {
+        const feedbackRes = await axios.get(`/api/programs/${id}/my-feedback`);
+        if (feedbackRes.data?.success && feedbackRes.data.data) {
+          setUserFeedback(feedbackRes.data.data);
+          setFeedbackRating(feedbackRes.data.data.rating || 5);
+          setFeedbackText(feedbackRes.data.data.reviewText || '');
+        }
+      } catch (fbErr) {
+        // Non-blocking
+      }
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
       setError(err.response?.data?.message || 'Failed to load program dashboard.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleFeedbackSubmit = async (e) => {
+    e.preventDefault();
+    if (!feedbackText.trim()) {
+      alert('Please share your thoughts or feedback for this program.');
+      return;
+    }
+    setSubmittingFeedback(true);
+    try {
+      const { data } = await axios.post(`/api/programs/${id}/feedback`, {
+        rating: feedbackRating,
+        reviewText: feedbackText.trim()
+      });
+      if (data.success) {
+        setUserFeedback(data.data);
+        setIsEditingFeedback(false);
+        alert('🌸 Thank you! Your blessed review and sacred feedback have been recorded.');
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to submit feedback.');
+    } finally {
+      setSubmittingFeedback(false);
     }
   };
 
@@ -430,6 +474,173 @@ const ProgramDashboard = () => {
 
   const isSelectedCompleted = selectedAssignment && progress && progress.submissions.some(sub => sub.day === selectedAssignment.dayNumber);
   const isSelectedActive = selectedAssignment && progress && selectedAssignment.dayNumber === progress.currentDay && !progress.completed;
+
+  const renderFeedbackCard = () => {
+    if (!isAllCompleted) return null;
+
+    return (
+      <div className="glass p-6 sm:p-8 rounded-3xl border-2 border-gold/40 flex flex-col gap-5 text-left bg-gradient-to-br from-[#FFFDF7] via-[#FFF9ED] to-[#FFF3DC] shadow-lg relative overflow-hidden w-full">
+        <div className="absolute -right-8 -top-8 w-36 h-36 bg-gold/15 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute -left-8 -bottom-8 w-36 h-36 bg-amber-200/20 rounded-full blur-2xl pointer-events-none" />
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gold/30 pb-4 relative z-10">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-2xl bg-gradient-to-br from-gold to-amber-600 text-charcoal-dark shadow-sm">
+              <Sparkles className="w-6 h-6 animate-pulse" />
+            </div>
+            <div>
+              <span className="font-serif text-lg sm:text-xl font-bold text-charcoal-dark block">
+                {isNavratri ? '9-Day Navratri Sadhana Feedback & Review' : 'Sacred Program Completion Review'}
+              </span>
+              <p className="text-xs text-charcoal-light">
+                Share your sacred transformation & reflections with Sonali Bhasin Kumar and Ascension
+              </p>
+            </div>
+          </div>
+
+          {userFeedback && !isEditingFeedback && (
+            <button
+              type="button"
+              onClick={() => setIsEditingFeedback(true)}
+              className="text-xs font-bold text-gold-dark hover:text-charcoal-dark bg-gold/15 hover:bg-gold/30 border border-gold/40 px-3 py-1.5 rounded-xl transition-all self-start sm:self-auto cursor-pointer flex items-center gap-1 shadow-xs"
+            >
+              <span>✏️ Edit Review</span>
+            </button>
+          )}
+        </div>
+
+        {userFeedback && !isEditingFeedback ? (
+          /* Already Submitted View */
+          <div className="flex flex-col gap-3 relative z-10">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star
+                    key={star}
+                    className={`w-5 h-5 ${
+                      star <= (userFeedback.rating || 5)
+                        ? 'text-gold fill-gold drop-shadow-xs'
+                        : 'text-cream-dark'
+                    }`}
+                  />
+                ))}
+                <span className="text-xs font-bold text-charcoal-dark ml-2">
+                  {userFeedback.rating || 5} / 5 Stars
+                </span>
+              </div>
+
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                <CheckCircle className="w-3.5 h-3.5" /> Blessed Review Recorded in Admin
+              </span>
+            </div>
+
+            <div className="bg-white/80 p-5 rounded-2xl border border-gold/30 shadow-xs">
+              <p className="font-serif italic text-sm text-charcoal-dark leading-relaxed whitespace-pre-wrap">
+                "{userFeedback.reviewText}"
+              </p>
+            </div>
+
+            <div className="flex items-center justify-between text-[11px] text-charcoal-light pt-1 flex-wrap gap-2">
+              <span>Submitted by: <strong className="text-charcoal-dark">{userFeedback.name || user?.name}</strong> ({userFeedback.email || user?.email})</span>
+              <span>Date: {new Date(userFeedback.createdAt || Date.now()).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+            </div>
+          </div>
+        ) : (
+          /* Feedback Submission Form */
+          <form onSubmit={handleFeedbackSubmit} className="flex flex-col gap-4 relative z-10">
+            {/* Star Rating Interactive Selector */}
+            <div className="flex flex-col gap-1.5">
+              <label className="font-serif font-bold text-xs uppercase tracking-wider text-charcoal-dark">
+                Your Sacred Rating <span className="text-red-500">*</span>
+              </label>
+              <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex items-center gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      type="button"
+                      key={star}
+                      onClick={() => setFeedbackRating(star)}
+                      onMouseEnter={() => setFeedbackHoverRating(star)}
+                      onMouseLeave={() => setFeedbackHoverRating(0)}
+                      className="p-1 transition-transform hover:scale-125 focus:outline-none cursor-pointer"
+                      title={`${star} Star`}
+                    >
+                      <Star
+                        className={`w-7 h-7 transition-colors ${
+                          star <= (feedbackHoverRating || feedbackRating)
+                            ? 'text-gold fill-gold drop-shadow-sm'
+                            : 'text-gray-300'
+                        }`}
+                      />
+                    </button>
+                  ))}
+                </div>
+                <span className="text-xs font-semibold text-gold-dark font-sans ml-1">
+                  {(feedbackHoverRating || feedbackRating) === 5 ? '🌟 Divine & Deeply Transformative (5/5)' :
+                   (feedbackHoverRating || feedbackRating) === 4 ? '🌸 Blessed & Peaceful (4/5)' :
+                   (feedbackHoverRating || feedbackRating) === 3 ? '✨ Meaningful Experience (3/5)' :
+                   (feedbackHoverRating || feedbackRating) === 2 ? '🙏 Fair Experience (2/5)' : 'Needs Improvement (1/5)'}
+                </span>
+              </div>
+            </div>
+
+            {/* Review Textarea */}
+            <div className="flex flex-col gap-1.5">
+              <label className="font-serif font-bold text-xs uppercase tracking-wider text-charcoal-dark">
+                Your Reflections & Program Experience <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                rows="4"
+                required
+                value={feedbackText}
+                onChange={(e) => setFeedbackText(e.target.value)}
+                placeholder="Share your spiritual transformation, how Maa Durga's audiobooks or daily assignments impacted your life, and your feedback for Sonali Bhasin Kumar..."
+                className="w-full bg-white/90 border border-gold/30 rounded-2xl p-4 text-xs text-charcoal placeholder-charcoal-light/60 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold shadow-inner font-sans leading-relaxed"
+              />
+            </div>
+
+            {/* User signature note */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
+              <div className="text-[11px] text-charcoal-light flex items-center gap-1.5">
+                <UserCheck className="w-3.5 h-3.5 text-sage" />
+                <span>Posting as: <strong className="text-charcoal-dark">{user?.name || 'Devotee'}</strong> ({user?.email || ''})</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {isEditingFeedback && (
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingFeedback(false)}
+                    className="bg-cream hover:bg-cream-dark text-charcoal-light font-bold py-2.5 px-4 rounded-xl text-xs uppercase tracking-wider transition-all cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={submittingFeedback}
+                  className="bg-gradient-to-r from-gold via-amber-500 to-amber-600 hover:from-gold-dark hover:to-amber-700 text-charcoal-dark font-bold py-2.5 px-6 rounded-xl text-xs uppercase tracking-wider transition-all shadow-md hover:shadow-lg disabled:opacity-50 flex items-center gap-2 cursor-pointer"
+                >
+                  {submittingFeedback ? (
+                    <>
+                      <div className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-charcoal-dark border-t-transparent" />
+                      <span>Submitting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>{userFeedback ? 'Update Sacred Review 🌸' : 'Submit Sacred Review 🌸'}</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </form>
+        )}
+      </div>
+    );
+  };
 
   // Render Live Session Workshop Dashboard (e.g. Ancestral Healing Workshop 10 Sessions)
   if (hasSessions) {
@@ -1178,6 +1389,9 @@ const ProgramDashboard = () => {
               </div>
             )}
 
+            {/* Sacred Program Review & Feedback Card */}
+            {renderFeedbackCard()}
+
           </div>
         ) : (
           /* ========================================================================= */
@@ -1769,6 +1983,9 @@ const ProgramDashboard = () => {
                   </div>
                 </div>
               )}
+
+              {/* Sacred Program Review & Feedback Card (When program is completed) */}
+              {renderFeedbackCard()}
 
             </div>
 

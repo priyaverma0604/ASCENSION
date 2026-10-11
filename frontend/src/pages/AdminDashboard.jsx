@@ -5,7 +5,7 @@ import {
   Calendar, MapPin, DollarSign, MessageCircle, FileText, Smile,
   Share2, Copy, Check, Sparkles, Users, Activity, BarChart3, Globe,
   Smartphone, Laptop, Tablet, Search, Shield, UserCheck, Radio, Clock,
-  ExternalLink, UserX, CheckCircle2, AlertCircle
+  ExternalLink, UserX, CheckCircle2, AlertCircle, Star
 } from 'lucide-react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
@@ -329,7 +329,7 @@ const AdminDashboard = () => {
     { id: 'donations', label: 'Donations', icon: <DollarSign className="w-4 h-4" /> },
     { id: 'community', label: 'Community', icon: <MessageCircle className="w-4 h-4" /> },
     { id: 'contacts', label: 'Contacts & Bookings', icon: <FileText className="w-4 h-4" /> },
-    { id: 'testimonials', label: 'Testimonials', icon: <Smile className="w-4 h-4" /> }
+    { id: 'testimonials', label: 'Reviews & Feedback', icon: <Star className="w-4 h-4 text-gold" /> }
   ];
 
   useEffect(() => {
@@ -808,7 +808,9 @@ const AdminDashboard = () => {
                     ? 'Website Traffic & Visitor Analytics' 
                     : activeTab === 'seo-indexing'
                       ? 'SEO, Google Indexing & Sitemaps'
-                      : `Manage ${activeTab}`}
+                      : activeTab === 'testimonials'
+                        ? 'Devotee Reviews & Program Feedback'
+                        : `Manage ${activeTab}`}
               </h3>
               <p className="text-[11px] text-charcoal-light mt-0.5">
                 {activeTab === 'users' 
@@ -817,7 +819,9 @@ const AdminDashboard = () => {
                     ? 'Track live visitors, pageviews, top visited content, and real-time site usage.' 
                     : activeTab === 'seo-indexing'
                       ? 'All public web pages configured for Google crawler indexing, live search status, and XML sitemaps.'
-                      : `Backoffice database records for ${activeTab}.`}
+                      : activeTab === 'testimonials'
+                        ? 'All participant testimonials, program completion feedback, star ratings, and community reviews.'
+                        : `Backoffice database records for ${activeTab}.`}
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -1772,7 +1776,9 @@ const AdminDashboard = () => {
                                 ? item.name
                                 : activeTab === 'donations'
                                   ? (item.name || 'Anonymous Donor')
-                                  : (item.title || item.name || `Log ID: ${item._id.substring(0, 10)}`)}
+                                  : activeTab === 'testimonials'
+                                    ? (item.name || 'Anonymous Seeker')
+                                    : (item.title || item.name || `Log ID: ${item._id.substring(0, 10)}`)}
                           </p>
                           <p className="text-[10px] text-charcoal-light line-clamp-1 max-w-sm mt-0.5">
                             {activeTab === 'orders'
@@ -1783,8 +1789,15 @@ const AdminDashboard = () => {
                                   ? `Email: ${item.email || 'N/A'} | Phone: ${item.phone || 'N/A'}`
                                   : activeTab === 'contacts'
                                     ? `Email: ${item.email} | Phone: ${item.phone || 'N/A'}`
-                                    : item.description || item.shortDescription || item.reviewText || item.message || item.content || `Date: ${new Date(item.createdAt).toLocaleDateString()}`}
+                                    : activeTab === 'testimonials'
+                                      ? `${item.email || item.user?.email ? `Email: ${item.email || item.user?.email} | ` : ''}${item.programTitle ? `Program: ${item.programTitle}` : item.designation || 'Participant'}`
+                                      : item.description || item.shortDescription || item.reviewText || item.message || item.content || `Date: ${new Date(item.createdAt).toLocaleDateString()}`}
                           </p>
+                          {activeTab === 'testimonials' && (
+                            <p className="text-[11px] text-charcoal-dark/90 italic mt-1 bg-cream/40 p-1.5 rounded-lg border border-cream-dark/40 line-clamp-2 max-w-md">
+                              "{item.reviewText}"
+                            </p>
+                          )}
                         </td>
 
                       {/* Column 2: Specific Details & Payment / Registration References */}
@@ -1795,7 +1808,23 @@ const AdminDashboard = () => {
                         {activeTab === 'webinars' && <span className="text-sage font-medium">Speaker: {item.speakerName} | Date: {new Date(item.date).toLocaleDateString()}</span>}
                         {activeTab === 'retreats' && <span className="text-sage font-medium">Interested: {item.interestedUsers?.length || 0} logged</span>}
                         {activeTab === 'community' && <span className="bg-lavender text-charcoal-dark py-0.5 px-2 rounded-md font-semibold uppercase">{item.type}</span>}
-                        {activeTab === 'testimonials' && <span className="text-gold">{'★'.repeat(item.rating)}</span>}
+                        {activeTab === 'testimonials' && (
+                          <div className="flex flex-col gap-1">
+                            <div className="flex items-center gap-0.5 text-gold text-xs font-bold">
+                              {'★'.repeat(item.rating || 5)}
+                              <span className="text-charcoal-light text-[10px] ml-1">({item.rating || 5}/5)</span>
+                            </div>
+                            {item.programTitle ? (
+                              <span className="bg-gold/15 text-gold-dark font-bold text-[9px] px-2 py-0.5 rounded-full border border-gold/30 w-fit line-clamp-1 max-w-[200px]" title={item.programTitle}>
+                                🌸 {item.programTitle}
+                              </span>
+                            ) : (
+                              <span className="bg-cream-dark text-charcoal-light text-[9px] px-2 py-0.5 rounded-full w-fit">
+                                General Website Review
+                              </span>
+                            )}
+                          </div>
+                        )}
                         
                         {/* Program Registrations */}
                         {activeTab === 'program-registrations' && (
@@ -2017,6 +2046,23 @@ const AdminDashboard = () => {
                                 {item.status}
                               </span>
                             )}
+
+                            {activeTab === 'testimonials' && (
+                              <div className="flex flex-col gap-1">
+                                <span className="text-[10px] text-charcoal-light">
+                                  {new Date(item.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                                </span>
+                                {item.isFeatured ? (
+                                  <span className="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full text-[9px] border border-emerald-300 w-fit">
+                                    ★ Featured on Site
+                                  </span>
+                                ) : (
+                                  <span className="bg-cream-dark text-charcoal-light font-medium px-2 py-0.5 rounded-full text-[9px] w-fit">
+                                    Standard
+                                  </span>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </td>
@@ -2044,14 +2090,37 @@ const AdminDashboard = () => {
                           </button>
                         )}
 
-                        {/* View Registrants/Inquiries/Order Details Button */}
-                        {['workshops', 'retreats', 'programs', 'orders', 'contacts', 'donations', 'webinars', 'webinar-registrations', 'program-registrations', 'workshop-registrations'].includes(activeTab) && (
+                        {/* View Registrants/Inquiries/Order Details/Review Button */}
+                        {['workshops', 'retreats', 'programs', 'orders', 'contacts', 'donations', 'webinars', 'webinar-registrations', 'program-registrations', 'workshop-registrations', 'testimonials'].includes(activeTab) && (
                           <button
                             onClick={() => handleOpenView(item)}
                             className="p-1.5 hover:text-sage text-charcoal/60 transition-colors focus:outline-none"
-                            title="View Full Details / Payment Proof"
+                            title="View Full Details / Review"
                           >
                             <Eye className="w-4.5 h-4.5" />
+                          </button>
+                        )}
+
+                        {/* Quick Toggle for Testimonials / Reviews */}
+                        {activeTab === 'testimonials' && (
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              try {
+                                await axios.put(`/api/testimonials/${item._id}`, { isFeatured: !item.isFeatured });
+                                fetchTabData();
+                              } catch (e) {
+                                alert('Failed to update featured status');
+                              }
+                            }}
+                            className={`p-1 text-[9px] font-bold uppercase rounded px-2 transition-colors cursor-pointer border ${
+                              item.isFeatured 
+                                ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100' 
+                                : 'bg-cream text-charcoal-light border-cream-dark hover:bg-cream-dark'
+                            }`}
+                            title={item.isFeatured ? 'Click to unfeature' : 'Click to feature on homepage'}
+                          >
+                            {item.isFeatured ? '★ Featured' : '☆ Feature'}
                           </button>
                         )}
 
@@ -2947,6 +3016,79 @@ const AdminDashboard = () => {
                             )}
                           </div>
                         </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Testimonial / Program Review View Mode Details */}
+                  {activeTab === 'testimonials' && selectedItem && (
+                    <div className="flex flex-col gap-4 font-sans text-xs">
+                      <div className="flex items-center justify-between border-b border-cream-dark pb-3">
+                        <div>
+                          <h4 className="font-serif font-bold text-base text-charcoal-dark">{selectedItem.name || 'Anonymous Seeker'}</h4>
+                          <p className="text-xs text-charcoal-light">{selectedItem.email || selectedItem.user?.email || 'No email registered'}</p>
+                        </div>
+                        <div className="flex flex-col items-end">
+                          <div className="text-gold text-base font-bold flex items-center gap-0.5">
+                            {'★'.repeat(selectedItem.rating || 5)}
+                            <span className="text-xs text-charcoal-light ml-1">({selectedItem.rating || 5}/5)</span>
+                          </div>
+                          <span className="text-[10px] text-charcoal-light">
+                            {new Date(selectedItem.createdAt).toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+
+                      {selectedItem.programTitle && (
+                        <div className="bg-gold/10 border border-gold/30 p-3.5 rounded-xl flex items-center gap-2.5">
+                          <Sparkles className="w-4 h-4 text-gold shrink-0 animate-pulse" />
+                          <div>
+                            <span className="text-[9px] uppercase font-bold text-gold-dark tracking-wider block">Sacred Program Review</span>
+                            <span className="text-xs font-bold text-charcoal-dark">{selectedItem.programTitle}</span>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="bg-cream/40 p-5 rounded-2xl border border-cream-dark/60 flex flex-col gap-1.5">
+                        <span className="text-[10px] uppercase font-bold text-charcoal-light tracking-wider">Devotee Feedback & Reflections</span>
+                        <p className="text-xs text-charcoal-dark leading-relaxed whitespace-pre-wrap italic font-serif text-sm">
+                          "{selectedItem.reviewText}"
+                        </p>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-2 border-t border-cream-dark">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] font-bold text-charcoal-dark">Status on Website:</span>
+                          {selectedItem.isFeatured ? (
+                            <span className="bg-emerald-100 text-emerald-800 font-bold px-2.5 py-0.5 rounded-full text-[10px] border border-emerald-300">
+                              ★ Featured on Homepage Slider
+                            </span>
+                          ) : (
+                            <span className="bg-cream-dark text-charcoal-light font-medium px-2.5 py-0.5 rounded-full text-[10px]">
+                              Standard (Backoffice Only)
+                            </span>
+                          )}
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            try {
+                              await axios.put(`/api/testimonials/${selectedItem._id}`, { isFeatured: !selectedItem.isFeatured });
+                              setSelectedItem(prev => ({ ...prev, isFeatured: !prev.isFeatured }));
+                              fetchTabData();
+                            } catch (e) {
+                              alert('Failed to update featured status');
+                            }
+                          }}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-bold uppercase transition-all shadow-xs cursor-pointer ${
+                            selectedItem.isFeatured
+                              ? 'bg-amber-100 text-amber-900 hover:bg-amber-200 border border-amber-300'
+                              : 'bg-emerald-600 text-white hover:bg-emerald-700'
+                          }`}
+                        >
+                          {selectedItem.isFeatured ? 'Unfeature Review' : '★ Feature on Website'}
+                        </button>
                       </div>
                     </div>
                   )}

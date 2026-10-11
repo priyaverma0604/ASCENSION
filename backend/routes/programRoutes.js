@@ -15,7 +15,9 @@ const {
   getProgramProgress,
   submitProgramProgressDay,
   getAllProgramProgress,
-  getMyEnrolledPrograms
+  getMyEnrolledPrograms,
+  submitProgramFeedback,
+  getMyProgramFeedback
 } = require('../controllers/programController');
 
 const {
@@ -60,6 +62,10 @@ router.post('/:id/enroll-qr', optionalProtect, upload.single('paymentScreenshot'
 router.get('/:id/progress', protect, getProgramProgress);
 router.post('/:id/progress/submit', protect, upload.single('photo'), submitProgramProgressDay);
 router.get('/:id/progress/all', protect, admin, getAllProgramProgress);
+
+// Program feedback & review routes
+router.post('/:id/feedback', protect, submitProgramFeedback);
+router.get('/:id/my-feedback', protect, getMyProgramFeedback);
 
 // Admin assignment management routes
 router.post('/:id/assignments', protect, admin, upload.single('image'), createAssignment);

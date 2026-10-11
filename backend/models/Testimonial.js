@@ -5,6 +5,10 @@ const testimonialSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please add a name']
   },
+  email: {
+    type: String,
+    default: ''
+  },
   image: {
     type: String,
     default: ''
@@ -22,11 +26,23 @@ const testimonialSchema = new mongoose.Schema({
   },
   isFeatured: {
     type: Boolean,
-    default: false
+    default: true
   },
   designation: {
     type: String,
     default: ''
+  },
+  program: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Program'
+  },
+  programTitle: {
+    type: String,
+    default: ''
+  },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
   }
 }, {
   timestamps: true
