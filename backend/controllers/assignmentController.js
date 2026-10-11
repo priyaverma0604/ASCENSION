@@ -4,11 +4,38 @@ const Assignment = require('../models/Assignment');
 const AssignmentSubmission = require('../models/AssignmentSubmission');
 const { isCloudinaryConfigured } = require('../config/cloudinary');
 
-// Helper to check enrollment
-const checkEnrollment = (program, userId) => {
-  return program.enrolledUsers.some(
-    (id) => id._id ? id._id.toString() === userId.toString() : id.toString() === userId.toString()
+// Helper to check enrollment with auto-healing and admin bypass
+const checkEnrollment = async (program, user) => {
+  if (!user) return false;
+  if (user.role === 'admin') return true;
+  
+  const userId = user._id ? user._id.toString() : user.toString();
+  const isDirectlyEnrolled = program.enrolledUsers.some(
+    (id) => (id?._id || id).toString() === userId
   );
+  if (isDirectlyEnrolled) return true;
+
+  // Auto-heal: Check if user has a paid registration for this program by userId or email
+  const ProgramRegistration = require('../models/ProgramRegistration');
+  const userEmail = (user.email || '').toLowerCase().trim();
+  const paidReg = await ProgramRegistration.findOne({
+    program: program._id,
+    paymentStatus: 'Paid',
+    $or: [
+      { user: user._id || userId },
+      ...(userEmail ? [{ email: userEmail }] : [])
+    ]
+  });
+
+  if (paidReg) {
+    if (!program.enrolledUsers.some((id) => (id?._id || id).toString() === userId)) {
+      program.enrolledUsers.push(user._id || userId);
+      await program.save();
+    }
+    return true;
+  }
+
+  return false;
 };
 
 // ==========================================
@@ -260,7 +287,7 @@ exports.getAssignmentsUser = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Program not found' });
     }
 
-    if (!checkEnrollment(program, req.user._id)) {
+    if (!await checkEnrollment(program, req.user)) {
       return res.status(403).json({ success: false, message: 'You are not enrolled in this program.' });
     }
 
@@ -347,7 +374,7 @@ exports.getCurrentAssignment = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Program not found' });
     }
 
-    if (!checkEnrollment(program, req.user._id)) {
+    if (!await checkEnrollment(program, req.user)) {
       return res.status(403).json({ success: false, message: 'You are not enrolled in this program.' });
     }
 
@@ -420,7 +447,7 @@ exports.submitAssignment = async (req, res, next) => {
 
     const program = assignment.program;
 
-    if (!checkEnrollment(program, req.user._id)) {
+    if (!await checkEnrollment(program, req.user)) {
       return res.status(403).json({ success: false, message: 'You are not enrolled in this program.' });
     }
 
@@ -581,7 +608,7 @@ exports.getAssignmentByDayNum = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Program not found' });
     }
 
-    if (!checkEnrollment(program, req.user._id)) {
+    if (!await checkEnrollment(program, req.user)) {
       return res.status(403).json({ success: false, message: 'You are not enrolled in this program.' });
     }
 

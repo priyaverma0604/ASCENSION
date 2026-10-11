@@ -650,10 +650,26 @@ exports.getProgramProgress = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Program not found' });
     }
 
-    // Check if user is enrolled
-    const isEnrolled = program.enrolledUsers.some(
-      (userId) => userId._id ? userId._id.toString() === req.user._id.toString() : userId.toString() === req.user._id.toString()
+    // Check if user is enrolled (with admin bypass & paid registration auto-healing)
+    let isEnrolled = req.user.role === 'admin' || program.enrolledUsers.some(
+      (userId) => (userId?._id || userId).toString() === req.user._id.toString()
     );
+    if (!isEnrolled) {
+      const userEmail = (req.user.email || '').toLowerCase().trim();
+      const paidReg = await ProgramRegistration.findOne({
+        program: program._id,
+        paymentStatus: 'Paid',
+        $or: [
+          { user: req.user._id },
+          ...(userEmail ? [{ email: userEmail }] : [])
+        ]
+      });
+      if (paidReg) {
+        isEnrolled = true;
+        program.enrolledUsers.push(req.user._id);
+        await program.save();
+      }
+    }
     if (!isEnrolled) {
       return res.status(403).json({ success: false, message: 'You are not enrolled in this program' });
     }
@@ -730,10 +746,26 @@ exports.submitProgramProgressDay = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Program not found' });
     }
 
-    // Check if user is enrolled
-    const isEnrolled = program.enrolledUsers.some(
-      (userId) => userId._id ? userId._id.toString() === req.user._id.toString() : userId.toString() === req.user._id.toString()
+    // Check if user is enrolled (with admin bypass & paid registration auto-healing)
+    let isEnrolled = req.user.role === 'admin' || program.enrolledUsers.some(
+      (userId) => (userId?._id || userId).toString() === req.user._id.toString()
     );
+    if (!isEnrolled) {
+      const userEmail = (req.user.email || '').toLowerCase().trim();
+      const paidReg = await ProgramRegistration.findOne({
+        program: program._id,
+        paymentStatus: 'Paid',
+        $or: [
+          { user: req.user._id },
+          ...(userEmail ? [{ email: userEmail }] : [])
+        ]
+      });
+      if (paidReg) {
+        isEnrolled = true;
+        program.enrolledUsers.push(req.user._id);
+        await program.save();
+      }
+    }
     if (!isEnrolled) {
       return res.status(403).json({ success: false, message: 'You are not enrolled in this program' });
     }
