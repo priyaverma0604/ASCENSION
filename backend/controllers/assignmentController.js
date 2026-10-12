@@ -38,6 +38,16 @@ const checkEnrollment = async (program, user) => {
   return false;
 };
 
+// Helper: Calculate current active Navratri day based on calendar in IST
+// Navratri Day 1 starts on 11 October 2026 IST
+const getNavratriCalendarDay = () => {
+  const start = new Date('2026-10-11T00:00:00+05:30');
+  const now = new Date();
+  const diffMs = now.getTime() - start.getTime();
+  const dayIndex = Math.floor(diffMs / (24 * 60 * 60 * 1000)) + 1;
+  return Math.min(Math.max(dayIndex, 1), 9);
+};
+
 // ==========================================
 // ADMIN CONTROLLERS
 // ==========================================
@@ -292,25 +302,20 @@ exports.getAssignmentsUser = async (req, res, next) => {
     }
 
     let progress = await UserProgramProgress.findOne({ user: req.user._id, program: program._id });
-    
-    // Check India Standard Time (IST) calendar date
-    const getISTDate = (d) => new Date(d).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
-    const todayIST = getISTDate(new Date());
 
     const isNavratriProgram = program.title.toLowerCase().includes('navratri') || program._id.toString() === '6a4963f49e941f93f91f5ac5';
     const totalProgramDays = isNavratriProgram ? 9 : (program.duration && !isNaN(parseInt(program.duration, 10)) ? parseInt(program.duration, 10) : 30);
     const isProgramCompleted = progress && (progress.completed || (progress.submissions && progress.submissions.length >= totalProgramDays));
 
-    let hasCompletedToday = false;
     let lastCompletedDay = 0;
     if (progress && progress.submissions && progress.submissions.length > 0) {
       const sortedSubs = [...progress.submissions].sort((a, b) => a.day - b.day);
       const lastSub = sortedSubs[sortedSubs.length - 1];
       lastCompletedDay = lastSub.day;
-      if (progress.submissions.some(s => s.submittedAt && getISTDate(s.submittedAt) === todayIST)) {
-        hasCompletedToday = true;
-      }
     }
+
+    const currentNavratriDay = isNavratriProgram ? getNavratriCalendarDay() : 999;
+    const hasCompletedToday = isNavratriProgram ? (lastCompletedDay >= currentNavratriDay) : false;
 
     // Fetch active assignments
     const assignments = await Assignment.find({ program: program._id, status: 'Active' }).sort('dayNumber');
@@ -321,20 +326,27 @@ exports.getAssignmentsUser = async (req, res, next) => {
       let isLocked = false;
       let unlocksTomorrow = false;
 
-      if (isProgramCompleted) {
-        isLocked = false;
-      } else if (isCompleted) {
+      if (isProgramCompleted || isCompleted) {
         isLocked = false; // Always allow re-listening to completed days
       } else {
         // Not completed yet
-        if (isNavratriProgram && hasCompletedToday) {
-          // Navratri rule: 1 audiobook per calendar day! If already completed today, next day unlocks tomorrow
-          isLocked = true;
-          if (assign.dayNumber === lastCompletedDay + 1) {
-            unlocksTomorrow = true;
+        if (isNavratriProgram) {
+          // Navratri unlocking rules:
+          // 1. Must be sequential (can't skip ahead without completing previous day)
+          if (assign.dayNumber > lastCompletedDay + 1) {
+            isLocked = true;
+          } else if (assign.dayNumber > currentNavratriDay) {
+            // Calendar hasn't reached this Navratri day yet (unlocks tomorrow/future)
+            isLocked = true;
+            if (assign.dayNumber === currentNavratriDay + 1) {
+              unlocksTomorrow = true;
+            }
+          } else {
+            // Sequential next day AND current Navratri day has arrived -> Unlocked!
+            isLocked = false;
           }
         } else {
-          // If hasn't completed today, next sequential day is unlocked
+          // Standard program: next sequential day is unlocked
           isLocked = assign.dayNumber > lastCompletedDay + 1;
         }
       }
@@ -357,6 +369,7 @@ exports.getAssignmentsUser = async (req, res, next) => {
       hasCompletedToday,
       lastCompletedDay,
       nextUnlockDay: lastCompletedDay + 1,
+      currentNavratriDay: isNavratriProgram ? currentNavratriDay : null,
       data
     });
   } catch (error) {
@@ -383,27 +396,23 @@ exports.getCurrentAssignment = async (req, res, next) => {
     const totalProgramDays = isNavratriProgram ? 9 : (program.duration && !isNaN(parseInt(program.duration, 10)) ? parseInt(program.duration, 10) : 30);
     const isProgramCompleted = progress && (progress.completed || (progress.submissions && progress.submissions.length >= totalProgramDays));
 
-    const getISTDate = (d) => new Date(d).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
-    const todayIST = getISTDate(new Date());
-
-    let hasCompletedToday = false;
     let lastCompletedDay = 0;
     if (progress && progress.submissions && progress.submissions.length > 0) {
       const sortedSubs = [...progress.submissions].sort((a, b) => a.day - b.day);
-      const lastSub = sortedSubs[sortedSubs.length - 1];
-      lastCompletedDay = lastSub.day;
-      if (progress.submissions.some(s => s.submittedAt && getISTDate(s.submittedAt) === todayIST)) {
-        hasCompletedToday = true;
-      }
+      lastCompletedDay = sortedSubs[sortedSubs.length - 1].day;
     }
+
+    const currentNavratriDay = isNavratriProgram ? getNavratriCalendarDay() : 999;
+    const isNavratriUpToDate = isNavratriProgram && (lastCompletedDay >= currentNavratriDay);
 
     let targetDayNum;
     if (isProgramCompleted) {
       targetDayNum = lastCompletedDay || 1;
-    } else if (isNavratriProgram && hasCompletedToday) {
-      // Completed today's sadhana: load today's completed day so user can re-listen
+    } else if (isNavratriProgram && isNavratriUpToDate) {
+      // Completed up to today's sacred Navratri day: load today's completed day so user can re-listen
       targetDayNum = lastCompletedDay;
     } else {
+      // Active next day to listen & complete
       targetDayNum = lastCompletedDay + 1;
     }
 
@@ -425,8 +434,8 @@ exports.getCurrentAssignment = async (req, res, next) => {
     }
 
     const assignmentObj = assignment.toObject();
-    assignmentObj.hasCompletedToday = hasCompletedToday;
-    assignmentObj.unlocksTomorrow = hasCompletedToday && !isProgramCompleted;
+    assignmentObj.hasCompletedToday = isNavratriUpToDate;
+    assignmentObj.unlocksTomorrow = isNavratriUpToDate && !isProgramCompleted;
     assignmentObj.nextDayNumber = lastCompletedDay + 1;
 
     res.json({ success: true, data: assignmentObj });
@@ -489,16 +498,13 @@ exports.submitAssignment = async (req, res, next) => {
       return res.status(400).json({ success: false, message: `You have already completed this ${totalProgramDays}-day program!` });
     }
 
-    // Navratri rule check: Only 1 audiobook per calendar day in IST allowed!
-    const getISTDate = (d) => new Date(d).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
-    const todayIST = getISTDate(new Date());
-
-    if (isNavratriProgram && progress.submissions && progress.submissions.length > 0) {
-      const alreadySubmittedToday = progress.submissions.some(s => s.submittedAt && getISTDate(s.submittedAt) === todayIST);
-      if (alreadySubmittedToday) {
+    // Navratri calendar check: Cannot submit a day that hasn't arrived on the calendar yet
+    if (isNavratriProgram) {
+      const currentNavratriDay = getNavratriCalendarDay();
+      if (assignment.dayNumber > currentNavratriDay) {
         return res.status(400).json({
           success: false,
-          message: `Only 1 audiobook per day is allowed during Navratri! Day ${assignment.dayNumber + 1} will unlock tomorrow. Jai Mata Di! 🌸`
+          message: `Day ${assignment.dayNumber} unlocks on its sacred Navratri calendar day! Day ${currentNavratriDay} is active today. Jai Mata Di! 🌸`
         });
       }
     }
@@ -622,22 +628,20 @@ exports.getAssignmentByDayNum = async (req, res, next) => {
     const hasAlreadyDoneDay = progress && progress.submissions?.some(s => s.day === dayNumber);
 
     if (!isCompleted && !hasAlreadyDoneDay) {
-      const getISTDate = (d) => new Date(d).toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
-      const todayIST = getISTDate(new Date());
-
-      let hasCompletedToday = false;
       let lastCompletedDay = 0;
       if (progress && progress.submissions && progress.submissions.length > 0) {
         const sortedSubs = [...progress.submissions].sort((a, b) => a.day - b.day);
         lastCompletedDay = sortedSubs[sortedSubs.length - 1].day;
-        hasCompletedToday = progress.submissions.some(s => s.submittedAt && getISTDate(s.submittedAt) === todayIST);
       }
 
-      if (isNavratriProgram && hasCompletedToday && dayNumber > lastCompletedDay) {
-        return res.status(403).json({
-          success: false,
-          message: `Day ${dayNumber} unlocks tomorrow! Please re-listen to today's completed sadhana.`
-        });
+      if (isNavratriProgram) {
+        const currentNavratriDay = getNavratriCalendarDay();
+        if (dayNumber > currentNavratriDay) {
+          return res.status(403).json({
+            success: false,
+            message: `Day ${dayNumber} unlocks on its sacred Navratri calendar day! Please re-listen to today's completed sadhana.`
+          });
+        }
       }
 
       if (dayNumber > (lastCompletedDay + 1)) {
