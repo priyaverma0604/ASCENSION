@@ -38,16 +38,6 @@ const checkEnrollment = async (program, user) => {
   return false;
 };
 
-// Helper: Calculate current active Navratri day based on calendar in IST
-// Navratri Day 1 starts on 11 October 2026 IST
-const getNavratriCalendarDay = () => {
-  const start = new Date('2026-10-11T00:00:00+05:30');
-  const now = new Date();
-  const diffMs = now.getTime() - start.getTime();
-  const dayIndex = Math.floor(diffMs / (24 * 60 * 60 * 1000)) + 1;
-  return Math.min(Math.max(dayIndex, 1), 9);
-};
-
 // ==========================================
 // ADMIN CONTROLLERS
 // ==========================================
@@ -314,41 +304,19 @@ exports.getAssignmentsUser = async (req, res, next) => {
       lastCompletedDay = lastSub.day;
     }
 
-    const currentNavratriDay = isNavratriProgram ? getNavratriCalendarDay() : 999;
-    const hasCompletedToday = isNavratriProgram ? (lastCompletedDay >= currentNavratriDay) : false;
-
     // Fetch active assignments
     const assignments = await Assignment.find({ program: program._id, status: 'Active' }).sort('dayNumber');
 
-    // Return assignments list indicating locked status
+    // Return assignments list indicating locked status (Sequential unlock: complete previous day to unlock next immediately)
     const data = assignments.map(assign => {
       const isCompleted = progress ? progress.submissions.some(sub => sub.day === assign.dayNumber) : false;
       let isLocked = false;
-      let unlocksTomorrow = false;
 
       if (isProgramCompleted || isCompleted) {
         isLocked = false; // Always allow re-listening to completed days
       } else {
-        // Not completed yet
-        if (isNavratriProgram) {
-          // Navratri unlocking rules:
-          // 1. Must be sequential (can't skip ahead without completing previous day)
-          if (assign.dayNumber > lastCompletedDay + 1) {
-            isLocked = true;
-          } else if (assign.dayNumber > currentNavratriDay) {
-            // Calendar hasn't reached this Navratri day yet (unlocks tomorrow/future)
-            isLocked = true;
-            if (assign.dayNumber === currentNavratriDay + 1) {
-              unlocksTomorrow = true;
-            }
-          } else {
-            // Sequential next day AND current Navratri day has arrived -> Unlocked!
-            isLocked = false;
-          }
-        } else {
-          // Standard program: next sequential day is unlocked
-          isLocked = assign.dayNumber > lastCompletedDay + 1;
-        }
+        // Next sequential day unlocks immediately once previous day is completed
+        isLocked = assign.dayNumber > lastCompletedDay + 1;
       }
 
       return {
@@ -360,16 +328,15 @@ exports.getAssignmentsUser = async (req, res, next) => {
         audioDuration: assign.audioDuration || assign.estimatedDuration || '',
         isLocked,
         isCompleted,
-        unlocksTomorrow
+        unlocksTomorrow: false
       };
     });
 
     res.json({
       success: true,
-      hasCompletedToday,
+      hasCompletedToday: false,
       lastCompletedDay,
       nextUnlockDay: lastCompletedDay + 1,
-      currentNavratriDay: isNavratriProgram ? currentNavratriDay : null,
       data
     });
   } catch (error) {
@@ -402,19 +369,8 @@ exports.getCurrentAssignment = async (req, res, next) => {
       lastCompletedDay = sortedSubs[sortedSubs.length - 1].day;
     }
 
-    const currentNavratriDay = isNavratriProgram ? getNavratriCalendarDay() : 999;
-    const isNavratriUpToDate = isNavratriProgram && (lastCompletedDay >= currentNavratriDay);
-
-    let targetDayNum;
-    if (isProgramCompleted) {
-      targetDayNum = lastCompletedDay || 1;
-    } else if (isNavratriProgram && isNavratriUpToDate) {
-      // Completed up to today's sacred Navratri day: load today's completed day so user can re-listen
-      targetDayNum = lastCompletedDay;
-    } else {
-      // Active next day to listen & complete
-      targetDayNum = lastCompletedDay + 1;
-    }
+    // Active day to listen & complete: next day after last completed day (or last completed day if entire program finished)
+    const targetDayNum = isProgramCompleted ? (lastCompletedDay || 1) : (lastCompletedDay + 1);
 
     let assignment = await Assignment.findOne({
       program: program._id,
@@ -434,8 +390,8 @@ exports.getCurrentAssignment = async (req, res, next) => {
     }
 
     const assignmentObj = assignment.toObject();
-    assignmentObj.hasCompletedToday = isNavratriUpToDate;
-    assignmentObj.unlocksTomorrow = isNavratriUpToDate && !isProgramCompleted;
+    assignmentObj.hasCompletedToday = false;
+    assignmentObj.unlocksTomorrow = false;
     assignmentObj.nextDayNumber = lastCompletedDay + 1;
 
     res.json({ success: true, data: assignmentObj });
@@ -632,16 +588,6 @@ exports.getAssignmentByDayNum = async (req, res, next) => {
       if (progress && progress.submissions && progress.submissions.length > 0) {
         const sortedSubs = [...progress.submissions].sort((a, b) => a.day - b.day);
         lastCompletedDay = sortedSubs[sortedSubs.length - 1].day;
-      }
-
-      if (isNavratriProgram) {
-        const currentNavratriDay = getNavratriCalendarDay();
-        if (dayNumber > currentNavratriDay) {
-          return res.status(403).json({
-            success: false,
-            message: `Day ${dayNumber} unlocks on its sacred Navratri calendar day! Please re-listen to today's completed sadhana.`
-          });
-        }
       }
 
       if (dayNumber > (lastCompletedDay + 1)) {

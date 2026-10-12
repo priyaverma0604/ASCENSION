@@ -1290,21 +1290,10 @@ const ProgramDashboard = () => {
                       </div>
 
                       {assignment.isLocked ? (
-                        assignment.unlocksTomorrow ? (
-                          <button
-                            onClick={() => alert(`Day ${dayNum} unlocks tomorrow! Only 1 sacred audiobook is unlocked per day during Navratri.`)}
-                            className="bg-amber-50 hover:bg-amber-100 text-gold-dark font-bold text-xs py-2 px-2.5 rounded-xl border border-gold/40 transition-all flex items-center gap-1 shrink-0 shadow-xs"
-                            title="Unlocks tomorrow"
-                          >
-                            <Lock className="w-3.5 h-3.5 text-gold-dark" />
-                            <span>Tomorrow</span>
-                          </button>
-                        ) : (
-                          <div className="bg-cream/40 text-charcoal-light font-bold text-xs py-2 px-2.5 rounded-xl border border-cream-dark transition-all flex items-center gap-1 shrink-0 opacity-60 select-none">
-                            <Lock className="w-3.5 h-3.5 text-charcoal-light" />
-                            <span>Locked</span>
-                          </div>
-                        )
+                        <div className="bg-cream/40 text-charcoal-light font-bold text-xs py-2 px-2.5 rounded-xl border border-cream-dark transition-all flex items-center gap-1 shrink-0 opacity-60 select-none">
+                          <Lock className="w-3.5 h-3.5 text-charcoal-light" />
+                          <span>Locked</span>
+                        </div>
                       ) : (
                         <button
                           onClick={() => fetchAssignmentDetails(dayNum)}
@@ -1529,28 +1518,7 @@ const ProgramDashboard = () => {
                     </span>
                   </div>
 
-                  {/* Today's Sacred Sadhana Completed Banner */}
-                  {selectedAssignment.unlocksTomorrow && (
-                    <div className="bg-gradient-to-r from-amber-500/10 via-gold/20 to-amber-500/10 border-2 border-gold/40 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-left shadow-xs">
-                      <div className="flex items-center gap-3">
-                        <span className="p-2.5 rounded-full bg-gold text-charcoal-dark shadow-sm shrink-0">
-                          <Sparkles className="w-5 h-5 animate-pulse" />
-                        </span>
-                        <div className="flex flex-col">
-                          <span className="font-serif font-bold text-sm text-charcoal-dark">
-                            🌸 Today's Sacred Sadhana Completed! Day {selectedAssignment.nextDayNumber || (selectedAssignment.dayNumber + 1)} Unlocks Tomorrow
-                          </span>
-                          <span className="text-xs text-charcoal-light">
-                            Only 1 sacred audiobook is unlocked per day during Navratri. You have unlimited access to re-listen to today's transmission below.
-                          </span>
-                        </div>
-                      </div>
-                      <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gold/30 text-charcoal-dark font-bold text-xs shrink-0">
-                        <Clock className="w-3.5 h-3.5 text-gold-dark" />
-                        <span>Next Day: Tomorrow 12:00 AM IST</span>
-                      </div>
-                    </div>
-                  )}
+
 
                   <div className="flex flex-col gap-4">
                     <h3 className="font-serif text-xl font-bold text-charcoal-dark flex items-center gap-2">
