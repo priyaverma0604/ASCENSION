@@ -454,17 +454,6 @@ exports.submitAssignment = async (req, res, next) => {
       return res.status(400).json({ success: false, message: `You have already completed this ${totalProgramDays}-day program!` });
     }
 
-    // Navratri calendar check: Cannot submit a day that hasn't arrived on the calendar yet
-    if (isNavratriProgram) {
-      const currentNavratriDay = getNavratriCalendarDay();
-      if (assignment.dayNumber > currentNavratriDay) {
-        return res.status(400).json({
-          success: false,
-          message: `Day ${assignment.dayNumber} unlocks on its sacred Navratri calendar day! Day ${currentNavratriDay} is active today. Jai Mata Di! 🌸`
-        });
-      }
-    }
-
     // Backend Security: Verify that the submitted assignment day matches the user's progress day
     if (assignment.dayNumber !== progress.currentDay) {
       return res.status(403).json({
