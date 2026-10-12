@@ -1987,9 +1987,6 @@ const ProgramDashboard = () => {
                       stateClasses = "bg-gold/10 border-gold/40 text-gold-dark font-bold animate-pulse";
                       icon = <Compass className="w-4 h-4 text-gold-dark shrink-0 animate-pulse" />;
                     }
-                  } else if (assignment.unlocksTomorrow) {
-                    stateClasses = "bg-amber-50/70 border-gold/40 text-charcoal-dark cursor-pointer hover:border-gold hover:bg-amber-50";
-                    icon = <Lock className="w-3.5 h-3.5 text-gold-dark shrink-0" />;
                   } else {
                     // Locked
                     stateClasses = "opacity-55 border-cream-dark bg-cream-light/30 cursor-not-allowed select-none text-charcoal-light";
@@ -1997,16 +1994,14 @@ const ProgramDashboard = () => {
                   }
 
                   const isSelected = selectedAssignment && selectedAssignment.dayNumber === dayNum;
-                  const activeClickableClass = !isDayLocked || assignment.unlocksTomorrow ? "cursor-pointer hover:shadow-sm" : "";
+                  const activeClickableClass = !isDayLocked ? "cursor-pointer hover:shadow-sm" : "";
                   const selectedClass = isSelected ? "ring-2 ring-sage/55 border-sage/60 font-bold" : "";
 
                   return (
                     <div 
                       key={dayNum}
                       onClick={() => {
-                        if (assignment.unlocksTomorrow && !isDayCompleted) {
-                          alert(`Day ${dayNum} unlocks tomorrow! Only 1 sacred audiobook is unlocked per day during Navratri.`);
-                        } else if (!isDayLocked) {
+                        if (!isDayLocked) {
                           fetchAssignmentDetails(dayNum);
                         }
                       }}
@@ -2022,11 +2017,6 @@ const ProgramDashboard = () => {
                       {isDayCompleted && (
                         <span className="text-[8px] bg-sage/10 text-sage font-bold uppercase tracking-wider py-0.5 px-1.5 rounded">
                           Done
-                        </span>
-                      )}
-                      {assignment.unlocksTomorrow && !isDayCompleted && (
-                        <span className="text-[8px] bg-gold/15 text-gold-dark font-extrabold uppercase tracking-wider py-0.5 px-1.5 rounded border border-gold/30">
-                          Tomorrow
                         </span>
                       )}
                       {isDayActive && (
