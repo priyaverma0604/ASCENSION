@@ -5,7 +5,7 @@ import {
   Calendar, MapPin, DollarSign, MessageCircle, FileText, Smile,
   Share2, Copy, Check, Sparkles, Users, Activity, BarChart3, Globe,
   Smartphone, Laptop, Tablet, Search, Shield, UserCheck, Radio, Clock,
-  ExternalLink, UserX, CheckCircle2, AlertCircle, Star, Video
+  ExternalLink, UserX, CheckCircle2, AlertCircle, Star, Video, Image, Upload
 } from 'lucide-react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
@@ -37,6 +37,13 @@ const formatTimeAgo = (date) => {
   if (days < 30) return `${days}d ago`;
   return new Date(date).toLocaleDateString();
 };
+
+const DEFAULT_PRODUCT_CATEGORIES = [
+  'Crystals', 'Lamps', 'Candles', 'Crystal Trees', 'Pendants', 
+  'Bracelets', 'Healing Stones', 'Selenite Products', 'Trays', 
+  'Decorative Pieces', 'Wax Melts', 'Bath Salts', 'Healing Oils',
+  'Healing Camphor', 'Wax Tablets', 'Sage Leaves', 'Energy Bottles', 'Water Bottles', 'Pyramids'
+];
 
 const INDEXABLE_PAGES = [
   {
@@ -265,6 +272,15 @@ const AdminDashboard = () => {
   const [productCategory, setProductCategory] = useState('Crystals');
   const [productStock, setProductStock] = useState('');
   const [productVideo, setProductVideo] = useState('');
+  const [productImages, setProductImages] = useState([]);
+  const [existingProductImages, setExistingProductImages] = useState([]);
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
+  const [customCategoryName, setCustomCategoryName] = useState('');
+
+  const availableCategories = Array.from(new Set([
+    ...DEFAULT_PRODUCT_CATEGORIES,
+    ...(listData && activeTab === 'products' ? listData.map(p => p.category).filter(Boolean) : [])
+  ])).sort();
 
   const [workshopTitle, setWorkshopTitle] = useState('');
   const [workshopDesc, setWorkshopDesc] = useState('');
@@ -508,6 +524,10 @@ const AdminDashboard = () => {
     setProductCategory('Crystals');
     setProductStock('10');
     setProductVideo('');
+    setProductImages([]);
+    setExistingProductImages([]);
+    setIsCustomCategory(false);
+    setCustomCategoryName('');
 
     setWorkshopTitle('');
     setWorkshopDesc('');
@@ -561,9 +581,13 @@ const AdminDashboard = () => {
       setProductName(item.name);
       setProductDesc(item.description);
       setProductPrice(item.pricing);
-      setProductCategory(item.category);
+      setProductCategory(item.category || 'Crystals');
       setProductStock(item.stock);
       setProductVideo(item.video || '');
+      setProductImages([]);
+      setExistingProductImages(item.images || []);
+      setIsCustomCategory(false);
+      setCustomCategoryName('');
     } else if (activeTab === 'workshops') {
       setWorkshopTitle(item.title);
       setWorkshopDesc(item.description);
@@ -642,14 +666,23 @@ const AdminDashboard = () => {
           pricing: servicePrice
         };
       } else if (activeTab === 'products') {
-        payload = {
-          name: productName,
-          description: productDesc,
-          pricing: productPrice,
-          category: productCategory,
-          stock: productStock,
-          video: productVideo
-        };
+        payload = new FormData();
+        payload.append('name', productName);
+        payload.append('description', productDesc);
+        payload.append('pricing', productPrice);
+        const resolvedCategory = isCustomCategory ? customCategoryName.trim() : productCategory;
+        payload.append('category', resolvedCategory || 'Crystals');
+        payload.append('stock', productStock);
+        payload.append('video', productVideo);
+        payload.append('existingImages', JSON.stringify(existingProductImages));
+
+        if (productImages && productImages.length > 0) {
+          productImages.forEach(file => {
+            payload.append('images', file);
+          });
+        }
+
+        config = { headers: { 'Content-Type': 'multipart/form-data' } };
       } else if (activeTab === 'workshops') {
         payload = {
           title: workshopTitle,
@@ -1773,35 +1806,50 @@ const AdminDashboard = () => {
                       <tr key={item._id} className="border-b border-cream-dark/40 hover:bg-cream/20 transition-colors">
                         {/* Column 1: Details / Customer Information */}
                         <td className="py-3 px-4">
-                          <p className="font-bold text-charcoal-dark">
-                            {activeTab === 'orders' 
-                              ? (item.user?.name || item.shippingAddress?.name || 'Shop Customer')
-                              : activeTab === 'program-registrations' || activeTab === 'workshop-registrations' || activeTab === 'webinar-registrations'
-                                ? item.name
-                                : activeTab === 'donations'
-                                  ? (item.name || 'Anonymous Donor')
-                                  : activeTab === 'testimonials'
-                                    ? (item.name || 'Anonymous Seeker')
-                                    : (item.title || item.name || `Log ID: ${item._id.substring(0, 10)}`)}
-                          </p>
-                          <p className="text-[10px] text-charcoal-light line-clamp-1 max-w-sm mt-0.5">
-                            {activeTab === 'orders'
-                              ? `Email: ${item.user?.email || 'N/A'} | Phone: ${item.shippingAddress?.phone || 'N/A'}`
-                              : activeTab === 'program-registrations' || activeTab === 'workshop-registrations' || activeTab === 'webinar-registrations'
-                                ? `Email: ${item.email} | Phone: ${item.phone}`
-                                : activeTab === 'donations'
-                                  ? `Email: ${item.email || 'N/A'} | Phone: ${item.phone || 'N/A'}`
-                                  : activeTab === 'contacts'
-                                    ? `Email: ${item.email} | Phone: ${item.phone || 'N/A'}`
-                                    : activeTab === 'testimonials'
-                                      ? `${item.email || item.user?.email ? `Email: ${item.email || item.user?.email} | ` : ''}${item.programTitle ? `Program: ${item.programTitle}` : item.designation || 'Participant'}`
-                                      : item.description || item.shortDescription || item.reviewText || item.message || item.content || `Date: ${new Date(item.createdAt).toLocaleDateString()}`}
-                          </p>
-                          {activeTab === 'testimonials' && (
-                            <p className="text-[11px] text-charcoal-dark/90 italic mt-1 bg-cream/40 p-1.5 rounded-lg border border-cream-dark/40 line-clamp-2 max-w-md">
-                              "{item.reviewText}"
-                            </p>
-                          )}
+                          <div className="flex items-center gap-2.5">
+                            {activeTab === 'products' && (
+                              <div className="w-10 h-10 rounded-lg overflow-hidden bg-cream shrink-0 border border-cream-dark">
+                                {item.images && item.images.length > 0 ? (
+                                  <img src={getImageUrl(item.images[0])} alt={item.name} className="w-full h-full object-cover" />
+                                ) : (
+                                  <div className="w-full h-full flex items-center justify-center text-charcoal-light">
+                                    <ShoppingBag className="w-4 h-4" />
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                            <div>
+                              <p className="font-bold text-charcoal-dark">
+                                {activeTab === 'orders' 
+                                  ? (item.user?.name || item.shippingAddress?.name || 'Shop Customer')
+                                  : activeTab === 'program-registrations' || activeTab === 'workshop-registrations' || activeTab === 'webinar-registrations'
+                                    ? item.name
+                                    : activeTab === 'donations'
+                                      ? (item.name || 'Anonymous Donor')
+                                      : activeTab === 'testimonials'
+                                        ? (item.name || 'Anonymous Seeker')
+                                        : (item.title || item.name || `Log ID: ${item._id.substring(0, 10)}`)}
+                              </p>
+                              <p className="text-[10px] text-charcoal-light line-clamp-1 max-w-sm mt-0.5">
+                                {activeTab === 'orders'
+                                  ? `Email: ${item.user?.email || 'N/A'} | Phone: ${item.shippingAddress?.phone || 'N/A'}`
+                                  : activeTab === 'program-registrations' || activeTab === 'workshop-registrations' || activeTab === 'webinar-registrations'
+                                    ? `Email: ${item.email} | Phone: ${item.phone}`
+                                    : activeTab === 'donations'
+                                      ? `Email: ${item.email || 'N/A'} | Phone: ${item.phone || 'N/A'}`
+                                      : activeTab === 'contacts'
+                                        ? `Email: ${item.email} | Phone: ${item.phone || 'N/A'}`
+                                        : activeTab === 'testimonials'
+                                          ? `${item.email || item.user?.email ? `Email: ${item.email || item.user?.email} | ` : ''}${item.programTitle ? `Program: ${item.programTitle}` : item.designation || 'Participant'}`
+                                          : item.description || item.shortDescription || item.reviewText || item.message || item.content || `Date: ${new Date(item.createdAt).toLocaleDateString()}`}
+                              </p>
+                              {activeTab === 'testimonials' && (
+                                <p className="text-[11px] text-charcoal-dark/90 italic mt-1 bg-cream/40 p-1.5 rounded-lg border border-cream-dark/40 line-clamp-2 max-w-md">
+                                  "{item.reviewText}"
+                                </p>
+                              )}
+                            </div>
+                          </div>
                         </td>
 
                       {/* Column 2: Specific Details & Payment / Registration References */}
@@ -1809,6 +1857,10 @@ const AdminDashboard = () => {
                         {activeTab === 'products' && (
                           <div className="flex items-center gap-1.5 flex-wrap">
                             <span className="bg-cream-dark text-charcoal-light py-0.5 px-2 rounded-md font-semibold">{item.category} (Stock: {item.stock})</span>
+                            <span className="bg-sage/15 text-sage border border-sage/30 text-[9.5px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                              <Image className="w-3 h-3" />
+                              <span>{item.images?.length || 0} pics</span>
+                            </span>
                             {item.video && (
                               <span className="bg-red-50 text-red-600 border border-red-200 text-[9.5px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1" title={item.video}>
                                 <Video className="w-3 h-3 text-red-500" />
@@ -3149,38 +3201,129 @@ const AdminDashboard = () => {
                         <label className="font-bold text-charcoal-light uppercase text-[10px]">Description</label>
                         <textarea required rows="3" value={productDesc} onChange={(e) => setProductDesc(e.target.value)} className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none" />
                       </div>
-                      <div className="grid grid-cols-3 gap-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <div className="flex flex-col gap-1">
                           <label className="font-bold text-charcoal-light uppercase text-[10px]">Price (INR)</label>
                           <input type="number" required value={productPrice} onChange={(e) => setProductPrice(e.target.value)} className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none" />
                         </div>
+
+                        {/* Category Selector with Custom Category Support */}
                         <div className="flex flex-col gap-1">
-                          <label className="font-bold text-charcoal-light uppercase text-[10px]">Category</label>
-                          <select value={productCategory} onChange={(e) => setProductCategory(e.target.value)} className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none">
-                            <option value="Energy Bottles">Energy Bottles</option>
-                            <option value="Bath Salts">Bath Salts</option>
-                            <option value="Healing Camphor">Healing Camphor</option>
-                            <option value="Healing Oils">Healing Oils</option>
-                            <option value="Candles">Candles</option>
-                            <option value="Wax Tablets">Wax Tablets</option>
-                            <option value="Crystals">Crystals</option>
-                            <option value="Pyramids">Pyramids</option>
-                            <option value="Lamps">Lamps</option>
-                            <option value="Crystal Trees">Crystal Trees</option>
-                            <option value="Pendants">Pendants</option>
-                            <option value="Bracelets">Bracelets</option>
-                            <option value="Healing Stones">Healing Stones</option>
-                            <option value="Selenite Products">Selenite Products</option>
-                            <option value="Trays">Trays</option>
-                            <option value="Decorative Pieces">Decorative Pieces</option>
-                            <option value="Wax Melts">Wax Melts</option>
-                          </select>
+                          <div className="flex items-center justify-between">
+                            <label className="font-bold text-charcoal-light uppercase text-[10px]">Category</label>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsCustomCategory(!isCustomCategory);
+                                if (!isCustomCategory) setCustomCategoryName('');
+                              }}
+                              className="text-[9.5px] font-bold text-sage hover:underline cursor-pointer"
+                            >
+                              {isCustomCategory ? '← Existing' : '+ Add New'}
+                            </button>
+                          </div>
+                          {isCustomCategory ? (
+                            <input
+                              type="text"
+                              required
+                              placeholder="Enter new category name..."
+                              value={customCategoryName}
+                              onChange={(e) => setCustomCategoryName(e.target.value)}
+                              className="bg-cream-light border border-sage rounded-xl py-2 px-3 focus:outline-none font-medium"
+                            />
+                          ) : (
+                            <select
+                              value={productCategory}
+                              onChange={(e) => {
+                                if (e.target.value === '__NEW__') {
+                                  setIsCustomCategory(true);
+                                  setCustomCategoryName('');
+                                } else {
+                                  setProductCategory(e.target.value);
+                                }
+                              }}
+                              className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none"
+                            >
+                              {availableCategories.map((cat) => (
+                                <option key={cat} value={cat}>{cat}</option>
+                              ))}
+                              <option value="__NEW__" className="font-bold text-sage">+ Add New Category...</option>
+                            </select>
+                          )}
                         </div>
+
                         <div className="flex flex-col gap-1">
                           <label className="font-bold text-charcoal-light uppercase text-[10px]">Stock Count</label>
                           <input type="number" required value={productStock} onChange={(e) => setProductStock(e.target.value)} className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none" />
                         </div>
                       </div>
+
+                      {/* Product Images Upload & Preview */}
+                      <div className="flex flex-col gap-2 p-3.5 bg-cream/35 border border-cream-dark/50 rounded-2xl">
+                        <div className="flex items-center justify-between">
+                          <label className="font-bold text-charcoal-light uppercase text-[10px] flex items-center gap-1.5">
+                            <Image className="w-3.5 h-3.5 text-sage" />
+                            <span>Product Images (Max 5 images)</span>
+                          </label>
+                          <span className="text-[9.5px] text-charcoal-light font-medium">
+                            {existingProductImages.length + productImages.length} / 5 Selected
+                          </span>
+                        </div>
+
+                        <input 
+                          type="file" 
+                          multiple 
+                          accept="image/jpeg,image/png,image/webp,image/jpg" 
+                          onChange={(e) => {
+                            const files = Array.from(e.target.files || []);
+                            if (existingProductImages.length + productImages.length + files.length > 5) {
+                              alert('You can upload a maximum of 5 images per product.');
+                              return;
+                            }
+                            setProductImages(prev => [...prev, ...files]);
+                            e.target.value = '';
+                          }}
+                          className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none text-[11px] file:mr-3 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-sage file:text-white file:cursor-pointer hover:file:bg-sage-dark cursor-pointer"
+                        />
+
+                        {/* Images Preview Grid */}
+                        {(existingProductImages.length > 0 || productImages.length > 0) && (
+                          <div className="flex flex-wrap gap-2.5 pt-2 border-t border-cream-dark/40">
+                            {/* Existing Images */}
+                            {existingProductImages.map((img, idx) => (
+                              <div key={`existing-${idx}`} className="relative w-16 h-16 rounded-xl overflow-hidden border border-cream-dark group shrink-0">
+                                <img src={getImageUrl(img)} alt={`Existing ${idx + 1}`} className="w-full h-full object-cover" />
+                                <button
+                                  type="button"
+                                  onClick={() => setExistingProductImages(prev => prev.filter((_, i) => i !== idx))}
+                                  className="absolute top-1 right-1 bg-red-600/90 text-white w-4.5 h-4.5 rounded-full flex items-center justify-center text-[10px] hover:bg-red-700 shadow-xs cursor-pointer z-10"
+                                  title="Remove image"
+                                >
+                                  ✕
+                                </button>
+                                <span className="absolute bottom-0 inset-x-0 bg-charcoal/60 text-white text-[8px] text-center font-bold">Saved</span>
+                              </div>
+                            ))}
+
+                            {/* Newly Selected Image Files */}
+                            {productImages.map((file, idx) => (
+                              <div key={`new-${idx}`} className="relative w-16 h-16 rounded-xl overflow-hidden border-2 border-sage/60 group shrink-0">
+                                <img src={URL.createObjectURL(file)} alt={`New ${idx + 1}`} className="w-full h-full object-cover" />
+                                <button
+                                  type="button"
+                                  onClick={() => setProductImages(prev => prev.filter((_, i) => i !== idx))}
+                                  className="absolute top-1 right-1 bg-red-600/90 text-white w-4.5 h-4.5 rounded-full flex items-center justify-center text-[10px] hover:bg-red-700 shadow-xs cursor-pointer z-10"
+                                  title="Remove image"
+                                >
+                                  ✕
+                                </button>
+                                <span className="absolute bottom-0 inset-x-0 bg-sage text-white text-[8px] text-center font-bold">New</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
                       <div className="flex flex-col gap-1">
                         <label className="font-bold text-charcoal-light uppercase text-[10px]">Product Video URL (YouTube, Google Drive, Vimeo, or MP4 Link - Optional)</label>
                         <input 

@@ -90,9 +90,24 @@ const Shop = () => {
   const [copiedUpi, setCopiedUpi] = useState(false);
   const [manualPayType, setManualPayType] = useState('bank'); // 'bank' or 'qr'
 
-  const categories = [
+  const [categoriesList, setCategoriesList] = useState([
     'All', 'Energy Bottles', 'Crystals', 'Pyramids', 'Bath Salts', 'Healing Camphor', 'Healing Oils', 'Candles', 'Wax Tablets', 'Sage Leaves'
-  ];
+  ]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const { data } = await axios.get('/api/products/categories');
+      if (data.success && data.data && data.data.length > 0) {
+        setCategoriesList(['All', ...data.data.filter(c => c && c !== 'All')]);
+      }
+    } catch (err) {
+      console.error('Error fetching categories in Shop:', err.message);
+    }
+  };
 
   useEffect(() => {
     fetchProducts();
@@ -727,7 +742,7 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                   Categories
                 </h4>
                 <div className="flex flex-row lg:flex-col gap-1.5 sm:gap-2 overflow-x-auto pb-2 lg:pb-0 scrollbar-none">
-                  {categories.map((cat) => (
+                  {categoriesList.map((cat) => (
                     <button
                       key={cat}
                       onClick={() => handleCategorySelect(cat)}

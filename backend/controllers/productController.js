@@ -73,6 +73,18 @@ exports.getProductById = async (req, res, next) => {
   }
 };
 
+// @desc    Get all unique product categories
+// @route   GET /api/products/categories
+// @access  Public
+exports.getCategories = async (req, res, next) => {
+  try {
+    const categories = await Product.distinct('category');
+    res.json({ success: true, data: categories.filter(Boolean) });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // @desc    Create a product
 // @route   POST /api/products
 // @access  Private/Admin
@@ -81,11 +93,17 @@ exports.createProduct = async (req, res, next) => {
     const { name, description, pricing, category, stock, video, videoUrl } = req.body;
 
     const images = getImagesPaths(req);
-    if (images.length === 0 && req.body.images) {
-      if (Array.isArray(req.body.images)) {
-        images.push(...req.body.images);
-      } else {
-        images.push(req.body.images);
+    if (req.body.images) {
+      let parsed = [];
+      try {
+        parsed = typeof req.body.images === 'string' ? JSON.parse(req.body.images) : req.body.images;
+      } catch (e) {
+        parsed = Array.isArray(req.body.images) ? req.body.images : [req.body.images];
+      }
+      if (Array.isArray(parsed)) {
+        images.push(...parsed.filter(Boolean));
+      } else if (parsed) {
+        images.push(parsed);
       }
     }
 
@@ -93,7 +111,7 @@ exports.createProduct = async (req, res, next) => {
       name,
       description,
       pricing,
-      category,
+      category: (category || '').trim(),
       stock: stock || 0,
       images,
       video: (video || videoUrl || '').trim()
@@ -115,23 +133,58 @@ exports.updateProduct = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
 
-    const { name, description, pricing, category, stock, video, videoUrl } = req.body;
+    const { name, description, pricing, category, stock, video, videoUrl, existingImages } = req.body;
 
     product.name = name || product.name;
     product.description = description || product.description;
     product.pricing = pricing !== undefined ? pricing : product.pricing;
-    product.category = category || product.category;
+    if (category) {
+      product.category = category.trim();
+    }
     product.stock = stock !== undefined ? stock : product.stock;
 
     if (video !== undefined || videoUrl !== undefined) {
       product.video = (video !== undefined ? video : (videoUrl || '')).trim();
     }
 
-    const newImages = getImagesPaths(req);
-    if (newImages.length > 0) {
-      product.images = newImages;
-    } else if (req.body.images) {
-      product.images = Array.isArray(req.body.images) ? req.body.images : [req.body.images];
+    const newUploadedFiles = getImagesPaths(req);
+
+    if (existingImages !== undefined || newUploadedFiles.length > 0 || req.body.images !== undefined) {
+      let finalImages = [];
+
+      if (existingImages) {
+        let parsedExisting = [];
+        try {
+          parsedExisting = typeof existingImages === 'string' ? JSON.parse(existingImages) : existingImages;
+        } catch (e) {
+          parsedExisting = Array.isArray(existingImages) ? existingImages : [existingImages];
+        }
+        if (Array.isArray(parsedExisting)) {
+          finalImages.push(...parsedExisting.filter(Boolean));
+        } else if (parsedExisting) {
+          finalImages.push(parsedExisting);
+        }
+      }
+
+      if (newUploadedFiles.length > 0) {
+        finalImages.push(...newUploadedFiles);
+      }
+
+      if (req.body.images) {
+        let parsedBodyImgs = [];
+        try {
+          parsedBodyImgs = typeof req.body.images === 'string' ? JSON.parse(req.body.images) : req.body.images;
+        } catch (e) {
+          parsedBodyImgs = Array.isArray(req.body.images) ? req.body.images : [req.body.images];
+        }
+        if (Array.isArray(parsedBodyImgs)) {
+          finalImages.push(...parsedBodyImgs.filter(Boolean));
+        } else if (parsedBodyImgs) {
+          finalImages.push(parsedBodyImgs);
+        }
+      }
+
+      product.images = finalImages;
     }
 
     const updatedProduct = await product.save();
