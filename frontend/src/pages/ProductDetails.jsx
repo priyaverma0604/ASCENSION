@@ -345,7 +345,7 @@ const ProductDetails = () => {
           
           {/* Left Column: Image Gallery & Video Player */}
           <div className="flex flex-col gap-3 sm:gap-4 lg:sticky lg:top-24">
-            <div className="h-[280px] sm:h-[400px] md:h-[500px] 2xl:h-[580px] bg-cream rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm border border-cream-dark/40 relative">
+            <div className="h-[280px] sm:h-[400px] md:h-[500px] 2xl:h-[580px] bg-[#FAF8F5] rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm border border-cream-dark/40 relative flex items-center justify-center">
               {activeMedia === 'video' && videoInfo ? (
                 <div className="w-full h-full bg-black flex items-center justify-center relative">
                   {videoInfo.type === 'direct' ? (
@@ -381,7 +381,7 @@ const ProductDetails = () => {
                   <img 
                     src={activeImage ? getImageUrl(activeImage) : "https://images.unsplash.com/photo-1615627121117-e3278bc8b1db?auto=format&fit=crop&w=800&q=80"} 
                     alt={product.name} 
-                    className="w-full h-full object-cover transition-all duration-300"
+                    className="w-full h-full object-contain p-2 sm:p-4 transition-all duration-300 drop-shadow-xs"
                   />
                   {videoInfo && (
                     <button
@@ -415,11 +415,11 @@ const ProductDetails = () => {
                       setActiveImage(img);
                       setActiveMedia('image');
                     }}
-                    className={`w-20 h-20 rounded-xl overflow-hidden border-2 shrink-0 transition-all cursor-pointer ${
+                    className={`w-20 h-20 rounded-xl overflow-hidden border-2 shrink-0 transition-all cursor-pointer bg-white/80 flex items-center justify-center ${
                       activeMedia === 'image' && activeImage === img ? 'border-gold shadow-sm scale-95' : 'border-cream-dark/50 opacity-70 hover:opacity-100'
                     }`}
                   >
-                    <img src={getImageUrl(img)} alt={`${product.name} ${idx+1}`} className="w-full h-full object-cover" />
+                    <img src={getImageUrl(img)} alt={`${product.name} ${idx+1}`} className="w-full h-full object-contain p-1" />
                   </button>
                 ))}
 
@@ -894,11 +894,11 @@ const ProductDetails = () => {
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
               {relatedProducts.map((p) => (
                 <div key={p._id} className="glass rounded-xl sm:rounded-2xl overflow-hidden flex flex-col p-2.5 sm:p-4 shadow-xs sm:shadow-sm border border-cream-dark/40 hover:shadow-md transition-all duration-300 relative group">
-                  <Link to={`/product/${p._id}`} className="h-32 sm:h-40 bg-cream rounded-lg sm:rounded-xl overflow-hidden mb-2 sm:mb-3 block">
+                  <Link to={`/product/${p._id}`} className="h-32 sm:h-40 bg-cream-light/80 rounded-lg sm:rounded-xl overflow-hidden mb-2 sm:mb-3 flex items-center justify-center p-1.5 border border-cream-dark/20 block">
                     <img 
                       src={p.images && p.images[0] ? getImageUrl(p.images[0]) : "https://images.unsplash.com/photo-1615627121117-e3278bc8b1db?auto=format&fit=crop&w=400&q=80"} 
                       alt={p.name} 
-                      className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500" 
+                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" 
                     />
                   </Link>
                   <div className="flex flex-col text-left gap-1 flex-1 font-sans text-xs">

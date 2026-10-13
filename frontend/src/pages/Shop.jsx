@@ -813,11 +813,11 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                         <Heart className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current" />
                       </button>
 
-                      <Link to={`/product/${product._id}`} className="h-32 sm:h-44 bg-cream rounded-lg sm:rounded-xl overflow-hidden relative mb-2 sm:mb-4 block">
+                      <Link to={`/product/${product._id}`} className="h-32 sm:h-44 bg-cream-light/80 rounded-lg sm:rounded-xl overflow-hidden relative mb-2 sm:mb-4 flex items-center justify-center p-1.5 border border-cream-dark/20 block">
                         <img 
                           src={product.images && product.images[0] ? getImageUrl(product.images[0]) : "https://images.unsplash.com/photo-1615627121117-e3278bc8b1db?auto=format&fit=crop&w=400&q=80"} 
                           alt={product.name} 
-                          className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500" 
+                          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" 
                         />
                       </Link>
                       
@@ -1466,11 +1466,11 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                       {getRecommendedProducts().map((product) => (
                         <div key={product._id} className="glass rounded-2xl overflow-hidden border border-cream-dark/45 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col h-full bg-white/75 group">
                           {/* Image container */}
-                          <Link to={`/product/${product._id}`} className="relative h-44 sm:h-52 w-full bg-cream overflow-hidden block">
+                          <Link to={`/product/${product._id}`} className="relative h-44 sm:h-52 w-full bg-cream-light/80 overflow-hidden flex items-center justify-center p-2 block border-b border-cream-dark/30">
                             <img 
                               src={product.images && product.images[0] ? getImageUrl(product.images[0]) : ""} 
                               alt={product.name} 
-                              className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" 
+                              className="w-full h-full object-contain transform group-hover:scale-105 transition-transform duration-500" 
                             />
                             <span className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm text-gold-dark text-[9px] font-bold uppercase tracking-wider py-1 px-2.5 rounded-full border border-cream-dark/50 shadow-xs">
                               {product.category || 'Crystals'}
@@ -1988,8 +1988,8 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                     >
                       <Heart className="w-3.5 h-3.5 fill-current" />
                     </button>
-                    <div className="h-40 bg-cream rounded-xl overflow-hidden mb-3">
-                      <img src={product.images && product.images[0] ? getImageUrl(product.images[0]) : ""} alt={product.name} className="w-full h-full object-cover" />
+                    <div className="h-40 bg-cream-light/80 rounded-xl overflow-hidden mb-3 flex items-center justify-center p-2 border border-cream-dark/30">
+                      <img src={product.images && product.images[0] ? getImageUrl(product.images[0]) : ""} alt={product.name} className="w-full h-full object-contain" />
                     </div>
                     <div className="flex flex-col text-left gap-1 flex-1 font-sans text-xs">
                       <span className="text-[9px] uppercase tracking-widest text-sage font-bold">{product.category}</span>

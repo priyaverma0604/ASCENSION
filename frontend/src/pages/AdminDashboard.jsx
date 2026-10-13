@@ -1808,9 +1808,9 @@ const AdminDashboard = () => {
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-2.5">
                             {activeTab === 'products' && (
-                              <div className="w-10 h-10 rounded-lg overflow-hidden bg-cream shrink-0 border border-cream-dark">
+                              <div className="w-10 h-10 rounded-lg overflow-hidden bg-white shrink-0 border border-cream-dark flex items-center justify-center">
                                 {item.images && item.images.length > 0 ? (
-                                  <img src={getImageUrl(item.images[0])} alt={item.name} className="w-full h-full object-cover" />
+                                  <img src={getImageUrl(item.images[0])} alt={item.name} className="w-full h-full object-contain p-0.5" />
                                 ) : (
                                   <div className="w-full h-full flex items-center justify-center text-charcoal-light">
                                     <ShoppingBag className="w-4 h-4" />
@@ -3291,8 +3291,8 @@ const AdminDashboard = () => {
                           <div className="flex flex-wrap gap-2.5 pt-2 border-t border-cream-dark/40">
                             {/* Existing Images */}
                             {existingProductImages.map((img, idx) => (
-                              <div key={`existing-${idx}`} className="relative w-16 h-16 rounded-xl overflow-hidden border border-cream-dark group shrink-0">
-                                <img src={getImageUrl(img)} alt={`Existing ${idx + 1}`} className="w-full h-full object-cover" />
+                              <div key={`existing-${idx}`} className="relative w-16 h-16 rounded-xl overflow-hidden border border-cream-dark group shrink-0 bg-white flex items-center justify-center">
+                                <img src={getImageUrl(img)} alt={`Existing ${idx + 1}`} className="w-full h-full object-contain p-1" />
                                 <button
                                   type="button"
                                   onClick={() => setExistingProductImages(prev => prev.filter((_, i) => i !== idx))}
@@ -3307,8 +3307,8 @@ const AdminDashboard = () => {
 
                             {/* Newly Selected Image Files */}
                             {productImages.map((file, idx) => (
-                              <div key={`new-${idx}`} className="relative w-16 h-16 rounded-xl overflow-hidden border-2 border-sage/60 group shrink-0">
-                                <img src={URL.createObjectURL(file)} alt={`New ${idx + 1}`} className="w-full h-full object-cover" />
+                              <div key={`new-${idx}`} className="relative w-16 h-16 rounded-xl overflow-hidden border-2 border-sage/60 group shrink-0 bg-white flex items-center justify-center">
+                                <img src={URL.createObjectURL(file)} alt={`New ${idx + 1}`} className="w-full h-full object-contain p-1" />
                                 <button
                                   type="button"
                                   onClick={() => setProductImages(prev => prev.filter((_, i) => i !== idx))}
