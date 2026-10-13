@@ -894,11 +894,11 @@ const ProductDetails = () => {
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
               {relatedProducts.map((p) => (
                 <div key={p._id} className="glass rounded-xl sm:rounded-2xl overflow-hidden flex flex-col p-2.5 sm:p-4 shadow-xs sm:shadow-sm border border-cream-dark/40 hover:shadow-md transition-all duration-300 relative group">
-                  <Link to={`/product/${p._id}`} className="h-32 sm:h-40 bg-cream-light/80 rounded-lg sm:rounded-xl overflow-hidden mb-2 sm:mb-3 flex items-center justify-center p-1.5 border border-cream-dark/20 block">
+                  <Link to={`/product/${p._id}`} className="h-32 sm:h-40 bg-cream rounded-lg sm:rounded-xl overflow-hidden mb-2 sm:mb-3 block">
                     <img 
                       src={p.images && p.images[0] ? getImageUrl(p.images[0]) : "https://images.unsplash.com/photo-1615627121117-e3278bc8b1db?auto=format&fit=crop&w=400&q=80"} 
                       alt={p.name} 
-                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500" 
+                      className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500" 
                     />
                   </Link>
                   <div className="flex flex-col text-left gap-1 flex-1 font-sans text-xs">
