@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
   Heart, ShoppingBag, Share2, Plus, Minus, 
   ChevronRight, CheckCircle, AlertCircle, Star, MessageSquare,
-  Sparkles, Moon, Sun, Flame, ShieldAlert
+  Sparkles, Moon, Sun, Flame, ShieldAlert, Play, Video, Film
 } from 'lucide-react';
 import axios from 'axios';
 import { CartContext } from '../context/CartContext';
@@ -19,6 +19,70 @@ const getImageUrl = (path) => {
   return `${apiBase}${path}`;
 };
 
+const getVideoEmbedInfo = (url) => {
+  if (!url || typeof url !== 'string') return null;
+  const trimmed = url.trim();
+  if (!trimmed) return null;
+
+  // YouTube URLs (standard, short, embed, shorts)
+  const ytMatch = trimmed.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/i);
+  if (ytMatch && ytMatch[1]) {
+    const videoId = ytMatch[1];
+    return {
+      type: 'youtube',
+      embedUrl: `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`,
+      thumbnail: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+      originalUrl: trimmed
+    };
+  }
+
+  // Vimeo URLs
+  const vimeoMatch = trimmed.match(/vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|video\/|)(\d+)/i);
+  if (vimeoMatch && vimeoMatch[1]) {
+    const videoId = vimeoMatch[1];
+    return {
+      type: 'vimeo',
+      embedUrl: `https://player.vimeo.com/video/${videoId}`,
+      thumbnail: null,
+      originalUrl: trimmed
+    };
+  }
+
+  // Google Drive video links
+  const gdriveMatch = trimmed.match(/(?:drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?id=))([a-zA-Z0-9_-]+)/i);
+  if (gdriveMatch && gdriveMatch[1]) {
+    const fileId = gdriveMatch[1];
+    return {
+      type: 'gdrive',
+      embedUrl: `https://drive.google.com/file/d/${fileId}/preview`,
+      thumbnail: null,
+      originalUrl: trimmed
+    };
+  }
+
+  // Direct video files (.mp4, .webm, .ogg, .mov, or Cloudinary /video/upload/)
+  if (/\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(trimmed) || trimmed.includes('/video/upload/')) {
+    return {
+      type: 'direct',
+      embedUrl: trimmed,
+      thumbnail: null,
+      originalUrl: trimmed
+    };
+  }
+
+  // Generic external embed
+  if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+    return {
+      type: 'iframe',
+      embedUrl: trimmed,
+      thumbnail: null,
+      originalUrl: trimmed
+    };
+  }
+
+  return null;
+};
+
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -31,6 +95,7 @@ const ProductDetails = () => {
   const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState('');
+  const [activeMedia, setActiveMedia] = useState('image'); // 'image' or 'video'
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [shareSuccess, setShareSuccess] = useState(false);
 
@@ -55,6 +120,9 @@ const ProductDetails = () => {
         setProduct(data.data);
         if (data.data.images && data.data.images.length > 0) {
           setActiveImage(data.data.images[0]);
+          setActiveMedia('image');
+        } else if (data.data.video) {
+          setActiveMedia('video');
         }
         // Fetch related products
         fetchRelatedProducts(data.data.category, data.data._id);
@@ -255,6 +323,7 @@ const ProductDetails = () => {
 
   const { tagline, shortDesc, benefits, ingredients, howToUse, whenToUse, ritual, ascensionWay, safety } = parseDescription(product.description);
   const isOutOfStock = product.stock <= 0;
+  const videoInfo = getVideoEmbedInfo(product.video);
 
   return (
     <div className="min-h-screen py-6 sm:py-10 px-3 sm:px-6 md:px-8 font-sans bg-cream-light">
@@ -274,35 +343,112 @@ const ProductDetails = () => {
         {/* Product Details Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-10 items-start">
           
-          {/* Left Column: Image Gallery */}
+          {/* Left Column: Image Gallery & Video Player */}
           <div className="flex flex-col gap-3 sm:gap-4 lg:sticky lg:top-24">
             <div className="h-[280px] sm:h-[400px] md:h-[500px] 2xl:h-[580px] bg-cream rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm border border-cream-dark/40 relative">
-              <img 
-                src={activeImage ? getImageUrl(activeImage) : "https://images.unsplash.com/photo-1615627121117-e3278bc8b1db?auto=format&fit=crop&w=800&q=80"} 
-                alt={product.name} 
-                className="w-full h-full object-cover transition-all duration-300"
-              />
+              {activeMedia === 'video' && videoInfo ? (
+                <div className="w-full h-full bg-black flex items-center justify-center relative">
+                  {videoInfo.type === 'direct' ? (
+                    <video 
+                      src={getImageUrl(videoInfo.embedUrl)} 
+                      controls 
+                      autoPlay 
+                      playsInline
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <iframe 
+                      src={videoInfo.embedUrl} 
+                      title={`${product.name} Video`} 
+                      className="w-full h-full border-0" 
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                      allowFullScreen 
+                    />
+                  )}
+                  {product.images && product.images.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setActiveMedia('image')}
+                      className="absolute top-3 right-3 bg-charcoal/85 hover:bg-charcoal text-white text-[10px] font-bold px-3 py-1.5 rounded-xl backdrop-blur-xs transition-all flex items-center gap-1.5 shadow-md border border-white/20 z-10 cursor-pointer"
+                      title="Switch back to photos"
+                    >
+                      <span>View Photos</span>
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <img 
+                    src={activeImage ? getImageUrl(activeImage) : "https://images.unsplash.com/photo-1615627121117-e3278bc8b1db?auto=format&fit=crop&w=800&q=80"} 
+                    alt={product.name} 
+                    className="w-full h-full object-cover transition-all duration-300"
+                  />
+                  {videoInfo && (
+                    <button
+                      type="button"
+                      onClick={() => setActiveMedia('video')}
+                      className="absolute bottom-3 left-3 bg-charcoal/85 hover:bg-charcoal text-white text-[11px] font-bold px-3.5 py-1.5 rounded-xl backdrop-blur-xs transition-all flex items-center gap-2 shadow-lg border border-gold/40 hover:scale-105 cursor-pointer z-10"
+                    >
+                      <div className="w-4 h-4 rounded-full bg-gold text-charcoal-dark flex items-center justify-center">
+                        <Play className="w-2.5 h-2.5 fill-current ml-0.5" />
+                      </div>
+                      <span>Watch Product Video</span>
+                    </button>
+                  )}
+                </>
+              )}
               {isOutOfStock && (
-                <div className="absolute inset-0 bg-charcoal/40 backdrop-blur-xs flex items-center justify-center">
+                <div className="absolute inset-0 bg-charcoal/40 backdrop-blur-xs flex items-center justify-center pointer-events-none">
                   <span className="bg-red-500 text-white font-bold uppercase tracking-widest text-xs px-4 py-2 rounded-xl">Out of Stock</span>
                 </div>
               )}
             </div>
 
-            {/* Gallery Thumbnails */}
-            {product.images && product.images.length > 1 && (
-              <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-none">
-                {product.images.map((img, idx) => (
+            {/* Gallery Thumbnails (Images + Video) */}
+            {((product.images && product.images.length > 1) || (product.images && product.images.length > 0 && videoInfo) || videoInfo) && (
+              <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-none items-center">
+                {product.images && product.images.map((img, idx) => (
                   <button 
                     key={idx}
-                    onClick={() => setActiveImage(img)}
-                    className={`w-20 h-20 rounded-xl overflow-hidden border-2 shrink-0 transition-all ${
-                      activeImage === img ? 'border-gold shadow-sm scale-95' : 'border-cream-dark/50 opacity-70 hover:opacity-100'
+                    type="button"
+                    onClick={() => {
+                      setActiveImage(img);
+                      setActiveMedia('image');
+                    }}
+                    className={`w-20 h-20 rounded-xl overflow-hidden border-2 shrink-0 transition-all cursor-pointer ${
+                      activeMedia === 'image' && activeImage === img ? 'border-gold shadow-sm scale-95' : 'border-cream-dark/50 opacity-70 hover:opacity-100'
                     }`}
                   >
                     <img src={getImageUrl(img)} alt={`${product.name} ${idx+1}`} className="w-full h-full object-cover" />
                   </button>
                 ))}
+
+                {videoInfo && (
+                  <button
+                    type="button"
+                    onClick={() => setActiveMedia('video')}
+                    className={`w-20 h-20 rounded-xl overflow-hidden border-2 shrink-0 transition-all flex flex-col items-center justify-center relative cursor-pointer ${
+                      activeMedia === 'video'
+                        ? 'border-gold ring-2 ring-gold/40 shadow-sm scale-95 bg-charcoal'
+                        : 'border-cream-dark/60 bg-cream/80 opacity-80 hover:opacity-100'
+                    }`}
+                    title="Watch Product Video"
+                  >
+                    {videoInfo.thumbnail ? (
+                      <img src={videoInfo.thumbnail} alt="Product Video Thumbnail" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-linear-to-br from-charcoal-dark to-charcoal flex items-center justify-center">
+                        <Video className="w-6 h-6 text-gold" />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-charcoal/50 flex flex-col items-center justify-center gap-1">
+                      <div className="w-6 h-6 rounded-full bg-gold text-charcoal-dark flex items-center justify-center shadow-md">
+                        <Play className="w-3 h-3 fill-current ml-0.5" />
+                      </div>
+                      <span className="text-[9px] font-bold text-white tracking-widest uppercase drop-shadow">Video</span>
+                    </div>
+                  </button>
+                )}
               </div>
             )}
           </div>
@@ -568,6 +714,58 @@ const ProductDetails = () => {
           </div>
 
         </div>
+
+        {/* Sacred Product Video Showcase */}
+        {videoInfo && (
+          <div className="border-t border-cream-dark/50 pt-8 sm:pt-10 text-left">
+            <div className="bg-linear-to-br from-cream/90 via-cream-light to-gold/10 p-5 sm:p-8 rounded-3xl border border-gold/30 shadow-xs">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                <div>
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-gold/15 text-gold-dark rounded-full text-[11px] font-bold uppercase tracking-wider mb-2 border border-gold/30">
+                    <Video className="w-3.5 h-3.5" />
+                    <span>Sacred Video Showcase & Ritual Guide</span>
+                  </div>
+                  <h2 className="font-serif text-xl sm:text-2xl font-bold text-charcoal-dark">
+                    Experience {product.name}
+                  </h2>
+                  <p className="text-xs text-charcoal/70 mt-1 max-w-2xl">
+                    Immerse yourself in the authentic visual details, divine craftsmanship, and energizing frequency of this sacred creation.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveMedia('video');
+                    window.scrollTo({ top: 180, behavior: 'smooth' });
+                  }}
+                  className="self-start md:self-center inline-flex items-center gap-2 bg-charcoal hover:bg-charcoal-dark text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-xs shrink-0 cursor-pointer"
+                >
+                  <Play className="w-3.5 h-3.5 fill-gold text-gold" />
+                  <span>Play in Main Showcase</span>
+                </button>
+              </div>
+
+              <div className="w-full aspect-video rounded-2xl overflow-hidden bg-black shadow-lg border border-cream-dark/60 max-w-5xl mx-auto">
+                {videoInfo.type === 'direct' ? (
+                  <video 
+                    src={getImageUrl(videoInfo.embedUrl)} 
+                    controls 
+                    playsInline
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <iframe 
+                    src={videoInfo.embedUrl} 
+                    title={`${product.name} Video Showcase`}
+                    className="w-full h-full border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Customer Reviews Section */}
         <div className="border-t border-cream-dark/50 pt-10 text-left">

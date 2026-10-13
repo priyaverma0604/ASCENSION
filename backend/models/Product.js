@@ -29,6 +29,11 @@ const productSchema = new mongoose.Schema({
       type: String
     }
   ],
+  video: {
+    type: String,
+    trim: true,
+    default: ''
+  },
   category: {
     type: String,
     required: [true, 'Please select a product category'],

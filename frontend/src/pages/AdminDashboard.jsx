@@ -5,7 +5,7 @@ import {
   Calendar, MapPin, DollarSign, MessageCircle, FileText, Smile,
   Share2, Copy, Check, Sparkles, Users, Activity, BarChart3, Globe,
   Smartphone, Laptop, Tablet, Search, Shield, UserCheck, Radio, Clock,
-  ExternalLink, UserX, CheckCircle2, AlertCircle, Star
+  ExternalLink, UserX, CheckCircle2, AlertCircle, Star, Video
 } from 'lucide-react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
@@ -264,6 +264,7 @@ const AdminDashboard = () => {
   const [productPrice, setProductPrice] = useState('');
   const [productCategory, setProductCategory] = useState('Crystals');
   const [productStock, setProductStock] = useState('');
+  const [productVideo, setProductVideo] = useState('');
 
   const [workshopTitle, setWorkshopTitle] = useState('');
   const [workshopDesc, setWorkshopDesc] = useState('');
@@ -506,6 +507,7 @@ const AdminDashboard = () => {
     setProductPrice('');
     setProductCategory('Crystals');
     setProductStock('10');
+    setProductVideo('');
 
     setWorkshopTitle('');
     setWorkshopDesc('');
@@ -561,6 +563,7 @@ const AdminDashboard = () => {
       setProductPrice(item.pricing);
       setProductCategory(item.category);
       setProductStock(item.stock);
+      setProductVideo(item.video || '');
     } else if (activeTab === 'workshops') {
       setWorkshopTitle(item.title);
       setWorkshopDesc(item.description);
@@ -644,7 +647,8 @@ const AdminDashboard = () => {
           description: productDesc,
           pricing: productPrice,
           category: productCategory,
-          stock: productStock
+          stock: productStock,
+          video: productVideo
         };
       } else if (activeTab === 'workshops') {
         payload = {
@@ -1802,7 +1806,17 @@ const AdminDashboard = () => {
 
                       {/* Column 2: Specific Details & Payment / Registration References */}
                       <td className="py-3 px-4">
-                        {activeTab === 'products' && <span className="bg-cream-dark text-charcoal-light py-0.5 px-2 rounded-md font-semibold">{item.category} (Stock: {item.stock})</span>}
+                        {activeTab === 'products' && (
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="bg-cream-dark text-charcoal-light py-0.5 px-2 rounded-md font-semibold">{item.category} (Stock: {item.stock})</span>
+                            {item.video && (
+                              <span className="bg-red-50 text-red-600 border border-red-200 text-[9.5px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1" title={item.video}>
+                                <Video className="w-3 h-3 text-red-500" />
+                                <span>Video</span>
+                              </span>
+                            )}
+                          </div>
+                        )}
                         {activeTab === 'programs' && <span className="text-sage font-medium">Enrolled: {item.enrolledUsers?.length || 0} / {item.enrollmentCapacity || '∞'}</span>}
                         {activeTab === 'workshops' && <span className="text-sage font-medium">Registered: {item.registeredUsers?.length || 0} / {item.capacity}</span>}
                         {activeTab === 'webinars' && <span className="text-sage font-medium">Speaker: {item.speakerName} | Date: {new Date(item.date).toLocaleDateString()}</span>}
@@ -3166,6 +3180,19 @@ const AdminDashboard = () => {
                           <label className="font-bold text-charcoal-light uppercase text-[10px]">Stock Count</label>
                           <input type="number" required value={productStock} onChange={(e) => setProductStock(e.target.value)} className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none" />
                         </div>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="font-bold text-charcoal-light uppercase text-[10px]">Product Video URL (YouTube, Google Drive, Vimeo, or MP4 Link - Optional)</label>
+                        <input 
+                          type="url" 
+                          placeholder="e.g. YouTube link, Google Drive link, Vimeo, or .mp4 link" 
+                          value={productVideo} 
+                          onChange={(e) => setProductVideo(e.target.value)} 
+                          className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none font-mono text-[11px]" 
+                        />
+                        <span className="text-[9.5px] text-charcoal-light italic">
+                          Paste any YouTube link, Google Drive link (set to "Anyone with the link can view"), Vimeo URL, or direct MP4 link. It will automatically play in the product page gallery and dedicated video showcase.
+                        </span>
                       </div>
                     </>
                   )}

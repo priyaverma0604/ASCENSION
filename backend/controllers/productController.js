@@ -78,7 +78,7 @@ exports.getProductById = async (req, res, next) => {
 // @access  Private/Admin
 exports.createProduct = async (req, res, next) => {
   try {
-    const { name, description, pricing, category, stock } = req.body;
+    const { name, description, pricing, category, stock, video, videoUrl } = req.body;
 
     const images = getImagesPaths(req);
     if (images.length === 0 && req.body.images) {
@@ -95,7 +95,8 @@ exports.createProduct = async (req, res, next) => {
       pricing,
       category,
       stock: stock || 0,
-      images
+      images,
+      video: (video || videoUrl || '').trim()
     });
 
     res.status(201).json({ success: true, data: product });
@@ -114,13 +115,17 @@ exports.updateProduct = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Product not found' });
     }
 
-    const { name, description, pricing, category, stock } = req.body;
+    const { name, description, pricing, category, stock, video, videoUrl } = req.body;
 
     product.name = name || product.name;
     product.description = description || product.description;
     product.pricing = pricing !== undefined ? pricing : product.pricing;
     product.category = category || product.category;
     product.stock = stock !== undefined ? stock : product.stock;
+
+    if (video !== undefined || videoUrl !== undefined) {
+      product.video = (video !== undefined ? video : (videoUrl || '')).trim();
+    }
 
     const newImages = getImagesPaths(req);
     if (newImages.length > 0) {

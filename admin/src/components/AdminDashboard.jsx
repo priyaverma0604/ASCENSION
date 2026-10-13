@@ -5,7 +5,7 @@ import {
   Calendar, MapPin, DollarSign, MessageCircle, FileText, Smile,
   Share2, Copy, Check, Sparkles, Users, Activity, BarChart3, Globe,
   Smartphone, Laptop, Tablet, Search, Shield, UserCheck, Radio, Clock,
-  ExternalLink, UserX, CheckCircle2, AlertCircle
+  ExternalLink, UserX, CheckCircle2, AlertCircle, Video
 } from 'lucide-react';
 import axios from 'axios';
 import logo from '../assets/logo.png';
@@ -282,6 +282,7 @@ const AdminDashboard = ({ user, onLogout }) => {
   const [productPrice, setProductPrice] = useState('');
   const [productCategory, setProductCategory] = useState('Crystals');
   const [productStock, setProductStock] = useState('');
+  const [productVideo, setProductVideo] = useState('');
 
   const [workshopTitle, setWorkshopTitle] = useState('');
   const [workshopDesc, setWorkshopDesc] = useState('');
@@ -584,6 +585,7 @@ const AdminDashboard = ({ user, onLogout }) => {
     setProductPrice('');
     setProductCategory('Crystals');
     setProductStock('10');
+    setProductVideo('');
 
     setWorkshopTitle('');
     setWorkshopDesc('');
@@ -650,6 +652,7 @@ const AdminDashboard = ({ user, onLogout }) => {
       setProductPrice(item.pricing);
       setProductCategory(item.category);
       setProductStock(item.stock);
+      setProductVideo(item.video || '');
     } else if (activeTab === 'workshops') {
       setWorkshopTitle(item.title);
       setWorkshopDesc(item.description);
@@ -743,7 +746,8 @@ const AdminDashboard = ({ user, onLogout }) => {
           description: productDesc,
           pricing: productPrice,
           category: productCategory,
-          stock: productStock
+          stock: productStock,
+          video: productVideo
         };
       } else if (activeTab === 'workshops') {
         payload = {
@@ -2034,7 +2038,17 @@ const AdminDashboard = ({ user, onLogout }) => {
                               )}
                             </div>
                           )}
-                          {activeTab === 'products' && <span className="bg-cream-dark text-charcoal-light py-0.5 px-2 rounded-md font-semibold">{item.category} (Stock: {item.stock})</span>}
+                          {activeTab === 'products' && (
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="bg-cream-dark text-charcoal-light py-0.5 px-2 rounded-md font-semibold">{item.category} (Stock: {item.stock})</span>
+                              {item.video && (
+                                <span className="bg-red-50 text-red-600 border border-red-200 text-[9.5px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1" title={item.video}>
+                                  <Video className="w-3 h-3 text-red-500" />
+                                  <span>Video</span>
+                                </span>
+                              )}
+                            </div>
+                          )}
                           {activeTab === 'workshops' && <span className="text-sage font-medium">Slots: {item.registeredUsers?.length} / {item.capacity}</span>}
                           {activeTab === 'retreats' && <span className="text-sage font-medium">Interested: {item.interestedUsers?.length} logged</span>}
                           {activeTab === 'programs' && <span className="text-sage font-medium">Enrolled: {item.enrolledUsers?.length} / {item.enrollmentCapacity}</span>}
@@ -3640,6 +3654,19 @@ const AdminDashboard = ({ user, onLogout }) => {
                           <label className="font-bold text-charcoal-light uppercase text-[10px]">Stock Count</label>
                           <input type="number" required value={productStock} onChange={(e) => setProductStock(e.target.value)} className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none" />
                         </div>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="font-bold text-charcoal-light uppercase text-[10px]">Product Video URL (YouTube, Google Drive, Vimeo, or MP4 Link - Optional)</label>
+                        <input 
+                          type="url" 
+                          placeholder="e.g. YouTube link, Google Drive link, Vimeo, or .mp4 link" 
+                          value={productVideo} 
+                          onChange={(e) => setProductVideo(e.target.value)} 
+                          className="bg-cream-light border rounded-xl py-2 px-3 focus:outline-none font-mono text-[11px]" 
+                        />
+                        <span className="text-[9.5px] text-charcoal-light italic">
+                          Paste any YouTube link, Google Drive link (set to "Anyone with the link can view"), Vimeo URL, or direct MP4 link. It will automatically play in the product page gallery and dedicated video showcase.
+                        </span>
                       </div>
                     </>
                   )}
