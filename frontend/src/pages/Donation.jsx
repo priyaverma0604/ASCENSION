@@ -109,12 +109,20 @@ const Donation = () => {
             }
           },
           prefill: { name, email, contact: phone },
-          theme: { color: '#D4AF37' }
+          theme: { color: '#D4AF37' },
+          modal: {
+            ondismiss: function () {
+              setLoading(false);
+            }
+          }
         };
 
         const rzp = new window.Razorpay(options);
+        rzp.on('payment.failed', function (response) {
+          alert(response.error?.description || 'Payment was unsuccessful. Please try again.');
+          setLoading(false);
+        });
         rzp.open();
-        setLoading(false);
       }
     } catch (err) {
       alert(err.response?.data?.message || 'Initiating donation failed');
