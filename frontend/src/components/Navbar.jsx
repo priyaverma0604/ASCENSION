@@ -59,8 +59,53 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className={`absolute lg:fixed top-0 z-50 w-full px-3 sm:px-4 md:px-8 transition-all duration-300 ${isScrolled ? 'py-1.5' : 'py-2.5 sm:py-3'}`}>
-        <div className={`glass max-w-7xl 2xl:max-w-screen-2xl 3xl:max-w-[1600px] mx-auto rounded-2xl flex items-center justify-between transition-all duration-300 ${isScrolled ? 'shadow-md py-2 px-4 sm:px-6' : 'shadow-sm py-2.5 sm:py-3 px-4 sm:px-6'}`}>
+      <header className="absolute lg:fixed top-0 z-50 w-full flex flex-col pointer-events-none">
+        {/* Top Festive Sale Announcement Strip (Amazon / Zepto style) */}
+        <div className="w-full bg-gradient-to-r from-[#7C2D12] via-[#9A3412] to-[#7C2D12] text-white py-1.5 px-3 overflow-hidden shadow-xs relative pointer-events-auto border-b border-amber-500/20">
+          <Link to="/shop?category=Diwali%20Special" className="max-w-7xl 2xl:max-w-screen-2xl mx-auto flex items-center group cursor-pointer overflow-hidden">
+            <div className="overflow-hidden whitespace-nowrap flex-1 flex">
+              <div className="inline-flex items-center gap-8 animate-marquee text-xs font-serif font-bold tracking-wide">
+                <span className="flex items-center gap-1.5 text-amber-200">
+                  <span>🪔</span>
+                  <span>THE DIWALI SALE IS LIVE</span>
+                </span>
+                <span className="text-amber-400/60">•</span>
+                <span className="font-sans font-semibold text-white text-[11px]">
+                  Festive Duo Offer: Buy Any 2 Candle Colors for ₹999 <span className="text-amber-300 font-bold">(Save ₹111)</span>
+                </span>
+                <span className="text-amber-400/60">•</span>
+                <span className="font-sans font-normal text-amber-100/90 text-[11px]">
+                  Rosewater Charm • Sapphire Serenity • Ruby Elegance • Lavender Peacock • Amber Grace • Golden Grace
+                </span>
+                <span className="text-amber-400/60">•</span>
+                <span className="bg-amber-400 hover:bg-amber-300 text-amber-950 font-sans text-[10px] uppercase font-black px-2.5 py-0.5 rounded-full shadow-xs transition-colors">
+                  Shop Deals →
+                </span>
+                <span className="text-amber-400/60">•</span>
+                <span className="flex items-center gap-1.5 text-amber-200">
+                  <span>🪔</span>
+                  <span>THE DIWALI SALE IS LIVE</span>
+                </span>
+                <span className="text-amber-400/60">•</span>
+                <span className="font-sans font-semibold text-white text-[11px]">
+                  Festive Duo Offer: Buy Any 2 Candle Colors for ₹999 <span className="text-amber-300 font-bold">(Save ₹111)</span>
+                </span>
+                <span className="text-amber-400/60">•</span>
+                <span className="font-sans font-normal text-amber-100/90 text-[11px]">
+                  Rosewater Charm • Sapphire Serenity • Ruby Elegance • Lavender Peacock • Amber Grace • Golden Grace
+                </span>
+                <span className="text-amber-400/60">•</span>
+                <span className="bg-amber-400 hover:bg-amber-300 text-amber-950 font-sans text-[10px] uppercase font-black px-2.5 py-0.5 rounded-full shadow-xs transition-colors">
+                  Shop Deals →
+                </span>
+              </div>
+            </div>
+          </Link>
+        </div>
+
+        {/* Floating Glass Navbar */}
+        <nav className={`w-full px-3 sm:px-4 md:px-8 transition-all duration-300 pointer-events-auto ${isScrolled ? 'py-1' : 'py-2 sm:py-2.5'}`}>
+          <div className={`glass max-w-7xl 2xl:max-w-screen-2xl 3xl:max-w-[1600px] mx-auto rounded-2xl flex items-center justify-between transition-all duration-300 ${isScrolled ? 'shadow-md py-2 px-4 sm:px-6' : 'shadow-sm py-2.5 sm:py-3 px-4 sm:px-6'}`}>
 
           {/* Logo */}
           <Link to="/" className="flex items-center group">
@@ -479,7 +524,8 @@ const Navbar = () => {
           </>
         )}
       </nav>
-      {!isHomePage && <div className="h-[65px] sm:h-[70px] md:h-[80px] w-full shrink-0" />}
+      </header>
+      {!isHomePage && <div className="h-[92px] sm:h-[98px] md:h-[108px] w-full shrink-0" />}
     </>
   );
 };

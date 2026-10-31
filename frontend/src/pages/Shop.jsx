@@ -5,6 +5,7 @@ import axios from 'axios';
 import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
 import { AuthContext } from '../context/AuthContext';
+import { DIWALI_DUO_CANDLES, getDiwaliCandleInfo, isDiwaliOfferCandle } from '../data/diwaliOffers';
 
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
@@ -90,8 +91,12 @@ const Shop = () => {
   const [copiedUpi, setCopiedUpi] = useState(false);
   const [manualPayType, setManualPayType] = useState('bank'); // 'bank' or 'qr'
 
+  // Quick Duo Candle Modal State
+  const [duoModalProduct, setDuoModalProduct] = useState(null);
+  const [duoModalSecondCandle, setDuoModalSecondCandle] = useState(null);
+
   const [categoriesList, setCategoriesList] = useState([
-    'All', 'Energy Bottles', 'Crystals', 'Pyramids', 'Bath Salts', 'Healing Camphor', 'Healing Oils', 'Candles', 'Wax Tablets', 'Sage Leaves'
+    'All', 'Diwali Special', 'Energy Bottles', 'Crystals', 'Pyramids', 'Bath Salts', 'Healing Camphor', 'Healing Oils', 'Candles', 'Wax Tablets', 'Sage Leaves'
   ]);
 
   useEffect(() => {
@@ -102,7 +107,13 @@ const Shop = () => {
     try {
       const { data } = await axios.get('/api/products/categories');
       if (data.success && data.data && data.data.length > 0) {
-        setCategoriesList(['All', ...data.data.filter(c => c && c !== 'All')]);
+        const cats = data.data.filter(c => c && c !== 'All');
+        const sortedCats = cats.sort((a, b) => {
+          if (a === 'Diwali Special') return -1;
+          if (b === 'Diwali Special') return 1;
+          return 0;
+        });
+        setCategoriesList(['All', ...sortedCats]);
       }
     } catch (err) {
       console.error('Error fetching categories in Shop:', err.message);
@@ -742,19 +753,42 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                   Categories
                 </h4>
                 <div className="flex flex-row lg:flex-col gap-1.5 sm:gap-2 overflow-x-auto pb-2 lg:pb-0 scrollbar-none">
-                  {categoriesList.map((cat) => (
-                    <button
-                      key={cat}
-                      onClick={() => handleCategorySelect(cat)}
-                      className={`text-xs text-left px-3 py-2 rounded-xl transition-all whitespace-nowrap shrink-0 ${
-                        category === cat
-                          ? 'bg-sage text-white font-bold'
-                          : 'bg-cream/50 text-charcoal-light hover:bg-cream-dark'
-                      }`}
-                    >
-                      {cat}
-                    </button>
-                  ))}
+                  {categoriesList.map((cat) => {
+                    const isDiwaliSpecial = cat === 'Diwali Special';
+                    return (
+                      <button
+                        key={cat}
+                        onClick={() => handleCategorySelect(cat)}
+                        className={`text-xs text-left px-3 py-2 rounded-xl transition-all whitespace-nowrap shrink-0 flex items-center justify-between gap-1.5 ${
+                          category === cat
+                            ? (isDiwaliSpecial ? 'bg-amber-600 text-white font-bold shadow-xs' : 'bg-sage text-white font-bold')
+                            : (isDiwaliSpecial ? 'bg-amber-50/80 text-amber-900 hover:bg-amber-100 font-semibold' : 'bg-cream/50 text-charcoal-light hover:bg-cream-dark')
+                        }`}
+                      >
+                        <span>{isDiwaliSpecial ? `🪔 ${cat}` : cat}</span>
+                        {isDiwaliSpecial && <span className="text-[9px] bg-amber-600 text-white px-1.5 py-0.5 rounded-full font-bold">Offer</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="mt-4 pt-3 border-t border-cream-dark/50 hidden lg:block">
+                  <a
+                    href="/Catalogue_Ascension_Seva_2026.pdf"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2.5 p-2.5 rounded-xl bg-cream/40 hover:bg-cream text-charcoal transition-all shadow-2xs group"
+                  >
+                    <span className="text-lg">🪔</span>
+                    <div className="flex flex-col text-left">
+                      <span className="text-[11px] font-bold text-amber-950 font-serif group-hover:text-amber-800">
+                        Diwali Catalogue 2026
+                      </span>
+                      <span className="text-[9px] text-charcoal-light">
+                        Download PDF Brochure
+                      </span>
+                    </div>
+                  </a>
                 </div>
               </div>
             </div>
@@ -819,6 +853,11 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                           alt={product.name} 
                           className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500" 
                         />
+                        {isDiwaliOfferCandle(product.name) && (
+                          <div className="absolute bottom-2 left-2 z-10 bg-amber-600 text-white text-[8px] sm:text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm flex items-center gap-1">
+                            <span>✨</span> Buy 2 Colors @ ₹999
+                          </div>
+                        )}
                       </Link>
                       
                       <div className="flex flex-col text-left gap-1 flex-1">
@@ -835,6 +874,7 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                         </p>
                         <div className="flex justify-between items-center border-t border-cream-dark/50 pt-2 sm:pt-3 mt-2 sm:mt-3 font-sans text-xs">
                           {(() => {
+                            const isDuoEligible = isDiwaliOfferCandle(product.name);
                             const isZodiac = product.name && product.name.toLowerCase().includes('zodiac');
                             const isBoat = product.name && product.name.toLowerCase().includes('boat');
                             const sellingPrice = product.pricing || (isBoat ? 475 : (isZodiac ? 1555 : 375));
@@ -847,7 +887,12 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                                   <span className="font-serif font-bold text-gold-dark text-xs sm:text-sm">
                                     ₹{sellingPrice}
                                   </span>
-                                  {hasDisc && (
+                                  {isDuoEligible && (
+                                    <span className="text-[9px] text-amber-700 font-bold bg-amber-50 px-1.5 py-0.2 rounded">
+                                      2 for ₹999
+                                    </span>
+                                  )}
+                                  {hasDisc && !isDuoEligible && (
                                     <>
                                       <span className="font-serif text-[10px] text-charcoal-light line-through decoration-red-400">
                                         ₹{origPrice}
@@ -861,24 +906,50 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                               </div>
                             );
                           })()}
-                          <button
-                            onClick={() => {
-                              if (product.name && product.name.toLowerCase().includes('boat')) {
-                                addToCart({
-                                  ...product,
-                                  _id: `${product._id}_small`,
-                                  name: `${product.name} (Small Size)`,
-                                  pricing: 475,
-                                  selectedSize: 'Small'
-                                });
-                              } else {
-                                addToCart(product);
-                              }
-                            }}
-                            className="bg-sage hover:bg-sage-dark text-white font-bold py-1 sm:py-1.5 px-2 sm:px-3 rounded-lg transition-colors text-[9px] sm:text-[10px] uppercase tracking-wider"
-                          >
-                            Add
-                          </button>
+
+                          {isDiwaliOfferCandle(product.name) ? (
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                onClick={() => {
+                                  setDuoModalProduct(product);
+                                  const other = DIWALI_DUO_CANDLES.find(c => !product.name.toLowerCase().includes(c.name.toLowerCase())) || DIWALI_DUO_CANDLES[1];
+                                  setDuoModalSecondCandle(other);
+                                }}
+                                className="bg-amber-600 hover:bg-amber-700 text-white font-bold py-1 sm:py-1.5 px-2 sm:px-2.5 rounded-lg transition-colors text-[9px] sm:text-[10px] uppercase tracking-wider whitespace-nowrap shadow-2xs"
+                              >
+                                Buy 2 @ ₹999
+                              </button>
+                              <button
+                                onClick={() => {
+                                  addToCart(product);
+                                  alert(`1x ${product.name} added to cart.`);
+                                }}
+                                className="bg-cream-dark/60 hover:bg-cream-dark text-charcoal font-bold py-1 sm:py-1.5 px-2 rounded-lg transition-colors text-[9px] sm:text-[10px] uppercase tracking-wider"
+                                title="Add 1 Single Candle (₹555)"
+                              >
+                                +1
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                if (product.name && product.name.toLowerCase().includes('boat')) {
+                                  addToCart({
+                                    ...product,
+                                    _id: `${product._id}_small`,
+                                    name: `${product.name} (Small Size)`,
+                                    pricing: 475,
+                                    selectedSize: 'Small'
+                                  });
+                                } else {
+                                  addToCart(product);
+                                }
+                              }}
+                              className="bg-sage hover:bg-sage-dark text-white font-bold py-1 sm:py-1.5 px-2 sm:px-3 rounded-lg transition-colors text-[9px] sm:text-[10px] uppercase tracking-wider"
+                            >
+                              Add
+                            </button>
+                          )}
                         </div>
                       </div>
 
@@ -2095,6 +2166,153 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
             )}
           </div>
         )}
+
+      {/* Quick Duo Candle Color Picker Modal */}
+      {duoModalProduct && duoModalSecondCandle && (
+        <div className="fixed inset-0 z-50 bg-charcoal/50 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl p-5 sm:p-6 flex flex-col gap-4 relative animate-scale-in text-left">
+            <button
+              onClick={() => setDuoModalProduct(null)}
+              className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-cream transition-colors text-charcoal-light hover:text-charcoal"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-amber-700 font-sans block">
+                Diwali Special Combo
+              </span>
+              <h3 className="font-serif text-lg font-bold text-charcoal-dark leading-tight mt-0.5">
+                Buy Any 2 Candle Colors for ₹999!
+              </h3>
+              <p className="text-xs text-charcoal-light mt-1">
+                Mix and match any 2 colors from our artisanal small floral collection (Save ₹111).
+              </p>
+            </div>
+
+            {/* Duo Visual Preview: Color 1 + Color 2 */}
+            <div className="p-3 rounded-2xl bg-amber-50/80 border border-amber-200/80 flex items-center justify-between gap-3 shadow-2xs">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="flex items-center -space-x-2 shrink-0">
+                  <img
+                    src={getImageUrl(duoModalProduct.images?.[0])}
+                    alt={duoModalProduct.name}
+                    className="w-12 h-12 object-cover rounded-xl border-2 border-white shadow-xs"
+                  />
+                  <img
+                    src={getImageUrl(duoModalSecondCandle.image)}
+                    alt={duoModalSecondCandle.name}
+                    className="w-12 h-12 object-cover rounded-xl border-2 border-amber-500 shadow-xs animate-scale-in"
+                  />
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-[10px] font-bold text-amber-700 uppercase tracking-wider">
+                    Pairing Preview
+                  </span>
+                  <span className="font-serif text-xs font-bold text-charcoal-dark truncate">
+                    {getDiwaliCandleInfo(duoModalProduct.name)?.name || duoModalProduct.name} + {duoModalSecondCandle.name}
+                  </span>
+                  <span className="text-[10px] text-charcoal-light truncate">
+                    {getDiwaliCandleInfo(duoModalProduct.name)?.colorName} &amp; {duoModalSecondCandle.colorName}
+                  </span>
+                </div>
+              </div>
+              <span className="font-serif font-bold text-sm text-amber-950 shrink-0">₹999</span>
+            </div>
+
+            {/* Candle 2 (Choose from Palette) */}
+            <div className="flex flex-col gap-2">
+              <span className="font-sans text-xs font-semibold text-charcoal-dark">
+                Choose Color 2:
+              </span>
+              <div className="grid grid-cols-2 gap-2">
+                {DIWALI_DUO_CANDLES.map((c) => {
+                  const isSelected = duoModalSecondCandle.id === c.id;
+                  return (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => setDuoModalSecondCandle(c)}
+                      className={`flex items-center gap-2 p-2 rounded-xl text-left transition-all ${
+                        isSelected
+                          ? 'bg-amber-50 ring-2 ring-amber-500 text-charcoal-dark shadow-xs'
+                          : 'bg-cream/25 hover:bg-cream/60 text-charcoal'
+                      }`}
+                    >
+                      <span
+                        className="w-4 h-4 rounded-full shrink-0 border border-white shadow-2xs"
+                        style={{ backgroundColor: c.colorHex }}
+                      />
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-[11px] font-bold font-serif truncate">
+                          {c.name}
+                        </span>
+                        <span className="text-[9px] text-charcoal-light font-sans truncate">
+                          {c.colorName}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Price & Actions */}
+            <div className="pt-3 border-t border-cream-dark/50 flex flex-col gap-2.5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] text-charcoal-light block">Combo Price</span>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="font-serif text-lg font-bold text-charcoal-dark">₹999</span>
+                    <span className="font-serif text-xs text-charcoal-light line-through decoration-red-400">₹1,110</span>
+                    <span className="text-[9px] font-bold bg-amber-100 text-amber-800 px-1.5 py-0.2 rounded">Save ₹111</span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const candle1 = getDiwaliCandleInfo(duoModalProduct.name);
+                    const candle2 = duoModalSecondCandle;
+                    addToCart({
+                      ...duoModalProduct,
+                      _id: `${duoModalProduct._id}_duo_${candle2.id}`,
+                      name: `Candle Duo: ${candle1?.name || duoModalProduct.name} + ${candle2.name}`,
+                      pricing: 999,
+                      originalPrice: 1110,
+                      isDuoOffer: true,
+                      selectedColors: [
+                        `${candle1?.name || duoModalProduct.name} (${candle1?.colorName || ''})`,
+                        `${candle2.name} (${candle2.colorName})`
+                      ]
+                    }, 1);
+                    setDuoModalProduct(null);
+                    alert(`Candle Duo (${candle1?.name || duoModalProduct.name} + ${candle2.name}) added to cart for ₹999!`);
+                  }}
+                  className="bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs uppercase tracking-wider py-2.5 px-4 rounded-xl shadow-xs transition-colors"
+                >
+                  Add Duo @ ₹999
+                </button>
+              </div>
+
+              <div className="flex justify-between items-center text-[10px] text-charcoal-light pt-1">
+                <span>Want only 1 candle?</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    addToCart(duoModalProduct, 1);
+                    setDuoModalProduct(null);
+                    alert(`1x ${duoModalProduct.name} added to cart for ₹555.`);
+                  }}
+                  className="text-amber-700 hover:underline font-bold"
+                >
+                  Add Single Candle (₹555)
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
 
       </div>
     </div>

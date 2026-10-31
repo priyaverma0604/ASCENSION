@@ -9,6 +9,7 @@ import axios from 'axios';
 import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
 import { AuthContext } from '../context/AuthContext';
+import { DIWALI_DUO_CANDLES, getDiwaliCandleInfo } from '../data/diwaliOffers';
 
 const getImageUrl = (path) => {
   if (!path) return '';
@@ -221,10 +222,34 @@ const ProductDetails = () => {
 
   const [selectedSize, setSelectedSize] = useState('Small');
 
+  const currentDuoCandle = getDiwaliCandleInfo(product?.name);
+  const isDuoEligible = Boolean(currentDuoCandle);
+  const [purchaseMode, setPurchaseMode] = useState('duo'); // 'duo' or 'single'
+  const [secondCandle, setSecondCandle] = useState(() => {
+    return DIWALI_DUO_CANDLES.find(c => !product?.name?.toLowerCase().includes(c.name.toLowerCase())) || DIWALI_DUO_CANDLES[1];
+  });
+
+  useEffect(() => {
+    if (product?.name) {
+      const other = DIWALI_DUO_CANDLES.find(c => !product.name.toLowerCase().includes(c.name.toLowerCase()));
+      if (other) setSecondCandle(other);
+    }
+  }, [product?.name]);
+
+  const isDuoActive = isDuoEligible && purchaseMode === 'duo';
   const isBoatCandle = product?.name && product.name.toLowerCase().includes('boat');
   const isZodiacBracelet = product?.name && product.name.toLowerCase().includes('zodiac');
-  const originalPrice = product?.originalPrice || (isZodiacBracelet ? 1999 : null);
-  const currentPrice = isBoatCandle ? (selectedSize === 'Big' ? 725 : 475) : (product?.pricing || (isZodiacBracelet ? 1555 : 375));
+
+  const originalPrice = isDuoActive 
+    ? 1110 
+    : (product?.originalPrice || (isZodiacBracelet ? 1999 : null));
+
+  const currentPrice = isBoatCandle 
+    ? (selectedSize === 'Big' ? 725 : 475) 
+    : (isDuoActive 
+        ? 999 
+        : (product?.pricing || (isZodiacBracelet ? 1555 : 375)));
+
   const hasDiscount = originalPrice && Number(originalPrice) > Number(currentPrice);
   const discountPercent = hasDiscount ? Math.round(((Number(originalPrice) - Number(currentPrice)) / Number(originalPrice)) * 100) : 0;
 
@@ -238,16 +263,34 @@ const ProductDetails = () => {
 
   const handleAddToCart = () => {
     if (!product) return;
-    const itemToAdd = isBoatCandle ? {
-      ...product,
-      _id: `${product._id}_${selectedSize.toLowerCase()}`,
-      name: `${product.name} (${selectedSize} Size)`,
-      pricing: currentPrice,
-      selectedSize
-    } : {
-      ...product,
-      pricing: currentPrice
-    };
+    let itemToAdd;
+    if (isBoatCandle) {
+      itemToAdd = {
+        ...product,
+        _id: `${product._id}_${selectedSize.toLowerCase()}`,
+        name: `${product.name} (${selectedSize} Size)`,
+        pricing: currentPrice,
+        selectedSize
+      };
+    } else if (isDuoActive && currentDuoCandle && secondCandle) {
+      itemToAdd = {
+        ...product,
+        _id: `${product._id}_duo_${secondCandle.id}`,
+        name: `Candle Duo: ${currentDuoCandle.name} + ${secondCandle.name}`,
+        pricing: 999,
+        originalPrice: 1110,
+        isDuoOffer: true,
+        selectedColors: [
+          `${currentDuoCandle.name} (${currentDuoCandle.colorName})`,
+          `${secondCandle.name} (${secondCandle.colorName})`
+        ]
+      };
+    } else {
+      itemToAdd = {
+        ...product,
+        pricing: currentPrice
+      };
+    }
 
     addToCart(itemToAdd, quantity);
     alert(`${quantity} unit(s) of ${itemToAdd.name} added to cart.`);
@@ -255,16 +298,34 @@ const ProductDetails = () => {
 
   const handleBuyNow = () => {
     if (!product) return;
-    const itemToAdd = isBoatCandle ? {
-      ...product,
-      _id: `${product._id}_${selectedSize.toLowerCase()}`,
-      name: `${product.name} (${selectedSize} Size)`,
-      pricing: currentPrice,
-      selectedSize
-    } : {
-      ...product,
-      pricing: currentPrice
-    };
+    let itemToAdd;
+    if (isBoatCandle) {
+      itemToAdd = {
+        ...product,
+        _id: `${product._id}_${selectedSize.toLowerCase()}`,
+        name: `${product.name} (${selectedSize} Size)`,
+        pricing: currentPrice,
+        selectedSize
+      };
+    } else if (isDuoActive && currentDuoCandle && secondCandle) {
+      itemToAdd = {
+        ...product,
+        _id: `${product._id}_duo_${secondCandle.id}`,
+        name: `Candle Duo: ${currentDuoCandle.name} + ${secondCandle.name}`,
+        pricing: 999,
+        originalPrice: 1110,
+        isDuoOffer: true,
+        selectedColors: [
+          `${currentDuoCandle.name} (${currentDuoCandle.colorName})`,
+          `${secondCandle.name} (${secondCandle.colorName})`
+        ]
+      };
+    } else {
+      itemToAdd = {
+        ...product,
+        pricing: currentPrice
+      };
+    }
 
     addToCart(itemToAdd, quantity);
     navigate('/shop?tab=cart');
@@ -345,7 +406,52 @@ const ProductDetails = () => {
           
           {/* Left Column: Image Gallery & Video Player */}
           <div className="flex flex-col gap-3 sm:gap-4 lg:sticky lg:top-24">
+            
+            {/* Duo Preview Switcher Tabs (when Buy 2 Colors is active) */}
+            {isDuoActive && secondCandle && (
+              <div className="flex items-center justify-between gap-2 p-1.5 rounded-2xl bg-cream/70 border border-cream-dark/50 animate-fade-in">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveImage(product.images[0]);
+                    setActiveMedia('image');
+                  }}
+                  className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                    activeImage === product.images[0]
+                      ? 'bg-white shadow-xs text-charcoal-dark ring-2 ring-gold'
+                      : 'text-charcoal-light hover:text-charcoal hover:bg-white/60'
+                  }`}
+                >
+                  <span className="w-2.5 h-2.5 rounded-full border border-white shadow-2xs" style={{ backgroundColor: currentDuoCandle?.colorHex }} />
+                  <span className="truncate">Color 1: {currentDuoCandle?.name}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveImage(secondCandle.image);
+                    setActiveMedia('image');
+                  }}
+                  className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                    activeImage === secondCandle.image
+                      ? 'bg-white shadow-xs text-charcoal-dark ring-2 ring-gold'
+                      : 'text-charcoal-light hover:text-charcoal hover:bg-white/60'
+                  }`}
+                >
+                  <span className="w-2.5 h-2.5 rounded-full border border-white shadow-2xs" style={{ backgroundColor: secondCandle?.colorHex }} />
+                  <span className="truncate">Color 2: {secondCandle?.name}</span>
+                </button>
+              </div>
+            )}
+
             <div className="h-[280px] sm:h-[400px] md:h-[500px] 2xl:h-[580px] bg-[#FAF8F5] rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm border border-cream-dark/40 relative flex items-center justify-center">
+              {/* Floating viewing badge when in Duo mode */}
+              {isDuoActive && secondCandle && (
+                <div className="absolute top-3 left-3 z-10 bg-white/95 backdrop-blur-xs text-charcoal-dark text-[10px] font-bold px-3 py-1 rounded-full shadow-sm flex items-center gap-1.5 border border-cream-dark/50">
+                  <span className="w-2.5 h-2.5 rounded-full border border-white shadow-2xs" style={{ backgroundColor: activeImage === secondCandle.image ? secondCandle.colorHex : currentDuoCandle?.colorHex }} />
+                  <span>Showing: {activeImage === secondCandle.image ? `${secondCandle.name} (Color 2)` : `${currentDuoCandle?.name} (Color 1)`}</span>
+                </div>
+              )}
               {activeMedia === 'video' && videoInfo ? (
                 <div className="w-full h-full bg-black flex items-center justify-center relative">
                   {videoInfo.type === 'direct' ? (
@@ -404,10 +510,47 @@ const ProductDetails = () => {
               )}
             </div>
 
-            {/* Gallery Thumbnails (Images + Video) */}
-            {((product.images && product.images.length > 1) || (product.images && product.images.length > 0 && videoInfo) || videoInfo) && (
+            {/* Gallery Thumbnails (Images + Video + Duo Candle 2) */}
+            {((isDuoActive && secondCandle) || (product.images && product.images.length > 1) || (product.images && product.images.length > 0 && videoInfo) || videoInfo) && (
               <div className="flex gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-none items-center">
-                {product.images && product.images.map((img, idx) => (
+                {/* Candle 1 Thumbnail */}
+                <button 
+                  type="button"
+                  onClick={() => {
+                    setActiveImage(product.images[0]);
+                    setActiveMedia('image');
+                  }}
+                  className={`w-20 h-20 rounded-xl overflow-hidden border-2 shrink-0 transition-all cursor-pointer bg-white/90 flex flex-col items-center justify-center p-1 relative ${
+                    activeMedia === 'image' && activeImage === product.images[0] ? 'border-gold shadow-sm scale-95 ring-2 ring-gold/40' : 'border-cream-dark/50 opacity-70 hover:opacity-100'
+                  }`}
+                  title={`Color 1: ${currentDuoCandle?.name || product.name}`}
+                >
+                  <img src={getImageUrl(product.images[0])} alt={product.name} className="w-full h-full object-contain" />
+                  {isDuoActive && (
+                    <span className="absolute bottom-0.5 inset-x-0 bg-charcoal/80 text-white text-[8px] font-bold text-center py-0.2">Color 1</span>
+                  )}
+                </button>
+
+                {/* Candle 2 Thumbnail (when in Duo mode) */}
+                {isDuoActive && secondCandle && (
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      setActiveImage(secondCandle.image);
+                      setActiveMedia('image');
+                    }}
+                    className={`w-20 h-20 rounded-xl overflow-hidden border-2 shrink-0 transition-all cursor-pointer bg-white/90 flex flex-col items-center justify-center p-1 relative ${
+                      activeMedia === 'image' && activeImage === secondCandle.image ? 'border-gold shadow-sm scale-95 ring-2 ring-gold/40' : 'border-cream-dark/50 opacity-70 hover:opacity-100'
+                    }`}
+                    title={`Color 2: ${secondCandle.name}`}
+                  >
+                    <img src={getImageUrl(secondCandle.image)} alt={secondCandle.name} className="w-full h-full object-contain" />
+                    <span className="absolute bottom-0.5 inset-x-0 bg-amber-600 text-white text-[8px] font-bold text-center py-0.2">Color 2</span>
+                  </button>
+                )}
+
+                {/* Additional Product Images if any (when not in duo mode) */}
+                {!isDuoActive && product.images && product.images.slice(1).map((img, idx) => (
                   <button 
                     key={idx}
                     type="button"
@@ -419,7 +562,7 @@ const ProductDetails = () => {
                       activeMedia === 'image' && activeImage === img ? 'border-gold shadow-sm scale-95' : 'border-cream-dark/50 opacity-70 hover:opacity-100'
                     }`}
                   >
-                    <img src={getImageUrl(img)} alt={`${product.name} ${idx+1}`} className="w-full h-full object-contain p-1" />
+                    <img src={getImageUrl(img)} alt={`${product.name} ${idx+2}`} className="w-full h-full object-contain p-1" />
                   </button>
                 ))}
 
@@ -533,6 +676,187 @@ const ProductDetails = () => {
                     <span className="font-serif text-gold-dark text-[11px]">₹725</span>
                   </button>
                 </div>
+              </div>
+            )}
+
+            {/* Diwali Duo Offer Option (Buy 2 Colors at ₹999) */}
+            {isDuoEligible && !isOutOfStock && (
+              <div className="flex flex-col gap-3 p-3.5 sm:p-4 rounded-2xl bg-cream/40">
+                <div className="flex items-center justify-between">
+                  <span className="font-serif text-xs font-bold text-charcoal-dark tracking-wide uppercase">
+                    Select Buying Option
+                  </span>
+                  <span className="text-[10px] font-bold text-gold-dark uppercase tracking-wider flex items-center gap-1">
+                    <span>✨</span> Buy 2 at ₹999 Deal
+                  </span>
+                </div>
+
+                {/* Option 1 & 2 Toggle */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPurchaseMode('single');
+                      setActiveImage(product.images[0]);
+                      setActiveMedia('image');
+                    }}
+                    className={`p-3 rounded-xl text-left transition-all flex flex-col justify-between cursor-pointer ${
+                      purchaseMode === 'single'
+                        ? 'bg-white shadow-xs ring-2 ring-gold/70 text-charcoal-dark'
+                        : 'bg-white/60 hover:bg-white text-charcoal-light'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-serif text-xs font-bold text-charcoal-dark">
+                        Single Candle
+                      </span>
+                      <span className="font-serif text-xs font-bold text-gold-dark">
+                        ₹555
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-charcoal-light mt-1">
+                      1x {currentDuoCandle?.name} ({currentDuoCandle?.colorName})
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPurchaseMode('duo');
+                      if (secondCandle) {
+                        setActiveImage(secondCandle.image);
+                        setActiveMedia('image');
+                      }
+                    }}
+                    className={`p-3 rounded-xl text-left transition-all flex flex-col justify-between relative overflow-hidden cursor-pointer ${
+                      purchaseMode === 'duo'
+                        ? 'bg-gradient-to-br from-amber-50 to-orange-50/80 ring-2 ring-gold shadow-sm text-charcoal-dark'
+                        : 'bg-white/60 hover:bg-white text-charcoal-light'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-serif text-xs font-bold text-charcoal-dark flex items-center gap-1.5">
+                        <span>✨ Buy 2 Colors</span>
+                        <span className="bg-gold-dark text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full uppercase">
+                          Save ₹111
+                        </span>
+                      </span>
+                      <div className="flex items-baseline gap-1">
+                        <span className="font-serif text-[10px] text-charcoal-light line-through decoration-red-400">
+                          ₹1,110
+                        </span>
+                        <span className="font-serif text-xs font-bold text-gold-dark">
+                          ₹999
+                        </span>
+                      </div>
+                    </div>
+                    <span className="text-[10px] text-charcoal-light mt-1">
+                      Choose any 2 candle colors for ₹999
+                    </span>
+                  </button>
+                </div>
+
+                {/* Color 2 Selector (when Duo is active) */}
+                {purchaseMode === 'duo' && (
+                  <div className="flex flex-col gap-2.5 pt-2 border-t border-cream-dark/30 animate-fade-in">
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="font-sans text-[11px] font-medium text-charcoal-dark">
+                        Color 1: <strong className="font-bold text-gold-dark">{currentDuoCandle?.name}</strong> ({currentDuoCandle?.colorName})
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActiveImage(product.images[0]);
+                          setActiveMedia('image');
+                        }}
+                        className="text-[10px] text-gold-dark hover:underline font-bold"
+                      >
+                        Preview Color 1
+                      </button>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <span className="font-sans text-[11px] font-semibold text-charcoal-dark">
+                        Select Second Candle Color (Click to preview):
+                      </span>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {DIWALI_DUO_CANDLES.map((c) => {
+                          const isSelected = secondCandle?.id === c.id;
+                          return (
+                            <button
+                              key={c.id}
+                              type="button"
+                              onClick={() => {
+                                setSecondCandle(c);
+                                setActiveImage(c.image);
+                                setActiveMedia('image');
+                              }}
+                              className={`flex items-center gap-2 p-2 rounded-xl text-left transition-all cursor-pointer ${
+                                isSelected
+                                  ? 'bg-white shadow-xs ring-2 ring-gold text-charcoal-dark'
+                                  : 'bg-white/70 hover:bg-white text-charcoal'
+                              }`}
+                            >
+                              <span
+                                className="w-3.5 h-3.5 rounded-full shrink-0 shadow-2xs border border-white"
+                                style={{ backgroundColor: c.colorHex }}
+                              />
+                              <div className="flex flex-col min-w-0">
+                                <span className="text-[11px] font-bold font-serif truncate leading-tight">
+                                  {c.name}
+                                </span>
+                                <span className="text-[9px] text-charcoal-light font-sans truncate">
+                                  {c.colorName}
+                                </span>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Duo Visual Preview Summary Card */}
+                    <div className="text-[11px] text-amber-950 bg-amber-50/90 border border-amber-200/80 p-3 rounded-2xl flex items-center justify-between gap-3 shadow-2xs">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="flex items-center -space-x-2 shrink-0">
+                          <img
+                            src={getImageUrl(product.images[0])}
+                            alt={currentDuoCandle?.name}
+                            className={`w-11 h-11 rounded-xl object-cover border-2 shadow-xs cursor-pointer transition-transform hover:scale-105 ${
+                              activeImage === product.images[0] ? 'border-amber-600 ring-2 ring-amber-400' : 'border-white'
+                            }`}
+                            onClick={() => {
+                              setActiveImage(product.images[0]);
+                              setActiveMedia('image');
+                            }}
+                            title={`Click to preview Color 1: ${currentDuoCandle?.name}`}
+                          />
+                          <img
+                            src={getImageUrl(secondCandle.image)}
+                            alt={secondCandle.name}
+                            className={`w-11 h-11 rounded-xl object-cover border-2 shadow-xs cursor-pointer transition-transform hover:scale-105 ${
+                              activeImage === secondCandle.image ? 'border-amber-600 ring-2 ring-amber-400' : 'border-white'
+                            }`}
+                            onClick={() => {
+                              setActiveImage(secondCandle.image);
+                              setActiveMedia('image');
+                            }}
+                            title={`Click to preview Color 2: ${secondCandle.name}`}
+                          />
+                        </div>
+                        <div className="flex flex-col min-w-0">
+                          <span className="font-serif font-bold text-charcoal-dark text-xs truncate leading-tight">
+                            {currentDuoCandle?.name} + {secondCandle?.name}
+                          </span>
+                          <span className="text-[10px] text-charcoal-light truncate">
+                            Both candle colors included for ₹999 (Click photo to preview)
+                          </span>
+                        </div>
+                      </div>
+                      <span className="font-serif font-bold text-sm text-amber-950 shrink-0">₹999</span>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

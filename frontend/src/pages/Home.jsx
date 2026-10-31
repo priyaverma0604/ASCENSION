@@ -9,6 +9,7 @@ import {
 import axios from 'axios';
 import RegisterWorkshopModal from '../components/RegisterWorkshopModal';
 import RegisterWebinarModal from '../components/RegisterWebinarModal';
+import { DIWALI_DUO_CANDLES } from '../data/diwaliOffers';
 import BookRetreatModal from '../components/BookRetreatModal';
 import BookSessionModal from '../components/BookSessionModal';
 import SeamlessWaterBackground from '../components/SeamlessWaterBackground';
@@ -63,6 +64,7 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
   const [testimonials, setTestimonials] = useState([]);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [products, setProducts] = useState([]);
+  const [diwaliProducts, setDiwaliProducts] = useState([]);
   const [retreats, setRetreats] = useState([]);
   const [activeRetreat, setActiveRetreat] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -286,6 +288,13 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
         setProducts(resProducts.data.data.slice(0, 4)); // Show 4 featured products
       }
 
+      const resDiwali = await axios.get('/api/products', {
+        params: { category: 'Diwali Special' }
+      });
+      if (resDiwali.data?.success && resDiwali.data.data.length > 0) {
+        setDiwaliProducts(resDiwali.data.data.slice(0, 6)); // Top 6 featured Diwali creations
+      }
+
       const resRetreats = await axios.get('/api/retreats');
       if (resRetreats.data.success) {
         setRetreats(resRetreats.data.data);
@@ -458,35 +467,59 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
         {/* Soft Radial Contrast Overlay to enhance text readability without fading the bottom edges */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.7)_0%,rgba(255,255,255,0.1)_80%)] z-0 pointer-events-none" />
 
-        <div className="flex flex-col items-center gap-3 sm:gap-4 relative z-10 w-full max-w-4xl 2xl:max-w-5xl 3xl:max-w-6xl mx-auto animate-fade-in lg:-translate-y-8 2xl:-translate-y-12">
+        <div className="flex flex-col items-center gap-2.5 sm:gap-3.5 relative z-10 w-full max-w-4xl 2xl:max-w-5xl 3xl:max-w-6xl mx-auto animate-fade-in mt-14 sm:mt-16 lg:mt-10 2xl:mt-12">
 
           {/* Flashy Live Webinar Announcement Flash Banner - Dynamic: only render when an active upcoming webinar exists */}
           {(() => {
             const todayStart = new Date();
             todayStart.setHours(0, 0, 0, 0);
             const activeWebinar = workshops.find(w => w.isWebinar && new Date(w.date) >= todayStart && w.status !== 'Completed' && w.status !== 'Cancelled');
-            if (!activeWebinar) return null;
+            if (activeWebinar) {
+              return (
+                <div 
+                  onClick={() => handleOpenWorkshop(activeWebinar)}
+                  className="group cursor-pointer inline-flex items-center gap-2 sm:gap-2.5 px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full bg-white/95 hover:bg-white border-2 border-[#D4A017] shadow-[0_4px_25px_rgba(212,160,23,0.35)] hover:shadow-[0_8px_35px_rgba(212,160,23,0.5)] transition-all duration-300 transform hover:scale-[1.03] mb-1 select-none animate-pulse"
+                >
+                  <span className="relative flex h-2.5 w-2.5 shrink-0">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-90"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-600"></span>
+                  </span>
+                  <span className="bg-red-600 text-white text-[9px] sm:text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs flex items-center gap-1">
+                    <Zap className="w-3 h-3 text-yellow-300 fill-yellow-300" />
+                    <span>REGISTRATIONS LIVE</span>
+                  </span>
+                  <span className="text-[11px] sm:text-xs font-bold text-charcoal-dark tracking-wide font-sans truncate max-w-[170px] sm:max-w-none">
+                    {activeWebinar.title}
+                  </span>
+                  <span className="text-[11px] sm:text-xs font-serif font-bold text-gold-dark flex items-center gap-1 group-hover:text-gold-darker">
+                    <span className="hidden sm:inline">•</span> ₹{activeWebinar.price} Pass <span className="group-hover:translate-x-1 transition-transform">→</span>
+                  </span>
+                </div>
+              );
+            }
 
+            // High-Visibility Diwali Sale Spotlight Banner in Hero (Zepto / Amazon Festive Style)
             return (
-              <div 
-                onClick={() => handleOpenWorkshop(activeWebinar)}
-                className="group cursor-pointer inline-flex items-center gap-2 sm:gap-2.5 px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full bg-white/95 hover:bg-white border-2 border-[#D4A017] shadow-[0_4px_25px_rgba(212,160,23,0.35)] hover:shadow-[0_8px_35px_rgba(212,160,23,0.5)] transition-all duration-300 transform hover:scale-[1.03] mb-1 select-none animate-pulse"
+              <Link 
+                to="/shop?category=Diwali%20Special"
+                className="group cursor-pointer inline-flex items-center gap-2 sm:gap-2.5 px-4 sm:px-5 py-2 sm:py-2 rounded-full bg-gradient-to-r from-amber-500/20 via-orange-500/15 to-amber-500/20 hover:bg-amber-500/25 border-2 border-amber-400/80 shadow-[0_4px_25px_rgba(245,158,11,0.25)] hover:shadow-[0_8px_30px_rgba(245,158,11,0.4)] transition-all duration-300 transform hover:scale-[1.03] mb-1 select-none backdrop-blur-md"
               >
                 <span className="relative flex h-2.5 w-2.5 shrink-0">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-90"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-600"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-90"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-600"></span>
                 </span>
-                <span className="bg-red-600 text-white text-[9px] sm:text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs flex items-center gap-1">
-                  <Zap className="w-3 h-3 text-yellow-300 fill-yellow-300" />
-                  <span>REGISTRATIONS LIVE</span>
+                <span className="bg-gradient-to-r from-amber-600 to-orange-600 text-white text-[9px] sm:text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-xs flex items-center gap-1">
+                  <span>🪔</span>
+                  <span>DIWALI SALE IS LIVE</span>
                 </span>
-                <span className="text-[11px] sm:text-xs font-bold text-charcoal-dark tracking-wide font-sans truncate max-w-[170px] sm:max-w-none">
-                  {activeWebinar.title}
+                <span className="text-[11px] sm:text-xs font-bold text-charcoal-dark tracking-wide font-sans">
+                  Buy Any 2 Candle Colors for ₹999 <span className="text-amber-800 font-semibold">(Save ₹111)</span>
                 </span>
-                <span className="text-[11px] sm:text-xs font-serif font-bold text-gold-dark flex items-center gap-1 group-hover:text-gold-darker">
-                  <span className="hidden sm:inline">•</span> ₹{activeWebinar.price} Pass <span className="group-hover:translate-x-1 transition-transform">→</span>
+                <span className="text-[11px] sm:text-xs font-bold text-amber-700 flex items-center gap-0.5 group-hover:translate-x-1 transition-transform">
+                  <span>Shop Deals</span>
+                  <span>→</span>
                 </span>
-              </div>
+              </Link>
             );
           })()}
 
@@ -601,7 +634,154 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
         </div>
       </section>
 
-      {/* 2. Discover Ascension */}
+      {/* 2. THE DIWALI SALE - FEATURED FESTIVE STOREFRONT (Zepto / Amazon Festive Sale Style) */}
+      <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-b from-[#FFFDF7] via-[#FFF8EC] to-[#FFFDF7] px-3 sm:px-6 md:px-12 border-b border-cream-dark/30 w-full relative overflow-hidden text-center">
+        {/* Festive Ambient Background Glow */}
+        <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[800px] h-[360px] bg-gradient-to-b from-amber-300/25 via-orange-200/20 to-transparent blur-3xl pointer-events-none rounded-full" />
+
+        <div className="max-w-6xl 2xl:max-w-7xl 3xl:max-w-screen-2xl mx-auto relative z-10">
+          
+          {/* Festive Sale Header */}
+          <div className="flex flex-col items-center text-center gap-2 max-w-3xl mx-auto mb-6 sm:mb-8">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500/20 via-orange-500/15 to-amber-500/20 border border-amber-400/50 text-amber-900 text-[11px] sm:text-xs font-bold uppercase tracking-widest shadow-2xs">
+              <span className="text-base animate-pulse">🪔</span>
+              <span>THE GREAT DIWALI SALE IS LIVE</span>
+            </div>
+
+            <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl 2xl:text-5xl font-bold text-charcoal-dark tracking-tight mt-1">
+              Handcrafted Floral Candles & <span className="text-amber-700">Auspicious Lotus Diyas</span>
+            </h2>
+
+            <p className="text-xs sm:text-sm text-charcoal-light font-sans leading-relaxed max-w-2xl mt-0.5">
+              Pure artisanal botanical soy wax with hand-poured fragrant floral motifs and blessed lotus diyas. Bring warmth, divine light, and fragrance into every corner of your home.
+            </p>
+
+            {/* Festive Deals Spotlight Card (Zepto / Amazon Sale Hero Card) */}
+            <div className="w-full mt-4 p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-white/90 backdrop-blur-md shadow-md flex flex-col lg:flex-row items-center justify-between gap-4 text-left border border-amber-200/60">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="bg-gradient-to-r from-amber-600 to-orange-600 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-xs flex items-center gap-1">
+                    <span>🎁</span>
+                    <span>FESTIVE DUO DEAL</span>
+                  </span>
+                  <span className="font-serif text-sm sm:text-base font-bold text-charcoal-dark">
+                    Buy Any 2 Candle Colors for ₹999
+                  </span>
+                  <span className="font-serif text-xs text-charcoal-light line-through decoration-red-400">
+                    ₹1,110
+                  </span>
+                  <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-md">
+                    Save ₹111
+                  </span>
+                </div>
+                {/* Color Swatch Preview Pills */}
+                <div className="flex items-center gap-1.5 flex-wrap text-[11px] font-sans">
+                  <span className="text-charcoal-light font-medium text-[10px] uppercase tracking-wider">Available Colors:</span>
+                  {DIWALI_DUO_CANDLES.map((c) => (
+                    <Link
+                      key={c.id}
+                      to={`/product/${c.id}`}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-cream-light/80 hover:bg-amber-100 border border-cream-dark/60 text-charcoal-dark text-[11px] font-medium transition-colors"
+                    >
+                      <span className="w-2.5 h-2.5 rounded-full shrink-0 shadow-2xs border border-white" style={{ backgroundColor: c.colorHex }} />
+                      <span>{c.name}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+              <Link
+                to="/shop?category=Diwali%20Special"
+                className="w-full lg:w-auto bg-gradient-to-r from-amber-600 via-orange-600 to-amber-600 hover:brightness-105 text-white text-xs font-bold uppercase tracking-wider px-6 py-3 rounded-xl transition-all shadow-md shrink-0 whitespace-nowrap text-center"
+              >
+                Shop Festive Duo →
+              </Link>
+            </div>
+          </div>
+
+          {/* 6-Candle Product Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 md:gap-5">
+            {DIWALI_DUO_CANDLES.map((candle) => {
+              const apiProduct = diwaliProducts.find(p => p.name?.toLowerCase().includes(candle.name.toLowerCase()));
+              const productId = apiProduct?._id || candle.id;
+              const displayImage = candle.image;
+
+              return (
+                <div
+                  key={candle.id}
+                  className="group bg-white rounded-2xl overflow-hidden shadow-2xs hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col text-left p-2.5 sm:p-3 relative border border-cream-dark/40"
+                >
+                  <Link to={`/product/${productId}`} className="h-32 sm:h-36 bg-cream-light rounded-xl overflow-hidden relative mb-2 block">
+                    <img
+                      src={getImageUrl(displayImage)}
+                      alt={candle.fullName}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute top-1.5 left-1.5 z-10 bg-gradient-to-r from-amber-600 to-orange-600 text-white text-[8px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs">
+                      Buy 2 @ ₹999
+                    </div>
+                  </Link>
+
+                  <div className="flex flex-col flex-1 justify-between gap-1.5">
+                    <div>
+                      <div className="flex items-center gap-1 mb-1">
+                        <span className="w-2 h-2 rounded-full border border-white shadow-2xs shrink-0" style={{ backgroundColor: candle.colorHex }} />
+                        <span className="text-[9px] font-bold uppercase tracking-wider text-amber-800 font-sans truncate">
+                          {candle.colorName}
+                        </span>
+                      </div>
+                      <Link to={`/product/${productId}`}>
+                        <h4 className="font-serif text-xs font-bold text-charcoal-dark line-clamp-1 group-hover:text-amber-800 transition-colors">
+                          {candle.name}
+                        </h4>
+                      </Link>
+                    </div>
+
+                    <div className="flex items-center justify-between border-t border-cream-dark/40 pt-2">
+                      <div className="flex flex-col">
+                        <span className="font-serif text-xs sm:text-sm font-bold text-charcoal-dark leading-tight">
+                          ₹555
+                        </span>
+                        <span className="text-[9px] text-amber-800 font-sans font-semibold">
+                          Duo: ₹999
+                        </span>
+                      </div>
+                      <Link
+                        to={`/product/${productId}`}
+                        className="bg-amber-600 hover:bg-amber-700 text-white font-bold text-[9px] uppercase tracking-wider px-2.5 py-1.5 rounded-lg transition-colors"
+                      >
+                        Buy Duo
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Bottom Actions: View All & Download Catalogue */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mt-8 font-sans">
+            <Link
+              to="/shop?category=Diwali%20Special"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:brightness-105 text-white font-bold text-xs uppercase tracking-wider py-3.5 px-7 rounded-xl shadow-md transition-all transform hover:scale-[1.02]"
+            >
+              <span>Explore All 33 Diwali Hampers & Diyas</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+
+            <a
+              href="/Catalogue_Ascension_Seva_2026.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white hover:bg-cream-light text-charcoal-dark font-bold text-xs uppercase tracking-wider py-3.5 px-6 rounded-xl shadow-xs transition-all hover:scale-[1.02] border border-cream-dark/60"
+            >
+              <span>🪔 View 2026 PDF Catalogue</span>
+            </a>
+          </div>
+
+        </div>
+      </section>
+
+      {/* 3. Discover Ascension */}
       <section className="py-20 md:py-24 bg-[#FFFDF7] px-4 sm:px-6 md:px-12 border-b border-cream-dark/30 w-full text-center">
         <div className="max-w-6xl 2xl:max-w-7xl 3xl:max-w-screen-2xl mx-auto">
           <span className="font-sans text-xs 2xl:text-sm text-gold-dark tracking-[0.25em] font-bold uppercase">Discover Ascension</span>
@@ -1369,6 +1549,8 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
           </div>
         </div>
       </section>
+
+
 
       {/* 8. Featured Shop (Optimized 2-column on mobile phones!) */}
       {(loading || products.length > 0) && (

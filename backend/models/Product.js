@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const productCategories = [
-  'Crystals', 'Lamps', 'Candles', 'Crystal Trees', 'Pendants', 
+  'Crystals', 'Lamps', 'Candles', 'Diwali Special', 'Diwali Special (Women Empowerment)', 'Crystal Trees', 'Pendants', 
   'Bracelets', 'Healing Stones', 'Selenite Products', 'Trays', 
   'Decorative Pieces', 'Wax Melts', 'Bath Salts', 'Healing Oils',
   'Healing Camphor', 'Wax Tablets', 'Sage Leaves', 'Energy Bottles', 'Water Bottles', 'Pyramids'
