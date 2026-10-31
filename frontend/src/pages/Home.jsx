@@ -758,24 +758,15 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
             })}
           </div>
 
-          {/* Bottom Actions: View All & Download Catalogue */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mt-8 font-sans">
+          {/* Bottom Action: View All */}
+          <div className="flex items-center justify-center mt-8 font-sans">
             <Link
               to="/shop?category=Diwali%20Special"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:brightness-105 text-white font-bold text-xs uppercase tracking-wider py-3.5 px-7 rounded-xl shadow-md transition-all transform hover:scale-[1.02]"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:brightness-105 text-white font-bold text-xs uppercase tracking-wider py-3.5 px-8 rounded-xl shadow-md transition-all transform hover:scale-[1.02]"
             >
               <span>Explore All 33 Diwali Hampers & Diyas</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
-
-            <a
-              href="/Catalogue_Ascension_Seva_2026.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white hover:bg-cream-light text-charcoal-dark font-bold text-xs uppercase tracking-wider py-3.5 px-6 rounded-xl shadow-xs transition-all hover:scale-[1.02] border border-cream-dark/60"
-            >
-              <span>🪔 View 2026 PDF Catalogue</span>
-            </a>
           </div>
 
         </div>

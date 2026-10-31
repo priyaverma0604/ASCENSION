@@ -771,25 +771,6 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                     );
                   })}
                 </div>
-
-                <div className="mt-4 pt-3 border-t border-cream-dark/50 hidden lg:block">
-                  <a
-                    href="/Catalogue_Ascension_Seva_2026.pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2.5 p-2.5 rounded-xl bg-cream/40 hover:bg-cream text-charcoal transition-all shadow-2xs group"
-                  >
-                    <span className="text-lg">🪔</span>
-                    <div className="flex flex-col text-left">
-                      <span className="text-[11px] font-bold text-amber-950 font-serif group-hover:text-amber-800">
-                        Diwali Catalogue 2026
-                      </span>
-                      <span className="text-[9px] text-charcoal-light">
-                        Download PDF Brochure
-                      </span>
-                    </div>
-                  </a>
-                </div>
               </div>
             </div>
 
