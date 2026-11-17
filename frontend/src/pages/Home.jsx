@@ -461,13 +461,13 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
     <div className="flex flex-col min-h-screen">
 
       {/* 1. Hero Section */}
-      <section className="relative min-h-[500px] lg:h-screen lg:min-h-[620px] lg:max-h-[1080px] 2xl:min-h-[700px] flex flex-col justify-center items-center px-4 sm:px-6 md:px-12 lg:px-20 text-center overflow-hidden border-b border-cream-dark/30 bg-cream-light py-12 lg:py-0">
+      <section className="relative min-h-[100svh] flex flex-col justify-between items-center px-4 sm:px-6 md:px-12 lg:px-20 text-center overflow-hidden border-b border-cream-dark/30 bg-cream-light pt-24 sm:pt-28 lg:pt-32 pb-8 sm:pb-10 2xl:pb-12">
         {/* Living Seamless Cinemagraph Water Flow Background */}
         <SeamlessWaterBackground />
         {/* Soft Radial Contrast Overlay to enhance text readability without fading the bottom edges */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.7)_0%,rgba(255,255,255,0.1)_80%)] z-0 pointer-events-none" />
 
-        <div className="flex flex-col items-center gap-2.5 sm:gap-3.5 relative z-10 w-full max-w-4xl 2xl:max-w-5xl 3xl:max-w-6xl mx-auto animate-fade-in mt-14 sm:mt-16 lg:mt-10 2xl:mt-12">
+        <div className="flex flex-col items-center gap-2.5 sm:gap-3.5 relative z-10 w-full max-w-4xl 2xl:max-w-5xl 3xl:max-w-6xl mx-auto animate-fade-in my-auto">
 
           {/* Flashy Live Webinar Announcement Flash Banner - Dynamic: only render when an active upcoming webinar exists */}
           {(() => {
@@ -534,8 +534,8 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
 
         </div>
 
-        {/* 1b. Trust Building Section Floating Card - Positioned absolute bottom inside Hero */}
-        <div className="relative lg:absolute lg:bottom-6 2xl:bottom-10 left-0 right-0 z-20 max-w-5xl 2xl:max-w-6xl 3xl:max-w-7xl w-full mx-auto px-4 sm:px-6 mt-8 lg:mt-0 animate-slide-up">
+        {/* 1b. Trust Building Section Floating Card - Positioned cleanly below content without overlap */}
+        <div className="relative z-20 max-w-5xl 2xl:max-w-6xl 3xl:max-w-7xl w-full mx-auto px-2 sm:px-6 mt-8 sm:mt-10 lg:mt-12 animate-slide-up">
           <div className="bg-white/95 backdrop-blur-xs rounded-3xl p-3.5 sm:p-4 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 items-center shadow-xl border border-cream-dark/50 hover:shadow-2xl transition-all duration-300">
 
             {/* Column 1: Lives Touched */}

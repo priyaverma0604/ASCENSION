@@ -70,7 +70,7 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Nav Links */}
-          <div className="hidden lg:flex items-center gap-6 xl:gap-7 2xl:gap-9">
+          <div className="hidden lg:flex items-center gap-3 xl:gap-5 2xl:gap-8">
             <NavLink
               to="/"
               className={({ isActive }) =>
