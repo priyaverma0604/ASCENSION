@@ -1821,7 +1821,9 @@ const AdminDashboard = () => {
                             <div>
                               <p className="font-bold text-charcoal-dark">
                                 {activeTab === 'orders' 
-                                  ? (item.user?.name || item.shippingAddress?.name || 'Shop Customer')
+                                  ? (item.shippingAddress?.firstName || item.shippingAddress?.lastName 
+                                      ? `${item.shippingAddress?.firstName || ''} ${item.shippingAddress?.lastName || ''}`.trim() 
+                                      : item.shippingAddress?.name || item.user?.name || 'Shop Customer')
                                   : activeTab === 'program-registrations' || activeTab === 'workshop-registrations' || activeTab === 'webinar-registrations'
                                     ? item.name
                                     : activeTab === 'donations'
@@ -1841,7 +1843,7 @@ const AdminDashboard = () => {
                               </p>
                               <p className="text-[10px] text-charcoal-light line-clamp-1 max-w-sm mt-0.5">
                                 {activeTab === 'orders'
-                                  ? `Email: ${item.user?.email || 'N/A'} | Phone: ${item.shippingAddress?.phone || 'N/A'}`
+                                  ? `${item.shippingAddress?.email || item.user?.email ? `Email: ${item.shippingAddress?.email || item.user?.email} | ` : ''}Phone: ${item.shippingAddress?.phone || 'N/A'}`
                                   : activeTab === 'program-registrations' || activeTab === 'workshop-registrations' || activeTab === 'webinar-registrations'
                                     ? `Email: ${item.email} | Phone: ${item.phone}`
                                     : activeTab === 'donations'
@@ -2592,11 +2594,23 @@ const AdminDashboard = () => {
                       <div className="bg-cream/70 p-4 rounded-xl border border-cream-dark/60 grid grid-cols-1 sm:grid-cols-2 gap-3 leading-relaxed">
                         <div>
                           <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Customer Name</p>
-                          <p className="font-bold text-charcoal-dark text-sm">{selectedItem.user?.name || 'Customer'}</p>
+                          <p className="font-bold text-charcoal-dark text-sm">
+                            {selectedItem.shippingAddress?.firstName || selectedItem.shippingAddress?.lastName 
+                              ? `${selectedItem.shippingAddress?.firstName || ''} ${selectedItem.shippingAddress?.lastName || ''}`.trim()
+                              : selectedItem.shippingAddress?.name || selectedItem.user?.name || 'Guest Customer'}
+                          </p>
                         </div>
                         <div>
                           <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Email Address</p>
-                          <p className="font-medium text-charcoal"><a href={`mailto:${selectedItem.user?.email}`} className="text-sage hover:underline">{selectedItem.user?.email}</a></p>
+                          <p className="font-medium text-charcoal">
+                            {selectedItem.shippingAddress?.email || selectedItem.user?.email ? (
+                              <a href={`mailto:${selectedItem.shippingAddress?.email || selectedItem.user?.email}`} className="text-sage hover:underline">
+                                {selectedItem.shippingAddress?.email || selectedItem.user?.email}
+                              </a>
+                            ) : (
+                              <span className="text-charcoal-light italic text-xs">Not provided (optional)</span>
+                            )}
+                          </p>
                         </div>
                         <div>
                           <p className="text-[10px] text-charcoal-light uppercase font-bold tracking-wider">Delivery Phone</p>

@@ -8,14 +8,14 @@ const {
   updateOrderStatus,
   verifyOrderPaymentUPI
 } = require('../controllers/orderController');
-const { protect, admin } = require('../middleware/auth');
+const { protect, optionalProtect, admin } = require('../middleware/auth');
 const upload = require('../middleware/upload');
 
 router.route('/')
   .get(protect, admin, getAllOrders)
-  .post(protect, upload.single('paymentScreenshot'), createOrder);
+  .post(optionalProtect, upload.single('paymentScreenshot'), createOrder);
 
-router.post('/verify', protect, verifyPayment);
+router.post('/verify', optionalProtect, verifyPayment);
 router.get('/myorders', protect, getMyOrders);
 router.put('/:id/status', protect, admin, updateOrderStatus);
 router.post('/:id/verify-upi', protect, admin, verifyOrderPaymentUPI);

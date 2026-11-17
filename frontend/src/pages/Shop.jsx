@@ -75,6 +75,9 @@ const Shop = () => {
   // Checkout state
   const [checkoutActive, setCheckoutActive] = useState(false);
   const [checkoutPaymentMethod, setCheckoutPaymentMethod] = useState('razorpay'); // 'razorpay' or 'upi_qr'
+  const [firstName, setFirstName] = useState(user?.name ? user.name.trim().split(' ')[0] : '');
+  const [lastName, setLastName] = useState(user?.name ? user.name.trim().split(' ').slice(1).join(' ') : '');
+  const [email, setEmail] = useState(user?.email || '');
   const [address, setAddress] = useState('');
   const [city, setCity] = useState('');
   const [stateName, setStateName] = useState('');
@@ -83,6 +86,19 @@ const Shop = () => {
   const [phone, setPhone] = useState(user?.phone || '');
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [checkoutSuccess, setCheckoutSuccess] = useState(false);
+
+  // Sync user details if available
+  useEffect(() => {
+    if (user) {
+      if (!firstName && user.name) {
+        const parts = user.name.trim().split(' ');
+        setFirstName(parts[0] || '');
+        setLastName(parts.slice(1).join(' ') || '');
+      }
+      if (!email && user.email) setEmail(user.email);
+      if (!phone && user.phone) setPhone(user.phone);
+    }
+  }, [user]);
   const [simulationMode, setSimulationMode] = useState(false);
   const [orderDetails, setOrderDetails] = useState(null);
   const [transactionId, setTransactionId] = useState('');
@@ -552,13 +568,16 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
   };
 
   const handleRazorpayCheckout = async () => {
-    if (!user) {
-      alert('Please register/login to complete purchase checkout.');
-      navigate('/login');
+    if (!firstName.trim()) {
+      alert('Please enter your first name.');
       return;
     }
-    if (!address.trim() || !city.trim() || !stateName.trim() || !postalCode.trim() || !phone.trim()) {
-      alert('Please fill out all shipping address fields and phone number.');
+    if (!phone.trim()) {
+      alert('Please enter your phone number for delivery updates.');
+      return;
+    }
+    if (!address.trim() || !city.trim() || !stateName.trim() || !postalCode.trim()) {
+      alert('Please fill out all shipping address fields (street, city, state, postal code).');
       return;
     }
 
@@ -571,12 +590,17 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
         return;
       }
 
+      const customerFullName = `${firstName.trim()} ${lastName.trim()}`.trim() || firstName.trim();
       const shippingPayload = {
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        name: customerFullName,
+        email: email.trim(),
         address: address.trim(),
         city: city.trim(),
         state: stateName.trim(),
         postalCode: postalCode.trim(),
-        country: country.trim(),
+        country: country.trim() || 'India',
         phone: phone.trim()
       };
 
@@ -600,8 +624,8 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
         image: '/logo.png',
         order_id: data.data.orderId,
         prefill: {
-          name: user.name,
-          email: user.email,
+          name: customerFullName,
+          email: email.trim() || (user?.email || ''),
           contact: phone.trim()
         },
         theme: {
@@ -647,9 +671,16 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
 
   const handleCheckoutSubmit = async (e) => {
     e.preventDefault();
-    if (!user) {
-      alert('Please register/login to complete purchase checkout.');
-      navigate('/login');
+    if (!firstName.trim()) {
+      alert('Please enter your first name.');
+      return;
+    }
+    if (!phone.trim()) {
+      alert('Please enter your mobile phone number.');
+      return;
+    }
+    if (!address.trim() || !city.trim() || !stateName.trim() || !postalCode.trim()) {
+      alert('Please fill out all shipping address fields.');
       return;
     }
     if (!transactionId || !screenshot) {
@@ -659,15 +690,20 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
     setCheckoutLoading(true);
 
     try {
+      const customerFullName = `${firstName.trim()} ${lastName.trim()}`.trim() || firstName.trim();
       const formData = new FormData();
       formData.append('items', JSON.stringify(cart.map(item => ({ product: item.product._id, quantity: item.quantity }))));
       formData.append('shippingAddress', JSON.stringify({
-        address,
-        city,
-        state: stateName,
-        postalCode,
-        country,
-        phone
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        name: customerFullName,
+        email: email.trim(),
+        address: address.trim(),
+        city: city.trim(),
+        state: stateName.trim(),
+        postalCode: postalCode.trim(),
+        country: country.trim() || 'India',
+        phone: phone.trim()
       }));
       formData.append('transactionId', transactionId);
       formData.append('paymentScreenshot', screenshot);
@@ -1732,56 +1768,120 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                 {checkoutActive && (
                   <div className="glass p-5 rounded-2xl border border-cream-dark/50 flex flex-col gap-3 font-sans text-xs text-charcoal animate-slide-up">
                     <h4 className="font-serif text-sm font-bold uppercase tracking-wider text-charcoal-dark border-b border-cream-dark pb-2 mb-2">
-                      Shipping Details
+                      Delivery & Contact Details
                     </h4>
 
-                    {/* Shipping Address Fields */}
+                    {/* Customer Name, Phone & Optional Email */}
                     <div className="flex flex-col gap-3 text-left">
-                      <div className="flex flex-col gap-1">
-                        <label className="text-[10px] font-bold text-charcoal-light uppercase">Street Address</label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[10px] font-bold text-charcoal-light uppercase">
+                            First Name <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="e.g. Priya"
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
+                            className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all text-xs"
+                          />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[10px] font-bold text-charcoal-light uppercase">
+                            Second Name / Surname
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="e.g. Verma"
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
+                            className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all text-xs"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[10px] font-bold text-charcoal-light uppercase">
+                            Phone Number <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="tel"
+                            required
+                            placeholder="10-digit mobile number"
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all text-xs"
+                          />
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          <label className="text-[10px] font-bold text-charcoal-light uppercase">
+                            Email Address <span className="text-charcoal-light/70 font-normal lowercase">(optional)</span>
+                          </label>
+                          <input
+                            type="email"
+                            placeholder="name@example.com (optional)"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all text-xs"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col gap-1 mt-0.5">
+                        <label className="text-[10px] font-bold text-charcoal-light uppercase">
+                          Street Address <span className="text-red-500">*</span>
+                        </label>
                         <input
                           type="text"
                           required
-                          placeholder="Door No, Street name"
+                          placeholder="House/Flat No, Apartment, Street name"
                           value={address}
                           onChange={(e) => setAddress(e.target.value)}
-                          className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all"
+                          className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all text-xs"
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div className="flex flex-col gap-1">
-                          <label className="text-[10px] font-bold text-charcoal-light uppercase">City</label>
+                          <label className="text-[10px] font-bold text-charcoal-light uppercase">
+                            City <span className="text-red-500">*</span>
+                          </label>
                           <input
                             type="text"
                             required
-                            placeholder="New Delhi"
+                            placeholder="e.g. New Delhi"
                             value={city}
                             onChange={(e) => setCity(e.target.value)}
-                            className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all"
+                            className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all text-xs"
                           />
                         </div>
                         <div className="flex flex-col gap-1">
-                          <label className="text-[10px] font-bold text-charcoal-light uppercase">State</label>
+                          <label className="text-[10px] font-bold text-charcoal-light uppercase">
+                            State <span className="text-red-500">*</span>
+                          </label>
                           <input
                             type="text"
                             required
-                            placeholder="Delhi"
+                            placeholder="e.g. Delhi"
                             value={stateName}
                             onChange={(e) => setStateName(e.target.value)}
-                            className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all"
+                            className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all text-xs"
                           />
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div className="flex flex-col gap-1">
-                          <label className="text-[10px] font-bold text-charcoal-light uppercase">Postal Code</label>
+                          <label className="text-[10px] font-bold text-charcoal-light uppercase">
+                            Postal Code <span className="text-red-500">*</span>
+                          </label>
                           <input
                             type="text"
                             required
-                            placeholder="110016"
+                            placeholder="e.g. 110016"
                             value={postalCode}
                             onChange={(e) => setPostalCode(e.target.value)}
-                            className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all"
+                            className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all text-xs"
                           />
                         </div>
                         <div className="flex flex-col gap-1">
@@ -1792,21 +1892,11 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                             placeholder="India"
                             value={country}
                             onChange={(e) => setCountry(e.target.value)}
-                            className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none"
+                            className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none text-xs"
                           />
                         </div>
                       </div>
-                      <div className="flex flex-col gap-1">
-                        <label className="text-[10px] font-bold text-charcoal-light uppercase">Phone Number</label>
-                        <input
-                          type="tel"
-                          required
-                          placeholder="10-digit phone"
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          className="bg-cream-light border border-cream-dark/60 rounded-xl py-2 px-3 text-charcoal focus:outline-none focus:border-sage transition-all"
-                        />
-                      </div>
+                    </div>
 
                       {/* Payment Method Selector */}
                       <div className="flex rounded-xl p-1 bg-cream border border-cream-dark/60 gap-1 mt-2">
@@ -2024,8 +2114,7 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                         </form>
                       )}
                     </div>
-                  </div>
-                )}
+                  )}
 
               </div>
             )}

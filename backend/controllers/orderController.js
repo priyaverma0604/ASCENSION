@@ -58,7 +58,10 @@ exports.createOrder = async (req, res, next) => {
         receipt: `receipt_order_${crypto.randomBytes(4).toString('hex')}`,
         notes: {
           type: 'order',
-          userId: req.user?._id ? req.user._id.toString() : ''
+          userId: req.user?._id ? req.user._id.toString() : 'guest',
+          customerName: `${shippingAddress.firstName || ''} ${shippingAddress.lastName || ''}`.trim() || shippingAddress.name || 'Guest Customer',
+          customerEmail: shippingAddress.email || req.user?.email || '',
+          customerPhone: shippingAddress.phone || ''
         }
       };
       
@@ -77,9 +80,13 @@ exports.createOrder = async (req, res, next) => {
       }
     }
 
+    const customerFullName = `${shippingAddress.firstName || ''} ${shippingAddress.lastName || ''}`.trim() || shippingAddress.name || 'Guest Customer';
+
     // Save order in database with pending status
     const order = await Order.create({
-      user: req.user._id,
+      user: req.user?._id || null,
+      guestEmail: shippingAddress.email || '',
+      guestName: customerFullName,
       items: orderItems,
       totalAmount: calculatedTotal,
       shippingAddress,
