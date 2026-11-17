@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const VisitLog = require('../models/VisitLog');
 const Order = require('../models/Order');
 const ProgramRegistration = require('../models/ProgramRegistration');
 const WorkshopRegistration = require('../models/WorkshopRegistration');
@@ -95,19 +96,25 @@ exports.getUserStats = async (req, res, next) => {
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
-    const [onlineNow, activeToday, activeThisWeek, newThisMonth, adminsCount] = await Promise.all([
+    const [onlineRegisteredUsers, onlineVisitorsList, activeToday, activeThisWeek, newThisMonth, adminsCount] = await Promise.all([
       User.countDocuments({ lastActive: { $gte: fiveMinutesAgo } }),
+      VisitLog.distinct('visitorId', { timestamp: { $gte: fiveMinutesAgo } }),
       User.countDocuments({ lastActive: { $gte: startOfToday } }),
       User.countDocuments({ lastActive: { $gte: sevenDaysAgo } }),
       User.countDocuments({ createdAt: { $gte: thirtyDaysAgo } }),
       User.countDocuments({ role: 'admin' })
     ]);
 
+    const liveVisitorsCount = onlineVisitorsList.length;
+    const totalOnline = Math.max(liveVisitorsCount, onlineRegisteredUsers, 1);
+
     res.json({
       success: true,
       data: {
         totalUsers,
-        onlineNow,
+        onlineNow: totalOnline,
+        onlineVisitors: liveVisitorsCount,
+        onlineRegisteredUsers,
         activeToday,
         activeThisWeek,
         newThisMonth,

@@ -21,14 +21,20 @@ const getVisitorId = () => {
 const getCampaignParams = () => {
   try {
     const searchParams = new URLSearchParams(window.location.search);
-    const utmSource = searchParams.get('utm_source') || searchParams.get('source') || '';
+    let utmSource = searchParams.get('utm_source') || searchParams.get('source') || '';
     const utmMedium = searchParams.get('utm_medium') || '';
     const utmCampaign = searchParams.get('utm_campaign') || searchParams.get('campaign') || '';
     const utmContent = searchParams.get('utm_content') || '';
     const utmTerm = searchParams.get('utm_term') || '';
     const fbclid = searchParams.get('fbclid') || '';
 
-    // If new UTM parameters exist in current URL, save to sessionStorage
+    // Auto-detect Instagram / Facebook In-App Browser if no explicit UTM source is provided
+    const isMetaApp = typeof navigator !== 'undefined' && /Instagram|FBAN|FBAV|FB_IAB|Threads/i.test(navigator.userAgent || '');
+    if (!utmSource && isMetaApp) {
+      utmSource = 'Instagram (In-App)';
+    }
+
+    // If new UTM parameters exist in current URL, save to sessionStorage and localStorage
     if (utmSource || utmCampaign || fbclid) {
       const campaignData = {
         utmSource,
@@ -39,15 +45,25 @@ const getCampaignParams = () => {
         fbclid,
         storedAt: Date.now()
       };
-      sessionStorage.setItem('ascension_campaign_params', JSON.stringify(campaignData));
+      try {
+        sessionStorage.setItem('ascension_campaign_params', JSON.stringify(campaignData));
+        localStorage.setItem('ascension_campaign_params', JSON.stringify(campaignData));
+      } catch (e) {}
       return campaignData;
     }
 
-    // Otherwise, check if user arrived earlier in this session via a campaign
-    const stored = sessionStorage.getItem('ascension_campaign_params');
-    if (stored) {
-      return JSON.parse(stored);
+    // Otherwise, check if user arrived earlier via a campaign
+    try {
+      const stored = sessionStorage.getItem('ascension_campaign_params') || localStorage.getItem('ascension_campaign_params');
+      if (stored) {
+        return JSON.parse(stored);
+      }
+    } catch (e) {}
+
+    if (isMetaApp) {
+      return { utmSource: 'Instagram (In-App)' };
     }
+
     return {};
   } catch (e) {
     return {};

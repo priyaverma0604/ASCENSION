@@ -51,10 +51,12 @@ exports.trackVisit = async (req, res, next) => {
     // Determine if traffic is originated from Meta (Facebook / Instagram Ads or organic)
     const sourceStr = (utmSource || '').toLowerCase();
     const refStr = (referrer || '').toLowerCase();
+    const uaStr = (userAgent || '').toLowerCase();
     const isMetaTraffic = Boolean(
       fbclid ||
-      /meta|facebook|fb|instagram|ig|threads/i.test(sourceStr) ||
-      /facebook\.com|instagram\.com|fb\.me|meta\.com/i.test(refStr)
+      /meta|facebook|fb|instagram|ig|threads|an|ads/i.test(sourceStr) ||
+      /facebook\.com|instagram\.com|fb\.me|meta\.com|threads\.net/i.test(refStr) ||
+      /instagram|fban|fbav|fb_iab|threads/i.test(uaStr)
     );
 
     // Save the visit log

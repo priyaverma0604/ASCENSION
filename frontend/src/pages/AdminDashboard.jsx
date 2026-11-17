@@ -914,8 +914,16 @@ const AdminDashboard = () => {
                         <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                       </span>
                     </div>
-                    <span className="text-2xl font-serif font-bold text-emerald-900 mt-1">{userStats.onlineNow}</span>
-                    <span className="text-[10px] text-emerald-700 mt-0.5">Active in last 5 mins</span>
+                    <span className="text-2xl font-serif font-bold text-emerald-900 mt-1">
+                      {userStats.onlineVisitors !== undefined && userStats.onlineVisitors > 0 
+                        ? userStats.onlineVisitors 
+                        : userStats.onlineNow}
+                    </span>
+                    <span className="text-[10px] text-emerald-700 mt-0.5">
+                      {userStats.onlineVisitors !== undefined && userStats.onlineVisitors > 0
+                        ? `${userStats.onlineVisitors} live visitor${userStats.onlineVisitors > 1 ? 's' : ''} on site (${userStats.onlineRegisteredUsers || 1} logged in)`
+                        : 'Active in last 5 mins'}
+                    </span>
                   </div>
                   <div className="bg-white/85 border border-cream-dark/60 rounded-2xl p-4 shadow-sm flex flex-col">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-charcoal-light flex items-center gap-1.5">
@@ -1207,6 +1215,9 @@ const AdminDashboard = () => {
                         <p className="text-base font-bold text-purple-950 mt-0.5">{analyticsSummary.metaViews?.total || 0}</p>
                       </div>
                     </div>
+                    <p className="text-[9.5px] text-purple-900/75 mt-2.5 font-medium leading-tight">
+                      Actual website landings from Instagram &amp; Facebook ads/posts. (Meta Ads Manager shows higher overall numbers because it counts feed impressions, reaches &amp; video plays).
+                    </p>
                   </div>
 
                   {/* Unique Visitors Card */}
