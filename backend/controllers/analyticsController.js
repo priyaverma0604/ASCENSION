@@ -1,5 +1,6 @@
 const VisitLog = require('../models/VisitLog');
 const User = require('../models/User');
+const SiteSettings = require('../models/SiteSettings');
 
 // Helper to determine device type
 const getDeviceType = (ua = '') => {
@@ -276,6 +277,12 @@ exports.getAnalyticsSummary = async (req, res, next) => {
       { $sort: { date: 1 } }
     ]);
 
+    // Fetch SiteSettings for Meta Ad campaign reach/impressions
+    const settings = await SiteSettings.findOne({ key: 'general' });
+    const adImpressions = settings?.metaAdImpressions || 0;
+    const adReach = settings?.metaAdReach || 0;
+    const ctr = adImpressions > 0 ? ((totalMetaViews / adImpressions) * 100).toFixed(2) : null;
+
     res.json({
       success: true,
       data: {
@@ -290,7 +297,11 @@ exports.getAnalyticsSummary = async (req, res, next) => {
           today: todayMetaViews,
           week: weekMetaViews,
           month: monthMetaViews,
-          unique: metaUnique.length
+          unique: metaUnique.length,
+          adImpressions,
+          adReach,
+          ctr,
+          lastSyncedAt: settings?.lastSyncedAt || null
         },
         uniqueVisitors: {
           total: allTimeUnique.length,
@@ -352,6 +363,45 @@ exports.clearAnalytics = async (req, res, next) => {
   try {
     await VisitLog.deleteMany({});
     res.json({ success: true, message: 'Website visit logs cleared' });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get Meta Ads settings
+// @route   GET /api/analytics/meta-settings
+// @access  Private / Admin
+exports.getMetaSettings = async (req, res, next) => {
+  try {
+    let settings = await SiteSettings.findOne({ key: 'general' });
+    if (!settings) {
+      settings = await SiteSettings.create({ key: 'general' });
+    }
+    res.json({ success: true, data: settings });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Update Meta Ads settings (impressions, reach, or API token)
+// @route   PUT /api/analytics/meta-settings
+// @access  Private / Admin
+exports.updateMetaSettings = async (req, res, next) => {
+  try {
+    const { metaAdImpressions, metaAdReach, metaAdAccountId, metaAccessToken } = req.body;
+    let settings = await SiteSettings.findOne({ key: 'general' });
+    if (!settings) {
+      settings = new SiteSettings({ key: 'general' });
+    }
+
+    if (metaAdImpressions !== undefined) settings.metaAdImpressions = Number(metaAdImpressions) || 0;
+    if (metaAdReach !== undefined) settings.metaAdReach = Number(metaAdReach) || 0;
+    if (metaAdAccountId !== undefined) settings.metaAdAccountId = String(metaAdAccountId || '').trim();
+    if (metaAccessToken !== undefined) settings.metaAccessToken = String(metaAccessToken || '').trim();
+    settings.lastSyncedAt = new Date();
+
+    await settings.save();
+    res.json({ success: true, message: 'Meta Ad impressions updated successfully!', data: settings });
   } catch (error) {
     next(error);
   }

@@ -5,7 +5,7 @@ import {
   Calendar, MapPin, DollarSign, MessageCircle, FileText, Smile,
   Share2, Copy, Check, Sparkles, Users, Activity, BarChart3, Globe,
   Smartphone, Laptop, Tablet, Search, Shield, UserCheck, Radio, Clock,
-  ExternalLink, UserX, CheckCircle2, AlertCircle, Star, Video, Image, Upload
+  ExternalLink, UserX, CheckCircle2, AlertCircle, Star, Video, Image, Upload, Settings
 } from 'lucide-react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
@@ -244,6 +244,10 @@ const AdminDashboard = () => {
   const [recentVisits, setRecentVisits] = useState([]);
   const [analyticsAutoRefresh, setAnalyticsAutoRefresh] = useState(false);
   const [clearingLogs, setClearingLogs] = useState(false);
+  const [showMetaImpressionsModal, setShowMetaImpressionsModal] = useState(false);
+  const [metaImpressionsInput, setMetaImpressionsInput] = useState('');
+  const [metaReachInput, setMetaReachInput] = useState('');
+  const [metaSaving, setMetaSaving] = useState(false);
 
   // SEO & Google Indexing State
   const [seoSearchQuery, setSeoSearchQuery] = useState('');
@@ -442,6 +446,31 @@ const AdminDashboard = () => {
       alert(err.response?.data?.message || 'Failed to clear logs');
     } finally {
       setClearingLogs(false);
+    }
+  };
+
+  const handleOpenMetaModal = () => {
+    setMetaImpressionsInput(analyticsSummary?.metaViews?.adImpressions ? String(analyticsSummary.metaViews.adImpressions) : '');
+    setMetaReachInput(analyticsSummary?.metaViews?.adReach ? String(analyticsSummary.metaViews.adReach) : '');
+    setShowMetaImpressionsModal(true);
+  };
+
+  const handleSaveMetaImpressions = async (e) => {
+    e.preventDefault();
+    setMetaSaving(true);
+    try {
+      const { data } = await axios.put('/api/analytics/meta-settings', {
+        metaAdImpressions: Number(metaImpressionsInput) || 0,
+        metaAdReach: Number(metaReachInput) || 0
+      });
+      if (data.success) {
+        setShowMetaImpressionsModal(false);
+        fetchTabData();
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to save Meta impressions');
+    } finally {
+      setMetaSaving(false);
     }
   };
 
@@ -1195,29 +1224,80 @@ const AdminDashboard = () => {
                     <div className="flex items-center justify-between border-b border-purple-200 pb-2 mb-3">
                       <span className="font-bold text-xs uppercase tracking-wider text-purple-900 flex items-center gap-1.5">
                         <span className="w-2.5 h-2.5 rounded-full bg-purple-600 animate-pulse"></span>
-                        🟣 Meta & Ads Views
+                        🟣 Meta & Ads
                       </span>
-                      <span className="text-[10px] bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-full border border-purple-300">
-                        {analyticsSummary.metaViews?.unique || 0} Unique
-                      </span>
+                      <button
+                        type="button"
+                        onClick={handleOpenMetaModal}
+                        className="text-[10px] bg-purple-100 hover:bg-purple-200 text-purple-800 font-bold px-2 py-0.5 rounded-full border border-purple-300 transition-colors flex items-center gap-1 cursor-pointer"
+                        title="Click to update Meta Ad Impressions & Reach"
+                      >
+                        <Settings className="w-3 h-3 text-purple-700" />
+                        <span>{analyticsSummary.metaViews?.adImpressions ? `${analyticsSummary.metaViews.adImpressions.toLocaleString()} Impressions` : 'Set Impressions'}</span>
+                      </button>
                     </div>
-                    <div className="grid grid-cols-3 gap-2 text-center">
-                      <div className="bg-purple-100/60 p-2 rounded-xl border border-purple-200">
-                        <p className="text-[9px] text-purple-700 uppercase font-bold">Today</p>
-                        <p className="text-base font-bold text-purple-950 mt-0.5">{analyticsSummary.metaViews?.today || 0}</p>
+
+                    {/* Section A: Meta Ad Impressions & Reach */}
+                    <div className="bg-purple-50/80 p-2.5 rounded-xl border border-purple-200/80 mb-2.5">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="text-[9.5px] font-bold uppercase tracking-wider text-purple-900">
+                          📢 Ad Feed Impressions
+                        </span>
+                        <button
+                          type="button"
+                          onClick={handleOpenMetaModal}
+                          className="text-[9px] text-purple-700 hover:text-purple-950 font-bold cursor-pointer underline"
+                        >
+                          ✎ Update
+                        </button>
                       </div>
-                      <div className="bg-purple-100/60 p-2 rounded-xl border border-purple-200">
-                        <p className="text-[9px] text-purple-700 uppercase font-bold">7 Days</p>
-                        <p className="text-base font-bold text-purple-950 mt-0.5">{analyticsSummary.metaViews?.week || 0}</p>
-                      </div>
-                      <div className="bg-purple-100/60 p-2 rounded-xl border border-purple-200">
-                        <p className="text-[9px] text-purple-700 uppercase font-bold">Total</p>
-                        <p className="text-base font-bold text-purple-950 mt-0.5">{analyticsSummary.metaViews?.total || 0}</p>
+                      <div className="grid grid-cols-3 gap-1.5 text-center">
+                        <div className="bg-white/90 p-1.5 rounded-lg border border-purple-100">
+                          <p className="text-[8.5px] text-purple-700 uppercase font-bold">Impressions</p>
+                          <p className="text-xs font-bold text-purple-950 mt-0.5">
+                            {analyticsSummary.metaViews?.adImpressions ? analyticsSummary.metaViews.adImpressions.toLocaleString() : 'Not Set'}
+                          </p>
+                        </div>
+                        <div className="bg-white/90 p-1.5 rounded-lg border border-purple-100">
+                          <p className="text-[8.5px] text-purple-700 uppercase font-bold">Reach</p>
+                          <p className="text-xs font-bold text-purple-950 mt-0.5">
+                            {analyticsSummary.metaViews?.adReach ? analyticsSummary.metaViews.adReach.toLocaleString() : 'Not Set'}
+                          </p>
+                        </div>
+                        <div className="bg-white/90 p-1.5 rounded-lg border border-purple-100">
+                          <p className="text-[8.5px] text-purple-700 uppercase font-bold">Landing CTR</p>
+                          <p className="text-xs font-bold text-emerald-800 mt-0.5">
+                            {analyticsSummary.metaViews?.ctr ? `${analyticsSummary.metaViews.ctr}%` : '-'}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                    <p className="text-[9.5px] text-purple-900/75 mt-2.5 font-medium leading-tight">
-                      Actual website landings from Instagram &amp; Facebook ads/posts. (Meta Ads Manager shows higher overall numbers because it counts feed impressions, reaches &amp; video plays).
-                    </p>
+
+                    {/* Section B: Actual Website Landings */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[9.5px] font-bold uppercase tracking-wider text-purple-900">
+                          🌐 Verified Site Landings
+                        </span>
+                        <span className="text-[9.5px] text-purple-700 font-bold">
+                          {analyticsSummary.metaViews?.unique || 0} Unique
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        <div className="bg-purple-100/60 p-2 rounded-xl border border-purple-200">
+                          <p className="text-[9px] text-purple-700 uppercase font-bold">Today</p>
+                          <p className="text-base font-bold text-purple-950 mt-0.5">{analyticsSummary.metaViews?.today || 0}</p>
+                        </div>
+                        <div className="bg-purple-100/60 p-2 rounded-xl border border-purple-200">
+                          <p className="text-[9px] text-purple-700 uppercase font-bold">7 Days</p>
+                          <p className="text-base font-bold text-purple-950 mt-0.5">{analyticsSummary.metaViews?.week || 0}</p>
+                        </div>
+                        <div className="bg-purple-100/60 p-2 rounded-xl border border-purple-200">
+                          <p className="text-[9px] text-purple-700 uppercase font-bold">Total</p>
+                          <p className="text-base font-bold text-purple-950 mt-0.5">{analyticsSummary.metaViews?.total || 0}</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Unique Visitors Card */}
@@ -3794,6 +3874,89 @@ const AdminDashboard = () => {
                 Close Window
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Meta Ad Impressions & Reach Update Modal */}
+      {showMetaImpressionsModal && (
+        <div className="fixed inset-0 z-50 bg-charcoal/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden animate-slide-up border border-purple-200">
+            {/* Modal Header */}
+            <div className="flex justify-between items-center p-5 bg-gradient-to-r from-purple-900 to-indigo-900 text-white">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-purple-400 animate-pulse"></span>
+                <h3 className="font-bold text-sm uppercase tracking-wider">Update Meta Ads Impressions</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowMetaImpressionsModal(false)}
+                className="text-white/70 hover:text-white p-1 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Form */}
+            <form onSubmit={handleSaveMetaImpressions} className="p-6 flex flex-col gap-4 text-xs font-sans">
+              <p className="text-charcoal-light leading-relaxed">
+                Enter your latest <strong>Impressions</strong> and <strong>Reach</strong> numbers from your Instagram / Facebook Ads Manager so they display on your dashboard alongside your verified website landings.
+              </p>
+
+              <div>
+                <label className="block font-bold text-charcoal-dark mb-1">
+                  Total Ad Impressions (From Meta Ads Manager) *
+                </label>
+                <input
+                  type="number"
+                  required
+                  min="0"
+                  placeholder="e.g. 50000"
+                  value={metaImpressionsInput}
+                  onChange={(e) => setMetaImpressionsInput(e.target.value)}
+                  className="w-full bg-purple-50/50 border border-purple-200 rounded-xl p-3 text-sm font-semibold text-charcoal-dark focus:outline-none focus:border-purple-500"
+                />
+                <span className="text-[10px] text-charcoal-light mt-0.5 block">
+                  Total times your ad was displayed across Instagram feeds, reels, and stories.
+                </span>
+              </div>
+
+              <div>
+                <label className="block font-bold text-charcoal-dark mb-1">
+                  People Reached (Total Reach)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  placeholder="e.g. 35000"
+                  value={metaReachInput}
+                  onChange={(e) => setMetaReachInput(e.target.value)}
+                  className="w-full bg-purple-50/50 border border-purple-200 rounded-xl p-3 text-sm font-semibold text-charcoal-dark focus:outline-none focus:border-purple-500"
+                />
+                <span className="text-[10px] text-charcoal-light mt-0.5 block">
+                  Number of unique individual people who saw your ad at least once.
+                </span>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-2 pt-3 border-t border-cream-dark/60 mt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowMetaImpressionsModal(false)}
+                  className="w-1/3 py-2.5 bg-cream hover:bg-cream-dark text-charcoal font-bold rounded-xl"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={metaSaving}
+                  className="w-2/3 py-2.5 bg-purple-700 hover:bg-purple-800 text-white font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5"
+                >
+                  {metaSaving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+                  <span>{metaSaving ? 'Saving...' : 'Save Impressions'}</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
