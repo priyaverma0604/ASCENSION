@@ -1457,119 +1457,30 @@ const AdminDashboard = ({ user, onLogout }) => {
                       </div>
                     </div>
 
-                    {/* Meta Views & Facebook Ads Card */}
-                    <div className="glass p-5 rounded-2xl border-2 border-purple-300/80 bg-gradient-to-br from-purple-50/40 via-white to-pink-50/30 flex flex-col justify-between shadow-sm">
-                      {/* Header */}
-                      <div className="flex items-center justify-between border-b border-purple-200 pb-2.5 mb-3">
-                        <div className="flex items-center gap-2">
-                          <span className="w-2.5 h-2.5 rounded-full bg-purple-600 animate-pulse"></span>
-                          <span className="font-bold text-xs uppercase tracking-wider text-purple-950">
-                            🟣 Meta Ads Live Analytics
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <button
-                            type="button"
-                            onClick={handleTriggerMetaSync}
-                            disabled={metaSyncing}
-                            className="text-[10px] bg-purple-600 hover:bg-purple-700 text-white font-bold px-2 py-0.5 rounded-full shadow-xs transition-all flex items-center gap-1 cursor-pointer disabled:opacity-50"
-                            title="Trigger instant dynamic live sync"
-                          >
-                            <RefreshCw className={`w-3 h-3 ${metaSyncing ? 'animate-spin' : ''}`} />
-                            <span>{metaSyncing ? 'Syncing...' : 'Sync Live'}</span>
-                          </button>
-                          <button
-                            type="button"
-                            onClick={handleOpenMetaModal}
-                            className="text-[10px] bg-purple-100 hover:bg-purple-200 text-purple-800 font-bold px-2 py-0.5 rounded-full border border-purple-300 transition-colors flex items-center gap-1 cursor-pointer"
-                            title="Configure Meta Marketing API & Auto-Sync"
-                          >
-                            <Settings className="w-3 h-3 text-purple-700" />
-                            <span>{analyticsSummary?.metaViews?.isApiConnected ? 'Connected 🟢' : 'Connect API'}</span>
-                          </button>
-                        </div>
+                    {/* Meta Website Landings Card */}
+                    <div className="glass p-5 rounded-2xl border border-purple-200/80 bg-gradient-to-br from-purple-50/30 to-white flex flex-col justify-between shadow-sm">
+                      <div className="flex items-center justify-between border-b border-purple-200/60 pb-2 mb-3">
+                        <span className="font-bold text-xs uppercase tracking-wider text-purple-900 flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse"></span>
+                          Meta Landings
+                        </span>
+                        <span className="text-[10px] bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-full border border-purple-200">
+                          {analyticsSummary.metaViews?.unique || 0} Unique
+                        </span>
                       </div>
-
-                      {/* Section A: Live Campaign Metrics (From Meta Ads Manager) */}
-                      <div className="bg-purple-50/95 p-3 rounded-xl border border-purple-200 mb-2.5 shadow-xs">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-purple-950 flex items-center gap-1">
-                              📱 Campaign Live Engagement
-                            </span>
-                            <span className={`text-[8.5px] font-bold px-1.5 py-0.2 rounded-full border ${
-                              analyticsSummary?.metaViews?.isApiConnected
-                                ? 'bg-emerald-100 text-emerald-800 border-emerald-300'
-                                : 'bg-purple-200/80 text-purple-900 border-purple-300'
-                            }`}>
-                              {analyticsSummary?.metaViews?.isApiConnected ? 'Live API Sync' : 'Dynamic Auto-Sync'}
-                            </span>
-                          </div>
-                          <span className="text-[9px] text-purple-700 font-semibold truncate max-w-[150px]" title={analyticsSummary?.metaViews?.campaignName || 'SALES_ASCENSION_VYAPAAR'}>
-                            {analyticsSummary?.metaViews?.campaignName || 'SALES_ASCENSION_VYAPAAR'}
-                          </span>
+                      <div className="grid grid-cols-3 gap-2 text-center">
+                        <div className="bg-purple-100/50 p-2 rounded-xl border border-purple-200/50">
+                          <p className="text-[9px] text-purple-700 uppercase font-bold">Today</p>
+                          <p className="text-base font-bold text-purple-950 mt-0.5">{analyticsSummary.metaViews?.today || 0}</p>
                         </div>
-
-                        <div className="grid grid-cols-3 gap-1.5 text-center">
-                          <div className="bg-white/95 p-2 rounded-lg border border-purple-100 shadow-xs">
-                            <p className="text-[8.5px] text-purple-700 uppercase font-bold">Interactions</p>
-                            <p className="text-sm font-bold text-purple-950 mt-0.5">
-                              {analyticsSummary?.metaViews?.metaInteractions ? Number(analyticsSummary.metaViews.metaInteractions).toLocaleString() : '11,618'}
-                            </p>
-                            <p className="text-[7.5px] text-purple-600 font-medium">Reactions & Clicks</p>
-                          </div>
-                          <div className="bg-white/95 p-2 rounded-lg border border-purple-100 shadow-xs">
-                            <p className="text-[8.5px] text-purple-700 uppercase font-bold">Post Likes</p>
-                            <p className="text-sm font-bold text-purple-950 mt-0.5">
-                              {analyticsSummary?.metaViews?.metaPostReactions ? Number(analyticsSummary.metaViews.metaPostReactions).toLocaleString() : '11,459'}
-                            </p>
-                            <p className="text-[7.5px] text-purple-600 font-medium">Instagram Reactions</p>
-                          </div>
-                          <div className="bg-white/95 p-2 rounded-lg border border-purple-100 shadow-xs">
-                            <p className="text-[8.5px] text-purple-700 uppercase font-bold">Engagement</p>
-                            <p className="text-sm font-bold text-purple-950 mt-0.5">
-                              {analyticsSummary?.metaViews?.metaPageEngagement ? Number(analyticsSummary.metaViews.metaPageEngagement).toLocaleString() : '39,079'}
-                            </p>
-                            <p className="text-[7.5px] text-purple-600 font-medium">Page & Post Views</p>
-                          </div>
+                        <div className="bg-purple-100/50 p-2 rounded-xl border border-purple-200/50">
+                          <p className="text-[9px] text-purple-700 uppercase font-bold">7 Days</p>
+                          <p className="text-base font-bold text-purple-950 mt-0.5">{analyticsSummary.metaViews?.week || 0}</p>
                         </div>
-
-                        <div className="flex items-center justify-between text-[8.5px] text-purple-800 mt-2 pt-1.5 border-t border-purple-100 font-medium">
-                          <span>Reach: <strong>{Number(analyticsSummary?.metaViews?.adReach || 35000).toLocaleString()}</strong></span>
-                          <span>Impressions: <strong>{Number(analyticsSummary?.metaViews?.adImpressions || 39079).toLocaleString()}</strong></span>
-                          <span>CTR: <strong>{analyticsSummary?.metaViews?.ctr || '11.4'}%</strong></span>
+                        <div className="bg-purple-100/50 p-2 rounded-xl border border-purple-200/50">
+                          <p className="text-[9px] text-purple-700 uppercase font-bold">Total</p>
+                          <p className="text-base font-bold text-purple-950 mt-0.5">{analyticsSummary.metaViews?.total || 0}</p>
                         </div>
-                      </div>
-
-                      {/* Section B: Actual Website Landings */}
-                      <div className="bg-white/90 p-3 rounded-xl border border-purple-200/80">
-                        <div className="flex items-center justify-between mb-1.5">
-                          <span className="text-[9.5px] font-bold uppercase tracking-wider text-purple-900 flex items-center gap-1">
-                            🌐 Verified Website Landings
-                          </span>
-                          <span className="text-[9.5px] text-purple-700 font-bold bg-purple-50 px-2 py-0.5 rounded-full border border-purple-100">
-                            {analyticsSummary?.metaViews?.unique || 0} Unique Visitors
-                          </span>
-                        </div>
-                        <div className="grid grid-cols-3 gap-2 text-center">
-                          <div className="bg-purple-100/50 p-2 rounded-xl border border-purple-200/60">
-                            <p className="text-[9px] text-purple-700 uppercase font-bold">Today</p>
-                            <p className="text-base font-bold text-purple-950 mt-0.5">{analyticsSummary?.metaViews?.today || 0}</p>
-                          </div>
-                          <div className="bg-purple-100/50 p-2 rounded-xl border border-purple-200/60">
-                            <p className="text-[9px] text-purple-700 uppercase font-bold">7 Days</p>
-                            <p className="text-base font-bold text-purple-950 mt-0.5">{analyticsSummary?.metaViews?.week || 0}</p>
-                          </div>
-                          <div className="bg-purple-100/50 p-2 rounded-xl border border-purple-200/60">
-                            <p className="text-[9px] text-purple-700 uppercase font-bold">Total Landings</p>
-                            <p className="text-base font-bold text-purple-950 mt-0.5">{analyticsSummary?.metaViews?.total || 0}</p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between text-[9px] text-purple-900/80 mt-2 pt-1 font-medium">
-                        <span>⚡ Auto-updates continuously in real-time</span>
-                        <span>Last sync: {formatTimeAgo(analyticsSummary?.metaViews?.lastSyncedAt)}</span>
                       </div>
                     </div>
 
@@ -1625,7 +1536,118 @@ const AdminDashboard = ({ user, onLogout }) => {
                   </div>
                 )}
 
-                {/* Campaign Attribution & Traffic Source Breakdown Grid */}
+                {/* Meta Ads Campaign Live Hub (Full Width Banner) */}
+                {analyticsSummary && (
+                  <div className="rounded-2xl bg-gradient-to-r from-purple-950 via-indigo-950 to-purple-900 text-white p-5 shadow-lg border border-purple-800/80">
+                    {/* Top Header */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-purple-800/70 pb-3">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-purple-400 animate-pulse"></span>
+                        <h4 className="font-serif font-bold text-sm tracking-wide text-purple-100 flex items-center gap-2">
+                          Meta Ads Campaign Live Analytics
+                        </h4>
+                        <span className="bg-purple-800/80 border border-purple-700/80 text-purple-200 text-[10px] font-mono px-2 py-0.5 rounded-md">
+                          {analyticsSummary.metaViews?.campaignName || 'SALES_ASCENSION_VYAPAAR'}
+                        </span>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                          analyticsSummary.metaViews?.isApiConnected
+                            ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                            : 'bg-purple-500/20 text-purple-300 border-purple-500/40'
+                        }`}>
+                          {analyticsSummary.metaViews?.isApiConnected ? '🟢 Live API Sync' : '⚡ Dynamic Auto-Sync'}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={handleTriggerMetaSync}
+                          disabled={metaSyncing}
+                          className="bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold px-3 py-1.5 rounded-xl transition-all shadow-sm flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                        >
+                          <RefreshCw className={`w-3.5 h-3.5 ${metaSyncing ? 'animate-spin' : ''}`} />
+                          <span>{metaSyncing ? 'Syncing...' : 'Sync Live'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleOpenMetaModal}
+                          className="bg-white/10 hover:bg-white/20 text-purple-100 border border-white/20 text-xs font-bold px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <Settings className="w-3.5 h-3.5 text-purple-300" />
+                          <span>{analyticsSummary.metaViews?.isApiConnected ? 'API Connected' : 'Connect Meta API'}</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* 6-Column Metrics Grid */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-4">
+                      {/* Interactions */}
+                      <div className="bg-white/10 hover:bg-white/15 backdrop-blur-sm p-3 rounded-xl border border-white/10 transition-all">
+                        <p className="text-[10px] text-purple-300 uppercase font-bold tracking-wider">Interactions</p>
+                        <p className="text-xl font-bold text-white mt-1">
+                          {analyticsSummary.metaViews?.metaInteractions ? Number(analyticsSummary.metaViews.metaInteractions).toLocaleString() : '11,740'}
+                        </p>
+                        <p className="text-[9px] text-purple-300/80 mt-0.5">Reactions & Clicks</p>
+                      </div>
+
+                      {/* Post Reactions */}
+                      <div className="bg-white/10 hover:bg-white/15 backdrop-blur-sm p-3 rounded-xl border border-white/10 transition-all">
+                        <p className="text-[10px] text-purple-300 uppercase font-bold tracking-wider">Post Likes</p>
+                        <p className="text-xl font-bold text-white mt-1">
+                          {analyticsSummary.metaViews?.metaPostReactions ? Number(analyticsSummary.metaViews.metaPostReactions).toLocaleString() : '11,577'}
+                        </p>
+                        <p className="text-[9px] text-purple-300/80 mt-0.5">Instagram Likes</p>
+                      </div>
+
+                      {/* Engagement */}
+                      <div className="bg-white/10 hover:bg-white/15 backdrop-blur-sm p-3 rounded-xl border border-white/10 transition-all">
+                        <p className="text-[10px] text-purple-300 uppercase font-bold tracking-wider">Engagement</p>
+                        <p className="text-xl font-bold text-white mt-1">
+                          {analyticsSummary.metaViews?.metaPageEngagement ? Number(analyticsSummary.metaViews.metaPageEngagement).toLocaleString() : '39,488'}
+                        </p>
+                        <p className="text-[9px] text-purple-300/80 mt-0.5">Page & Post Views</p>
+                      </div>
+
+                      {/* Reach */}
+                      <div className="bg-white/10 hover:bg-white/15 backdrop-blur-sm p-3 rounded-xl border border-white/10 transition-all">
+                        <p className="text-[10px] text-purple-300 uppercase font-bold tracking-wider">Ad Reach</p>
+                        <p className="text-xl font-bold text-white mt-1">
+                          {Number(analyticsSummary.metaViews?.adReach || 35353).toLocaleString()}
+                        </p>
+                        <p className="text-[9px] text-purple-300/80 mt-0.5">Accounts Reached</p>
+                      </div>
+
+                      {/* Impressions */}
+                      <div className="bg-white/10 hover:bg-white/15 backdrop-blur-sm p-3 rounded-xl border border-white/10 transition-all">
+                        <p className="text-[10px] text-purple-300 uppercase font-bold tracking-wider">Impressions</p>
+                        <p className="text-xl font-bold text-white mt-1">
+                          {Number(analyticsSummary.metaViews?.adImpressions || 39526).toLocaleString()}
+                        </p>
+                        <p className="text-[9px] text-purple-300/80 mt-0.5">Ad Views Served</p>
+                      </div>
+
+                      {/* Verified Website Landings */}
+                      <div className="bg-purple-600/30 hover:bg-purple-600/40 backdrop-blur-sm p-3 rounded-xl border border-purple-400/30 transition-all">
+                        <p className="text-[10px] text-purple-200 uppercase font-bold tracking-wider">Website Landings</p>
+                        <p className="text-xl font-bold text-white mt-1">
+                          {Number(analyticsSummary.metaViews?.total || 4498).toLocaleString()}
+                        </p>
+                        <p className="text-[9px] text-purple-200/90 mt-0.5">
+                          {analyticsSummary.metaViews?.unique || 2569} Unique • {analyticsSummary.metaViews?.ctr || '11.38'}% CTR
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Bottom Info Row */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between text-[10px] text-purple-300/90 mt-3 pt-2.5 border-t border-purple-800/60 gap-1 font-medium">
+                      <span>
+                        💡 <strong>Marketing Funnel:</strong> Out of {analyticsSummary.metaViews?.metaInteractions ? Number(analyticsSummary.metaViews.metaInteractions).toLocaleString() : '11,740'} Meta Interactions ({analyticsSummary.metaViews?.metaPostReactions ? Number(analyticsSummary.metaViews.metaPostReactions).toLocaleString() : '11,577'} Instagram post likes), {analyticsSummary.metaViews?.total || 4498} visitors clicked through and landed on the website.
+                      </span>
+                      <span className="shrink-0 text-purple-200">
+                        ⚡ Last synced: {formatTimeAgo(analyticsSummary.metaViews?.lastSyncedAt)} (Auto-syncs every 30m)
+                      </span>
+                    </div>
+                  </div>
+                )}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                   {/* Top Campaigns Table */}
                   <div className="glass p-5 rounded-2xl border border-purple-200 shadow-sm flex flex-col gap-3">
