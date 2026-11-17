@@ -31,6 +31,7 @@ import ProductDetails from './pages/ProductDetails';
 import ProgramDashboard from './pages/ProgramDashboard';
 import ThankYouProgram from './pages/ThankYouProgram';
 import ErrorBoundary from './components/ErrorBoundary';
+import CartNotificationToast from './components/CartNotificationToast';
 
 // Context Providers
 import { AuthProvider } from './context/AuthContext';
@@ -45,6 +46,7 @@ function App() {
           <Router>
             <ScrollToTop />
             <VisitorTracker />
+            <CartNotificationToast />
             <div className="flex flex-col min-h-screen bg-[#FFFDF7] text-charcoal relative">
               {/* Global Subtle Waterfall Watermark Background */}
               <div 

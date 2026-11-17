@@ -110,6 +110,24 @@ const Shop = () => {
   // Quick Duo Candle Modal State
   const [duoModalProduct, setDuoModalProduct] = useState(null);
   const [duoModalSecondCandle, setDuoModalSecondCandle] = useState(null);
+  const [addedProductId, setAddedProductId] = useState(null);
+
+  const handleQuickAdd = (product, extra = {}) => {
+    if (product.name && product.name.toLowerCase().includes('boat')) {
+      addToCart({
+        ...product,
+        _id: `${product._id}_small`,
+        name: `${product.name} (Small Size)`,
+        pricing: 475,
+        selectedSize: 'Small',
+        ...extra
+      });
+    } else {
+      addToCart({ ...product, ...extra });
+    }
+    setAddedProductId(product._id);
+    setTimeout(() => setAddedProductId(null), 1500);
+  };
 
   const [categoriesList, setCategoriesList] = useState([
     'All', 'Diwali Special', 'Energy Bottles', 'Crystals', 'Pyramids', 'Bath Salts', 'Healing Camphor', 'Healing Oils', 'Candles', 'Wax Tablets', 'Sage Leaves'
@@ -941,34 +959,34 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                                 Buy 2 @ ₹999
                               </button>
                               <button
-                                onClick={() => {
-                                  addToCart(product);
-                                  alert(`1x ${product.name} added to cart.`);
-                                }}
-                                className="bg-cream-dark/60 hover:bg-cream-dark text-charcoal font-bold py-1 sm:py-1.5 px-2 rounded-lg transition-colors text-[9px] sm:text-[10px] uppercase tracking-wider"
+                                onClick={() => handleQuickAdd(product)}
+                                className={`font-bold py-1 sm:py-1.5 px-2 rounded-lg transition-all duration-200 text-[9px] sm:text-[10px] uppercase tracking-wider ${
+                                  addedProductId === product._id
+                                    ? 'bg-emerald-600 text-white scale-105 shadow-xs'
+                                    : 'bg-cream-dark/60 hover:bg-cream-dark text-charcoal'
+                                }`}
                                 title="Add 1 Single Candle (₹555)"
                               >
-                                +1
+                                {addedProductId === product._id ? '✓ Added' : '+1'}
                               </button>
                             </div>
                           ) : (
                             <button
-                              onClick={() => {
-                                if (product.name && product.name.toLowerCase().includes('boat')) {
-                                  addToCart({
-                                    ...product,
-                                    _id: `${product._id}_small`,
-                                    name: `${product.name} (Small Size)`,
-                                    pricing: 475,
-                                    selectedSize: 'Small'
-                                  });
-                                } else {
-                                  addToCart(product);
-                                }
-                              }}
-                              className="bg-sage hover:bg-sage-dark text-white font-bold py-1 sm:py-1.5 px-2 sm:px-3 rounded-lg transition-colors text-[9px] sm:text-[10px] uppercase tracking-wider"
+                              onClick={() => handleQuickAdd(product)}
+                              className={`font-bold py-1 sm:py-1.5 px-2.5 sm:px-3 rounded-lg transition-all duration-200 text-[9px] sm:text-[10px] uppercase tracking-wider flex items-center gap-1 cursor-pointer ${
+                                addedProductId === product._id
+                                  ? 'bg-emerald-600 text-white scale-105 shadow-xs'
+                                  : 'bg-sage hover:bg-sage-dark text-white'
+                              }`}
                             >
-                              Add
+                              {addedProductId === product._id ? (
+                                <>
+                                  <Check className="w-3 h-3" />
+                                  <span>Added</span>
+                                </>
+                              ) : (
+                                <span>Add</span>
+                              )}
                             </button>
                           )}
                         </div>
@@ -1119,17 +1137,27 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                         <button
                           onClick={() => {
                             if (matchingProd) {
-                              addToCart(matchingProd);
-                              alert(`${matchingProd.name} (₹${matchingProd.pricing || 1555}) added to your cart!`);
-                            } else {
-                              alert(`${selectedZodiac.primaryBracelet} is in stock below!`);
+                              handleQuickAdd(matchingProd);
                             }
                           }}
-                          className="bg-gold hover:bg-gold-dark text-charcoal-dark font-bold text-[10px] uppercase tracking-wider py-2 px-4 rounded-xl shadow-xs transition-colors shrink-0 flex items-center gap-1.5"
+                          className={`font-bold text-[10px] uppercase tracking-wider py-2 px-4 rounded-xl shadow-xs transition-all duration-200 shrink-0 flex items-center gap-1.5 cursor-pointer ${
+                            matchingProd && addedProductId === matchingProd._id
+                              ? 'bg-emerald-600 text-white scale-105'
+                              : 'bg-gold hover:bg-gold-dark text-charcoal-dark'
+                          }`}
                         >
-                          <span>Quick Add to Cart (₹{braceletPrice})</span>
-                          {braceletOrigPrice > braceletPrice && (
-                            <span className="line-through text-charcoal/60 text-[9px] font-normal">₹{braceletOrigPrice}</span>
+                          {matchingProd && addedProductId === matchingProd._id ? (
+                            <>
+                              <Check className="w-3.5 h-3.5" />
+                              <span>Added to Cart</span>
+                            </>
+                          ) : (
+                            <>
+                              <span>Quick Add to Cart (₹{braceletPrice})</span>
+                              {braceletOrigPrice > braceletPrice && (
+                                <span className="line-through text-charcoal/60 text-[9px] font-normal">₹{braceletOrigPrice}</span>
+                              )}
+                            </>
                           )}
                         </button>
                       </div>
@@ -1609,23 +1637,21 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                               })()}
                               
                               <button
-                                onClick={() => {
-                                  if (product.name && product.name.toLowerCase().includes('boat')) {
-                                    addToCart({
-                                      ...product,
-                                      _id: `${product._id}_small`,
-                                      name: `${product.name} (Small Size)`,
-                                      pricing: 475,
-                                      selectedSize: 'Small'
-                                    });
-                                  } else {
-                                    addToCart(product);
-                                  }
-                                  alert(`${product.name} added to cart!`);
-                                }}
-                                className="bg-gold hover:bg-gold-dark text-charcoal-dark font-bold text-[9px] uppercase tracking-wider py-1.5 px-3.5 rounded-xl shadow-xs transition-all duration-300 cursor-pointer"
+                                onClick={() => handleQuickAdd(product)}
+                                className={`font-bold text-[9px] uppercase tracking-wider py-1.5 px-3.5 rounded-xl shadow-xs transition-all duration-300 cursor-pointer flex items-center gap-1 ${
+                                  addedProductId === product._id
+                                    ? 'bg-emerald-600 text-white scale-105'
+                                    : 'bg-gold hover:bg-gold-dark text-charcoal-dark'
+                                }`}
                               >
-                                Add to Cart
+                                {addedProductId === product._id ? (
+                                  <>
+                                    <Check className="w-3 h-3" />
+                                    <span>Added</span>
+                                  </>
+                                ) : (
+                                  <span>Add to Cart</span>
+                                )}
                               </button>
                             </div>
                           </div>
@@ -2155,22 +2181,21 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                         ₹{product.pricing || (product.name && product.name.toLowerCase().includes('boat') ? 475 : 375)}
                       </p>
                       <button
-                        onClick={() => {
-                          if (product.name && product.name.toLowerCase().includes('boat')) {
-                            addToCart({
-                              ...product,
-                              _id: `${product._id}_small`,
-                              name: `${product.name} (Small Size)`,
-                              pricing: 475,
-                              selectedSize: 'Small'
-                            });
-                          } else {
-                            addToCart(product);
-                          }
-                        }}
-                        className="bg-sage hover:bg-sage-dark text-white font-bold py-2 rounded-xl transition-colors text-[10px] uppercase tracking-wider mt-3"
+                        onClick={() => handleQuickAdd(product)}
+                        className={`font-bold py-2 rounded-xl transition-all duration-200 text-[10px] uppercase tracking-wider mt-3 flex items-center justify-center gap-1 cursor-pointer ${
+                          addedProductId === product._id
+                            ? 'bg-emerald-600 text-white scale-102'
+                            : 'bg-sage hover:bg-sage-dark text-white'
+                        }`}
                       >
-                        Move to Cart
+                        {addedProductId === product._id ? (
+                          <>
+                            <Check className="w-3.5 h-3.5" />
+                            <span>Moved to Cart!</span>
+                          </>
+                        ) : (
+                          <span>Move to Cart</span>
+                        )}
                       </button>
                     </div>
                   </div>

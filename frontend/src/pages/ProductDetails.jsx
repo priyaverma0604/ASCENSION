@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { 
   Heart, ShoppingBag, Share2, Plus, Minus, 
   ChevronRight, CheckCircle, AlertCircle, Star, MessageSquare,
-  Sparkles, Moon, Sun, Flame, ShieldAlert, Play, Video, Film
+  Sparkles, Moon, Sun, Flame, ShieldAlert, Play, Video, Film, Check
 } from 'lucide-react';
 import axios from 'axios';
 import { CartContext } from '../context/CartContext';
@@ -99,6 +99,7 @@ const ProductDetails = () => {
   const [activeMedia, setActiveMedia] = useState('image'); // 'image' or 'video'
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [shareSuccess, setShareSuccess] = useState(false);
+  const [addedToCart, setAddedToCart] = useState(false);
 
   // Review states
   const [rating, setRating] = useState(5);
@@ -293,7 +294,8 @@ const ProductDetails = () => {
     }
 
     addToCart(itemToAdd, quantity);
-    alert(`${quantity} unit(s) of ${itemToAdd.name} added to cart.`);
+    setAddedToCart(true);
+    setTimeout(() => setAddedToCart(false), 2000);
   };
 
   const handleBuyNow = () => {
@@ -885,10 +887,23 @@ const ProductDetails = () => {
 
                 <button 
                   onClick={handleAddToCart}
-                  className="flex-1 min-w-[140px] bg-sage hover:bg-sage-dark text-white font-bold py-3 px-6 rounded-xl transition-all shadow-sm text-xs uppercase tracking-wider flex items-center justify-center gap-2"
+                  className={`flex-1 min-w-[140px] font-bold py-3 px-6 rounded-xl transition-all shadow-sm text-xs uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer ${
+                    addedToCart
+                      ? 'bg-emerald-600 text-white scale-102 shadow-md'
+                      : 'bg-sage hover:bg-sage-dark text-white'
+                  }`}
                 >
-                  <ShoppingBag className="w-4 h-4" />
-                  <span>Add to Cart</span>
+                  {addedToCart ? (
+                    <>
+                      <Check className="w-4 h-4" />
+                      <span>Added to Cart!</span>
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingBag className="w-4 h-4" />
+                      <span>Add to Cart</span>
+                    </>
+                  )}
                 </button>
 
                 <button 

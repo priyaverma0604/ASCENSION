@@ -1,9 +1,11 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useRef } from 'react';
 
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
+  const [toast, setToast] = useState(null);
+  const toastTimeoutRef = useRef(null);
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -22,6 +24,11 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('ascension_cart', JSON.stringify(cart));
   }, [cart]);
 
+  const hideToast = () => {
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    setToast(null);
+  };
+
   const addToCart = (product, quantity = 1) => {
     setCart((prevCart) => {
       const existingItemIndex = prevCart.findIndex((item) => item.product._id === product._id);
@@ -34,6 +41,20 @@ export const CartProvider = ({ children }) => {
       
       return [...prevCart, { product, quantity }];
     });
+
+    // Trigger visual toast checkpoint
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    setToast({
+      show: true,
+      productId: product._id,
+      productName: product.name,
+      price: product.pricing || product.price,
+      quantity
+    });
+
+    toastTimeoutRef.current = setTimeout(() => {
+      setToast(null);
+    }, 3800);
   };
 
   const removeFromCart = (productId) => {
@@ -73,7 +94,10 @@ export const CartProvider = ({ children }) => {
         updateQuantity,
         clearCart,
         getCartCount,
-        getCartTotal
+        getCartTotal,
+        toast,
+        setToast,
+        hideToast
       }}
     >
       {children}
