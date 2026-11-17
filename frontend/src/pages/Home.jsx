@@ -498,29 +498,7 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
               );
             }
 
-            // High-Visibility Diwali Sale Spotlight Banner in Hero (Zepto / Amazon Festive Style)
-            return (
-              <Link 
-                to="/shop?category=Diwali%20Special"
-                className="group cursor-pointer inline-flex items-center gap-2 sm:gap-2.5 px-4 sm:px-5 py-2 sm:py-2 rounded-full bg-gradient-to-r from-amber-500/20 via-orange-500/15 to-amber-500/20 hover:bg-amber-500/25 border-2 border-amber-400/80 shadow-[0_4px_25px_rgba(245,158,11,0.25)] hover:shadow-[0_8px_30px_rgba(245,158,11,0.4)] transition-all duration-300 transform hover:scale-[1.03] mb-1 select-none backdrop-blur-md"
-              >
-                <span className="relative flex h-2.5 w-2.5 shrink-0">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-90"></span>
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-600"></span>
-                </span>
-                <span className="bg-gradient-to-r from-amber-600 to-orange-600 text-white text-[9px] sm:text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider shadow-xs flex items-center gap-1">
-                  <span>🪔</span>
-                  <span>DIWALI SALE IS LIVE</span>
-                </span>
-                <span className="text-[11px] sm:text-xs font-bold text-charcoal-dark tracking-wide font-sans">
-                  Buy Any 2 Candle Colors for ₹999 <span className="text-amber-800 font-semibold">(Save ₹111)</span>
-                </span>
-                <span className="text-[11px] sm:text-xs font-bold text-amber-700 flex items-center gap-0.5 group-hover:translate-x-1 transition-transform">
-                  <span>Shop Deals</span>
-                  <span>→</span>
-                </span>
-              </Link>
-            );
+            return null;
           })()}
 
           <span className="font-cormorant text-xs sm:text-base 2xl:text-lg text-black font-bold tracking-wider uppercase">
@@ -644,8 +622,8 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
           {/* Festive Sale Header */}
           <div className="flex flex-col items-center text-center gap-2 max-w-3xl mx-auto mb-6 sm:mb-8">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500/20 via-orange-500/15 to-amber-500/20 border border-amber-400/50 text-amber-900 text-[11px] sm:text-xs font-bold uppercase tracking-widest shadow-2xs">
-              <span className="text-base animate-pulse">🪔</span>
-              <span>THE GREAT DIWALI SALE IS LIVE</span>
+              <span className="text-base">✨</span>
+              <span>ARTISANAL BOTANICAL COLLECTION</span>
             </div>
 
             <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl 2xl:text-5xl font-bold text-charcoal-dark tracking-tight mt-1">
@@ -764,7 +742,7 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
               to="/shop?category=Diwali%20Special"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:brightness-105 text-white font-bold text-xs uppercase tracking-wider py-3.5 px-8 rounded-xl shadow-md transition-all transform hover:scale-[1.02]"
             >
-              <span>Explore All 33 Diwali Hampers & Diyas</span>
+              <span>Explore Handcrafted Candles & Hampers</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
