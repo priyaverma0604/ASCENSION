@@ -33,13 +33,19 @@ exports.getTestimonials = async (req, res, next) => {
 // @access  Public / Authenticated
 exports.createTestimonial = async (req, res, next) => {
   try {
-    const { name, rating, reviewText, isFeatured, email, designation, program, programTitle } = req.body;
+    const { name, rating, reviewText, isFeatured, email, designation, program, programTitle, videoUrl, videoType, isVideo } = req.body;
 
     const userName = name || req.user?.name;
     const userEmail = email || req.user?.email || '';
 
-    if (!userName || !reviewText) {
-      return res.status(400).json({ success: false, message: 'Please provide name and review text' });
+    const isVideoItem = isVideo === true || isVideo === 'true' || Boolean(videoUrl);
+
+    if (!userName) {
+      return res.status(400).json({ success: false, message: 'Please provide name' });
+    }
+
+    if (!isVideoItem && !reviewText) {
+      return res.status(400).json({ success: false, message: 'Please provide review text' });
     }
 
     const image = getImagePath(req) || req.body.image || (req.user?.avatar || '');
@@ -49,12 +55,15 @@ exports.createTestimonial = async (req, res, next) => {
       name: userName,
       email: userEmail,
       rating: rating ? Number(rating) : 5,
-      reviewText: reviewText.trim(),
+      reviewText: (reviewText || '').trim(),
       isFeatured: isFeatured !== undefined ? (isFeatured === 'true' || isFeatured === true) : true,
       designation: designation || (programTitle ? `Participant: ${programTitle}` : 'Blessed Seeker'),
       program: program || null,
       programTitle: programTitle || '',
-      image
+      image,
+      videoUrl: videoUrl || '',
+      videoType: videoType || (videoUrl?.includes('instagram') ? 'instagram' : ''),
+      isVideo: isVideoItem
     });
 
     res.status(201).json({ success: true, message: 'Thank you for your blessed review!', data: testimonial });
@@ -73,11 +82,15 @@ exports.updateTestimonial = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'Testimonial not found' });
     }
 
-    const { name, rating, reviewText, isFeatured } = req.body;
+    const { name, rating, reviewText, isFeatured, designation, videoUrl, videoType, isVideo } = req.body;
 
     testimonial.name = name || testimonial.name;
     testimonial.rating = rating !== undefined ? rating : testimonial.rating;
-    testimonial.reviewText = reviewText || testimonial.reviewText;
+    if (reviewText !== undefined) testimonial.reviewText = reviewText;
+    if (designation !== undefined) testimonial.designation = designation;
+    if (videoUrl !== undefined) testimonial.videoUrl = videoUrl;
+    if (videoType !== undefined) testimonial.videoType = videoType;
+    if (isVideo !== undefined) testimonial.isVideo = isVideo === 'true' || isVideo === true;
     
     if (isFeatured !== undefined) {
       testimonial.isFeatured = isFeatured === 'true' || isFeatured === true;

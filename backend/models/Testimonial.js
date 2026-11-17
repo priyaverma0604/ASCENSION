@@ -22,7 +22,20 @@ const testimonialSchema = new mongoose.Schema({
   },
   reviewText: {
     type: String,
-    required: [true, 'Please add review text']
+    default: ''
+  },
+  videoUrl: {
+    type: String,
+    default: ''
+  },
+  videoType: {
+    type: String,
+    enum: ['instagram', 'youtube', 'vimeo', 'custom', ''],
+    default: ''
+  },
+  isVideo: {
+    type: Boolean,
+    default: false
   },
   isFeatured: {
     type: Boolean,

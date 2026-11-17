@@ -4,7 +4,7 @@ import {
   Compass, Calendar, ArrowRight, MessageCircle, ChevronLeft, ChevronRight, Check,
   ShieldCheck, UserCheck, Heart, Lock, Sparkles, Award, Users, Shield, Star, Leaf,
   TrendingUp, ShoppingBag, Eye, HeartHandshake, MapPin, Mail, Phone, CalendarRange,
-  Moon, Sun, Zap, Flame, X
+  Moon, Sun, Zap, Flame, X, Video, ExternalLink
 } from 'lucide-react';
 import axios from 'axios';
 import RegisterWorkshopModal from '../components/RegisterWorkshopModal';
@@ -52,6 +52,42 @@ const getImageUrl = (path) => {
   return `${apiBase}${path}`;
 };
 
+const DEFAULT_VIDEO_TESTIMONIALS = [
+  {
+    _id: 'video-1',
+    name: 'Sonali Bhasin Kumar Healing Journey',
+    designation: 'Sacred Spiritual Transformation',
+    rating: 5,
+    videoUrl: 'https://www.instagram.com/tv/CV68_YQBQS4/?xtok=c2IydGFnMnlxcWZt',
+    embedUrl: 'https://www.instagram.com/p/CV68_YQBQS4/embed/',
+    reviewText: 'A heartfelt client video testimonial reflecting on sacred angelic guidance, emotional release, and spiritual healing with Sonali Bhasin Kumar.',
+    isVideo: true,
+    videoType: 'instagram'
+  },
+  {
+    _id: 'video-2',
+    name: 'Sacred Awakening Experience',
+    designation: 'Client Transformation & Energy Healing',
+    rating: 5,
+    videoUrl: 'https://www.instagram.com/reel/CZOJrvNLXlN/?cplk=bnA3d2JidjJreGN6',
+    embedUrl: 'https://www.instagram.com/reel/CZOJrvNLXlN/embed/',
+    reviewText: 'A transformative client video reflection on divine alignment, emotional peace, and miraculous inner healing through Ascension.',
+    isVideo: true,
+    videoType: 'instagram'
+  }
+];
+
+const getInstagramEmbedUrl = (url) => {
+  if (!url) return '';
+  if (url.includes('/embed')) return url;
+  const match = url.match(/instagram\.com\/(tv|reel|p)\/([A-Za-z0-9_-]+)/);
+  if (match && match[2]) {
+    const type = match[1] === 'reel' ? 'reel' : 'p';
+    return `https://www.instagram.com/${type}/${match[2]}/embed/`;
+  }
+  return url;
+};
+
 const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
@@ -63,6 +99,7 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
   const [selectedService, setSelectedService] = useState(null);
   const [testimonials, setTestimonials] = useState([]);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const [testimonialTab, setTestimonialTab] = useState('video');
   const [products, setProducts] = useState([]);
   const [diwaliProducts, setDiwaliProducts] = useState([]);
   const [retreats, setRetreats] = useState([]);
@@ -439,14 +476,18 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
     setCarouselIndex((prev) => (prev === 0 ? workshops.length - 1 : prev - 1));
   };
 
-  // Auto-scroll testimonials
+  const videoTestimonials = testimonials.filter(t => t.isVideo || Boolean(t.videoUrl));
+  const writtenTestimonials = testimonials.filter(t => !t.isVideo && !t.videoUrl);
+  const displayVideos = videoTestimonials.length > 0 ? videoTestimonials : DEFAULT_VIDEO_TESTIMONIALS;
+
+  // Auto-scroll written testimonials when on written reviews tab
   useEffect(() => {
-    if (testimonials.length === 0) return;
+    if (writtenTestimonials.length <= 1 || testimonialTab !== 'written') return;
     const timer = setInterval(() => {
-      setActiveTestimonial((prev) => (prev === testimonials.length - 1 ? 0 : prev + 1));
+      setActiveTestimonial((prev) => (prev >= writtenTestimonials.length - 1 ? 0 : prev + 1));
     }, 6000);
     return () => clearInterval(timer);
-  }, [testimonials]);
+  }, [writtenTestimonials.length, testimonialTab]);
 
   const handleNewsletterSubmit = (e) => {
     e.preventDefault();
@@ -1302,92 +1343,256 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
       </section>
 
       {/* 6. Testimonials Section */}
-      {(loading || testimonials.length > 0) && (
-        <section className="py-20 md:py-24 bg-[#FFFDF7] px-4 sm:px-6 md:px-12 border-b border-cream-dark/30 w-full text-center">
-          <div className="max-w-4xl 2xl:max-w-5xl mx-auto">
-            <span className="font-sans text-xs 2xl:text-sm text-gold-dark tracking-[0.25em] font-bold uppercase">Testimonials</span>
-            <h2 className="font-serif text-3xl 2xl:text-4xl font-bold text-charcoal-dark mt-2 mb-10 sm:mb-12">Client Experiences</h2>
+      {(loading || testimonials.length > 0 || displayVideos.length > 0) && (
+        <section className="py-20 md:py-24 bg-[#FFFDF7] px-4 sm:px-6 md:px-12 border-b border-cream-dark/30 w-full text-center relative">
+          <div className="max-w-5xl 2xl:max-w-6xl mx-auto">
+            <span className="font-sans text-xs 2xl:text-sm text-gold-dark tracking-[0.25em] font-bold uppercase">
+              Devotee Experiences
+            </span>
+            <h2 className="font-serif text-3xl 2xl:text-4xl font-bold text-charcoal-dark mt-2 mb-3">
+              Client Transformations & Stories
+            </h2>
+            <p className="font-serif italic text-xs sm:text-sm md:text-base text-charcoal-light max-w-xl mx-auto mb-8">
+              Hear directly from seekers who have experienced deep energetic healing, emotional release, and spiritual ascension with Sonali Bhasin Kumar.
+            </p>
 
-            <div className="bg-white p-6 sm:p-8 md:p-12 rounded-[24px] shadow-md border border-cream-dark/40 min-h-[260px] flex flex-col justify-center items-center gap-4 relative animate-fade-in">
-              {loading ? (
-                <div className="flex flex-col items-center gap-4 w-full animate-pulse">
-                  <div className="h-4 bg-cream-dark rounded-full w-24"></div>
-                  <div className="h-4 bg-cream-dark rounded-full w-3/4"></div>
-                  <div className="h-4 bg-cream-dark rounded-full w-1/2"></div>
-                  <div className="flex items-center gap-3 mt-6">
-                    <div className="w-12 h-12 bg-cream-dark rounded-full"></div>
-                    <div className="flex flex-col gap-2">
-                      <div className="h-3 bg-cream-dark rounded-full w-20"></div>
-                      <div className="h-2 bg-cream-dark rounded-full w-12"></div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  {/* Star Rating */}
-                  <div className="flex text-gold text-sm gap-1 mb-2">
-                    {'★'.repeat(testimonials[activeTestimonial].rating || 5)}
-                  </div>
-                  <div className="h-[220px] sm:h-[180px] md:h-[140px] flex items-center justify-center overflow-y-auto py-2 w-full">
-                    <p className="font-serif italic text-xs sm:text-sm md:text-base 2xl:text-lg text-charcoal-light leading-relaxed max-w-2xl text-center">
-                      "{testimonials[activeTestimonial].reviewText}"
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-3 mt-6 font-sans text-left">
-                    {testimonials[activeTestimonial].image ? (
-                      <img
-                        src={getImageUrl(testimonials[activeTestimonial].image)}
-                        alt={testimonials[activeTestimonial].name}
-                        className="w-12 h-12 rounded-full object-cover border border-cream-dark"
-                      />
-                    ) : (
-                      <div className="w-12 h-12 rounded-full bg-gold/10 text-gold flex items-center justify-center border border-cream-dark font-serif font-bold text-sm">
-                        {testimonials[activeTestimonial].name.charAt(0)}
-                      </div>
-                    )}
-                    <div>
-                      <p className="text-xs 2xl:text-sm font-bold text-charcoal-dark">{testimonials[activeTestimonial].name}</p>
-                      {testimonials[activeTestimonial].designation && (
-                        <p className="text-[10px] text-gold-dark uppercase tracking-wider font-bold mt-0.5">
-                          {testimonials[activeTestimonial].designation}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Slider Arrows */}
-                  {testimonials.length > 1 && (
-                    <div className="absolute inset-y-0 w-full flex items-center justify-between pointer-events-none px-2 sm:px-4">
-                      <button
-                        onClick={() => setActiveTestimonial((prev) => (prev === 0 ? testimonials.length - 1 : prev - 1))}
-                        className="pointer-events-auto w-8 h-8 rounded-full bg-white hover:bg-cream-light border border-cream-dark/50 flex items-center justify-center text-charcoal hover:text-gold transition-colors focus:outline-none shadow-sm"
-                      >
-                        <ChevronLeft className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => setActiveTestimonial((prev) => (prev === testimonials.length - 1 ? 0 : prev + 1))}
-                        className="pointer-events-auto w-8 h-8 rounded-full bg-white hover:bg-cream-light border border-cream-dark/50 flex items-center justify-center text-charcoal hover:text-gold transition-colors focus:outline-none shadow-sm"
-                      >
-                        <ChevronRight className="w-4 h-4" />
-                      </button>
-                    </div>
-                  )}
-                </>
-              )}
+            {/* Testimonials Switcher Tabs */}
+            <div className="inline-flex items-center p-1.5 bg-cream/70 border border-cream-dark/80 rounded-full shadow-inner mb-10 gap-1 sm:gap-2">
+              <button
+                type="button"
+                onClick={() => setTestimonialTab('video')}
+                className={`inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer ${
+                  testimonialTab === 'video'
+                    ? 'bg-gold text-white shadow-md shadow-gold/25 scale-102'
+                    : 'text-charcoal-dark hover:text-gold hover:bg-white/60'
+                }`}
+              >
+                <Video className="w-3.5 h-3.5" />
+                <span>Video Stories ({displayVideos.length})</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setTestimonialTab('written')}
+                className={`inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer ${
+                  testimonialTab === 'written'
+                    ? 'bg-gold text-white shadow-md shadow-gold/25 scale-102'
+                    : 'text-charcoal-dark hover:text-gold hover:bg-white/60'
+                }`}
+              >
+                <MessageCircle className="w-3.5 h-3.5" />
+                <span>Written Reviews ({writtenTestimonials.length})</span>
+              </button>
             </div>
 
-            {/* Testimonial Indicators */}
-            {!loading && testimonials.length > 1 && (
-              <div className="flex justify-center gap-2 mt-6">
-                {testimonials.map((_, idx) => (
+            {/* Video Testimonials Tab Content */}
+            {testimonialTab === 'video' && (
+              <div className="animate-fade-in">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl 2xl:max-w-5xl mx-auto items-stretch">
+                  {displayVideos.map((item, idx) => {
+                    const embedSrc = getInstagramEmbedUrl(item.videoUrl) || item.embedUrl;
+                    const igDirectUrl = item.videoUrl || 'https://www.instagram.com/ascension_sonalibhasinkumar/';
+                    return (
+                      <div
+                        key={item._id || idx}
+                        className="bg-white rounded-[28px] p-4 sm:p-6 shadow-md hover:shadow-xl border border-cream-dark/60 transition-all duration-300 flex flex-col justify-between text-left"
+                      >
+                        {/* Card Top Details */}
+                        <div className="flex items-center justify-between pb-3.5 mb-3 border-b border-cream-dark/40">
+                          <div className="flex items-center gap-2.5">
+                            <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gold/15 text-gold-dark shrink-0">
+                              <Video className="w-4 h-4" />
+                            </span>
+                            <div>
+                              <span className="text-[10px] uppercase font-bold text-gold-dark tracking-wider block">
+                                Verified Video Experience
+                              </span>
+                              <h3 className="font-serif font-bold text-sm sm:text-base text-charcoal-dark leading-tight line-clamp-1">
+                                {item.name}
+                              </h3>
+                            </div>
+                          </div>
+                          <div className="flex text-gold text-xs gap-0.5" title="5 Star Healing Experience">
+                            {'★'.repeat(item.rating || 5)}
+                          </div>
+                        </div>
+
+                        {/* Instagram Video Player Embed */}
+                        <div className="relative w-full rounded-2xl overflow-hidden bg-cream/30 border border-cream-dark/50 shadow-inner flex justify-center items-center">
+                          <iframe
+                            src={embedSrc}
+                            title={item.name}
+                            className="w-full h-[520px] border-0"
+                            scrolling="no"
+                            allowTransparency="true"
+                            allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                          />
+                        </div>
+
+                        {/* Card Footer */}
+                        <div className="mt-4 pt-3.5 border-t border-cream-dark/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 font-sans">
+                          <div className="flex-1 pr-2">
+                            {item.designation && (
+                              <p className="text-[10px] text-gold-dark font-bold uppercase tracking-wider">
+                                {item.designation}
+                              </p>
+                            )}
+                            <p className="text-xs text-charcoal-light line-clamp-2 mt-0.5 leading-relaxed">
+                              {item.reviewText}
+                            </p>
+                          </div>
+                          <a
+                            href={igDirectUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-[11px] font-bold text-sage-dark hover:text-gold transition-colors self-start sm:self-auto shrink-0 bg-cream/70 hover:bg-cream-dark/40 px-3.5 py-2 rounded-full border border-cream-dark/70 shadow-sm"
+                          >
+                            <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051C.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
+                            </svg>
+                            <span>Open on Instagram</span>
+                            <ExternalLink className="w-3 h-3 ml-0.5" />
+                          </a>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Switch to Written Tab Callout */}
+                {writtenTestimonials.length > 0 && (
+                  <div className="mt-10">
+                    <button
+                      type="button"
+                      onClick={() => setTestimonialTab('written')}
+                      className="text-xs font-sans text-charcoal-light hover:text-gold transition-colors inline-flex items-center gap-1.5 underline decoration-gold/40 hover:decoration-gold cursor-pointer"
+                    >
+                      <span>Prefer to read words of gratitude? Browse our written devotee reviews</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Written Testimonials Tab Content */}
+            {testimonialTab === 'written' && (
+              <div className="animate-fade-in max-w-4xl mx-auto">
+                <div className="bg-white p-6 sm:p-8 md:p-12 rounded-[28px] shadow-md border border-cream-dark/40 min-h-[260px] flex flex-col justify-center items-center gap-4 relative">
+                  {loading ? (
+                    <div className="flex flex-col items-center gap-4 w-full animate-pulse">
+                      <div className="h-4 bg-cream-dark rounded-full w-24"></div>
+                      <div className="h-4 bg-cream-dark rounded-full w-3/4"></div>
+                      <div className="h-4 bg-cream-dark rounded-full w-1/2"></div>
+                      <div className="flex items-center gap-3 mt-6">
+                        <div className="w-12 h-12 bg-cream-dark rounded-full"></div>
+                        <div className="flex flex-col gap-2">
+                          <div className="h-3 bg-cream-dark rounded-full w-20"></div>
+                          <div className="h-2 bg-cream-dark rounded-full w-12"></div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : writtenTestimonials.length > 0 ? (
+                    (() => {
+                      const current = writtenTestimonials[activeTestimonial] || writtenTestimonials[0];
+                      return (
+                        <>
+                          {/* Star Rating */}
+                          <div className="flex text-gold text-sm gap-1 mb-2">
+                            {'★'.repeat(current.rating || 5)}
+                          </div>
+                          <div className="h-[220px] sm:h-[180px] md:h-[140px] flex items-center justify-center overflow-y-auto py-2 w-full">
+                            <p className="font-serif italic text-xs sm:text-sm md:text-base 2xl:text-lg text-charcoal-light leading-relaxed max-w-2xl text-center">
+                              "{current.reviewText}"
+                            </p>
+                          </div>
+
+                          <div className="flex items-center gap-3 mt-6 font-sans text-left">
+                            {current.image ? (
+                              <img
+                                src={getImageUrl(current.image)}
+                                alt={current.name}
+                                className="w-12 h-12 rounded-full object-cover border border-cream-dark"
+                                onError={(e) => {
+                                  e.currentTarget.style.display = 'none';
+                                  if (e.currentTarget.nextElementSibling) {
+                                    e.currentTarget.nextElementSibling.style.display = 'flex';
+                                  }
+                                }}
+                              />
+                            ) : null}
+                            <div
+                              style={{ display: current.image ? 'none' : 'flex' }}
+                              className="w-12 h-12 rounded-full bg-gold/10 text-gold items-center justify-center border border-cream-dark font-serif font-bold text-sm"
+                            >
+                              {current.name?.charAt(0) || 'A'}
+                            </div>
+                            <div>
+                              <p className="text-xs 2xl:text-sm font-bold text-charcoal-dark">{current.name}</p>
+                              {current.designation && (
+                                <p className="text-[10px] text-gold-dark uppercase tracking-wider font-bold mt-0.5">
+                                  {current.designation}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Slider Arrows */}
+                          {writtenTestimonials.length > 1 && (
+                            <div className="absolute inset-y-0 w-full flex items-center justify-between pointer-events-none px-2 sm:px-4">
+                              <button
+                                type="button"
+                                onClick={() => setActiveTestimonial((prev) => (prev === 0 ? writtenTestimonials.length - 1 : prev - 1))}
+                                className="pointer-events-auto w-8 h-8 rounded-full bg-white hover:bg-cream-light border border-cream-dark/50 flex items-center justify-center text-charcoal hover:text-gold transition-colors focus:outline-none shadow-sm cursor-pointer"
+                                aria-label="Previous review"
+                              >
+                                <ChevronLeft className="w-4 h-4" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setActiveTestimonial((prev) => (prev === writtenTestimonials.length - 1 ? 0 : prev + 1))}
+                                className="pointer-events-auto w-8 h-8 rounded-full bg-white hover:bg-cream-light border border-cream-dark/50 flex items-center justify-center text-charcoal hover:text-gold transition-colors focus:outline-none shadow-sm cursor-pointer"
+                                aria-label="Next review"
+                              >
+                                <ChevronRight className="w-4 h-4" />
+                              </button>
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()
+                  ) : (
+                    <p className="text-charcoal-light italic">No written reviews yet.</p>
+                  )}
+                </div>
+
+                {/* Testimonial Indicators */}
+                {!loading && writtenTestimonials.length > 1 && (
+                  <div className="flex justify-center gap-2 mt-6">
+                    {writtenTestimonials.map((_, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setActiveTestimonial(idx)}
+                        className={`w-1.5 h-1.5 rounded-full transition-all duration-300 focus:outline-none cursor-pointer ${
+                          idx === activeTestimonial ? 'bg-gold w-5' : 'bg-gold/30'
+                        }`}
+                        aria-label={`Go to review ${idx + 1}`}
+                      ></button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Switch to Video Tab Callout */}
+                <div className="mt-8">
                   <button
-                    key={idx}
-                    onClick={() => setActiveTestimonial(idx)}
-                    className={`w-1.5 h-1.5 rounded-full transition-all duration-300 focus:outline-none ${idx === activeTestimonial ? 'bg-gold w-5' : 'bg-gold/30'
-                      }`}
-                  ></button>
-                ))}
+                    type="button"
+                    onClick={() => setTestimonialTab('video')}
+                    className="text-xs font-sans text-charcoal-light hover:text-gold transition-colors inline-flex items-center gap-1.5 underline decoration-gold/40 hover:decoration-gold cursor-pointer"
+                  >
+                    <span>Watch real video transformations & Instagram stories</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </button>
+                </div>
               </div>
             )}
           </div>

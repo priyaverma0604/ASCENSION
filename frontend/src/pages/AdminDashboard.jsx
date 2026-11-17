@@ -1827,7 +1827,16 @@ const AdminDashboard = () => {
                                     : activeTab === 'donations'
                                       ? (item.name || 'Anonymous Donor')
                                       : activeTab === 'testimonials'
-                                        ? (item.name || 'Anonymous Seeker')
+                                        ? (
+                                          <span className="inline-flex items-center gap-1.5 flex-wrap">
+                                            <span>{item.name || 'Anonymous Seeker'}</span>
+                                            {item.isVideo && (
+                                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold bg-purple-100 text-purple-800 border border-purple-200">
+                                                🎥 Video
+                                              </span>
+                                            )}
+                                          </span>
+                                        )
                                         : (item.title || item.name || `Log ID: ${item._id.substring(0, 10)}`)}
                               </p>
                               <p className="text-[10px] text-charcoal-light line-clamp-1 max-w-sm mt-0.5">
@@ -3111,6 +3120,20 @@ const AdminDashboard = () => {
                           <div>
                             <span className="text-[9px] uppercase font-bold text-gold-dark tracking-wider block">Sacred Program Review</span>
                             <span className="text-xs font-bold text-charcoal-dark">{selectedItem.programTitle}</span>
+                          </div>
+                        </div>
+                      )}
+
+                      {selectedItem.videoUrl && (
+                        <div className="bg-purple-50 border border-purple-200 p-3.5 rounded-xl flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <Video className="w-4 h-4 text-purple-600 shrink-0" />
+                            <div>
+                              <span className="text-[9px] uppercase font-bold text-purple-700 tracking-wider block">Instagram Video Testimonial</span>
+                              <a href={selectedItem.videoUrl} target="_blank" rel="noreferrer" className="text-xs text-purple-900 underline font-semibold break-all">
+                                {selectedItem.videoUrl}
+                              </a>
+                            </div>
                           </div>
                         </div>
                       )}
