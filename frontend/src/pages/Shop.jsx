@@ -832,6 +832,10 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                         <img 
                           src={product.images && product.images[0] ? getImageUrl(product.images[0]) : "https://images.unsplash.com/photo-1615627121117-e3278bc8b1db?auto=format&fit=crop&w=400&q=80"} 
                           alt={product.name} 
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = "https://images.unsplash.com/photo-1615627121117-e3278bc8b1db?auto=format&fit=crop&w=400&q=80";
+                          }}
                           className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500" 
                         />
                         {isDiwaliOfferCandle(product.name) && (
@@ -1520,8 +1524,12 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                           {/* Image container */}
                           <Link to={`/product/${product._id}`} className="relative h-44 sm:h-52 w-full bg-cream overflow-hidden block">
                             <img 
-                              src={product.images && product.images[0] ? getImageUrl(product.images[0]) : ""} 
+                              src={product.images && product.images[0] ? getImageUrl(product.images[0]) : "https://images.unsplash.com/photo-1615627121117-e3278bc8b1db?auto=format&fit=crop&w=400&q=80"} 
                               alt={product.name} 
+                              onError={(e) => {
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = "https://images.unsplash.com/photo-1615627121117-e3278bc8b1db?auto=format&fit=crop&w=400&q=80";
+                              }}
                               className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" 
                             />
                             <span className="absolute top-3 left-3 bg-white/95 backdrop-blur-sm text-gold-dark text-[9px] font-bold uppercase tracking-wider py-1 px-2.5 rounded-full border border-cream-dark/50 shadow-xs">
@@ -2041,7 +2049,15 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
                       <Heart className="w-3.5 h-3.5 fill-current" />
                     </button>
                     <div className="h-40 bg-cream rounded-xl overflow-hidden mb-3">
-                      <img src={product.images && product.images[0] ? getImageUrl(product.images[0]) : ""} alt={product.name} className="w-full h-full object-cover" />
+                      <img 
+                        src={product.images && product.images[0] ? getImageUrl(product.images[0]) : "https://images.unsplash.com/photo-1615627121117-e3278bc8b1db?auto=format&fit=crop&w=400&q=80"} 
+                        alt={product.name} 
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = "https://images.unsplash.com/photo-1615627121117-e3278bc8b1db?auto=format&fit=crop&w=400&q=80";
+                        }}
+                        className="w-full h-full object-cover" 
+                      />
                     </div>
                     <div className="flex flex-col text-left gap-1 flex-1 font-sans text-xs">
                       <span className="text-[9px] uppercase tracking-widest text-sage font-bold">{product.category}</span>

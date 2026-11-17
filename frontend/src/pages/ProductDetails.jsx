@@ -487,6 +487,10 @@ const ProductDetails = () => {
                   <img 
                     src={activeImage ? getImageUrl(activeImage) : "https://images.unsplash.com/photo-1615627121117-e3278bc8b1db?auto=format&fit=crop&w=800&q=80"} 
                     alt={product.name} 
+                    onError={(e) => {
+                      e.currentTarget.onerror = null;
+                      e.currentTarget.src = "https://images.unsplash.com/photo-1615627121117-e3278bc8b1db?auto=format&fit=crop&w=800&q=80";
+                    }}
                     className="w-full h-full object-contain p-2 sm:p-4 transition-all duration-300 drop-shadow-xs"
                   />
                   {videoInfo && (
@@ -1222,6 +1226,10 @@ const ProductDetails = () => {
                     <img 
                       src={p.images && p.images[0] ? getImageUrl(p.images[0]) : "https://images.unsplash.com/photo-1615627121117-e3278bc8b1db?auto=format&fit=crop&w=400&q=80"} 
                       alt={p.name} 
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = "https://images.unsplash.com/photo-1615627121117-e3278bc8b1db?auto=format&fit=crop&w=400&q=80";
+                      }}
                       className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500" 
                     />
                   </Link>

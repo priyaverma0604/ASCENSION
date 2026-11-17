@@ -283,7 +283,7 @@ const ThankYouProgram = () => {
             </div>
           </div>
           <a
-            href="https://wa.me/919999999999?text=Hello%20Sonali%20Ma'am,%20I%20have%20enrolled%20in%20the%20Navratri%20Program"
+            href="https://wa.me/918447121061?text=Hello%20Sonali%20Ma'am,%20I%20have%20enrolled%20in%20the%20Navratri%20Program"
             target="_blank"
             rel="noopener noreferrer"
             className="text-sage font-bold hover:underline flex items-center gap-1 text-xs"

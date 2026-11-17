@@ -76,7 +76,7 @@ exports.submitContact = async (req, res, next) => {
       console.log('--------------------------------------------------');
       console.log('--- SIMULATED WHATSAPP NOTIFICATION SENT TO USER ---');
       console.log(`To: ${phone}`);
-      console.log(`From (Ascension): +91 89290 61557`);
+      console.log(`From (Ascension): +91 84471 21061`);
       console.log(`Message: Dear ${name}, your booking request for the service has been received! We will verify transaction ${transactionId || 'N/A'} and confirm your slot. Blessings!`);
       console.log('--------------------------------------------------');
     }
@@ -156,11 +156,11 @@ exports.updateQueryStatus = async (req, res, next) => {
         console.error('Failed to send user approval confirmation email:', mailError.message);
       }
 
-      // 2. Simulated WhatsApp sending from 8929061557 to user
+      // 2. Simulated WhatsApp sending from 8447121061 to user
       console.log('--------------------------------------------------');
       console.log('--- AUTOMATED WHATSAPP CONFIRMATION SENT TO USER ---');
       console.log(`To: ${query.phone}`);
-      console.log(`From (Ascension): +91 89290 61557`);
+      console.log(`From (Ascension): +91 84471 21061`);
       console.log(`Message: Dear ${query.name}, your payment for the service booking has been verified and approved successfully! We will coordinate with you shortly to schedule your final slot. Blessings!`);
       console.log('--------------------------------------------------');
     }
@@ -246,7 +246,7 @@ exports.updateQueryStatus = async (req, res, next) => {
       </div>
 
       <p style="font-size: 12px; color: #7a7672; margin-top: 20px; line-height: 1.5;">
-        Need assistance with sizing or bespoke astrological customization? Simply reply to this email or reach us on WhatsApp at <strong>+91 89290 61557</strong>.
+        Need assistance with sizing or bespoke astrological customization? Simply reply to this email or reach us on WhatsApp at <strong>+91 84471 21061</strong>.
       </p>
     </div>
     <div class="footer">

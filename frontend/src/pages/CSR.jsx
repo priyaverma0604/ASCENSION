@@ -539,7 +539,7 @@ const CSR = () => {
                 <span className="bg-gold/15 p-2 rounded-xl text-gold-dark shrink-0">
                   <Phone className="w-4 h-4" />
                 </span>
-                <a href="tel:+918929061557" className="hover:text-gold transition-colors font-semibold text-charcoal-dark">+91 89290 61557</a>
+                <a href="tel:+918447121061" className="hover:text-gold transition-colors font-semibold text-charcoal-dark">+91 84471 21061</a>
               </div>
               <div className="flex items-center gap-3">
                 <span className="bg-gold/15 p-2 rounded-xl text-gold-dark shrink-0">

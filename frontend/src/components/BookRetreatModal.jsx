@@ -70,7 +70,7 @@ const BookRetreatModal = ({ retreat, onClose }) => {
             </p>
             <div className="flex flex-col gap-2 w-full mt-4">
               <a
-                href={`https://wa.me/918929061557?text=Hi%20Sonali,%20I%20am%20interested%20in%20Ascension's%20upcoming%20Spiritual%20Retreats.%20Please%20keep%20me%20updated!`}
+                href={`https://wa.me/918447121061?text=Hi%20Sonali,%20I%20am%20interested%20in%20Ascension's%20upcoming%20Spiritual%20Retreats.%20Please%20keep%20me%20updated!`}
                 target="_blank"
                 rel="noreferrer"
                 className="w-full flex items-center justify-center gap-2 bg-sage hover:bg-sage-dark text-white text-xs font-bold py-2.5 rounded-xl transition-all duration-300 shadow-sm"
@@ -169,7 +169,7 @@ const BookRetreatModal = ({ retreat, onClose }) => {
 
             <div className="text-center border-t border-cream-dark/40 pt-2.5">
               <a
-                href={`https://wa.me/918929061557?text=Hi%20Sonali,%20I%20am%20interested%20in%20Ascension's%20upcoming%20Spiritual%20Retreats.%20Please%20keep%20me%20updated!`}
+                href={`https://wa.me/918447121061?text=Hi%20Sonali,%20I%20am%20interested%20in%20Ascension's%20upcoming%20Spiritual%20Retreats.%20Please%20keep%20me%20updated!`}
                 target="_blank"
                 rel="noreferrer"
                 className="text-[10px] text-gold-dark hover:text-sage font-bold flex items-center justify-center gap-1"

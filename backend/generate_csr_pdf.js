@@ -34,7 +34,7 @@ function drawFooter(pageNumber, totalPages = 4) {
   const bottomY = 780;
   doc.strokeColor('#E5E7EB').lineWidth(0.8).moveTo(50, bottomY - 10).lineTo(545, bottomY - 10).stroke();
   doc.fillColor(TEXT_MUTED).fontSize(8).font('Helvetica')
-    .text('Ascension Seva Foundation  |  ascensionseva@gmail.com  |  +91 8929061557', 50, bottomY, { width: 400, align: 'left' });
+    .text('Ascension Seva Foundation  |  ascensionseva@gmail.com  |  +91 84471 21061', 50, bottomY, { width: 400, align: 'left' });
   doc.text(`Page ${pageNumber} of ${totalPages}`, 450, bottomY, { width: 95, align: 'right' });
 }
 
@@ -238,7 +238,7 @@ const contactY = doc.y;
 doc.rect(50, contactY, 495, 52).fillAndStroke('#F3F4F6', '#E5E7EB');
 doc.fillColor(TEXT_DARK).fontSize(9.5).font('Helvetica-Bold').text('Direct Contact Information:', 65, contactY + 8);
 doc.font('Helvetica').fontSize(9.5).fillColor(TEXT_DARK)
-  .text('📞  Phone / WhatsApp:  +91 89290 61557', 65, contactY + 23)
+  .text('📞  Phone / WhatsApp:  +91 84471 21061', 65, contactY + 23)
   .text('✉️  Official Email:  ascensionseva@gmail.com', 65, contactY + 36);
 
 drawFooter(4, 4);

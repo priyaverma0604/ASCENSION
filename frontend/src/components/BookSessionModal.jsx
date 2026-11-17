@@ -827,7 +827,7 @@ const BookSessionModal = ({ service, onClose }) => {
               </p>
               <div className="flex flex-col gap-2 w-full mt-4 font-sans">
                 <a
-                  href={`https://wa.me/918929061557?text=Hi%20Sonali,%20I%20have%20booked%20a%20session%20for%20${encodeURIComponent(bookingServiceTitle)}%20(Exchange:%20₹${effectivePrice}).%20Payment%20Reference:%20${confirmedPaymentId || transactionId}.%20Looking%20forward%20to%20our%20session!`}
+                  href={`https://wa.me/918447121061?text=Hi%20Sonali,%20I%20have%20booked%20a%20session%20for%20${encodeURIComponent(bookingServiceTitle)}%20(Exchange:%20₹${effectivePrice}).%20Payment%20Reference:%20${confirmedPaymentId || transactionId}.%20Looking%20forward%20to%20our%20session!`}
                   target="_blank"
                   rel="noreferrer"
                   className="w-full flex items-center justify-center gap-2 bg-sage hover:bg-sage-dark text-white text-xs font-bold py-2.5 rounded-xl transition-all duration-300 shadow-sm"

@@ -504,7 +504,7 @@ const Navbar = () => {
                 {/* Direct Mobile Contact Actions */}
                 <div className="pt-3 mt-2 border-t border-cream-dark/70 flex gap-2">
                   <a
-                    href="https://wa.me/918929061557?text=Hi%20Sonali%20Ma'am,%20I%20would%20like%20to%20know%20more%20about%20Ascension%20sessions."
+                    href="https://wa.me/918447121061?text=Hi%20Sonali%20Ma'am,%20I%20would%20like%20to%20know%20more%20about%20Ascension%20sessions."
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition-colors"
@@ -512,7 +512,7 @@ const Navbar = () => {
                     <span>WhatsApp</span>
                   </a>
                   <a
-                    href="tel:+918929061557"
+                    href="tel:+918447121061"
                     className="flex-1 bg-cream-dark hover:bg-cream text-charcoal-dark text-[11px] font-bold py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 transition-colors border border-cream-dark/80"
                   >
                     <span>Call Us</span>
