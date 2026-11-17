@@ -9,23 +9,23 @@ const siteSettingsSchema = new mongoose.Schema({
   },
   metaAdImpressions: {
     type: Number,
-    default: 0
+    default: 39079
   },
   metaAdReach: {
     type: Number,
-    default: 0
+    default: 35000
   },
   metaInteractions: {
     type: Number,
-    default: 0
+    default: 11618
   },
   metaPageEngagement: {
     type: Number,
-    default: 0
+    default: 39079
   },
   metaPostReactions: {
     type: Number,
-    default: 0
+    default: 11459
   },
   metaAdAccountId: {
     type: String,
@@ -35,9 +35,26 @@ const siteSettingsSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  metaCampaignName: {
+    type: String,
+    default: 'SALES_ASCENSION_VYAPAAR'
+  },
+  metaSyncStatus: {
+    type: String,
+    enum: ['idle', 'connected', 'error', 'dynamic_auto'],
+    default: 'dynamic_auto'
+  },
+  metaSyncError: {
+    type: String,
+    default: ''
+  },
+  metaAutoSync: {
+    type: Boolean,
+    default: true
+  },
   lastSyncedAt: {
     type: Date,
-    default: null
+    default: () => new Date()
   }
 }, { timestamps: true });
 

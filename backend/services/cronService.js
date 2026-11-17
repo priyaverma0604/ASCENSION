@@ -238,4 +238,24 @@ const startWebinarReminderCron = () => {
   console.log('Cron Service: Webinar & Workshop reminder schedule successfully initialized.');
 };
 
-module.exports = { startWebinarReminderCron };
+const startMetaAdsSyncCron = () => {
+  const { syncMetaAdsData } = require('./metaAdsService');
+  // Sync Meta Ads dynamic metrics every 30 minutes: '*/30 * * * *'
+  cron.schedule('*/30 * * * *', async () => {
+    try {
+      console.log('Cron Service: Running automated Meta Ads dynamic sync...');
+      await syncMetaAdsData(false);
+    } catch (err) {
+      console.error('Cron Service: Meta Ads sync error:', err.message);
+    }
+  });
+
+  // Initial sync 10 seconds after boot
+  setTimeout(() => {
+    syncMetaAdsData(false).catch(err => console.error('Initial Meta sync error:', err.message));
+  }, 10000);
+
+  console.log('Cron Service: Dynamic Meta Ads sync scheduler initialized (every 30 mins).');
+};
+
+module.exports = { startWebinarReminderCron, startMetaAdsSyncCron };

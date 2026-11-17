@@ -72,8 +72,9 @@ app.use(errorHandler);
 
 // Set Port and Start Server
 const PORT = process.env.PORT || 5000;
-const { startWebinarReminderCron } = require('./services/cronService');
+const { startWebinarReminderCron, startMetaAdsSyncCron } = require('./services/cronService');
 app.listen(PORT, () => {
   console.log(`Server running in development mode on port ${PORT}`);
   startWebinarReminderCron();
+  startMetaAdsSyncCron();
 });
