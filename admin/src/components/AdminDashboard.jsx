@@ -9,19 +9,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import logo from '../assets/logo.png';
-
-const getImageUrl = (path) => {
-  if (!path || path === 'razorpay_online') return '';
-  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
-    return path;
-  }
-  const apiBase = import.meta.env.VITE_API_URL || axios.defaults.baseURL || (typeof window !== 'undefined' ? window.location.origin : '');
-  const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  if (apiBase && !apiBase.includes('localhost') && !apiBase.startsWith('http')) {
-    return `https://${apiBase}${cleanPath}`;
-  }
-  return apiBase ? `${apiBase.replace(/\/$/, '')}${cleanPath}` : cleanPath;
-};
+import getImageUrl from '../utils/imageUrl';
 
 const formatTimeAgo = (date) => {
   if (!date) return 'Never';

@@ -9,19 +9,7 @@ import {
 } from 'lucide-react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
-
-const getImageUrl = (path) => {
-  if (!path || path === 'razorpay_online') return '';
-  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
-    return path;
-  }
-  let apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5001';
-  if (apiBase) {
-    apiBase = apiBase.replace(/\/api\/?$/, '').replace(/\/$/, '');
-  }
-  const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  return `${apiBase}${cleanPath}`;
-};
+import getImageUrl from '../utils/imageUrl';
 
 const formatTimeAgo = (date) => {
   if (!date) return 'Never';

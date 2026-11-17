@@ -3,15 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Compass, Clock, CheckCircle, ArrowRight, Sparkles } from 'lucide-react';
 import axios from 'axios';
 import BookSessionModal from '../components/BookSessionModal';
-
-const getImageUrl = (path) => {
-  if (!path) return '';
-  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
-    return path;
-  }
-  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5001';
-  return `${apiBase}${path}`;
-};
+import getImageUrl from '../utils/imageUrl';
 
 const getObjectPosition = (title = '') => {
   const t = title.toLowerCase();

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { X, CheckCircle, Calendar, MessageSquare, Phone, AlertTriangle, UploadCloud, CreditCard, Compass, ShieldCheck, Zap, Sparkles, Landmark, Copy, Check, Smartphone } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
+import getImageUrl from '../utils/imageUrl';
 
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
@@ -15,15 +16,6 @@ const loadRazorpayScript = () => {
     script.onerror = () => resolve(false);
     document.body.appendChild(script);
   });
-};
-
-const getImageUrl = (path) => {
-  if (!path) return '';
-  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
-    return path;
-  }
-  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-  return `${apiBase}${path}`;
 };
 
 const ORACLE_DECK_TIERS = [

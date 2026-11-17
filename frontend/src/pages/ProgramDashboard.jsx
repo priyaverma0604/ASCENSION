@@ -33,14 +33,12 @@ const NAVRATRI_DAY_IMAGES = {
   9: day9Img,
 };
 
+import resolveImageUrl from '../utils/imageUrl';
+
 const getImageUrl = (path) => {
   if (!path) return '';
   if (typeof path === 'string' && path.includes('navratri')) return navratriBanner;
-  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
-    return path;
-  }
-  const apiBase = import.meta.env.VITE_API_URL || '';
-  return `${apiBase}${path}`;
+  return resolveImageUrl(path);
 };
 
 const DEFAULT_ANCESTRAL_SESSIONS = [

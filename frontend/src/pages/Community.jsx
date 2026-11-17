@@ -12,15 +12,7 @@ import animalWelfareMoment from '../assets/gallery/animal_welfare_3.jpg';
 import womenHygieneMoment from '../assets/gallery/women_hygiene_2.jpg';
 import mahabhojMoment from '../assets/gallery/mahabhoj_2.png';
 import shikshaKendraMoment from '../assets/gallery/shiksha_kendra_1.png';
-
-const getImageUrl = (path) => {
-  if (!path) return '';
-  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
-    return path;
-  }
-  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-  return `${apiBase}${path}`;
-};
+import getImageUrl from '../utils/imageUrl';
 
 const Community = () => {
   const { user } = useContext(AuthContext);

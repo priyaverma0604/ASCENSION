@@ -6,29 +6,7 @@ import {
 } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import axios from 'axios';
-
-const loadRazorpayScript = () => {
-  return new Promise((resolve) => {
-    if (window.Razorpay) {
-      resolve(true);
-      return;
-    }
-    const script = document.createElement('script');
-    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-    script.onload = () => resolve(true);
-    script.onerror = () => resolve(false);
-    document.body.appendChild(script);
-  });
-};
-
-const getImageUrl = (path) => {
-  if (!path) return '';
-  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
-    return path;
-  }
-  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-  return `${apiBase}${path}`;
-};
+import getImageUrl from '../utils/imageUrl';
 
 const EnrollProgramModal = ({ program, onClose }) => {
   const navigate = useNavigate();

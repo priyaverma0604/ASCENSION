@@ -10,15 +10,7 @@ import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
 import { AuthContext } from '../context/AuthContext';
 import { DIWALI_DUO_CANDLES, getDiwaliCandleInfo } from '../data/diwaliOffers';
-
-const getImageUrl = (path) => {
-  if (!path) return '';
-  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
-    return path;
-  }
-  const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-  return `${apiBase}${path}`;
-};
+import getImageUrl from '../utils/imageUrl';
 
 const getVideoEmbedInfo = (url) => {
   if (!url || typeof url !== 'string') return null;
