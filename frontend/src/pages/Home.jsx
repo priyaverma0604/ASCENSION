@@ -502,7 +502,7 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
     <div className="flex flex-col min-h-screen">
 
       {/* 1. Hero Section */}
-      <section className="relative min-h-[100svh] flex flex-col justify-between items-center px-4 sm:px-6 md:px-12 lg:px-20 text-center overflow-hidden border-b border-cream-dark/30 bg-cream-light pt-24 sm:pt-28 lg:pt-32 pb-8 sm:pb-10 2xl:pb-12">
+      <section className="relative min-h-[100svh] flex flex-col justify-between items-center px-4 sm:px-6 md:px-12 lg:px-20 text-center overflow-hidden border-b border-cream-dark/30 bg-cream-light pt-20 sm:pt-24 lg:pt-28 pb-6 sm:pb-8 2xl:pb-10">
         {/* Living Seamless Cinemagraph Water Flow Background */}
         <SeamlessWaterBackground />
         {/* Soft Radial Contrast Overlay to enhance text readability without fading the bottom edges */}
@@ -556,18 +556,18 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
             Embark on a profound journey of self-realization, emotional release, and energetic alignment. Experience custom angelic guidance, therapeutic sound baths, and subconscious healing in a secure, sacred environment.
           </p>
 
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center w-full max-w-md mx-auto mt-3.5 font-sans">
+          {/* CTA Buttons - Guaranteed single line on all screen sizes */}
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center w-full sm:w-auto max-w-xl mx-auto mt-3.5 font-sans">
             <Link
               to="/services"
-              className="bg-sage hover:bg-sage-dark text-white text-xs 2xl:text-sm font-bold uppercase tracking-wider py-3.5 sm:py-4 px-7 sm:px-8 rounded-xl shadow-md transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center gap-2 group w-full sm:w-auto"
+              className="bg-sage hover:bg-sage-dark text-white text-xs 2xl:text-sm font-bold uppercase tracking-wider py-3.5 sm:py-4 px-6 sm:px-8 rounded-xl shadow-md transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center gap-2 group w-full sm:w-auto whitespace-nowrap shrink-0"
             >
-              <span>Explore Services</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1.5 transition-transform duration-300" />
+              <span className="whitespace-nowrap">Explore Services</span>
+              <ArrowRight className="w-4 h-4 shrink-0 group-hover:translate-x-1.5 transition-transform duration-300" />
             </Link>
             <Link
               to="/donate"
-              className="bg-cream-light hover:bg-cream-dark text-gold-dark border border-gold/45 text-xs 2xl:text-sm font-bold uppercase tracking-wider py-3.5 sm:py-4 px-7 sm:px-8 rounded-xl transition-all duration-300 transform hover:scale-[1.02] text-center w-full sm:w-auto"
+              className="bg-cream-light hover:bg-cream-dark text-gold-dark border border-gold/45 text-xs 2xl:text-sm font-bold uppercase tracking-wider py-3.5 sm:py-4 px-6 sm:px-8 rounded-xl transition-all duration-300 transform hover:scale-[1.02] text-center w-full sm:w-auto whitespace-nowrap shrink-0"
             >
               Support Our NGO
             </Link>
@@ -576,7 +576,7 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
         </div>
 
         {/* 1b. Trust Building Section Floating Card - Positioned cleanly below content without overlap */}
-        <div className="relative z-20 max-w-5xl 2xl:max-w-6xl 3xl:max-w-7xl w-full mx-auto px-2 sm:px-6 mt-8 sm:mt-10 lg:mt-12 animate-slide-up">
+        <div className="relative z-20 max-w-5xl 2xl:max-w-6xl 3xl:max-w-7xl w-full mx-auto px-2 sm:px-6 mt-6 sm:mt-8 animate-slide-up">
           <div className="bg-white/95 backdrop-blur-xs rounded-3xl p-3.5 sm:p-4 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 items-center shadow-xl border border-cream-dark/50 hover:shadow-2xl transition-all duration-300">
 
             {/* Column 1: Lives Touched */}
@@ -1333,7 +1333,7 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
 
             <Link
               to="/about"
-              className="bg-sage hover:bg-sage-dark text-white font-sans text-xs 2xl:text-sm font-bold uppercase tracking-wider py-3.5 sm:py-4 px-8 rounded-xl shadow-md transition-all duration-300 self-start hover:-translate-y-0.5 mt-2"
+              className="bg-sage hover:bg-sage-dark text-white font-sans text-xs 2xl:text-sm font-bold uppercase tracking-wider py-3.5 sm:py-4 px-8 rounded-xl shadow-md transition-all duration-300 self-start hover:-translate-y-0.5 mt-2 whitespace-nowrap shrink-0"
             >
               Know My Journey
             </Link>
@@ -1679,13 +1679,13 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
               <div className={`flex flex-col sm:flex-row items-center gap-3 sm:gap-4 mt-1 font-sans transition-all duration-700 delay-1000 ${sevaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}>
                 <Link
                   to="/donate"
-                  className="w-full sm:w-auto text-center bg-gradient-to-r from-gold via-gold-light to-gold-dark hover:brightness-[1.03] text-charcoal-dark font-bold text-xs uppercase tracking-wider py-3 px-6 rounded-xl transition-all duration-300 shadow-md transform hover:scale-[1.02] active:scale-[0.98]"
+                  className="w-full sm:w-auto text-center bg-gradient-to-r from-gold via-gold-light to-gold-dark hover:brightness-[1.03] text-charcoal-dark font-bold text-xs uppercase tracking-wider py-3 px-6 rounded-xl transition-all duration-300 shadow-md transform hover:scale-[1.02] active:scale-[0.98] whitespace-nowrap shrink-0"
                 >
                   Donate Now
                 </Link>
                 <Link
                   to="/ngo"
-                  className="w-full sm:w-auto text-center bg-transparent hover:bg-cream-light/30 border border-cream-dark/80 text-charcoal-dark font-bold text-xs uppercase tracking-wider py-3 px-6 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+                  className="w-full sm:w-auto text-center bg-transparent hover:bg-cream-light/30 border border-cream-dark/80 text-charcoal-dark font-bold text-xs uppercase tracking-wider py-3 px-6 rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] whitespace-nowrap shrink-0"
                 >
                   Become a Volunteer
                 </Link>
