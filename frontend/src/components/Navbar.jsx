@@ -62,7 +62,7 @@ const Navbar = () => {
       <header className="absolute lg:fixed top-0 z-50 w-full flex flex-col pointer-events-none">
         {/* Floating Glass Navbar */}
         <nav className={`w-full px-3 sm:px-4 md:px-8 transition-all duration-300 pointer-events-auto ${isScrolled ? 'py-1' : 'py-2 sm:py-2.5'}`}>
-          <div className={`glass max-w-7xl 2xl:max-w-screen-2xl 3xl:max-w-[1600px] mx-auto rounded-2xl flex items-center justify-between transition-all duration-300 ${isScrolled ? 'shadow-md py-2 px-4 sm:px-6' : 'shadow-sm py-2.5 sm:py-3 px-4 sm:px-6'}`}>
+          <div className={`max-w-7xl 2xl:max-w-screen-2xl 3xl:max-w-[1600px] mx-auto rounded-2xl flex items-center justify-between transition-all duration-300 backdrop-blur-xl border border-cream-dark/70 ${isScrolled ? 'bg-white/98 shadow-md py-2 px-4 sm:px-6' : 'bg-cream-light/94 sm:bg-cream-light/95 shadow-sm py-2.5 sm:py-3 px-4 sm:px-6'}`}>
 
           {/* Logo */}
           <Link to="/" className="flex items-center group">
