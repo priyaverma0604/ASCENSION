@@ -18,7 +18,12 @@ const getImagePath = (req) => {
 // @access  Public
 exports.getServices = async (req, res, next) => {
   try {
-    const services = await Service.find({});
+    const limit = parseInt(req.query.limit, 10) || 0;
+    let query = Service.find({}).lean();
+    if (limit > 0) {
+      query = query.limit(limit);
+    }
+    const services = await query;
     res.json({ success: true, count: services.length, data: services });
   } catch (error) {
     next(error);

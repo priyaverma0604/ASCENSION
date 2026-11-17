@@ -50,6 +50,23 @@ exports.trackVisit = async (req, res, next) => {
       return res.json({ success: true, ignored: true });
     }
 
+    // Handle lightweight presence heartbeats without duplicating pageviews
+    if (req.body.isHeartbeat) {
+      const activeUserId = userId || (req.user ? req.user._id : null);
+      if (activeUserId) {
+        User.findByIdAndUpdate(activeUserId, { 
+          lastActive: new Date(),
+          ipAddress: clientIp.toString()
+        }).exec().catch(() => {});
+      }
+      await VisitLog.findOneAndUpdate(
+        { visitorId },
+        { $set: { timestamp: new Date() } },
+        { sort: { timestamp: -1 } }
+      ).exec().catch(() => {});
+      return res.json({ success: true, heartbeat: true });
+    }
+
     // Determine if traffic is originated from Meta (Facebook / Instagram Ads or organic)
     const sourceStr = (utmSource || '').toLowerCase();
     const refStr = (referrer || '').toLowerCase();

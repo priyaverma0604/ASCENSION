@@ -291,17 +291,25 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
 
   const fetchHomeData = async () => {
     try {
-      const resWorkshops = await axios.get('/api/workshops');
-      const resWebinars = await axios.get('/api/webinars');
+      const [resWorkshops, resWebinars, resServices, resTestimonials, resProducts, resDiwali, resRetreats] = await Promise.all([
+        axios.get('/api/workshops?upcoming=true'),
+        axios.get('/api/webinars?upcoming=true'),
+        axios.get('/api/services?limit=6'),
+        axios.get('/api/testimonials?limit=12'),
+        axios.get('/api/products?limit=4'),
+        axios.get('/api/products', { params: { category: 'Diwali Special', limit: 6 } }),
+        axios.get('/api/retreats')
+      ]);
+
       let combined = [];
       const todayStart = new Date();
       todayStart.setHours(0, 0, 0, 0);
 
-      if (resWorkshops.data.success) {
+      if (resWorkshops.data?.success) {
         const activeWorkshops = resWorkshops.data.data.filter(w => new Date(w.date) >= todayStart);
         combined = [...combined, ...activeWorkshops];
       }
-      if (resWebinars.data.success) {
+      if (resWebinars.data?.success) {
         const activeWebinars = resWebinars.data.data
           .filter(w => new Date(w.date) >= todayStart && w.status !== 'Completed' && w.status !== 'Cancelled')
           .map(w => ({ ...w, isWebinar: true }));
@@ -310,30 +318,23 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
       combined.sort((a, b) => new Date(a.date) - new Date(b.date));
       setWorkshops(combined);
 
-      const resServices = await axios.get('/api/services');
-      if (resServices.data.success) {
-        setServices(resServices.data.data.slice(0, 6)); // We need 6 premium cards now
+      if (resServices.data?.success) {
+        setServices(resServices.data.data.slice(0, 6));
       }
 
-      const resTestimonials = await axios.get('/api/testimonials');
-      if (resTestimonials.data.success) {
+      if (resTestimonials.data?.success) {
         setTestimonials(resTestimonials.data.data);
       }
 
-      const resProducts = await axios.get('/api/products');
-      if (resProducts.data.success) {
-        setProducts(resProducts.data.data.slice(0, 4)); // Show 4 featured products
+      if (resProducts.data?.success) {
+        setProducts(resProducts.data.data);
       }
 
-      const resDiwali = await axios.get('/api/products', {
-        params: { category: 'Diwali Special' }
-      });
       if (resDiwali.data?.success && resDiwali.data.data.length > 0) {
-        setDiwaliProducts(resDiwali.data.data.slice(0, 6)); // Top 6 featured Diwali creations
+        setDiwaliProducts(resDiwali.data.data);
       }
 
-      const resRetreats = await axios.get('/api/retreats');
-      if (resRetreats.data.success) {
+      if (resRetreats.data?.success) {
         setRetreats(resRetreats.data.data);
       }
     } catch (err) {

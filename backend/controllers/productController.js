@@ -15,12 +15,12 @@ const getImagesPaths = (req) => {
   return [];
 };
 
-// @desc    Get all products (with search, category, and sorting filters)
+// @desc    Get all products (with search, category, sorting, and pagination filters)
 // @route   GET /api/products
 // @access  Public
 exports.getProducts = async (req, res, next) => {
   try {
-    const { category, search, sort } = req.query;
+    const { category, search, sort, limit, page } = req.query;
     let query = {};
 
     // Category filter
@@ -36,7 +36,7 @@ exports.getProducts = async (req, res, next) => {
       ];
     }
 
-    let productsQuery = Product.find(query);
+    let productsQuery = Product.find(query).lean();
 
     // Sorting
     if (sort) {
@@ -49,6 +49,13 @@ exports.getProducts = async (req, res, next) => {
       }
     } else {
       productsQuery = productsQuery.sort({ createdAt: -1 }); // Default to newest
+    }
+
+    // Pagination / Limit support for bandwidth optimization
+    const parsedLimit = parseInt(limit, 10);
+    const parsedPage = parseInt(page, 10) || 1;
+    if (parsedLimit > 0) {
+      productsQuery = productsQuery.skip((parsedPage - 1) * parsedLimit).limit(parsedLimit);
     }
 
     const products = await productsQuery;

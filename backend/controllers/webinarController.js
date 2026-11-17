@@ -48,7 +48,12 @@ exports.getWebinars = async (req, res, next) => {
       query = query.select('-zoomLink');
     }
 
-    const webinars = await query;
+    const limit = parseInt(req.query.limit, 10) || 0;
+    if (limit > 0) {
+      query = query.limit(limit);
+    }
+
+    const webinars = await query.lean();
     res.json({ success: true, count: webinars.length, data: webinars });
   } catch (error) {
     next(error);

@@ -18,10 +18,16 @@ const getImagePath = (req) => {
 // @access  Public
 exports.getTestimonials = async (req, res, next) => {
   try {
-    const testimonials = await Testimonial.find({})
+    const limit = parseInt(req.query.limit, 10) || 0;
+    let query = Testimonial.find({})
       .populate('user', 'name email avatar')
       .populate('program', 'title')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
+    if (limit > 0) {
+      query = query.limit(limit);
+    }
+    const testimonials = await query;
     res.json({ success: true, count: testimonials.length, data: testimonials });
   } catch (error) {
     next(error);

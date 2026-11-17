@@ -11,7 +11,18 @@ const crypto = require('crypto');
 // @access  Public
 exports.getWorkshops = async (req, res, next) => {
   try {
-    const workshops = await Workshop.find({}).sort({ date: 1 });
+    let filter = {};
+    if (req.query.upcoming === 'true') {
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+      filter.date = { $gte: todayStart };
+    }
+    const limit = parseInt(req.query.limit, 10) || 0;
+    let query = Workshop.find(filter).sort({ date: 1 }).lean();
+    if (limit > 0) {
+      query = query.limit(limit);
+    }
+    const workshops = await query;
     res.json({ success: true, count: workshops.length, data: workshops });
   } catch (error) {
     next(error);

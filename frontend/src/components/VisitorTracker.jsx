@@ -75,7 +75,7 @@ const VisitorTracker = () => {
   const { user } = useContext(AuthContext) || {};
   const lastTrackedPath = useRef('');
 
-  const sendTrackingPing = async (path, title) => {
+  const sendTrackingPing = async (path, title, isHeartbeat = false) => {
     try {
       const visitorId = getVisitorId();
       const campaign = getCampaignParams();
@@ -84,7 +84,7 @@ const VisitorTracker = () => {
         visitorId,
         pagePath: path || window.location.pathname,
         pageTitle: title || document.title || 'Ascension Page',
-        referrer: document.referrer || '',
+        referrer: isHeartbeat ? '' : (document.referrer || ''),
         userId: user?._id || null,
         userName: user?.name || null,
         userEmail: user?.email || null,
@@ -93,7 +93,8 @@ const VisitorTracker = () => {
         utmCampaign: campaign.utmCampaign || '',
         utmContent: campaign.utmContent || '',
         utmTerm: campaign.utmTerm || '',
-        fbclid: campaign.fbclid || ''
+        fbclid: campaign.fbclid || '',
+        isHeartbeat
       });
     } catch (err) {
       // Silently fail without interrupting user experience
@@ -115,19 +116,19 @@ const VisitorTracker = () => {
 
       // Small timeout to allow document.title to update
       const timer = setTimeout(() => {
-        sendTrackingPing(currentPath, document.title);
+        sendTrackingPing(currentPath, document.title, false);
       }, 300);
       return () => clearTimeout(timer);
     }
   }, [location.pathname, location.search, user?._id]);
 
-  // Keep heartbeat alive every 45 seconds while user stays on site
+  // Keep presence alive every 2 minutes while user actively browses tab
   useEffect(() => {
     const interval = setInterval(() => {
-      if (document.visibilityState === 'visible') {
-        sendTrackingPing(location.pathname + location.search, document.title);
+      if (typeof document !== 'undefined' && document.visibilityState === 'visible') {
+        sendTrackingPing(location.pathname + location.search, document.title, true);
       }
-    }, 45000); // 45 seconds heartbeat
+    }, 120000); // 2 minutes heartbeat
 
     return () => clearInterval(interval);
   }, [location.pathname, user?._id]);
