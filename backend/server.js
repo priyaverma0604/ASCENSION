@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const compression = require('compression');
 const dotenv = require('dotenv');
 const path = require('path');
+const fs = require('fs');
 const connectDB = require('./config/db');
 const errorHandler = require('./middleware/errorHandler');
 
@@ -97,7 +98,6 @@ app.get('/api/health', (req, res) => {
 
 // Serve frontend build in production if available with long-term asset caching
 const frontendDist = path.join(__dirname, '../frontend/dist');
-const fs = require('fs');
 if (fs.existsSync(frontendDist)) {
   app.use(express.static(frontendDist, {
     maxAge: '1y',
