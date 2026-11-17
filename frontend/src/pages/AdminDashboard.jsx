@@ -922,7 +922,7 @@ const AdminDashboard = () => {
                     <span className="text-[10px] text-emerald-700 mt-0.5">
                       {userStats.onlineVisitors !== undefined && userStats.onlineVisitors > 0
                         ? `${userStats.onlineVisitors} live visitor${userStats.onlineVisitors > 1 ? 's' : ''} on site (${userStats.onlineRegisteredUsers || 1} logged in)`
-                        : 'Active in last 5 mins'}
+                        : 'Active in last 15 mins'}
                     </span>
                   </div>
                   <div className="bg-white/85 border border-cream-dark/60 rounded-2xl p-4 shadow-sm flex flex-col">
@@ -1139,7 +1139,7 @@ const AdminDashboard = () => {
                       Realtime Website Traffic Monitor
                     </h4>
                     <p className="text-xs text-white/80 mt-0.5">
-                      <strong>{analyticsSummary?.realtime?.activeVisitors || 0} active visitors</strong> browsing the site right now (including <strong>{analyticsSummary?.realtime?.activeUsers || 0} logged-in users</strong>).
+                      <strong>{analyticsSummary?.realtime?.activeVisitors || 0} active visitors</strong> browsing the site in the last 15 mins (including <strong>{analyticsSummary?.realtime?.activeUsers || 0} logged-in users</strong>).
                     </p>
                   </div>
                 </div>

@@ -88,7 +88,8 @@ exports.getUserStats = async (req, res, next) => {
     const totalUsers = await User.countDocuments({});
     
     const now = new Date();
-    const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
+    // 15-minute active window (matching GA4 realtime)
+    const activeWindow = new Date(now.getTime() - 15 * 60 * 1000);
     
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
@@ -97,8 +98,8 @@ exports.getUserStats = async (req, res, next) => {
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
     const [onlineRegisteredUsers, onlineVisitorsList, activeToday, activeThisWeek, newThisMonth, adminsCount] = await Promise.all([
-      User.countDocuments({ lastActive: { $gte: fiveMinutesAgo } }),
-      VisitLog.distinct('visitorId', { timestamp: { $gte: fiveMinutesAgo } }),
+      User.countDocuments({ lastActive: { $gte: activeWindow } }),
+      VisitLog.distinct('visitorId', { timestamp: { $gte: activeWindow } }),
       User.countDocuments({ lastActive: { $gte: startOfToday } }),
       User.countDocuments({ lastActive: { $gte: sevenDaysAgo } }),
       User.countDocuments({ createdAt: { $gte: thirtyDaysAgo } }),

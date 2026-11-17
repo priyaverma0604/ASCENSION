@@ -121,13 +121,13 @@ const VisitorTracker = () => {
     }
   }, [location.pathname, location.search, user?._id]);
 
-  // Keep heartbeat alive every 2 minutes while user stays on site
+  // Keep heartbeat alive every 45 seconds while user stays on site
   useEffect(() => {
     const interval = setInterval(() => {
       if (document.visibilityState === 'visible') {
         sendTrackingPing(location.pathname + location.search, document.title);
       }
-    }, 120000); // 2 minutes
+    }, 45000); // 45 seconds heartbeat
 
     return () => clearInterval(interval);
   }, [location.pathname, user?._id]);

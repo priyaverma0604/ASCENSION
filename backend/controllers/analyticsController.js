@@ -104,7 +104,8 @@ exports.trackVisit = async (req, res, next) => {
 exports.getAnalyticsSummary = async (req, res, next) => {
   try {
     const now = new Date();
-    const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
+    // 15-minute active session window (matching standard web analytics / GA4 realtime)
+    const activeWindow = new Date(now.getTime() - 15 * 60 * 1000);
 
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
@@ -129,8 +130,8 @@ exports.getAnalyticsSummary = async (req, res, next) => {
       VisitLog.countDocuments({ timestamp: { $gte: startOfToday } }),
       VisitLog.countDocuments({ timestamp: { $gte: sevenDaysAgo } }),
       VisitLog.countDocuments({ timestamp: { $gte: thirtyDaysAgo } }),
-      VisitLog.distinct('visitorId', { timestamp: { $gte: fiveMinutesAgo } }),
-      VisitLog.distinct('userId', { timestamp: { $gte: fiveMinutesAgo }, userId: { $ne: null } }),
+      VisitLog.distinct('visitorId', { timestamp: { $gte: activeWindow } }),
+      VisitLog.distinct('userId', { timestamp: { $gte: activeWindow }, userId: { $ne: null } }),
       VisitLog.countDocuments({ isMetaTraffic: true }),
       VisitLog.countDocuments({ isMetaTraffic: true, timestamp: { $gte: startOfToday } }),
       VisitLog.countDocuments({ isMetaTraffic: true, timestamp: { $gte: sevenDaysAgo } }),
