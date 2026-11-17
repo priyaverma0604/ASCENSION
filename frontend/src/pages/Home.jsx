@@ -544,9 +544,9 @@ const Home = ({ scrollToWebinar = false, autoOpenAncestral = false }) => {
             Reclaim your peace. Reconnect with your light.
           </span>
 
-          <h1 className="font-noto text-2xl sm:text-3xl md:text-4xl lg:text-5xl 2xl:text-6xl font-bold tracking-tight text-charcoal-dark leading-tight mt-1 sm:mt-2">
+          <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl 2xl:text-6xl font-bold tracking-wide text-charcoal-dark leading-tight mt-1 sm:mt-2">
             A Sanctuary for <br />
-            <span className="text-gold drop-shadow-[0_1.5px_2px_rgba(31,29,26,0.4)] font-extrabold">Spiritual Awakening</span> <br />
+            <span className="text-gold drop-shadow-[0_1.5px_2px_rgba(31,29,26,0.4)] font-bold">Spiritual Awakening</span> <br />
             & Healing
           </h1>
 
