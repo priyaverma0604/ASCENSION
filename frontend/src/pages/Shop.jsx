@@ -622,8 +622,19 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
         phone: phone.trim()
       };
 
+      const itemsPayload = cart.map(item => {
+        const prodId = String(item.product?._id || '');
+        const cleanId = prodId.includes('_') ? prodId.split('_')[0] : prodId;
+        return {
+          product: cleanId,
+          name: item.product?.name,
+          price: item.product?.pricing || item.product?.price,
+          quantity: item.quantity
+        };
+      });
+
       const { data } = await axios.post('/api/orders', {
-        items: cart.map(item => ({ product: item.product._id, quantity: item.quantity })),
+        items: itemsPayload,
         shippingAddress: shippingPayload
       });
 
@@ -709,8 +720,18 @@ Attached Photo: ${selectedPhoto ? selectedPhoto.name : 'Selfie'}`);
 
     try {
       const customerFullName = `${firstName.trim()} ${lastName.trim()}`.trim() || firstName.trim();
+      const itemsPayload = cart.map(item => {
+        const prodId = String(item.product?._id || '');
+        const cleanId = prodId.includes('_') ? prodId.split('_')[0] : prodId;
+        return {
+          product: cleanId,
+          name: item.product?.name,
+          price: item.product?.pricing || item.product?.price,
+          quantity: item.quantity
+        };
+      });
       const formData = new FormData();
-      formData.append('items', JSON.stringify(cart.map(item => ({ product: item.product._id, quantity: item.quantity }))));
+      formData.append('items', JSON.stringify(itemsPayload));
       formData.append('shippingAddress', JSON.stringify({
         firstName: firstName.trim(),
         lastName: lastName.trim(),

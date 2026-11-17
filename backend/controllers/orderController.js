@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Order = require('../models/Order');
 const Product = require('../models/Product');
 const { razorpayInstance, isRazorpayConfigured } = require('../config/razorpay');
@@ -31,20 +32,43 @@ exports.createOrder = async (req, res, next) => {
 
     // Verify products and calculate total cost from database
     for (const item of items) {
-      const product = await Product.findById(item.product);
-      if (!product) {
-        return res.status(404).json({ success: false, message: `Product not found: ${item.product}` });
+      let rawProdId = typeof item.product === 'object' && item.product?._id ? item.product._id : item.product;
+      let cleanProdId = String(rawProdId || '').trim();
+      if (cleanProdId.includes('_')) {
+        cleanProdId = cleanProdId.split('_')[0];
       }
-      if (product.stock < item.quantity) {
+
+      let product = null;
+      if (cleanProdId && mongoose.Types.ObjectId.isValid(cleanProdId)) {
+        product = await Product.findById(cleanProdId);
+      }
+
+      if (!product && item.name) {
+        const cleanName = item.name.replace(/\s*\([^)]*\)/g, '').trim();
+        product = await Product.findOne({
+          $or: [
+            { name: new RegExp(`^${cleanName}`, 'i') },
+            { name: item.name }
+          ]
+        });
+      }
+
+      if (!product) {
+        return res.status(404).json({ success: false, message: `Product not found: ${item.name || cleanProdId}` });
+      }
+
+      if (product.stock !== undefined && product.stock !== null && product.stock < item.quantity) {
         return res.status(400).json({ success: false, message: `Insufficient stock for product: ${product.name}. Available: ${product.stock}` });
       }
 
-      calculatedTotal += product.pricing * item.quantity;
+      const itemPrice = (typeof item.price === 'number' && item.price > 0) ? item.price : product.pricing;
+      calculatedTotal += itemPrice * item.quantity;
+
       orderItems.push({
         product: product._id,
-        name: product.name,
+        name: item.name || product.name,
         quantity: item.quantity,
-        price: product.pricing
+        price: itemPrice
       });
     }
 
