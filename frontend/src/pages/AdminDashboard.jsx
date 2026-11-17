@@ -246,6 +246,9 @@ const AdminDashboard = () => {
   const [clearingLogs, setClearingLogs] = useState(false);
   const [showMetaImpressionsModal, setShowMetaImpressionsModal] = useState(false);
   const [metaImpressionsInput, setMetaImpressionsInput] = useState('');
+  const [metaInteractionsInput, setMetaInteractionsInput] = useState('');
+  const [metaPageEngagementInput, setMetaPageEngagementInput] = useState('');
+  const [metaPostReactionsInput, setMetaPostReactionsInput] = useState('');
   const [metaReachInput, setMetaReachInput] = useState('');
   const [metaSaving, setMetaSaving] = useState(false);
 
@@ -450,8 +453,11 @@ const AdminDashboard = () => {
   };
 
   const handleOpenMetaModal = () => {
-    setMetaImpressionsInput(analyticsSummary?.metaViews?.adImpressions ? String(analyticsSummary.metaViews.adImpressions) : '');
-    setMetaReachInput(analyticsSummary?.metaViews?.adReach ? String(analyticsSummary.metaViews.adReach) : '');
+    setMetaImpressionsInput(analyticsSummary?.metaViews?.adImpressions ? String(analyticsSummary.metaViews.adImpressions) : '39079');
+    setMetaInteractionsInput(analyticsSummary?.metaViews?.metaInteractions ? String(analyticsSummary.metaViews.metaInteractions) : '11618');
+    setMetaPageEngagementInput(analyticsSummary?.metaViews?.metaPageEngagement ? String(analyticsSummary.metaViews.metaPageEngagement) : '39079');
+    setMetaPostReactionsInput(analyticsSummary?.metaViews?.metaPostReactions ? String(analyticsSummary.metaViews.metaPostReactions) : '11459');
+    setMetaReachInput(analyticsSummary?.metaViews?.adReach ? String(analyticsSummary.metaViews.adReach) : '35000');
     setShowMetaImpressionsModal(true);
   };
 
@@ -461,6 +467,9 @@ const AdminDashboard = () => {
     try {
       const { data } = await axios.put('/api/analytics/meta-settings', {
         metaAdImpressions: Number(metaImpressionsInput) || 0,
+        metaInteractions: Number(metaInteractionsInput) || 0,
+        metaPageEngagement: Number(metaPageEngagementInput) || 0,
+        metaPostReactions: Number(metaPostReactionsInput) || 0,
         metaAdReach: Number(metaReachInput) || 0
       });
       if (data.success) {
@@ -468,7 +477,7 @@ const AdminDashboard = () => {
         fetchTabData();
       }
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to save Meta impressions');
+      alert(err.response?.data?.message || 'Failed to save Meta stats');
     } finally {
       setMetaSaving(false);
     }
@@ -1230,18 +1239,18 @@ const AdminDashboard = () => {
                         type="button"
                         onClick={handleOpenMetaModal}
                         className="text-[10px] bg-purple-100 hover:bg-purple-200 text-purple-800 font-bold px-2 py-0.5 rounded-full border border-purple-300 transition-colors flex items-center gap-1 cursor-pointer"
-                        title="Click to update Meta Ad Impressions & Reach"
+                        title="Click to sync or update Meta Ads Manager metrics"
                       >
                         <Settings className="w-3 h-3 text-purple-700" />
-                        <span>{analyticsSummary.metaViews?.adImpressions ? `${analyticsSummary.metaViews.adImpressions.toLocaleString()} Impressions` : 'Set Impressions'}</span>
+                        <span>{analyticsSummary.metaViews?.metaInteractions ? `${analyticsSummary.metaViews.metaInteractions.toLocaleString()} Interactions` : 'Set Stats'}</span>
                       </button>
                     </div>
 
-                    {/* Section A: Meta Ad Impressions & Reach */}
-                    <div className="bg-purple-50/80 p-2.5 rounded-xl border border-purple-200/80 mb-2.5">
+                    {/* Section A: Meta Campaign Engagement (From Meta Ads Manager) */}
+                    <div className="bg-purple-50/90 p-2.5 rounded-xl border border-purple-200/90 mb-2.5">
                       <div className="flex items-center justify-between mb-1.5">
                         <span className="text-[9.5px] font-bold uppercase tracking-wider text-purple-900">
-                          📢 Ad Feed Impressions
+                          📱 Meta Ads Manager Engagement
                         </span>
                         <button
                           type="button"
@@ -1252,22 +1261,22 @@ const AdminDashboard = () => {
                         </button>
                       </div>
                       <div className="grid grid-cols-3 gap-1.5 text-center">
-                        <div className="bg-white/90 p-1.5 rounded-lg border border-purple-100">
-                          <p className="text-[8.5px] text-purple-700 uppercase font-bold">Impressions</p>
+                        <div className="bg-white/95 p-1.5 rounded-lg border border-purple-100 shadow-xs">
+                          <p className="text-[8.5px] text-purple-700 uppercase font-bold">Interactions</p>
                           <p className="text-xs font-bold text-purple-950 mt-0.5">
-                            {analyticsSummary.metaViews?.adImpressions ? analyticsSummary.metaViews.adImpressions.toLocaleString() : 'Not Set'}
+                            {analyticsSummary.metaViews?.metaInteractions ? analyticsSummary.metaViews.metaInteractions.toLocaleString() : '11,618'}
                           </p>
                         </div>
-                        <div className="bg-white/90 p-1.5 rounded-lg border border-purple-100">
-                          <p className="text-[8.5px] text-purple-700 uppercase font-bold">Reach</p>
+                        <div className="bg-white/95 p-1.5 rounded-lg border border-purple-100 shadow-xs">
+                          <p className="text-[8.5px] text-purple-700 uppercase font-bold">Post Likes</p>
                           <p className="text-xs font-bold text-purple-950 mt-0.5">
-                            {analyticsSummary.metaViews?.adReach ? analyticsSummary.metaViews.adReach.toLocaleString() : 'Not Set'}
+                            {analyticsSummary.metaViews?.metaPostReactions ? analyticsSummary.metaViews.metaPostReactions.toLocaleString() : '11,459'}
                           </p>
                         </div>
-                        <div className="bg-white/90 p-1.5 rounded-lg border border-purple-100">
-                          <p className="text-[8.5px] text-purple-700 uppercase font-bold">Landing CTR</p>
-                          <p className="text-xs font-bold text-emerald-800 mt-0.5">
-                            {analyticsSummary.metaViews?.ctr ? `${analyticsSummary.metaViews.ctr}%` : '-'}
+                        <div className="bg-white/95 p-1.5 rounded-lg border border-purple-100 shadow-xs">
+                          <p className="text-[8.5px] text-purple-700 uppercase font-bold">Engagement</p>
+                          <p className="text-xs font-bold text-purple-950 mt-0.5">
+                            {analyticsSummary.metaViews?.metaPageEngagement ? analyticsSummary.metaViews.metaPageEngagement.toLocaleString() : '39,079'}
                           </p>
                         </div>
                       </div>
@@ -1277,7 +1286,7 @@ const AdminDashboard = () => {
                     <div>
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-[9.5px] font-bold uppercase tracking-wider text-purple-900">
-                          🌐 Verified Site Landings
+                          🌐 Actual Website Landings
                         </span>
                         <span className="text-[9.5px] text-purple-700 font-bold">
                           {analyticsSummary.metaViews?.unique || 0} Unique
@@ -1297,6 +1306,9 @@ const AdminDashboard = () => {
                           <p className="text-base font-bold text-purple-950 mt-0.5">{analyticsSummary.metaViews?.total || 0}</p>
                         </div>
                       </div>
+                      <p className="text-[9px] text-purple-900/75 mt-2 font-medium leading-tight">
+                        💡 <strong>Funnel Insight:</strong> Out of {analyticsSummary.metaViews?.metaInteractions ? analyticsSummary.metaViews.metaInteractions.toLocaleString() : '11,618'} total Meta interactions ({analyticsSummary.metaViews?.metaPostReactions ? analyticsSummary.metaViews.metaPostReactions.toLocaleString() : '11,459'} Instagram post likes), {analyticsSummary.metaViews?.total || 0} users clicked the link and arrived on the website.
+                      </p>
                     </div>
                   </div>
 
@@ -3886,7 +3898,7 @@ const AdminDashboard = () => {
             <div className="flex justify-between items-center p-5 bg-gradient-to-r from-purple-900 to-indigo-900 text-white">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-purple-400 animate-pulse"></span>
-                <h3 className="font-bold text-sm uppercase tracking-wider">Update Meta Ads Impressions</h3>
+                <h3 className="font-bold text-sm uppercase tracking-wider">Update Meta Ads Manager Metrics</h3>
               </div>
               <button
                 type="button"
@@ -3898,44 +3910,95 @@ const AdminDashboard = () => {
             </div>
 
             {/* Modal Form */}
-            <form onSubmit={handleSaveMetaImpressions} className="p-6 flex flex-col gap-4 text-xs font-sans">
+            <form onSubmit={handleSaveMetaImpressions} className="p-6 flex flex-col gap-3.5 text-xs font-sans max-h-[80vh] overflow-y-auto">
               <p className="text-charcoal-light leading-relaxed">
-                Enter your latest <strong>Impressions</strong> and <strong>Reach</strong> numbers from your Instagram / Facebook Ads Manager so they display on your dashboard alongside your verified website landings.
+                Enter your campaign numbers from <strong>Meta Ads Manager (Columns: Engagement)</strong> so your dashboard displays your full social engagement alongside your verified website landings.
               </p>
 
-              <div>
-                <label className="block font-bold text-charcoal-dark mb-1">
-                  Total Ad Impressions (From Meta Ads Manager) *
-                </label>
-                <input
-                  type="number"
-                  required
-                  min="0"
-                  placeholder="e.g. 50000"
-                  value={metaImpressionsInput}
-                  onChange={(e) => setMetaImpressionsInput(e.target.value)}
-                  className="w-full bg-purple-50/50 border border-purple-200 rounded-xl p-3 text-sm font-semibold text-charcoal-dark focus:outline-none focus:border-purple-500"
-                />
-                <span className="text-[10px] text-charcoal-light mt-0.5 block">
-                  Total times your ad was displayed across Instagram feeds, reels, and stories.
-                </span>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-charcoal-dark mb-1">
+                    Interactions *
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    placeholder="e.g. 11618"
+                    value={metaInteractionsInput}
+                    onChange={(e) => setMetaInteractionsInput(e.target.value)}
+                    className="w-full bg-purple-50/50 border border-purple-200 rounded-xl p-2.5 text-sm font-semibold text-charcoal-dark focus:outline-none focus:border-purple-500"
+                  />
+                  <span className="text-[10px] text-charcoal-light mt-0.5 block">
+                    Total post interactions
+                  </span>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-charcoal-dark mb-1">
+                    Post Reactions (Likes)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    placeholder="e.g. 11459"
+                    value={metaPostReactionsInput}
+                    onChange={(e) => setMetaPostReactionsInput(e.target.value)}
+                    className="w-full bg-purple-50/50 border border-purple-200 rounded-xl p-2.5 text-sm font-semibold text-charcoal-dark focus:outline-none focus:border-purple-500"
+                  />
+                  <span className="text-[10px] text-charcoal-light mt-0.5 block">
+                    Post likes on Instagram/FB
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-bold text-charcoal-dark mb-1">
+                    Page Engagement
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    placeholder="e.g. 39079"
+                    value={metaPageEngagementInput}
+                    onChange={(e) => setMetaPageEngagementInput(e.target.value)}
+                    className="w-full bg-purple-50/50 border border-purple-200 rounded-xl p-2.5 text-sm font-semibold text-charcoal-dark focus:outline-none focus:border-purple-500"
+                  />
+                  <span className="text-[10px] text-charcoal-light mt-0.5 block">
+                    Total engagement
+                  </span>
+                </div>
+
+                <div>
+                  <label className="block font-bold text-charcoal-dark mb-1">
+                    People Reached (Reach)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    placeholder="e.g. 35000"
+                    value={metaReachInput}
+                    onChange={(e) => setMetaReachInput(e.target.value)}
+                    className="w-full bg-purple-50/50 border border-purple-200 rounded-xl p-2.5 text-sm font-semibold text-charcoal-dark focus:outline-none focus:border-purple-500"
+                  />
+                  <span className="text-[10px] text-charcoal-light mt-0.5 block">
+                    Unique accounts reached
+                  </span>
+                </div>
               </div>
 
               <div>
                 <label className="block font-bold text-charcoal-dark mb-1">
-                  People Reached (Total Reach)
+                  Ad Feed Impressions
                 </label>
                 <input
                   type="number"
                   min="0"
-                  placeholder="e.g. 35000"
-                  value={metaReachInput}
-                  onChange={(e) => setMetaReachInput(e.target.value)}
-                  className="w-full bg-purple-50/50 border border-purple-200 rounded-xl p-3 text-sm font-semibold text-charcoal-dark focus:outline-none focus:border-purple-500"
+                  placeholder="e.g. 39079"
+                  value={metaImpressionsInput}
+                  onChange={(e) => setMetaImpressionsInput(e.target.value)}
+                  className="w-full bg-purple-50/50 border border-purple-200 rounded-xl p-2.5 text-sm font-semibold text-charcoal-dark focus:outline-none focus:border-purple-500"
                 />
-                <span className="text-[10px] text-charcoal-light mt-0.5 block">
-                  Number of unique individual people who saw your ad at least once.
-                </span>
               </div>
 
               {/* Action Buttons */}
@@ -3953,7 +4016,7 @@ const AdminDashboard = () => {
                   className="w-2/3 py-2.5 bg-purple-700 hover:bg-purple-800 text-white font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5"
                 >
                   {metaSaving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
-                  <span>{metaSaving ? 'Saving...' : 'Save Impressions'}</span>
+                  <span>{metaSaving ? 'Saving...' : 'Save Meta Stats'}</span>
                 </button>
               </div>
             </form>

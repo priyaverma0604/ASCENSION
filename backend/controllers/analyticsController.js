@@ -277,10 +277,13 @@ exports.getAnalyticsSummary = async (req, res, next) => {
       { $sort: { date: 1 } }
     ]);
 
-    // Fetch SiteSettings for Meta Ad campaign reach/impressions
+    // Fetch SiteSettings for Meta Ad campaign reach/impressions/engagement
     const settings = await SiteSettings.findOne({ key: 'general' });
     const adImpressions = settings?.metaAdImpressions || 0;
     const adReach = settings?.metaAdReach || 0;
+    const metaInteractions = settings?.metaInteractions || 0;
+    const metaPageEngagement = settings?.metaPageEngagement || 0;
+    const metaPostReactions = settings?.metaPostReactions || 0;
     const ctr = adImpressions > 0 ? ((totalMetaViews / adImpressions) * 100).toFixed(2) : null;
 
     res.json({
@@ -300,6 +303,9 @@ exports.getAnalyticsSummary = async (req, res, next) => {
           unique: metaUnique.length,
           adImpressions,
           adReach,
+          metaInteractions,
+          metaPageEngagement,
+          metaPostReactions,
           ctr,
           lastSyncedAt: settings?.lastSyncedAt || null
         },
@@ -383,12 +389,21 @@ exports.getMetaSettings = async (req, res, next) => {
   }
 };
 
-// @desc    Update Meta Ads settings (impressions, reach, or API token)
+// @desc    Update Meta Ads settings (impressions, reach, engagement, or API token)
 // @route   PUT /api/analytics/meta-settings
 // @access  Private / Admin
 exports.updateMetaSettings = async (req, res, next) => {
   try {
-    const { metaAdImpressions, metaAdReach, metaAdAccountId, metaAccessToken } = req.body;
+    const { 
+      metaAdImpressions, 
+      metaAdReach, 
+      metaInteractions, 
+      metaPageEngagement, 
+      metaPostReactions, 
+      metaAdAccountId, 
+      metaAccessToken 
+    } = req.body;
+
     let settings = await SiteSettings.findOne({ key: 'general' });
     if (!settings) {
       settings = new SiteSettings({ key: 'general' });
@@ -396,12 +411,15 @@ exports.updateMetaSettings = async (req, res, next) => {
 
     if (metaAdImpressions !== undefined) settings.metaAdImpressions = Number(metaAdImpressions) || 0;
     if (metaAdReach !== undefined) settings.metaAdReach = Number(metaAdReach) || 0;
+    if (metaInteractions !== undefined) settings.metaInteractions = Number(metaInteractions) || 0;
+    if (metaPageEngagement !== undefined) settings.metaPageEngagement = Number(metaPageEngagement) || 0;
+    if (metaPostReactions !== undefined) settings.metaPostReactions = Number(metaPostReactions) || 0;
     if (metaAdAccountId !== undefined) settings.metaAdAccountId = String(metaAdAccountId || '').trim();
     if (metaAccessToken !== undefined) settings.metaAccessToken = String(metaAccessToken || '').trim();
     settings.lastSyncedAt = new Date();
 
     await settings.save();
-    res.json({ success: true, message: 'Meta Ad impressions updated successfully!', data: settings });
+    res.json({ success: true, message: 'Meta Ad stats updated successfully!', data: settings });
   } catch (error) {
     next(error);
   }

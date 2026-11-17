@@ -15,6 +15,18 @@ const siteSettingsSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  metaInteractions: {
+    type: Number,
+    default: 0
+  },
+  metaPageEngagement: {
+    type: Number,
+    default: 0
+  },
+  metaPostReactions: {
+    type: Number,
+    default: 0
+  },
   metaAdAccountId: {
     type: String,
     default: ''
