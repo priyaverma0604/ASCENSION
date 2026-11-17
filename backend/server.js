@@ -39,7 +39,31 @@ if (process.env.NODE_ENV !== 'production') {
   app.use(morgan('dev'));
 }
 
-// Serve local uploads folder with aggressive browser caching & ETags (30 days)
+// Cloudinary CDN Redirect for /uploads:
+// Offload all image traffic from Render directly to Cloudinary edge CDN
+const cloudinaryMapPath = path.join(__dirname, 'scripts/cloudinary_url_map.json');
+let cloudinaryUrlMap = {};
+if (fs.existsSync(cloudinaryMapPath)) {
+  try {
+    cloudinaryUrlMap = JSON.parse(fs.readFileSync(cloudinaryMapPath, 'utf8'));
+  } catch (e) {}
+}
+
+app.use('/uploads', (req, res, next) => {
+  const cleanPath = `/uploads${req.path}`;
+  if (cloudinaryUrlMap[cleanPath]) {
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    return res.redirect(301, cloudinaryUrlMap[cleanPath]);
+  }
+  const baseName = req.path.split('/').pop();
+  if (baseName && cloudinaryUrlMap[baseName]) {
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    return res.redirect(301, cloudinaryUrlMap[baseName]);
+  }
+  next();
+});
+
+// Serve local uploads folder with aggressive browser caching & ETags (30 days fallback)
 app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
   maxAge: '30d',
   etag: true,
